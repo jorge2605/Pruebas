@@ -240,35 +240,40 @@ public class Evaluacion extends javax.swing.JInternalFrame implements ActionList
             double totalUsd = 0;
             double totalMxn = 0;
             double totalNull = 0;
-            while(rs.next()){
-                double precioMxn;
-                String proveedor = rs.getString("Proveedor");
-                String sql2 = "select Nombre, Moneda from registroprov_compras where Nombre like '"+proveedor+"'";
+            String pro = lblProyecto.getText();
+            System.out.println(pro);
+            if(!pro.equals("MATERIAL DE OFICINA") && !pro.equals("MATERIAL DE MANTENIMIENTO") && !pro.equals("MATERIAL DE LIMPIEZA")
+                     && !pro.equals("HERRAMIENTAS") && !pro.equals("SEGURIDAD")){
+                while(rs.next()){
+                    double precioMxn;
+                    String proveedor = rs.getString("Proveedor");
+                    String sql2 = "select Nombre, Moneda from registroprov_compras where Nombre like '"+proveedor+"'";
+                    Statement st2 = con.createStatement();
+                    ResultSet rs2 = st2.executeQuery(sql2);
+                    String moneda = null;
+                    while(rs2.next()){
+                        moneda = rs2.getString("Moneda");
+                    }
+                    try{precioMxn = Double.parseDouble(rs.getString("Precio"));}catch(Exception e){precioMxn = 0;}
+
+                    if(moneda == null){
+                        totalNull += precioMxn;
+                    }else if(moneda.equals("MXN")){
+                        totalMxn += precioMxn;
+                    }else{
+                        totalUsd += precioMxn;
+                    }
+
+                }
+                DecimalFormat format = new DecimalFormat("#,###.##");
+                lblGastado.setText("MXN: " + String.valueOf(format.format(totalMxn)) + " USD: " + format.format(totalUsd) + " Sin definir: "+format.format(totalNull));
+
+                sql = "select Costo, Moneda, Proyecto from proyectos where Proyecto like '"+lblProyecto.getText()+"'";
                 Statement st2 = con.createStatement();
-                ResultSet rs2 = st2.executeQuery(sql2);
-                String moneda = null;
+                ResultSet rs2 = st2.executeQuery(sql);
                 while(rs2.next()){
-                    moneda = rs2.getString("Moneda");
+                    lblTotal.setText(rs2.getString("Costo") + " " + rs2.getString("Moneda"));
                 }
-                try{precioMxn = Double.parseDouble(rs.getString("Precio"));}catch(Exception e){precioMxn = 0;}
-                
-                if(moneda == null){
-                    totalNull += precioMxn;
-                }else if(moneda.equals("MXN")){
-                    totalMxn += precioMxn;
-                }else{
-                    totalUsd += precioMxn;
-                }
-                
-            }
-            DecimalFormat format = new DecimalFormat("#,###.##");
-            lblGastado.setText("MXN: " + String.valueOf(format.format(totalMxn)) + " USD: " + format.format(totalUsd) + " Sin definir: "+format.format(totalNull));
-            
-            sql = "select Costo, Moneda, Proyecto from proyectos where Proyecto like '"+lblProyecto.getText()+"'";
-            Statement st2 = con.createStatement();
-            ResultSet rs2 = st2.executeQuery(sql);
-            while(rs2.next()){
-                lblTotal.setText(rs2.getString("Costo") + " " + rs2.getString("Moneda"));
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error: "+e,"error",JOptionPane.ERROR_MESSAGE);
@@ -392,7 +397,7 @@ public class Evaluacion extends javax.swing.JInternalFrame implements ActionList
         jScrollPane1.setPreferredSize(new java.awt.Dimension(250, 100));
 
         PanelPedidos.setBackground(new java.awt.Color(255, 255, 255));
-        PanelPedidos.setPreferredSize(new java.awt.Dimension(100, 1500));
+        PanelPedidos.setPreferredSize(new java.awt.Dimension(100, 100));
         PanelPedidos.setLayout(new java.awt.GridBagLayout());
         jScrollPane1.setViewportView(PanelPedidos);
 
