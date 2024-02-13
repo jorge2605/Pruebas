@@ -300,10 +300,10 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     
     public void limpiarTablaImportada(){
         DefaultTableModel miModelo;
-        String titulos[] = {"ID","DESCRIPCION","NUMERO PARTE","U.M.","CANTIDAD","PRECIO","TOTAL","PROVEEDOR","TE","NO. ITEM"};
+        String titulos[] = {"ID","DESCRIPCION","NUMERO PARTE","U.M.","CANTIDAD","PRECIO","TOTAL","PROVEEDOR","TE","NO. ITEM","CANTIDAD ENCONTRADA"};
         miModelo = (new DefaultTableModel(null,titulos){
         boolean[] canEdit = new boolean [] {
-            false, true, true, true, true, true, true, true, true
+            false, true, true, true, true, true, true, true, true, false,false
         };
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -393,8 +393,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             datos1[7] = rs1.getString("Proveedor");
                             datos1[8] = rs1.getString("TE");
                             datos1[9] = rs1.getString("TE");
-                            datos1[10] = rs1.getString("Estado");
-                            if((datos1[10]) != null){
+                            datos1[10] = rs1.getString("cantidadStock");
+                            datos1[13] = rs1.getString("Estado");
+                            if((datos1[13]) != null){
                                 miModelo.addRow(datos1);
                             }
                         }
@@ -528,8 +529,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         datos1[7] = rs1.getString("Proveedor");
                         datos1[8] = rs1.getString("TE");
                         datos1[9] = rs1.getString("TE");
-                        datos1[10] = rs1.getString("OC");
-                        if((datos1[10]) == null){
+                        datos1[10] = rs1.getString("cantidadStock");
+                        datos1[13] = rs1.getString("OC");
+                        if((datos1[13]) == null){
                         miModelo.addRow(datos1);
                         }
 
@@ -565,10 +567,11 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         datos[5] = rs.getString("Precio");
                         datos[7] = rs.getString("Proveedor");
                         datos[8] = rs.getString("TE");
+                        datos[10] = rs.getString("cantidadStock");
                         datos[9] = String.valueOf(cont);
                         cont++;
-                        datos[10] = rs.getString("OC");
-                        if((datos[10]) == null){
+                        datos[13] = rs.getString("OC");
+                        if((datos[13]) == null){
                             miModelo.addRow(datos);
                         }
                         Statement st20 = con.createStatement();
@@ -738,6 +741,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             int n = 0, n2 = 0;
             for (int i = 0; i < Tabla2.getRowCount(); i++) {
                 String UM,Precio,Proveedor,TE;
+                double cantStock,cantidad;
+                try{cantStock = Double.parseDouble(Tabla2.getValueAt(i, 10).toString());}catch(Exception e){cantStock = 0;}
+                try{cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());}catch(Exception e){cantidad = 0;}
                 
                 if(Tabla2.getValueAt(i, 3) == null){
                     UM = "";
@@ -776,7 +782,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             pst5.setString(1, Tabla2.getValueAt(i, 1).toString());
                             pst5.setString(2, Tabla2.getValueAt(i, 2).toString());
                             pst5.setString(3, UM);
-                            pst5.setString(4, Tabla2.getValueAt(i, 4).toString());
+                            pst5.setString(4, String.valueOf(cantidad + cantStock));
                             pst5.setString(5, Precio);
                             pst5.setString(6, Proveedor);
                             pst5.setString(7, TE);
@@ -794,7 +800,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             pst.setString(1, Tabla2.getValueAt(i, 1).toString());
                             pst.setString(2, Tabla2.getValueAt(i, 2).toString());
                             pst.setString(3, UM);
-                            pst.setString(4, Tabla2.getValueAt(i, 4).toString());
+                            pst.setString(4, String.valueOf(cantidad + cantStock));
                             pst.setString(5, Precio);
                             pst.setString(6, Proveedor);
                             pst.setString(7, TE);
@@ -816,7 +822,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 pst.setString(1, Tabla2.getValueAt(i, 1).toString());
                 pst.setString(2, Tabla2.getValueAt(i, 2).toString());
                 pst.setString(3, UM);
-                pst.setString(4, Tabla2.getValueAt(i, 4).toString());
+                pst.setString(4, String.valueOf(cantidad + cantStock));
                 pst.setString(5, Precio);
                 pst.setString(6, Proveedor);
                 pst.setString(7, TE);
@@ -868,7 +874,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         PreparedStatement pst = con.prepareStatement(inse);
                         pst.setString(1, Tabla2.getValueAt(i, 2).toString());
                         pst.setString(2, Tabla2.getValueAt(i, 1).toString());
-                        pst.setString(3, Tabla2.getValueAt(i, 4).toString());
+                        pst.setString(3, "0");
                         pst.setString(4, Tabla2.getValueAt(i, 3).toString());
                         pst.setString(5, Tabla2.getValueAt(i, 7).toString());
                         
@@ -879,7 +885,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         PreparedStatement pst = con.prepareStatement(inse);
                         pst.setString(1, Tabla2.getValueAt(i, 2).toString());
                         pst.setString(2, Tabla2.getValueAt(i, 1).toString());
-                        pst.setString(3, Tabla2.getValueAt(i, 4).toString());
+                        pst.setString(3, "0");
                         pst.setString(4, Tabla2.getValueAt(i, 3).toString());
                         pst.setString(5, Tabla2.getValueAt(i, 7).toString());
                         
@@ -902,7 +908,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         pst2.setString(2, Tabla2.getValueAt(i, 2).toString());
                         pst2.setString(3, Tabla2.getValueAt(i, 1).toString());
                         pst2.setString(4, dat[1]);
-                        pst2.setString(5, Tabla2.getValueAt(i, 4).toString());
+                        pst2.setString(5, "0");
                         pst2.setString(6, dat[2]);
                         pst2.setString(7, Tabla2.getValueAt(i, 3).toString());
                         pst2.setString(8, Tabla2.getValueAt(i, 7).toString());
@@ -942,6 +948,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             
             for (int i = 0; i < Tabla2.getRowCount(); i++) {
                 String UM,Precio,Proveedor, TE;
+                double cantidad, canSt;
+                try{canSt = Double.parseDouble(Tabla2.getValueAt(i, 10).toString());}catch(Exception e){canSt = 0;}
+                try{cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());}catch(Exception e){cantidad = 0;}
                 
                 if(Tabla2.getValueAt(i, 3) == null){
                     UM = "";
@@ -979,7 +988,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             pst5.setString(1, Tabla2.getValueAt(i, 1).toString());
                             pst5.setString(2, Tabla2.getValueAt(i, 2).toString());
                             pst5.setString(3, UM);
-                            pst5.setString(4, Tabla2.getValueAt(i, 4).toString());
+                            pst5.setString(4, String.valueOf(cantidad + canSt));
                             pst5.setString(5, Precio);
                             pst5.setString(6, Proveedor);
                             
@@ -1016,7 +1025,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             pst.setString(1, Tabla2.getValueAt(i, 1).toString());
                             pst.setString(2, Tabla2.getValueAt(i, 2).toString());
                             pst.setString(3, UM);
-                            pst.setString(4, Tabla2.getValueAt(i, 4).toString());
+                            pst.setString(4, String.valueOf(cantidad + canSt));
                             pst.setString(5, Precio);
                             pst.setString(6, Proveedor);
                             
@@ -1051,7 +1060,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 pst.setString(1, Tabla2.getValueAt(i, 1).toString());
                 pst.setString(2, Tabla2.getValueAt(i, 2).toString());
                 pst.setString(3, UM);
-                pst.setString(4, Tabla2.getValueAt(i, 4).toString());
+                pst.setString(4, String.valueOf(cantidad + canSt));
                 pst.setString(5, Precio);
                 pst.setString(6, Proveedor);
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
