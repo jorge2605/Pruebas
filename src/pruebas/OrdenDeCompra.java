@@ -66,6 +66,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import scrollPane.ScrollBarCustom;
@@ -487,7 +489,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("COMPRADO")){
                         CrearOrden.setEnabled(true);
                     }
-
+                    
                 }else if(tab == 0){
                 }else{
                 //REQUISICIONES PARTE DE ARRIBA
@@ -629,6 +631,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 }
             }
             reducirCantidad();
+            verGastos();
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -3306,6 +3309,90 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         return band;
     }
     
+    public Stack<String> extraerProveedores(){
+        Stack<String> pila = new Stack<>();
+        for (int i = 0; i < Tabla2.getRowCount(); i++) {
+            boolean band = true;
+            if(Tabla2.getValueAt(i, 7) != null){
+                if(pila.isEmpty()){
+                    pila.push(Tabla2.getValueAt(i, 7).toString());
+                }
+                for (int j = 0; j < pila.size(); j++) {
+                    if(pila.get(j).equals(Tabla2.getValueAt(i, 7).toString())){
+                        band = false;
+                    }
+                }
+                if(band){
+                    pila.push(Tabla2.getValueAt(i, 7).toString());
+                }
+            }
+        }
+        return pila;
+    }
+    
+    public void crearBotones(String proveedor, String costo){
+        JPanel panel = new javax.swing.JPanel();
+        panel.setBackground(new java.awt.Color(255, 255, 255));
+        panel.setLayout(new java.awt.BorderLayout(10, 0));
+        
+        JLabel label = new javax.swing.JLabel();
+        label.setFont(new java.awt.Font("Lexend", 1, 12));
+        label.setText(proveedor + ": ");
+        panel.add(label, java.awt.BorderLayout.WEST);
+        
+        JTextField field = new javax.swing.JTextField();
+        field.setBackground(new java.awt.Color(255, 255, 255));
+        field.setEditable(false);
+        field.setText(costo);
+        field.setFont(new java.awt.Font("Lexend", 0, 12)); // NOI18N
+        field.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        field.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(153, 153, 153)));
+        field.setPreferredSize(new java.awt.Dimension(100, 17));
+        panel.add(field, java.awt.BorderLayout.CENTER);
+        
+        panelGastos.add(panel);
+    }
+    
+    public String getTotal(Connection con, String proveedor) throws SQLException{
+        String costo = "";
+        Statement st = con.createStatement();
+        String sql = "select Cantidad, Precio,Proveedor from requisiciones where Proveedor like '"+proveedor+"' and precio is not null and Precio != ''";
+        ResultSet rs = st.executeQuery(sql);
+        double total = 0;
+        while(rs.next()){
+            double cantidad,precio;
+            try{cantidad = Double.parseDouble(rs.getString("Cantidad"));}catch(Exception e){cantidad = 0;}
+            try{precio = Double.parseDouble(rs.getString("Precio"));}catch(Exception e){precio = 0;}
+            total += cantidad * precio;
+        }
+        DecimalFormat d = new DecimalFormat("#,###.##");
+        costo = d.format(total);
+        return costo;
+    }
+    
+    public void verGastos(){
+        panelGastos.removeAll();
+        revalidate();
+        repaint();
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM");
+        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date d = new Date();
+        String fecha = sdf.format(d).toUpperCase();
+        lblGastos.setText(fecha);
+        Stack<String> proveedores = extraerProveedores();
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            for (int i = 0; i < proveedores.size(); i++) {
+                crearBotones(proveedores.get(i),getTotal(con,proveedores.get(i)));
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public OrdenDeCompra(String numEmpleado) {
         initComponents();
         verDatos();
@@ -3371,6 +3458,10 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         btnCompra = new RSMaterialComponent.RSRadioButtonMaterial();
         jScrollPane3 = new javax.swing.JScrollPane();
         txtComentarios = new javax.swing.JTextArea();
+        jPanel17 = new javax.swing.JPanel();
+        lblGastos = new javax.swing.JLabel();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        panelGastos = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         lblRequi = new javax.swing.JLabel();
         lblTitulo = new javax.swing.JLabel();
@@ -3531,7 +3622,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
         btnSalir.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText(" X ");
         jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -3554,9 +3645,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel9.setFont(new java.awt.Font("Roboto", 1, 48)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 165, 252));
-        jLabel9.setText("     COMPRAS     ");
+        jLabel9.setText("Compras");
         jPanel3.add(jLabel9);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
@@ -3569,6 +3660,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jPanel4.setLayout(new java.awt.BorderLayout());
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel8.setPreferredSize(new java.awt.Dimension(1507, 75));
         jPanel8.setLayout(new javax.swing.BoxLayout(jPanel8, javax.swing.BoxLayout.LINE_AXIS));
 
         jPanel10.setBackground(new java.awt.Color(255, 255, 255));
@@ -3633,7 +3725,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             .addGroup(jPanel12Layout.createSequentialGroup()
                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCompra, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCompra, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -3642,6 +3734,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jScrollPane3.setBorder(null);
 
         txtComentarios.setEditable(false);
+        txtComentarios.setBackground(new java.awt.Color(255, 255, 255));
         txtComentarios.setColumns(20);
         txtComentarios.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtComentarios.setLineWrap(true);
@@ -3651,6 +3744,26 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jScrollPane3.setViewportView(txtComentarios);
 
         jPanel8.add(jScrollPane3);
+
+        jPanel17.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel17.setPreferredSize(new java.awt.Dimension(808, 10));
+        jPanel17.setLayout(new java.awt.BorderLayout());
+
+        lblGastos.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        lblGastos.setText("Gastos en el mes de Febrero");
+        jPanel17.add(lblGastos, java.awt.BorderLayout.PAGE_START);
+
+        jScrollPane5.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 255, 255), 1, true));
+        jScrollPane5.setMaximumSize(new java.awt.Dimension(200, 32767));
+
+        panelGastos.setBackground(new java.awt.Color(255, 255, 255));
+        panelGastos.setMinimumSize(new java.awt.Dimension(1505, 100));
+        panelGastos.setPreferredSize(new java.awt.Dimension(100, 60));
+        jScrollPane5.setViewportView(panelGastos);
+
+        jPanel17.add(jScrollPane5, java.awt.BorderLayout.CENTER);
+
+        jPanel8.add(jPanel17);
 
         jPanel11.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -3680,7 +3793,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblRequi, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
         jPanel8.add(jPanel11);
@@ -4444,6 +4557,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             }
         }
         CrearCoti.setEnabled(true);
+        extraerProveedores();
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -5530,6 +5644,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -5544,6 +5659,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JPopupMenu.Separator jSeparator3;
@@ -5552,6 +5668,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private javax.swing.JPopupMenu.Separator jSeparator6;
     private javax.swing.JPopupMenu.Separator jSeparator7;
     private javax.swing.JPopupMenu.Separator jSeparator8;
+    private javax.swing.JLabel lblGastos;
     private javax.swing.JLabel lblRequi;
     private javax.swing.JLabel lblTitulo;
     private scrollPane.PanelRound panel1;
@@ -5565,6 +5682,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private scrollPane.PanelRound panel8;
     private scrollPane.PanelRound panel9;
     private javax.swing.JPanel panelEditar;
+    private javax.swing.JPanel panelGastos;
     private javax.swing.JMenuItem pegar;
     private javax.swing.JLabel txtCambio;
     private javax.swing.JLabel txtCambio1;

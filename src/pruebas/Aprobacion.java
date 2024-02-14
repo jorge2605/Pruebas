@@ -174,6 +174,24 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
         }
     }
     
+    public void verProyecto(String proyecto){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select Proyecto, Descripcion from proyectos where Proyecto like '" + proyecto + "'";
+            ResultSet rs = st.executeQuery(sql);
+            String descripcion = "";
+            while(rs.next()){
+                descripcion = rs.getString("Proyecto");
+            }
+            txtProyecto.setText(proyecto + ": " + descripcion);
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public Aprobacion(String numEmpleado) {
         initComponents();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
@@ -207,6 +225,9 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
         jLabel9 = new javax.swing.JLabel();
         panelRound1 = new scrollPane.PanelRound();
         panelRound2 = new scrollPane.PanelRound();
+        jLabel8 = new javax.swing.JLabel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        txtProyecto = new javax.swing.JTextArea();
         panelRound3 = new scrollPane.PanelRound();
         btnAceptar = new javax.swing.JButton();
         btnRechazar = new javax.swing.JButton();
@@ -219,8 +240,6 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
         jPanel5 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         txtNumero = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        txtProyecto = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
@@ -381,6 +400,30 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
         panelRound2.setPreferredSize(new java.awt.Dimension(400, 100));
         panelRound2.setRoundTopLeft(50);
         panelRound2.setRoundTopRight(50);
+        panelRound2.setLayout(new java.awt.BorderLayout());
+
+        jLabel8.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel8.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel8.setText("PROYECTO:");
+        panelRound2.add(jLabel8, java.awt.BorderLayout.NORTH);
+
+        jScrollPane4.setBorder(null);
+
+        txtProyecto.setEditable(false);
+        txtProyecto.setBackground(new java.awt.Color(255, 255, 255));
+        txtProyecto.setColumns(20);
+        txtProyecto.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        txtProyecto.setForeground(new java.awt.Color(0, 0, 0));
+        txtProyecto.setLineWrap(true);
+        txtProyecto.setRows(5);
+        txtProyecto.setWrapStyleWord(true);
+        txtProyecto.setBorder(null);
+        jScrollPane4.setViewportView(txtProyecto);
+
+        panelRound2.add(jScrollPane4, java.awt.BorderLayout.CENTER);
+
         panelRound1.add(panelRound2, java.awt.BorderLayout.PAGE_START);
 
         panelRound3.setBackground(new java.awt.Color(255, 255, 255));
@@ -486,20 +529,6 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
             }
         });
         jPanel5.add(txtNumero);
-
-        jLabel8.setBackground(new java.awt.Color(0, 0, 0));
-        jLabel8.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel8.setForeground(new java.awt.Color(0, 0, 0));
-        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("PROYECTO:");
-        jPanel5.add(jLabel8);
-
-        txtProyecto.setEditable(false);
-        txtProyecto.setBackground(new java.awt.Color(255, 255, 255));
-        txtProyecto.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        txtProyecto.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
-        jPanel5.add(txtProyecto);
 
         jLabel3.setBackground(new java.awt.Color(0, 0, 0));
         jLabel3.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
@@ -623,7 +652,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
                 }
                 txtNumero.setText(datos[7]);
                 txtNombre.setText(datos[8]);
-                txtProyecto.setText(datos[9]);
+                verProyecto(datos[9]);
                 calcularTotal();
             }else{
             int tab = Tabla1.getRowCount() - cont;
@@ -661,6 +690,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
                 txtNombre.setText(datos[8]);
                 txtFecha.setText(fecha);
                 txtProyecto.setText(datos[9]);
+                verProyecto(datos[9]);
                 calcularTotal();
             }else if(Tabla1.getSelectedRow() == tab){
                 //TITULO ORDENES EDITADAS
@@ -686,9 +716,8 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
                 datos[8] = rs.getString("Requisitor");
                 if(datos[0] != null){
                     miModelo.addRow(datos);
-                    
                 }
-                txtProyecto.setText(datos[6]);
+                verProyecto(datos[6]);
                 txtNumero.setText(id);
                 txtNombre.setText(datos[8]);
             }
@@ -972,6 +1001,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblX;
     private scrollPane.PanelRound panelRound1;
     private scrollPane.PanelRound panelRound2;
@@ -985,7 +1015,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtFecha;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtNumero;
-    private javax.swing.JTextField txtProyecto;
+    private javax.swing.JTextArea txtProyecto;
     private javax.swing.JTextField txtTotal;
     // End of variables declaration//GEN-END:variables
 }
