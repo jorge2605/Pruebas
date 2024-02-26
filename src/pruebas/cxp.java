@@ -757,21 +757,13 @@ public class cxp extends javax.swing.JInternalFrame {
                     }
                     
                 }
-//                hoja.addMergedRegion(new CellRangeAddress (
-//                i+4+acumFilaTotal,
-//                i+4+acumFilaTotal,
-//                1,
-//                1
-//                ));
             }
             book.write(new FileOutputStream(a));
             book.close();
             
             try {
-            // Obtén el Desktop
             Desktop desktop = Desktop.getDesktop();
 
-            // Verifica si el Desktop es soportado y el archivo existe
             if (desktop.isSupported(Desktop.Action.OPEN) && new File(a).exists()) {
                 desktop.open(new File(a));
             } else {

@@ -1,6 +1,7 @@
 package pruebas;
 
 import Conexiones.Conexion;
+import Modelo.colorAprobacion;
 import java.awt.Color;
 import java.awt.Font;
 import java.sql.Connection;
@@ -10,6 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.Stack;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -19,6 +22,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
     String estado;
     int inicio;
     public String numEmpleado;
+    public Stack<String[]> proveedores;
     
     public void limpiarTabla(){
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
@@ -63,11 +67,11 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
 
         },
         new String [] {
-            "DESCRIPCION", "CODIGO", "CANTIDAD", "PRECIO", "PROVEEDOR"
+            "Descripcion", "Codigo", "Cantidad", "Precio", "Proveedor", "Moneda"
         }
     ) {
         boolean[] canEdit = new boolean [] {
-            false, false, false, false,false
+            false, false, false, false,false,false
         };
 
         public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -88,10 +92,6 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
     jScrollPane3.getViewport().setForeground(Color.white);
         
     jScrollPane3.setViewportView(Tabla2);
-
-    if (Tabla2.getColumnModel().getColumnCount() > 0) {
-        Tabla2.getColumnModel().getColumn(0).setPreferredWidth(250);
-    }
     }
     
     public void limpiar(){
@@ -184,7 +184,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
             ResultSet rs = st.executeQuery(sql);
             String descripcion = "";
             while(rs.next()){
-                descripcion = rs.getString("Proyecto");
+                descripcion = rs.getString("Descripcion");
             }
             txtProyecto.setText(proyecto + ": " + descripcion);
         }catch(SQLException e){
@@ -192,11 +192,73 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
         }
     }
     
+    public final void descargarProveedores(){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select Nombre, Moneda, Iva, Isr from registroprov_compras";
+            ResultSet rs = st.executeQuery(sql);
+            proveedores = new Stack<>();
+            while(rs.next()){
+                String datos[] = new String[4];
+                datos[0] = rs.getString("Nombre");
+                datos[1] = rs.getString("Moneda");
+                datos[2] = rs.getString("Iva");
+                datos[3] = rs.getString("Isr");
+                proveedores.push(datos);
+                cont++;
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public String[] getArray(String proveedor){
+         for (int i = 0; i < proveedores.size(); i++) {
+            String dat[] = proveedores.get(i);
+            for (int j = 0; j < dat.length; j++) {
+                if(dat[0].equals(proveedor)){
+                    return(dat);
+                }
+            }
+        }
+        return null;
+    }
+    
+    public String[] getCalculos(int inicio, int fin, String[] datosProveedor){
+        String datos[] = new String[5];
+        double subTotal = 0;
+        for (int i = inicio; i <= fin; i++) {
+            double precio;
+            double cantidad;
+            try{precio = Double.parseDouble(Tabla2.getValueAt(i, 3).toString());}catch(Exception e){precio  = 0;}
+            try{cantidad = Double.parseDouble(Tabla2.getValueAt(i, 2).toString());}catch(Exception e){cantidad  = 0;}
+            subTotal += (precio * cantidad);
+        }
+        double iva;
+        double isr;
+        double total;
+        try{iva = Double.parseDouble(datosProveedor[2]);}catch(Exception e){iva  = 0;}
+        try{isr = Double.parseDouble(datosProveedor[3]);}catch(Exception e){isr  = 0;}
+        iva = (subTotal * iva) / 100;
+        isr = (subTotal * isr) / 100;
+        total = subTotal + iva - isr;
+        DecimalFormat df = new DecimalFormat("#,###.##");
+        datos[0] = String.valueOf(df.format(subTotal));
+        datos[1] = String.valueOf(df.format(iva));
+        datos[2] = String.valueOf(df.format(isr));
+        datos[3] = String.valueOf(df.format(total));
+        return datos;
+    }
+    
     public Aprobacion(String numEmpleado) {
         initComponents();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         limpiarTabla();
         limpiarTabla2();
+        descargarProveedores();
         estado = "requi";
         verDatos();
         revalidate();
@@ -250,7 +312,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
         jLabel1 = new javax.swing.JLabel();
         txtTotal = new javax.swing.JTextField();
         jScrollPane3 = new javax.swing.JScrollPane();
-        Tabla2 = new javax.swing.JTable();
+        Tabla2 = new colorAprobacion();
         jLabel10 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(255, 255, 255));
@@ -595,11 +657,11 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "DESCRIPCION", "CODIGO", "CANTIDAD", "PRECIO", "PROVEEDOR"
+                "Descripcion", "Codigo", "Cantidad", "Precio", "Proveedor", "Moneda"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -635,7 +697,7 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
             
             if(estado.equals("proyecto")){
                 
-                String sql = "select * from requisiciones where Id like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString()+"'";
+                String sql = "select * from requisiciones where Id like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString()+"' order by Proveedor asc";
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery(sql);
                 String datos[] = new String[10];
@@ -702,26 +764,68 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
             }else{
             //SELECCIONA REQUISICIONES PARTE DE ARRIBA
             
-            Statement st = con.createStatement();
-            String sql = "select * from Requisiciones where NumRequisicion like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString()+"'";
-            ResultSet rs = st.executeQuery(sql);
-            String datos[] = new String[10];
-            while(rs.next()){
-                datos[0] = rs.getString("Descripcion");
-                datos[1] = rs.getString("NumParte");
-                datos[2] = rs.getString("Cantidad");
-                datos[3] = rs.getString("Precio");
-                datos[4] = rs.getString("Proveedor");
-                datos[6] = rs.getString("Proyecto");
-                datos[8] = rs.getString("Requisitor");
-                if(datos[0] != null){
-                    miModelo.addRow(datos);
+                Statement st = con.createStatement();
+                String sql = "select * from Requisiciones where NumRequisicion like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString()+"' and OC is null  order by Proveedor asc";
+                ResultSet rs = st.executeQuery(sql);
+                String datos[] = new String[10];
+                String prov = "";
+                boolean band = true;
+                int inicio = 0;
+                int cont = 0;
+                String arr[] = new String[5];
+                while(rs.next()){
+                    band = true;
+                    datos[0] = rs.getString("Descripcion");
+                    datos[1] = rs.getString("NumParte");
+                    datos[2] = rs.getString("Cantidad");
+                    datos[3] = rs.getString("Precio");
+                    datos[4] = rs.getString("Proveedor");
+                    datos[6] = rs.getString("Proyecto");
+                    datos[8] = rs.getString("Requisitor");
+                    String array[] = getArray(datos[4]);
+                    arr = array;
+                    if(Tabla2.getRowCount() < 1){
+                        prov = datos[4];
+                        inicio = cont;
+                    }else if(!prov.equals(datos[4])){
+                        prov = datos[4];
+                        String calculos[] = getCalculos(inicio, cont, array);
+                        inicio = cont;
+                        String da[] = new String[6];
+                        da[0] = "Calculos:";
+                        da[1] = "";
+                        da[2] = "S: "+calculos[0];
+                        da[3] = "I: "+calculos[1];
+                        da[4] = "IS:"+calculos[2];
+                        da[5] = "T: "+calculos[3];
+                        miModelo.addRow(da);
+                        band = false;
+                    }
+                    try{
+                        datos[5] = array[1];
+                    }catch(Exception e){}
+
+                    if(datos[0] != null){
+                        miModelo.addRow(datos);
+                        band = true;
+                    }
+                    verProyecto(datos[6]);
+                    txtNumero.setText(id);
+                    txtNombre.setText(datos[8]);
+                    cont++;
                 }
-                verProyecto(datos[6]);
-                txtNumero.setText(id);
-                txtNombre.setText(datos[8]);
-            }
-            calcularTotal();
+                if(band){
+                    String calculos[] = getCalculos(inicio, cont, arr);
+                    String da[] = new String[6];
+                    da[0] = "Calculos:";
+                    da[1] = "";
+                    da[2] = "S: "+calculos[0];
+                    da[3] = "I: "+calculos[1];
+                    da[4] = "IS:"+calculos[2];
+                    da[5] = "T: "+calculos[3];
+                    miModelo.addRow(da);
+                }
+//                calcularTotal();
             }
             }
         }catch(SQLException e){
