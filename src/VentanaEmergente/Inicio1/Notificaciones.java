@@ -2,6 +2,7 @@ package VentanaEmergente.Inicio1;
 import Conexiones.ConexionChat;
 import java.awt.Color;
 import pruebas.Inicio1;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyVetoException;
@@ -15,6 +16,7 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import pruebas.Aprobacion;
 import pruebas.VerRequisiciones;
 import scrollPane.ScrollBarCustom;
@@ -28,7 +30,7 @@ public class Notificaciones extends javax.swing.JFrame implements ActionListener
     int cont, num;
     String selec[], depa[];
     String texto[];
-    public String numEmpleado;
+    String numEmpleado;
     
     public void agregarBotones(int con, String titulo, String texto, String fecha,String visto){
         panel[cont] = new JPanel();
@@ -66,7 +68,45 @@ public class Notificaciones extends javax.swing.JFrame implements ActionListener
         jPanel3.add(panel[cont]);
     }
     
-    public ],datos[2],datos[3]);
+    public void verNotificaciones(){
+        try{
+            botones = new JButton[100];
+            panel = new JPanel[100];
+            depa = new String[100];
+            selec = new String[100];
+            texto = new String[100];
+            Connection con = null;
+            ConexionChat con1 = new ConexionChat();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String not = "noti"+numero;
+            String cont = "select * from chat."+not;
+            Statement st1 = con.createStatement();
+            ResultSet rs1 = st1.executeQuery(cont);
+            int inicio = 0;
+            int fin = 0;
+            while(rs1.next()){
+                fin++;
+            }
+            inicio = fin - 10;
+            String sql = "select * from "+not+" order by Id desc limit "+0+","+15;
+            ResultSet rs = st.executeQuery(sql);
+            String datos[] = new String[10];
+            int co = -1;
+            this.cont = -1;
+            while(rs.next()){
+                co++;
+                this.cont++;
+                datos[0] = rs.getString("Titulo");
+                datos[1] = rs.getString("Texto");
+                datos[2] = rs.getString("Fecha");
+                datos[3] = rs.getString("Visto");
+                datos[4] = rs.getString("Id");
+                datos[5] = rs.getString("Departamento");
+                depa[this.cont] = datos[5];
+                selec[this.cont] = datos[4];
+                texto[this.cont] = datos[1];
+                agregarBotones(co, datos[0],datos[1],datos[2],datos[3]);
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
