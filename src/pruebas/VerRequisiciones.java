@@ -1078,19 +1078,19 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
                         }
                     }
                     if(f){
-                        String sql2 = "select Id,NumeroEmpleado, NumeroCotizacion, Estatus, Estado, Progreso, Costo, Fecha from Requisicion where Id like "+datos[0]+" order by Id desc";
+                        String sql2 = "select Id,NumeroEmpleado, NumeroCotizacion, Estatus, Estado, Progreso, Costo, Fecha from Requisicion where Id like '%"+datos[0]+"%' order by Id desc";
                         Statement st3 = con.createStatement();
                         ResultSet rs2 = st3.executeQuery(sql2);
                         String datos2[] = new String[10];
                         while(rs2.next()){
-                        datos2[0] = rs2.getString("Id");
-                        datos2[1] = rs2.getString("NumeroEmpleado");
-                        datos2[2] = rs2.getString("NumeroCotizacion");
-                        datos2[3] = rs2.getString("Estatus");
-                        datos2[4] = rs2.getString("Estado");
-                        datos2[5] = rs2.getString("Progreso");
-                        datos2[6] = rs2.getString("Costo");
-                        datos2[7] = rs2.getString("Fecha");
+                            datos2[0] = rs2.getString("Id");
+                            datos2[1] = rs2.getString("NumeroEmpleado");
+                            datos2[2] = rs2.getString("NumeroCotizacion");
+                            datos2[3] = rs2.getString("Estatus");
+                            datos2[4] = rs2.getString("Estado");
+                            datos2[5] = rs2.getString("Progreso");
+                            datos2[6] = rs2.getString("Costo");
+                            datos2[7] = rs2.getString("Fecha");
                         }
                         model.addRow(datos2);
                     }
@@ -1135,6 +1135,7 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_txtProyectoActionPerformed
 
