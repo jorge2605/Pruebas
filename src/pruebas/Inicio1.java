@@ -2609,6 +2609,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
         }
         c.setVisible(true);
+        c.getNumEmpleado();
     }//GEN-LAST:event_btnElecActionPerformed
 
     private void btnElecMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnElecMouseExited
