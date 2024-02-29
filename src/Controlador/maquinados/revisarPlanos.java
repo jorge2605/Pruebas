@@ -16,6 +16,17 @@ import pruebas.Inicio1;
 
 public class revisarPlanos {
     
+    public String CORTES = "datos";
+    public String FRESADORA = "fresadora";
+    public String CNC = "cnc";
+    public String TORNO = "torno";
+    public String ACABADOS = "acabados";
+    public String CALIDAD = "calidad";
+    public String TRATAMIENTO = "trata";
+    public String TERMINADO_TRATAMIENTO = "trata";
+    public String TERMINADO_CALIDAD = "calidad";
+    public String LIBERACION = "";
+    
     public String seleccion;
     
     public Stack checarRevisionPlano(String plano){
@@ -452,6 +463,119 @@ public class revisarPlanos {
             JOptionPane.showMessageDialog(null, "Error: "+e,"error",JOptionPane.ERROR_MESSAGE);
         }
         return cont;
+    }
+    
+    public String convertirStringToEstacion(String estacion){
+        String esta = null;
+        if(estacion != null){
+            switch (estacion) {
+                case "CORTES":
+                    return CORTES;
+                case "FRESADORA":
+                    return FRESADORA;
+                case "CNC":
+                    return CNC;
+                case "TORNO":
+                    return TORNO;
+                case "ACABADOS":
+                    return ACABADOS;
+                case "CALIDAD":
+                    return CALIDAD;
+                case "TRATAMIENTO":
+                    return TRATAMIENTO;
+                case "TERMINADO_TRATAMIENTO":
+                    return TERMINADO_TRATAMIENTO;
+                case "TERMINADO_CALIDAD":
+                    return TERMINADO_CALIDAD;
+                case "LIBERACION":
+                    return LIBERACION;
+                default:
+                    break;
+            }
+        }
+        return esta;
+    }
+    
+    public void terminarPlanoEnEstacion(String estacion, String plano, String empleado){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            estacion = convertirStringToEstacion(estacion);
+            if(estacion != null){
+                String sql = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ?, Empleado = ? where Proyecto = ?";
+                PreparedStatement pst = con.prepareStatement(sql);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                Date d = new Date();
+                String fecha = sdf.format(d);
+
+                pst.setString(1, "SI");
+                pst.setString(2, fecha);
+                pst.setString(3, fecha);
+                pst.setString(4, empleado);
+                pst.setString(5, plano);
+
+                int n = pst.executeUpdate();
+
+                if(n > 0){
+                    JOptionPane.showMessageDialog(null, "Datos Actualizados");
+                }
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null,"Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void sendToCalidad(String plano, String proyecto, String empleado){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from calidad where Proyecto like '" + plano + "'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                //Si existe plano en calidad
+                String sql2 = "update calidad set Tratamiento = ?, Terminado = ?, FechaInicio = ?, FechaFinal = ? where Proyecto = ?";
+                PreparedStatement pst = con.prepareStatement(sql2);
+                
+                pst.setString(1, "NO");
+                pst.setString(2, "NO");
+                pst.setString(3, "");
+                pst.setString(4, "");
+                pst.setString(5, plano);
+                
+                int n = pst.executeUpdate();
+                
+                if(n > 0){
+                    JOptionPane.showMessageDialog(null, "Datos enviados a calidad");
+                }
+                
+            }else{
+                //Si no existe plano en calidad
+                String sql2 = "insert into calidad (Tratamiento, Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Cronometro, Prioridad, Empleado) values(?,?,?,?,?,?,?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql2);
+                
+                pst.setString(1, "NO");
+                pst.setString(2, "NO");
+                pst.setString(3, "");
+                pst.setString(4, "");
+                pst.setString(5, plano);
+                pst.setString(6, proyecto);
+                pst.setString(7, "00:00");
+                pst.setString(8, "60");
+                pst.setString(9, empleado);
+                
+                int n = pst.executeUpdate();
+                
+                if(n > 0){
+                    JOptionPane.showMessageDialog(null, "Datos enviados a calidad");
+                }
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
     }
     
 }

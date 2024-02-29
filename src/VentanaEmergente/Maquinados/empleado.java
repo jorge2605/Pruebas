@@ -1,25 +1,27 @@
 package VentanaEmergente.Maquinados;
 
+import java.awt.KeyboardFocusManager;
+
 public class empleado extends javax.swing.JDialog {
 
     int x,y;
     
     public String getEmpleado(){
         initComponents();
-        setVisible(true);
+        txtEmpleado.requestFocusInWindow();
         return txtEmpleado.getText();
     }
     
     public empleado(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         setLocationRelativeTo(parent);
+        
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         panelIngresar = new javax.swing.JPanel();
         btnIngresar = new javax.swing.JButton();
@@ -27,6 +29,11 @@ public class empleado extends javax.swing.JDialog {
         txtEmpleado = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        pnlX = new javax.swing.JPanel();
+        btnX = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
@@ -35,25 +42,6 @@ public class empleado extends javax.swing.JDialog {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new java.awt.BorderLayout(10, 10));
-
-        jLabel1.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(0, 102, 204));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("<html>\n<div style = 'width:300px; text-align:center;'>\nIngresa tu numero de empleado\n</div>");
-        jLabel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                jLabel1MouseDragged(evt);
-            }
-        });
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                jLabel1MousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jLabel1MouseReleased(evt);
-            }
-        });
-        jPanel1.add(jLabel1, java.awt.BorderLayout.PAGE_START);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 40, 10));
@@ -100,6 +88,49 @@ public class empleado extends javax.swing.JDialog {
         jPanel5.add(jLabel3, java.awt.BorderLayout.LINE_START);
 
         jPanel1.add(jPanel5, java.awt.BorderLayout.CENTER);
+
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("<html>\n<div style = 'width:300px; text-align:center;'>\nIngresa tu numero de empleado\n</div>");
+        jLabel1.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                jLabel1MouseDragged(evt);
+            }
+        });
+        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jLabel1MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jLabel1MouseReleased(evt);
+            }
+        });
+        jPanel3.add(jLabel1, java.awt.BorderLayout.CENTER);
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        pnlX.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnX.setBackground(new java.awt.Color(255, 255, 255));
+        btnX.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        btnX.setText(" X ");
+        btnX.setBorder(null);
+        btnX.setBorderPainted(false);
+        btnX.setContentAreaFilled(false);
+        btnX.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnX.setFocusPainted(false);
+        pnlX.add(btnX);
+
+        jPanel4.add(pnlX);
+
+        jPanel3.add(jPanel4, java.awt.BorderLayout.PAGE_START);
+
+        jPanel1.add(jPanel3, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -171,13 +202,17 @@ public class empleado extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton btnIngresar;
+    public javax.swing.JButton btnX;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel panelIngresar;
+    private javax.swing.JPanel pnlX;
     public javax.swing.JTextField txtEmpleado;
     // End of variables declaration//GEN-END:variables
 }
