@@ -1,18 +1,20 @@
 package pruebas;
 
 import Conexiones.Conexion;
+import Controlador.maquinados.revisarPlanos;
 import VentanaEmergente.Maquinados.empleado;
-import com.mxrck.autocompleter.TextAutoCompleter;
 import com.mysql.jdbc.Connection;
 import java.awt.Color;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -28,6 +30,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     public Stack<String> nombreEmpleados;
     public int PROYECTO = 1;
     public int PLANO = 2;
+    public empleado emp;
     
     public void limpiarFormulario(){
         txtPlano2.setText("");
@@ -104,9 +107,11 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     public String getNumEmpleado(){
         String empleado;
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        empleado emp = new empleado(f,true);
+        emp = new empleado(f,true);
         empleado = emp.getEmpleado();
-        addEmpleados(empleado);
+        
+        emp.btnX.addActionListener(this);
+        emp.setVisible(true);
         return empleado;
     }
     
@@ -189,13 +194,28 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         }
     }
     
+    public String extraerBotones(){
+        Stack<String> botones = new Stack<>();
+        if(pnlCnc.getBackground().equals(Color.green)){
+            botones.push("Cnc");
+        }
+        if(pnlFresa.getBackground().equals(Color.green)){
+            botones.push("Fresadora");
+        }
+        if(pnlTorno.getBackground().equals(Color.green)){
+            botones.push("Torno");
+        }
+        if(pnlRecti.getBackground().equals(Color.green)){
+            botones.push("Rectificadora");
+        }
+        return botones.toString();
+    }
+    
     public Maquinados(String numEmpleado) {
         initComponents();
         this.numEmpleado = numEmpleado;
         jScrollPane5.getVerticalScrollBar().setUnitIncrement(15);
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-//        String empleado = getNumEmpleado();
-        
     }
 
     @SuppressWarnings("unchecked")
@@ -353,6 +373,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         btnGuardar.setContentAreaFilled(false);
         btnGuardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardar.setFocusPainted(false);
+        btnGuardar.setNextFocusableComponent(txtPlano);
         btnGuardar.setPreferredSize(new java.awt.Dimension(180, 40));
         btnGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -603,7 +624,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel10.setFont(new java.awt.Font("Lexend", 1, 18)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(153, 204, 255));
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setText("Maquina:");
+        jLabel10.setText("<html> \n<span style='color: rgb(240,0,0)'>* </span> \n<span>Maquina:</span>");
         jPanel18.add(jLabel10, java.awt.BorderLayout.WEST);
 
         jPanel19.setBackground(new java.awt.Color(255, 255, 255));
@@ -701,7 +722,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel11.setFont(new java.awt.Font("Lexend", 1, 18)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(153, 204, 255));
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel11.setText("Tiempo:");
+        jLabel11.setText("<html> \n<span style='color: rgb(240,0,0)'>* </span> \n<span>Tiempo:</span>");
         jPanel20.add(jLabel11, java.awt.BorderLayout.WEST);
 
         jPanel21.setBackground(new java.awt.Color(255, 255, 255));
@@ -787,7 +808,57 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     }//GEN-LAST:event_lblSalirMouseExited
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        this.numEmpleado = getNumEmpleado();
+        if(txtPlano2.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debes llenar el campo de plano","Advertencia",JOptionPane.WARNING_MESSAGE);
+        } else if(txtProyecto.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debes llenar el campo de proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
+        } else if(txtCantidad.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debes llenar el campo de cantidad","Advertencia",JOptionPane.WARNING_MESSAGE);
+        } else if(txtTiempo.getText().equals("") || txtTiempo2.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debes llenar el campo de tiempo","Advertencia",JOptionPane.WARNING_MESSAGE);
+        } else if(extraerBotones().equals("[]")){
+            JOptionPane.showMessageDialog(this, "Debes seleccionar por lo menos una maquina","Advertencia",JOptionPane.WARNING_MESSAGE);
+        }else{
+            try{
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date d = new Date(); 
+                String fecha = sdf.format(d);
+                String sql = "insert into maquinados (Plano, Proyecto, Tiempo, Empleado, Dimension, Material, Maquina,Fecha) values(?,?,?,?,?,?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql);
+
+                pst.setString(1, txtPlano2.getText());
+                pst.setString(2, txtProyecto.getText());
+                pst.setString(3, txtTiempo.getText() + ":" + txtTiempo2.getText());
+                pst.setString(4, numEmpleado);
+                pst.setString(5, txtDimensiones.getText());
+                pst.setString(6, txtMaterial.getText());
+                pst.setString(7, extraerBotones());
+                pst.setString(8, fecha);
+
+                int n = pst.executeUpdate();
+
+                if(n > 0){
+                    KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+                    manager.focusNextComponent();
+                    revisarPlanos revisar = new revisarPlanos();
+                    String estacion = revisar.buscar(txtPlano2.getText());
+                    revisar.terminarPlanoEnEstacion(estacion, txtPlano2.getText(), numEmpleado);
+                    revisar.sendToCalidad(txtPlano2.getText(), txtProyecto.getText(), numEmpleado);
+                    JOptionPane.showMessageDialog(this, "Datos Guardados");
+                    limpiarFormulario();
+
+                }else{
+                    JOptionPane.showMessageDialog(this, "Datos no guardados","Error",JOptionPane.ERROR_MESSAGE);
+                }
+
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+            }
+            this.numEmpleado = getNumEmpleado();
+        }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnFresaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFresaActionPerformed
@@ -823,6 +894,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                 txtCantidad.setText(rs.getString("Cantidad"));
                 txtMaterial.setText(rs.getString("Material"));
             }
+            KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+            manager.focusNextComponent();
             if(plano == null){
                 plano = verificarNomenclatura(txtPlano.getText(),PLANO );
                 verPlano(plano);
@@ -983,9 +1056,17 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < btnEmpleado.size(); i++) {
-            if(e.getSource() == btnEmpleado.get(i)){
-                String empleado = getNumEmpleado();
+        if(btnEmpleado != null){
+            for (int i = 0; i < btnEmpleado.size(); i++) {
+                if(e.getSource() == btnEmpleado.get(i)){
+                    numEmpleado = getNumEmpleado();
+                }
+            }
+        }
+        if(emp != null){
+            if(e.getSource() == emp.btnX){
+                emp.dispose();
+                this.dispose();
             }
         }
     }
