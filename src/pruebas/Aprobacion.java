@@ -782,37 +782,41 @@ public final class Aprobacion extends javax.swing.JInternalFrame {
                     datos[4] = rs.getString("Proveedor");
                     datos[6] = rs.getString("Proyecto");
                     datos[8] = rs.getString("Requisitor");
-                    String array[] = getArray(datos[4]);
-                    arr = array;
-                    if(Tabla2.getRowCount() < 1){
-                        prov = datos[4];
-                        inicio = cont;
-                    }else if(!prov.equals(datos[4])){
-                        prov = datos[4];
-                        String calculos[] = getCalculos(inicio, cont, array);
-                        inicio = cont;
-                        String da[] = new String[6];
-                        da[0] = "Calculos:";
-                        da[1] = "";
-                        da[2] = "S: "+calculos[0];
-                        da[3] = "I: "+calculos[1];
-                        da[4] = "IS:"+calculos[2];
-                        da[5] = "T: "+calculos[3];
-                        miModelo.addRow(da);
-                        band = false;
-                    }
-                    try{
-                        datos[5] = array[1];
-                    }catch(Exception e){}
+                    if(datos[3] != null){
+                        if(!datos[3].equals("")){
+                            String array[] = getArray(datos[4]);
+                            arr = array;
+                            if(Tabla2.getRowCount() < 1){
+                                prov = datos[4];
+                                inicio = cont;
+                            }else if(!prov.equals(datos[4])){
+                                prov = datos[4];
+                                String calculos[] = getCalculos(inicio, cont, array);
+                                inicio = cont;
+                                String da[] = new String[6];
+                                da[0] = "Calculos:";
+                                da[1] = "";
+                                da[2] = "S: "+calculos[0];
+                                da[3] = "I: "+calculos[1];
+                                da[4] = "IS:"+calculos[2];
+                                da[5] = "T: "+calculos[3];
+                                miModelo.addRow(da);
+                                band = false;
+                            }
+                            try{
+                                datos[5] = array[1];
+                            }catch(Exception e){}
 
-                    if(datos[0] != null){
-                        miModelo.addRow(datos);
-                        band = true;
+                            if(datos[0] != null){
+                                miModelo.addRow(datos);
+                                band = true;
+                            }
+                            verProyecto(datos[6]);
+                            txtNumero.setText(id);
+                            txtNombre.setText(datos[8]);
+                            cont++;
+                        }
                     }
-                    verProyecto(datos[6]);
-                    txtNumero.setText(id);
-                    txtNombre.setText(datos[8]);
-                    cont++;
                 }
                 if(band){
                     String calculos[] = getCalculos(inicio, cont, arr);

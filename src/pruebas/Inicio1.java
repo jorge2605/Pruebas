@@ -52,6 +52,10 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     boolean pedido = true;
     InicioAlmacen inicioAlmacen;
     InicioCostos inicioCostos;
+    int notiCostos;
+    Evaluacion evaluacion;
+    public int HOME = 1;
+    public int COSTOS = 2;
     
     public void activar(){
         Thread hilo = new Thread() {
@@ -258,6 +262,71 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         }
     }
     
+    public final int getCostos(String numEmpleado, int seleccion){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from requisicion where Progreso like 'EVALUACION'";
+            ResultSet rs = st.executeQuery(sql);
+            int cont = 0;
+            while(rs.next()){
+                cont++;
+            }
+            if(seleccion == COSTOS){
+                cont--;
+            }
+            return cont;
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        return 0;
+    }
+    
+    public String getEmpleadoCostos(String numEmpleado){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            Statement st2 = con.createStatement();
+            String sql2 = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "'";
+            ResultSet rs2 = st2.executeQuery(sql2);
+            String costos = null;
+            while(rs2.next()){
+                costos = rs2.getString("Costos");
+            }
+            return costos;
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"error",JOptionPane.ERROR_MESSAGE);
+        }
+        return null;
+    }
+    
+    public void checkCostos(){
+        boolean band = true;
+        Thread hilo = new Thread(new Runnable() {
+            public void run() {
+                while(band) {
+                    try {
+                        notiCostos = getCostos(lblId.getText(), HOME);
+                        if(notiCostos == 0){
+                            lblNotiCostos.setVisible(false);
+                        }else{
+                            lblNotiCostos.setVisible(true);
+                            lblNotiCostos.setText(String.valueOf(notiCostos));
+                        }
+                        sleep(90000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        hilo.start();
+    }
+    
     public Inicio1(String numero, String nombre) {
         initComponents();
         lblId.setText(numero);
@@ -268,19 +337,17 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             errores.setVisible(false);
         }
         lblNombre.setText(nombre);
-        
         setLocationRelativeTo(null);
         setTitle("SERVICIOS INDUSTRIALES 3i");
         this.setIconImage(new ImageIcon(getClass().getResource("/Imagenes/towi_Azul.png")).getImage()); 
         btnCalidad.setComponentPopupMenu(jPopupMenu1);
-//        iniciarServidor();
-//        verNotificaciones(); 
-//        activar(); 
         pedido = false;
-//        actualizar(); 
         cargarUbicacionVentana(this);
         this.setExtendedState(Inicio1.MAXIMIZED_BOTH);
         getPrecioDolar();
+        if(getEmpleadoCostos(numero) != null){
+            checkCostos();
+        }
     }
 
    
@@ -443,6 +510,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         rSPanelRound34 = new rojeru_san.rspanel.RSPanelRound();
         btnCostos = new javax.swing.JButton();
         jLabel33 = new javax.swing.JLabel();
+        lblNotiCostos = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
 
         miReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/excel_1.png"))); // NOI18N
@@ -2171,15 +2239,28 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         });
         rSPanelRound34.add(btnCostos);
 
-        jPanel41.add(rSPanelRound34, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        jPanel41.add(rSPanelRound34, gridBagConstraints);
 
         jLabel33.setFont(new java.awt.Font("Roboto Medium", 0, 14)); // NOI18N
         jLabel33.setForeground(new java.awt.Color(51, 51, 51));
         jLabel33.setText("Costos");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         jPanel41.add(jLabel33, gridBagConstraints);
+
+        lblNotiCostos.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblNotiCostos.setForeground(new java.awt.Color(255, 255, 255));
+        lblNotiCostos.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblNotiCostos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/CR.png"))); // NOI18N
+        lblNotiCostos.setText("0");
+        lblNotiCostos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel41.add(lblNotiCostos, gridBagConstraints);
 
         jPanel7.add(jPanel41);
 
@@ -2954,6 +3035,12 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private void btnCostosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCostosActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         inicioCostos = new InicioCostos(f,true);
+        if(notiCostos == 0){
+            inicioCostos.lblNotiCostos.setVisible(false);
+        }else{
+            inicioCostos.lblNotiCostos.setVisible(true);
+            inicioCostos.lblNotiCostos.setText(String.valueOf(notiCostos));
+        }
         inicioCostos.setLocationRelativeTo(f);
         inicioCostos.btnCostos.addActionListener(this);
         inicioCostos.btnEvaluacion.addActionListener(this);
@@ -3107,6 +3194,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JLabel lblId1;
     private javax.swing.JLabel lblId2;
     public static javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblNotiCostos;
     private javax.swing.JMenuItem miReporte;
     private javax.swing.JPanel panel11;
     private javax.swing.JPanel panel12;
@@ -3251,17 +3339,36 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
                 c.setVisible(true);
             }else if(e.getSource() == inicioCostos.btnEvaluacion){
                 inicioCostos.dispose();
-                Evaluacion c = new Evaluacion(lblId.getText());
-                jDesktopPane1.add(c);
-                c.toFront();
-                c.setLocation(jDesktopPane1.getWidth() / 2 - c.getWidth() / 2, jDesktopPane1.getHeight() / 2 - c.getHeight() / 2);
+                evaluacion = new Evaluacion(lblId.getText());
+                evaluacion.btnAceptar.addActionListener(this);
+                evaluacion.btnRechazar.addActionListener(this);
+                jDesktopPane1.add(evaluacion);
+                evaluacion.toFront();
+                evaluacion.setLocation(jDesktopPane1.getWidth() / 2 - evaluacion.getWidth() / 2, jDesktopPane1.getHeight() / 2 - evaluacion.getHeight() / 2);
                 try{
-                    c.setMaximum(true);
+                    evaluacion.setMaximum(true);
                 }catch(PropertyVetoException ex){
                     Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
                 }
         //        c.insertarSemanas();
-                c.setVisible(true);
+                evaluacion.setVisible(true);
+            }
+        }
+        
+        if(evaluacion != null){
+            if(e.getSource() == evaluacion.btnAceptar || e.getSource() == evaluacion.btnRechazar){
+                notiCostos = getCostos(lblId.getText(), COSTOS);
+                if(notiCostos == 0){
+                    lblNotiCostos.setVisible(false);
+                    this.revalidate();
+                    this.repaint();
+                }else{
+                    System.err.println("se activa uno de los 2 botones");
+                    lblNotiCostos.setText(String.valueOf(notiCostos));
+                    lblNotiCostos.setVisible(true);
+                    this.revalidate();
+                    this.repaint();
+                }
             }
         }
     }

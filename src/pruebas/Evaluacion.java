@@ -693,8 +693,8 @@ public class Evaluacion extends javax.swing.JInternalFrame implements ActionList
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PanelPedidos;
     private javax.swing.JTable Tabla1;
-    private javax.swing.JButton btnAceptar;
-    private javax.swing.JButton btnRechazar;
+    public javax.swing.JButton btnAceptar;
+    public javax.swing.JButton btnRechazar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
@@ -722,7 +722,7 @@ public class Evaluacion extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JLabel lblProyecto;
     private javax.swing.JLabel lblRequi;
     private javax.swing.JLabel lblRequisitor;
-    private javax.swing.JLabel lblSalir;
+    public javax.swing.JLabel lblSalir;
     private javax.swing.JLabel lblTotal;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelAceptar;
