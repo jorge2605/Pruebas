@@ -1419,23 +1419,19 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                     if(IndiceColumna > 1 && IndiceColumna < 6){
                     String a = "";
                         
-                    
-//                        if(celda!=null){
-                            
-                            switch (celda.getCellType()){
-                                case NUMERIC:
-                                    ListaColumna[IndiceColumna]=(celda.getNumericCellValue());
-                                    break;
-                                case STRING:
-                                    ListaColumna[IndiceColumna]=celda.getStringCellValue();
-                                    break;
-                                case BOOLEAN:
-                                    ListaColumna[IndiceColumna]=celda.getBooleanCellValue();
-                                    break;
-                                default:
-                                     break;
-                            }
-//                        }
+                    switch (celda.getCellType()){
+                        case NUMERIC:
+                            ListaColumna[IndiceColumna]=(celda.getNumericCellValue());
+                            break;
+                        case STRING:
+                            ListaColumna[IndiceColumna]=celda.getStringCellValue();
+                            break;
+                        case BOOLEAN:
+                            ListaColumna[IndiceColumna]=celda.getBooleanCellValue();
+                            break;
+                        default:
+                             break;
+                    }
                         System.out.println(IndiceColumna + ", "+ ListaColumna[IndiceColumna]);
                     switch (IndiceColumna) {
                         case 2:
