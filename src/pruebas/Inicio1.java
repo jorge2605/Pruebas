@@ -104,7 +104,9 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         }
     }catch(SQLException e){
         JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-    } 
+    }   catch (ClassNotFoundException ex) { 
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
     
     public void actualizar(){
@@ -152,6 +154,8 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, ex);
         }
     
     }
@@ -184,6 +188,8 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

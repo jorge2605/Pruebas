@@ -24,316 +24,321 @@ public class InicioSesion extends javax.swing.JFrame  {
    int x,y;
    Espera espera = new Espera();
    boolean avanzar;
+   public int ERROR_AL_CONECTARSE = 1;
    
    int acum;
    
-    public void Acceso(){
-        if(avanzar){
-            try{
-            espera.activar();
-
-            espera.setSize(870, 477);
-            espera.setLocationRelativeTo(null);
-            espera.setVisible(true);
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            String datos[] = new String[50];
-            String sql = "select AES_DECRYPT(Contraseña,'mi_llave'),NumEmpleado,Nombre,Diseño,Cambio,Reportes,Carga,Ventas,Cortes,Fresa,"
-                    + "Cnc,Torno,Acabados,Calidad,Tratamiento,Electrico,CrearEmpleado,VerEmpleado,Inventario,Ensamble,InventarioPlanos,"
-                    + "Requisiciones,Orden,Aprobacion,Recibo,Prestamo,Cotizacion,VerRequisiciones,Cotizar,Apellido,ProyectMan, Remisiones, Checador from registroEmpleados where NumEmpleado like '"+Usuario.getText()+"'";
-            ResultSet rs = st.executeQuery(sql);
-            while(rs.next()){
-            datos[0] = rs.getString("NumEmpleado");
-            datos[1] = rs.getString("Nombre");
-            datos[2] = rs.getString("Diseño");
-            datos[3] = rs.getString("Cambio");
-            datos[4] = rs.getString("Reportes");
-            datos[5] = rs.getString("Carga");
-            datos[6] = rs.getString("Ventas");
-            datos[7] = rs.getString("AES_DECRYPT(Contraseña,'mi_llave')");
-            datos[8] = rs.getString("Cortes");
-            datos[9] = rs.getString("Fresa");
-            datos[10] = rs.getString("Cnc");
-            datos[11] = rs.getString("Torno");
-            datos[12] = rs.getString("Acabados");
-            datos[13] = rs.getString("Calidad");
-            datos[14] = rs.getString("Tratamiento");
-            datos[15] = rs.getString("Electrico");
-            datos[16] = rs.getString("CrearEmpleado");
-            datos[17] = rs.getString("VerEmpleado");
-            datos[18] = rs.getString("Inventario");
-            datos[19] = rs.getString("Ensamble");
-            datos[20] = rs.getString("InventarioPlanos");
-            datos[21] = rs.getString("Requisiciones");
-            datos[22] = rs.getString("Orden");
-            datos[23] = rs.getString("Aprobacion");
-            datos[24] = rs.getString("Recibo");
-            datos[25] = rs.getString("Prestamo");
-            datos[26] = rs.getString("Cotizacion");
-            datos[27] = rs.getString("VerRequisiciones");
-            datos[28] = rs.getString("Cotizar");
-            datos[29] = rs.getString("Apellido");
-            datos[30] = rs.getString("ProyectMan");
-            datos[31] = rs.getString("Remisiones");
-            datos[32] = rs.getString("Checador");
-            }
-                 System.out.println(datos[7]);
-            if(Usuario.getText().equals(datos[0]) && Contra.getText().equals(datos[7])){
-            String dir = "";
-             try{
-                 Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-                 while(interfaces.hasMoreElements())
-                 {
-                     NetworkInterface interfaz = interfaces.nextElement();
-                     Enumeration<InetAddress> direcciones = interfaz.getInetAddresses();
-                     while(direcciones.hasMoreElements()){
-                         InetAddress direccion = direcciones.nextElement();
-                         if(direccion instanceof Inet4Address
-                                 && !direccion.isLoopbackAddress()){
-
-                             dir = direccion.toString();
-                         }
-                     }
-                 }  
-             }catch(Exception e){
-                 System.out.println("ERROR: "+e);
-                 espera.dispose();
-             }
-
-             String sql3 = "update registroempleados set Ip = ? where NumEmpleado = ?";
-             PreparedStatement pst3 = con.prepareStatement(sql3);
-
-             pst3.setString(1, dir.substring(1, dir.length()));
-             pst3.setString(2, datos[0]);
-
-             pst3.executeUpdate();
-
-             espera.band = false;
-             espera.dispose();
-                Inicio1 i = new Inicio1(datos[0],datos[1]+" "+datos[29]);
-
+    public void Acceso() throws ClassNotFoundException{
+        if(ERROR_AL_CONECTARSE == 1){
+            JOptionPane.showMessageDialog(this, "Error al conectarse a la base de datos","Error",JOptionPane.ERROR_MESSAGE);
+        }else{
+            if(avanzar){
                 try{
-                i.iniciarServidor();
-                }catch(Exception e){
-                    espera.dispose();
+                espera.activar();
+
+                espera.setSize(870, 477);
+                espera.setLocationRelativeTo(null);
+                espera.setVisible(true);
+                Connection con = null;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                Statement st = con.createStatement();
+                String datos[] = new String[50];
+                String sql = "select AES_DECRYPT(Contraseña,'mi_llave'),NumEmpleado,Nombre,Diseño,Cambio,Reportes,Carga,Ventas,Cortes,Fresa,"
+                        + "Cnc,Torno,Acabados,Calidad,Tratamiento,Electrico,CrearEmpleado,VerEmpleado,Inventario,Ensamble,InventarioPlanos,"
+                        + "Requisiciones,Orden,Aprobacion,Recibo,Prestamo,Cotizacion,VerRequisiciones,Cotizar,Apellido,ProyectMan, Remisiones, Checador from registroEmpleados where NumEmpleado like '"+Usuario.getText()+"'";
+                ResultSet rs = st.executeQuery(sql);
+                while(rs.next()){
+                datos[0] = rs.getString("NumEmpleado");
+                datos[1] = rs.getString("Nombre");
+                datos[2] = rs.getString("Diseño");
+                datos[3] = rs.getString("Cambio");
+                datos[4] = rs.getString("Reportes");
+                datos[5] = rs.getString("Carga");
+                datos[6] = rs.getString("Ventas");
+                datos[7] = rs.getString("AES_DECRYPT(Contraseña,'mi_llave')");
+                datos[8] = rs.getString("Cortes");
+                datos[9] = rs.getString("Fresa");
+                datos[10] = rs.getString("Cnc");
+                datos[11] = rs.getString("Torno");
+                datos[12] = rs.getString("Acabados");
+                datos[13] = rs.getString("Calidad");
+                datos[14] = rs.getString("Tratamiento");
+                datos[15] = rs.getString("Electrico");
+                datos[16] = rs.getString("CrearEmpleado");
+                datos[17] = rs.getString("VerEmpleado");
+                datos[18] = rs.getString("Inventario");
+                datos[19] = rs.getString("Ensamble");
+                datos[20] = rs.getString("InventarioPlanos");
+                datos[21] = rs.getString("Requisiciones");
+                datos[22] = rs.getString("Orden");
+                datos[23] = rs.getString("Aprobacion");
+                datos[24] = rs.getString("Recibo");
+                datos[25] = rs.getString("Prestamo");
+                datos[26] = rs.getString("Cotizacion");
+                datos[27] = rs.getString("VerRequisiciones");
+                datos[28] = rs.getString("Cotizar");
+                datos[29] = rs.getString("Apellido");
+                datos[30] = rs.getString("ProyectMan");
+                datos[31] = rs.getString("Remisiones");
+                datos[32] = rs.getString("Checador");
                 }
-                String sql4 = "select * from actualizacion";
-                Connection con2 = null;
-                ConexionChat c = new ConexionChat();
-                con2 = c.getConnection();
-                Statement st4 = con2.createStatement();
-                ResultSet rs4 = st4.executeQuery(sql4);
-                String ver = "";
-                while(rs4.next()){
-                    ver = rs4.getString("Version");
+                     System.out.println(datos[7]);
+                if(Usuario.getText().equals(datos[0]) && Contra.getText().equals(datos[7])){
+                String dir = "";
+                 try{
+                     Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+                     while(interfaces.hasMoreElements())
+                     {
+                         NetworkInterface interfaz = interfaces.nextElement();
+                         Enumeration<InetAddress> direcciones = interfaz.getInetAddresses();
+                         while(direcciones.hasMoreElements()){
+                             InetAddress direccion = direcciones.nextElement();
+                             if(direccion instanceof Inet4Address
+                                     && !direccion.isLoopbackAddress()){
+
+                                 dir = direccion.toString();
+                             }
+                         }
+                     }  
+                 }catch(Exception e){
+                     System.out.println("ERROR: "+e);
+                     espera.dispose();
+                 }
+
+                 String sql3 = "update registroempleados set Ip = ? where NumEmpleado = ?";
+                 PreparedStatement pst3 = con.prepareStatement(sql3);
+
+                 pst3.setString(1, dir.substring(1, dir.length()));
+                 pst3.setString(2, datos[0]);
+
+                 pst3.executeUpdate();
+
+                 espera.band = false;
+                 espera.dispose();
+                    Inicio1 i = new Inicio1(datos[0],datos[1]+" "+datos[29]);
+
+                    try{
+                    i.iniciarServidor();
+                    }catch(Exception e){
+                        espera.dispose();
+                    }
+                    String sql4 = "select * from actualizacion";
+                    Connection con2 = null;
+                    ConexionChat c = new ConexionChat();
+                    con2 = c.getConnection();
+                    Statement st4 = con2.createStatement();
+                    ResultSet rs4 = st4.executeQuery(sql4);
+                    String ver = "";
+                    while(rs4.next()){
+                        ver = rs4.getString("Version");
+                    }
+
+                    if(!ver.equals(lblVersion.getText())){
+                        i.btnActualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/update on_16.png"))); // NOI18N
+                    }
+
+                i.setVisible(true);
+         //       Inicio.lblId.setText(datos[0]);
+         //       Inicio.lblNombre.setText(datos[1]+" "+datos[8]);
+                Guardar g = new Guardar(datos[1]+" "+datos[29],datos[0]);
+                 g.nombre = datos[1]+" "+datos[29];
+                 g.usuario = datos[0];
+
+                if(datos[2].equals("1")){
+                    i.btnDisenio.setEnabled(true);
+                }else{
+                    i.btnDisenio.setEnabled(false);
                 }
 
-                if(!ver.equals(lblVersion.getText())){
-                    i.btnActualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/update on_16.png"))); // NOI18N
+                if(datos[3].equals("1")){
+                    i.btnEstado.setEnabled(true);
+                }else{
+                    i.btnEstado.setEnabled(false);
                 }
 
-            i.setVisible(true);
-     //       Inicio.lblId.setText(datos[0]);
-     //       Inicio.lblNombre.setText(datos[1]+" "+datos[8]);
-            Guardar g = new Guardar(datos[1]+" "+datos[29],datos[0]);
-             g.nombre = datos[1]+" "+datos[29];
-             g.usuario = datos[0];
+                if(datos[4].equals("1")){
+                    i.btnEstado1.setEnabled(true);
+                }else{
+                    i.btnEstado1.setEnabled(false);
+                }
 
-            if(datos[2].equals("1")){
-                i.btnDisenio.setEnabled(true);
-            }else{
-                i.btnDisenio.setEnabled(false);
+                if(datos[5].equals("1")){
+                    i.btnEstado2.setEnabled(true);
+                }else{
+                    i.btnEstado2.setEnabled(false);
+                }
+
+                if(datos[6].equals("1")){
+                    i.btnEstado3.setEnabled(true);
+                }else{
+                    i.btnEstado3.setEnabled(false);
+                }
+
+                if(datos[8].equals("1")){
+                    i.btnCorte.setEnabled(true);
+                }else{
+                    i.btnCorte.setEnabled(false);
+                }
+
+                if(datos[9].equals("1")){
+                    i.btnFresa.setEnabled(true);
+                }else{
+                    i.btnFresa.setEnabled(false);
+                }
+
+                if(datos[10].equals("1")){
+                    i.btnCnc.setEnabled(true);
+                }else{
+                    i.btnCnc.setEnabled(false);
+                }
+
+                if(datos[11].equals("1")){
+                    i.btnTorno.setEnabled(true);
+                }else{
+                    i.btnTorno.setEnabled(false);
+                }
+
+                if(datos[12].equals("1")){
+                    i.btnAcabados.setEnabled(true);
+                }else{
+                    i.btnAcabados.setEnabled(false);
+                }
+
+                if(datos[13].equals("1")){
+                    i.btnCalidad.setEnabled(true);
+                }else{
+                    i.btnCalidad.setEnabled(false);
+                }
+
+                if(datos[14].equals("1")){
+                    i.btnTrata.setEnabled(true);
+                }else{
+                    i.btnTrata.setEnabled(false);
+                }
+
+                if(datos[15].equals("1")){
+                    i.btnElec.setEnabled(true);
+                }else{
+                    i.btnElec.setEnabled(false);
+                }
+
+                if(datos[16].equals("1")){
+                    i.btnRegistro.setEnabled(true);
+                }else{
+                    i.btnRegistro.setEnabled(false);
+                }
+
+                if(datos[17].equals("1")){
+                    i.btnEmpleado.setEnabled(true);
+                }else{
+                    i.btnEmpleado.setEnabled(false);
+                }
+
+                if(datos[18].equals("1")){
+                    i.btnInventario.setEnabled(true);
+                }else{
+                    i.btnInventario.setEnabled(false);
+                }
+
+                if(datos[19].equals("1")){
+                    i.btnInventario1.setEnabled(true);
+                }else{
+                    i.btnInventario1.setEnabled(false);
+                }
+
+                if(datos[20].equals("1")){
+                    i.btnInventario2.setEnabled(true);
+                }else{
+                    i.btnInventario2.setEnabled(false);
+                }
+
+                if(datos[21].equals("1")){
+                    i.btnRequisicion.setEnabled(true);
+                }else{
+                    i.btnRequisicion.setEnabled(false);
+                }
+
+                if(datos[22].equals("1")){
+                    i.btnOrden.setEnabled(true);
+                }else{
+                    i.btnOrden.setEnabled(false);
+                }
+
+                if(datos[23].equals("1")){
+                    i.btnOrden1.setEnabled(true);
+                }else{
+                    i.btnOrden1.setEnabled(false);
+                }
+
+                if(datos[24].equals("1")){
+                    i.btnRecibos.setEnabled(true);
+                }else{
+                    i.btnRecibos.setEnabled(false);
             }
 
-            if(datos[3].equals("1")){
-                i.btnEstado.setEnabled(true);
+            if(datos[25].equals("1")){
+                i.btnPrestamos.setEnabled(true);
             }else{
-                i.btnEstado.setEnabled(false);
+                i.btnPrestamos.setEnabled(false);
             }
 
-            if(datos[4].equals("1")){
-                i.btnEstado1.setEnabled(true);
+            if(datos[26].equals("1")){
+                i.btnCotizacion.setEnabled(true);
             }else{
-                i.btnEstado1.setEnabled(false);
+                i.btnCotizacion.setEnabled(false);
             }
 
-            if(datos[5].equals("1")){
-                i.btnEstado2.setEnabled(true);
+                if(datos[27].equals("1")){
+                    i.btnVer.setEnabled(true);
+                }else{
+                    i.btnVer.setEnabled(false);
+                }
+
+                if(datos[28].equals("1")){
+                    i.btnCotizacionVentas.setEnabled(true);
+                }else{
+                    i.btnCotizacionVentas.setEnabled(false);
+                }
+
+                if(datos[30].equals("1")){
+                    i.btnEstado5.setEnabled(true);
+                }else{
+                    i.btnEstado5.setEnabled(false);
+                }
+
+                if(datos[31].equals("1")){
+                    i.btnRemisiones.setEnabled(true);
+                }else{
+                    i.btnRemisiones.setEnabled(false);
+                }
+
+                if(datos[32].equals("1")){
+                    i.btnChecador.setEnabled(true);
+                }else{
+                    i.btnChecador.setEnabled(false);
+                }
+
+                dispose();
+                } else if(Usuario.getText().equals(datos[0]) && Contra.getText() != (datos[7])){
+                    espera.band = false;
+                 espera.dispose();
+                JOptionPane.showMessageDialog(this, "CONTASEÑA INCORRECTA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+
+                }else{
+                    espera.band = false;
+                 espera.dispose();
+                JOptionPane.showMessageDialog(this, "EL USUARIO NO EXISTE","ERROR",JOptionPane.ERROR_MESSAGE);
+
+                }
+                }catch(SQLException e){
+                 espera.band = false;
+                 espera.dispose();
+                 JOptionPane.showMessageDialog(this, "ERROR"+e,"",JOptionPane.ERROR_MESSAGE);
+               }
             }else{
-                i.btnEstado2.setEnabled(false);
+                JOptionPane.showMessageDialog(this, "NO PUEDES AVANZAR HASTA ACTUALIZAR TOWI","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
             }
-
-            if(datos[6].equals("1")){
-                i.btnEstado3.setEnabled(true);
-            }else{
-                i.btnEstado3.setEnabled(false);
-            }
-
-            if(datos[8].equals("1")){
-                i.btnCorte.setEnabled(true);
-            }else{
-                i.btnCorte.setEnabled(false);
-            }
-
-            if(datos[9].equals("1")){
-                i.btnFresa.setEnabled(true);
-            }else{
-                i.btnFresa.setEnabled(false);
-            }
-
-            if(datos[10].equals("1")){
-                i.btnCnc.setEnabled(true);
-            }else{
-                i.btnCnc.setEnabled(false);
-            }
-
-            if(datos[11].equals("1")){
-                i.btnTorno.setEnabled(true);
-            }else{
-                i.btnTorno.setEnabled(false);
-            }
-
-            if(datos[12].equals("1")){
-                i.btnAcabados.setEnabled(true);
-            }else{
-                i.btnAcabados.setEnabled(false);
-            }
-
-            if(datos[13].equals("1")){
-                i.btnCalidad.setEnabled(true);
-            }else{
-                i.btnCalidad.setEnabled(false);
-            }
-
-            if(datos[14].equals("1")){
-                i.btnTrata.setEnabled(true);
-            }else{
-                i.btnTrata.setEnabled(false);
-            }
-
-            if(datos[15].equals("1")){
-                i.btnElec.setEnabled(true);
-            }else{
-                i.btnElec.setEnabled(false);
-            }
-
-            if(datos[16].equals("1")){
-                i.btnRegistro.setEnabled(true);
-            }else{
-                i.btnRegistro.setEnabled(false);
-            }
-
-            if(datos[17].equals("1")){
-                i.btnEmpleado.setEnabled(true);
-            }else{
-                i.btnEmpleado.setEnabled(false);
-            }
-
-            if(datos[18].equals("1")){
-                i.btnInventario.setEnabled(true);
-            }else{
-                i.btnInventario.setEnabled(false);
-            }
-
-            if(datos[19].equals("1")){
-                i.btnInventario1.setEnabled(true);
-            }else{
-                i.btnInventario1.setEnabled(false);
-            }
-
-            if(datos[20].equals("1")){
-                i.btnInventario2.setEnabled(true);
-            }else{
-                i.btnInventario2.setEnabled(false);
-            }
-
-            if(datos[21].equals("1")){
-                i.btnRequisicion.setEnabled(true);
-            }else{
-                i.btnRequisicion.setEnabled(false);
-            }
-
-            if(datos[22].equals("1")){
-                i.btnOrden.setEnabled(true);
-            }else{
-                i.btnOrden.setEnabled(false);
-            }
-
-            if(datos[23].equals("1")){
-                i.btnOrden1.setEnabled(true);
-            }else{
-                i.btnOrden1.setEnabled(false);
-            }
-
-            if(datos[24].equals("1")){
-                i.btnRecibos.setEnabled(true);
-            }else{
-                i.btnRecibos.setEnabled(false);
-        }
-
-        if(datos[25].equals("1")){
-            i.btnPrestamos.setEnabled(true);
-        }else{
-            i.btnPrestamos.setEnabled(false);
-        }
-
-        if(datos[26].equals("1")){
-            i.btnCotizacion.setEnabled(true);
-        }else{
-            i.btnCotizacion.setEnabled(false);
-        }
-
-            if(datos[27].equals("1")){
-                i.btnVer.setEnabled(true);
-            }else{
-                i.btnVer.setEnabled(false);
-            }
-
-            if(datos[28].equals("1")){
-                i.btnCotizacionVentas.setEnabled(true);
-            }else{
-                i.btnCotizacionVentas.setEnabled(false);
-            }
-
-            if(datos[30].equals("1")){
-                i.btnEstado5.setEnabled(true);
-            }else{
-                i.btnEstado5.setEnabled(false);
-            }
-
-            if(datos[31].equals("1")){
-                i.btnRemisiones.setEnabled(true);
-            }else{
-                i.btnRemisiones.setEnabled(false);
-            }
-
-            if(datos[32].equals("1")){
-                i.btnChecador.setEnabled(true);
-            }else{
-                i.btnChecador.setEnabled(false);
-            }
-
-            dispose();
-            } else if(Usuario.getText().equals(datos[0]) && Contra.getText() != (datos[7])){
-                espera.band = false;
-             espera.dispose();
-            JOptionPane.showMessageDialog(this, "CONTASEÑA INCORRECTA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-
-            }else{
-                espera.band = false;
-             espera.dispose();
-            JOptionPane.showMessageDialog(this, "EL USUARIO NO EXISTE","ERROR",JOptionPane.ERROR_MESSAGE);
-
-            }
-            }catch(SQLException e){
-             espera.band = false;
-             espera.dispose();
-             JOptionPane.showMessageDialog(this, "ERROR"+e,"",JOptionPane.ERROR_MESSAGE);
-           }
-        }else{
-            JOptionPane.showMessageDialog(this, "NO PUEDES AVANZAR HASTA ACTUALIZAR TOWI","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
         }
     }
     
@@ -354,61 +359,61 @@ public class InicioSesion extends javax.swing.JFrame  {
     });hilo.start();
     }
     
-    public void verificarVersion(){
-        boolean band = false;
-        try{
-            Connection con;
-            ConexionChat con1 = new ConexionChat();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            String sql = "select * from actualizacion";
-            ResultSet rs = st.executeQuery(sql);
-            String version = "";
-            while(rs.next()){
-                version = rs.getString("Version");
-                avanzar = rs.getBoolean("Avanzar");
+    public final void verificarVersion(){
+        Thread hilo = new Thread(new Runnable() {
+            public void run(){
+            boolean band = false;
+            try{
+                Connection con;
+                ConexionChat con1 = new ConexionChat();
+                con = con1.getConnection();
+                Statement st = con.createStatement();
+                String sql = "select * from actualizacion";
+                ResultSet rs = st.executeQuery(sql);
+                String version = "";
+                while(rs.next()){
+                    version = rs.getString("Version");
+                    avanzar = rs.getBoolean("Avanzar");
+                }
+                if(version.equals(lblVersion.getText())){
+                    band = true;
+                    avanzar = true;
+                }
+                ERROR_AL_CONECTARSE = 0;
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(null, "Error al conectarse a la base de datos","Error",JOptionPane.ERROR_MESSAGE);
+                ERROR_AL_CONECTARSE = 1;
+            }catch (ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(null, "Error al conectarse a la base de datos","Error",JOptionPane.ERROR_MESSAGE);
+                ERROR_AL_CONECTARSE = 1;
+                Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if(version.equals(lblVersion.getText())){
-                band = true;
-                avanzar = true;
+        if(ERROR_AL_CONECTARSE != 1){
+            if(band == false){
+                panelVersion.setVisible(true);
+                panelVersion.setBackground(new Color(0,0,0,0));
+                intermitente();
+            }else{
+                panelVersion.setVisible(false);
             }
-        }catch(SQLException e){
-            System.out.println("ERROR: "+e);
         }
-        if(band == false){
-            panelVersion.setVisible(true);
-            panelVersion.setBackground(new Color(0,0,0,0));
-            intermitente();
-        }else{
-            panelVersion.setVisible(false);
-        }
+            }
+        });
+        hilo.start();
     }
     
     public InicioSesion() {
         initComponents();
         this.setTitle("SERVICIOS INDUSTRIALES 3i");
         this.setIconImage(new ImageIcon(getClass().getResource("/Imagenes/towi_Azul.png")).getImage());
-//        TextPrompt p = new TextPrompt("USUARIO",Usuario);
-//        TextPrompt p1 = new TextPrompt("*********",Contra);
         this.setBackground(new Color(0,0,0,0));
+        panelVersion.setBackground(new Color(0,0,0,0));
         try{
         verificarVersion();
         }catch(Exception e){
-            JOptionPane.showMessageDialog(this, "error: "+e);
+            JOptionPane.showMessageDialog(this, "Error al conectarse a al base de datos");
         }
-//        Usuario.setBackground(new Color(0,0,0,0));
-//        Contra.setBackground(new Color(0,0,0,0));
-//        try {
-//                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-//                } catch (ClassNotFoundException ex) {
-//                    Logger.getLogger(Disenio2.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (InstantiationException ex) {
-//                    Logger.getLogger(Disenio2.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (IllegalAccessException ex) {
-//                    Logger.getLogger(Disenio2.class.getName()).log(Level.SEVERE, null, ex);
-//                } catch (UnsupportedLookAndFeelException ex) {
-//                    Logger.getLogger(Disenio2.class.getName()).log(Level.SEVERE, null, ex);
-//                }
+        System.out.println(ERROR_AL_CONECTARSE);
     }
 
     
@@ -688,7 +693,11 @@ public class InicioSesion extends javax.swing.JFrame  {
     }//GEN-LAST:event_lblEntrarMouseExited
 
     private void lblEntrarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblEntrarMouseClicked
-       Acceso();
+       try {
+           Acceso();
+       } catch (ClassNotFoundException ex) {
+           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+       }
     }//GEN-LAST:event_lblEntrarMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -716,40 +725,52 @@ public class InicioSesion extends javax.swing.JFrame  {
     }//GEN-LAST:event_panelMMouseDragged
 
     private void ContraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ContraActionPerformed
-        Acceso();
+       try {
+           Acceso();
+       } catch (ClassNotFoundException ex) {
+           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+       }
     }//GEN-LAST:event_ContraActionPerformed
 
     private void UsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsuarioActionPerformed
-        Acceso();
+       try {
+           Acceso();
+       } catch (ClassNotFoundException ex) {
+           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+       }
     }//GEN-LAST:event_UsuarioActionPerformed
 
     private void lblVersionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblVersionMouseClicked
-        int opc = JOptionPane.showConfirmDialog(this, "Towi se cerrara completamente, ¿Esta de acuerdo?");
-        if(opc == 0){
-            try {
-                 String jarPath = "C:\\Pruebas\\BD\\Actualizar\\Descarga.jar";
+        if(ERROR_AL_CONECTARSE != 1){
+            int opc = JOptionPane.showConfirmDialog(this, "Towi se cerrara completamente, ¿Esta de acuerdo?");
+            if(opc == 0){
+                try {
+                     String jarPath = "C:\\Pruebas\\BD\\Actualizar\\Descarga.jar";
 
-                 // Ejecutar el JAR usando Runtime
-                 Runtime.getRuntime().exec("java -jar " + jarPath);
-                 System.exit(0);
-             } catch (Exception e) {
-                 e.printStackTrace();
-             }
+                     // Ejecutar el JAR usando Runtime
+                     Runtime.getRuntime().exec("java -jar " + jarPath);
+                     System.exit(0);
+                 } catch (Exception e) {
+                     e.printStackTrace();
+                 }
+            }
         }
     }//GEN-LAST:event_lblVersionMouseClicked
 
     private void panelVersionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelVersionMouseClicked
-        int opc = JOptionPane.showConfirmDialog(this, "Towi se cerrara completamente, ¿Esta de acuerdo?");
-        if(opc == 0){
-            try {
-                 String jarPath = "C:\\Pruebas\\BD\\Actualizar\\Descarga.jar";
+        if(ERROR_AL_CONECTARSE != 1){
+            int opc = JOptionPane.showConfirmDialog(this, "Towi se cerrara completamente, ¿Esta de acuerdo?");
+            if(opc == 0){
+                try {
+                     String jarPath = "C:\\Pruebas\\BD\\Actualizar\\Descarga.jar";
 
-                 // Ejecutar el JAR usando Runtime
-                 Runtime.getRuntime().exec("java -jar " + jarPath);
-                 System.exit(0);
-             } catch (Exception e) {
-                 e.printStackTrace();
-             }
+                     // Ejecutar el JAR usando Runtime
+                     Runtime.getRuntime().exec("java -jar " + jarPath);
+                     System.exit(0);
+                 } catch (Exception e) {
+                     e.printStackTrace();
+                 }
+            }
         }
     }//GEN-LAST:event_panelVersionMouseClicked
 
