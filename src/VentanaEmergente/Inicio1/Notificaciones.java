@@ -110,6 +110,8 @@ public class Notificaciones extends javax.swing.JFrame implements ActionListener
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Notificaciones.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -274,6 +276,8 @@ public class Notificaciones extends javax.swing.JFrame implements ActionListener
                 }catch(SQLException ex){
                     JOptionPane.showMessageDialog(this, "ERROR: "+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
                     System.out.println(ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Notificaciones.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
                 switch (depa[i]) {

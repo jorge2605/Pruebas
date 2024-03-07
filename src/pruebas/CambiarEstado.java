@@ -186,7 +186,6 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 }else{
                     estado = cortes[6];
                 }
-                System.out.println(datos[1]+"-"+estado);
                 if(estado.equals("SIN MATERIAL")){
                     datos[3] = "SIN MATERIAL";
                 }else{
@@ -297,7 +296,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
         }
     }
     
-    public void verDatos(){
+    public final void verDatos(){
         DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
     try{
         
@@ -309,10 +308,10 @@ private TableRowSorter<TableModel> modeloOrdenado;
         String sql = "select Planta,Descripcion,Proyecto from Proyectos where Mostrar like 'SI' order by iD desc";
         ResultSet rs = st.executeQuery(sql);
         while(rs.next()){
-        datos[0] = rs.getString("Planta");
-        datos[1] = rs.getString("Descripcion");
-        datos[2] = rs.getString("Proyecto");
-        miModelo.addRow(datos);
+            datos[0] = rs.getString("Planta");
+            datos[1] = rs.getString("Descripcion");
+            datos[2] = rs.getString("Proyecto");
+            miModelo.addRow(datos);
         }
         }catch(SQLException e){
         JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -638,6 +637,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
         jMenu2 = new javax.swing.JMenu();
 
         setBorder(null);
+        getContentPane().setLayout(new java.awt.BorderLayout());
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
@@ -646,8 +646,9 @@ private TableRowSorter<TableModel> modeloOrdenado;
         jPanel5.setLayout(new java.awt.BorderLayout());
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel1.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 165, 252));
         jLabel1.setText("ESTADO DE PROYECTOS");
         jPanel6.add(jLabel1);
@@ -658,10 +659,10 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
         btnSalir.setBackground(new java.awt.Color(255, 255, 255));
 
-        lblX.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
+        lblX.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
         lblX.setForeground(new java.awt.Color(0, 0, 0));
         lblX.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblX.setText(" x ");
+        lblX.setText(" X ");
         lblX.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblX.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -690,6 +691,8 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -732,6 +735,8 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
         TablaDeDatos1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -952,7 +957,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblConteo)
+                .addComponent(lblConteo, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -972,6 +977,8 @@ private TableRowSorter<TableModel> modeloOrdenado;
         jPanel3.add(jPanel1, java.awt.BorderLayout.EAST);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jMenu1.setText("File");
 
@@ -1003,17 +1010,6 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
         setJMenuBar(jMenuBar1);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1420, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -1025,97 +1021,100 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 terminarProyecto(proyecto);
             }
         }else{
-        if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2) == null){
-            
-        }else{
-        espera.activar();
-        espera.setVisible(true);
-        limpiarTabla();
-        buscar();
-        conteo();
-        btnLiberar.setEnabled(false);
-        int fila = Tabla1.getSelectedRow();
-        txtProyecto.setText((String) Tabla1.getValueAt(fila, 2));
-        txtPlano.setText("TODOS");
-        btnExportarD.setEnabled(true);
-        btnPrioridad.setEnabled(true);
-        btnVer.setEnabled(false);
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        
-        String sql = "select Proyecto, Liberado from Proyectos where Proyecto like '"+Tabla1.getValueAt(fila, 2).toString()+"'";
-        ResultSet rs = st.executeQuery(sql);
-        String datos[] = new String[10];
-        int cont = 0, v = 0, f = 0;
-        while(rs.next()){
-        cont++;
-        datos[0] = rs.getString("Liberado");
-        if(datos[0].equals("SI")){
-        v++;
-        }
-        if(datos[0].equals("NO")){
-        f++;
-        }
-        }
-        if((cont == v)){
-        btnLiberar.setEnabled(false);
-        txtLiberado.setText("SI");
-        }else if(cont == f){
-        btnLiberar.setEnabled(true);
-        txtLiberado.setText("NO");
-        }else{
-        btnLiberar.setEnabled(true);
-        txtLiberado.setText("INCOMPLETO");
-        }
-        
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL ENVIAR A CORTES: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
-        
-        int total = TablaDeDatos1.getRowCount();
-        int v = 0;
-        for (int i = 0; i < total; i++) {
-            if(TablaDeDatos1.getValueAt(i, 3).toString().equals("TERMINADO")){
-            v++;
+            if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2) == null){
+
+            }else{
+                Thread hilo = new Thread() {
+                   public void run(){
+                        espera.activar();
+                        espera.setVisible(true);
+                        limpiarTabla();
+                        buscar();
+                        conteo();
+                        btnLiberar.setEnabled(false);
+                        int fila = Tabla1.getSelectedRow();
+                        txtProyecto.setText((String) Tabla1.getValueAt(fila, 2));
+                        txtPlano.setText("TODOS");
+                        btnExportarD.setEnabled(true);
+                        btnPrioridad.setEnabled(true);
+                        btnVer.setEnabled(false);
+                        try{
+                            Connection con = null;
+                            Conexion con1 = new Conexion();
+                            con = con1.getConnection();
+                            Statement st = con.createStatement();
+
+                            String sql = "select Proyecto, Liberado from Proyectos where Proyecto like '"+Tabla1.getValueAt(fila, 2).toString()+"'";
+                            ResultSet rs = st.executeQuery(sql);
+                            String datos[] = new String[10];
+                            int cont = 0, v = 0, f = 0;
+                            while(rs.next()){
+                                cont++;
+                                datos[0] = rs.getString("Liberado");
+                                if(datos[0].equals("SI")){
+                                    v++;
+                                }
+                                if(datos[0].equals("NO")){
+                                    f++;
+                                }
+                            }
+                            if((cont == v)){
+                                btnLiberar.setEnabled(false);
+                                txtLiberado.setText("SI");
+                            }else if(cont == f){
+                                btnLiberar.setEnabled(true);
+                                txtLiberado.setText("NO");
+                            }else{
+                                btnLiberar.setEnabled(true);
+                                txtLiberado.setText("INCOMPLETO");
+                            }
+                        }catch(SQLException e){
+                            espera.band = false;
+                            espera.dispose();
+                            JOptionPane.showMessageDialog(null, "ERROR AL ENVIAR A CORTES: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                        }
+
+                        int total = TablaDeDatos1.getRowCount();
+                        int v = 0;
+                        for (int i = 0; i < total; i++) {
+                            if(TablaDeDatos1.getValueAt(i, 3).toString().equals("TERMINADO")){
+                                v++;
+                            }
+                        }
+                        if(v == total){
+                            int opc = JOptionPane.showConfirmDialog(null,"PROYECTO TOTALMENTE TERMINADO, ¿DESEAS CERRARLO?");
+                            if(opc == 0){
+                                try{
+                                    Connection con = null;
+                                    Conexion con1 = new Conexion();
+                                    con = con1.getConnection();
+                                    String sql = "update Proyectos set Mostrar = ? where Proyecto = ?";
+                                    PreparedStatement pst = con.prepareStatement(sql);
+
+                                    int f = Tabla1.getSelectedRow();
+                                    pst.setString(1, "NO");
+                                    pst.setString(2, Tabla1.getValueAt(f, 2).toString());
+
+                                    int n = pst.executeUpdate();
+                                    if(n > 0){
+                                        limpiarTabla1();
+                                        buscar();
+                                        limpiarTabla();
+                                        JOptionPane.showMessageDialog(null, "DATOS GUARDADOS");
+                                    }
+                                }catch(SQLException e){
+                                    espera.band = false;
+                                    espera.dispose();
+                                    JOptionPane.showMessageDialog(null, "ERROR AL GUARDAR DATOS","ERROR",JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                        espera.band = false;
+                        espera.dispose();
+                   }
+                };
+                hilo.start();
             }
-        }
-        if(v == total){
-        int opc = JOptionPane.showConfirmDialog(this,"PROYECTO TOTALMENTE TERMINADO, ¿DESEAS CERRARLO?");
-        
-        if(opc == 0){
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        String sql = "update Proyectos set Mostrar = ? where Proyecto = ?";
-        PreparedStatement pst = con.prepareStatement(sql);
-        
-        int f = Tabla1.getSelectedRow();
-        pst.setString(1, "NO");
-        pst.setString(2, Tabla1.getValueAt(f, 2).toString());
-        
-        int n = pst.executeUpdate();
-        if(n > 0){
-            limpiarTabla1();
-            buscar();
-            limpiarTabla();
-        JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
-        }
-        
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR DATOS","ERROR",JOptionPane.ERROR_MESSAGE);
-        
-        }
-        }
-        }
-        
-        espera.band = false;
-        espera.dispose();
-        }
         }
     }//GEN-LAST:event_Tabla1MouseClicked
 

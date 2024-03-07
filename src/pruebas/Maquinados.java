@@ -2,12 +2,20 @@ package pruebas;
 
 import Conexiones.Conexion;
 import Controlador.maquinados.revisarPlanos;
+import VentanaEmergente.Inicio1.Espera;
 import VentanaEmergente.Maquinados.empleado;
 import com.mysql.jdbc.Connection;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,6 +39,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     public int PROYECTO = 1;
     public int PLANO = 2;
     public empleado emp;
+    Espera espera = new Espera();
     
     public void limpiarFormulario(){
         txtPlano2.setText("");
@@ -248,6 +257,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jPanel12 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         txtPlano2 = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         txtProyecto = new javax.swing.JTextField();
@@ -448,6 +458,20 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         txtPlano2.setEnabled(false);
         txtPlano2.setPreferredSize(new java.awt.Dimension(300, 30));
         jPanel12.add(txtPlano2, java.awt.BorderLayout.CENTER);
+
+        jButton1.setBackground(new java.awt.Color(255, 255, 255));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf.png"))); // NOI18N
+        jButton1.setBorder(null);
+        jButton1.setBorderPainted(false);
+        jButton1.setContentAreaFilled(false);
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setFocusPainted(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel12.add(jButton1, java.awt.BorderLayout.EAST);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = 4;
@@ -993,6 +1017,52 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         btnGuardar.setForeground(new Color(0,102,255));
     }//GEN-LAST:event_btnGuardarMouseExited
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        if(txtPlano2.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debes seleccionar un Plano","Advertencia",JOptionPane.WARNING_MESSAGE);
+        }else{
+            Thread hilo = new Thread() {
+                public void run(){
+                     espera.activar();
+                     espera.setVisible(true);
+                    try{
+                        java.sql.Connection con = null;
+                        Conexion con1 = new Conexion();
+                        con = con1.getConnection();
+                        Statement st = con.createStatement();
+                        String plano = txtPlano2.getText();
+                        String sql = "select Pdf,Plano from pdfplanos where Plano like '"+plano+"'";
+                        ResultSet rs = st.executeQuery(sql);
+                        byte[] b = null;
+                        while(rs.next()){
+                            b = rs.getBytes("Pdf");
+                        }
+                         try (InputStream bos = new ByteArrayInputStream(b)) {
+                            int tamInput = bos.available();
+                            byte[] datosPdf = new byte[tamInput];
+                            bos.read(datosPdf, 0, tamInput);
+                            try (OutputStream out = new FileOutputStream("new.pdf")) {
+                                out.write(datosPdf);
+                            }
+                         Desktop.getDesktop().open(new File("new.pdf"));
+                         }catch(Exception e){
+                            espera.band = false;
+                            espera.dispose();
+                            JOptionPane.showMessageDialog(null, "No se encontro el archivo","Error",JOptionPane.ERROR_MESSAGE);
+                         }
+                    }catch(SQLException | NumberFormatException   e){
+                        espera.band = false;
+                        espera.dispose();
+                        JOptionPane.showMessageDialog(null,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                    }
+                    espera.band = false;
+                    espera.dispose();
+                   }
+        };
+        hilo.start();
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCnc;
@@ -1000,6 +1070,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnRecti;
     private javax.swing.JButton btnTorno;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;

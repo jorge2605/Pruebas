@@ -99,7 +99,9 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
-        }
+        }   catch (ClassNotFoundException ex) {
+                Logger.getLogger(EntregaRequisicion.class.getName()).log(Level.SEVERE, null, ex);
+            }
     }
         
     public boolean aut(){

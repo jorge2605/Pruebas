@@ -23,7 +23,6 @@ public class Servidor extends Observable implements Runnable {
         try {
             //Creamos el servidor del socket
             servidor = new ServerSocket(puerto);
-            System.out.println("Servidor iniciado");
 
             //Siempre estara escuchando peticiones
             while (true) {

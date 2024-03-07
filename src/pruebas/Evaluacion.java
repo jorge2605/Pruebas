@@ -241,7 +241,6 @@ public class Evaluacion extends javax.swing.JInternalFrame implements ActionList
             double totalMxn = 0;
             double totalNull = 0;
             String pro = lblProyecto.getText();
-            System.out.println(pro);
             if(!pro.equals("MATERIAL DE OFICINA") && !pro.equals("MATERIAL DE MANTENIMIENTO") && !pro.equals("MATERIAL DE LIMPIEZA")
                      && !pro.equals("HERRAMIENTAS") && !pro.equals("SEGURIDAD")){
                 while(rs.next()){
@@ -655,7 +654,6 @@ public class Evaluacion extends javax.swing.JInternalFrame implements ActionList
 
     private void btnRechazarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRechazarActionPerformed
         String notas = mostrarDialogoEmergente();
-        System.out.println(notas);
         if(notas != null){
             if(notas.equals("")){
                 JOptionPane.showMessageDialog(this, "Debes insertar comentarios", "Error", JOptionPane.ERROR_MESSAGE);

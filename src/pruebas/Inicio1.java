@@ -3,6 +3,7 @@ import Conexiones.Conexion;
 import Conexiones.ConexionChat;
 import Modelo.ModeloExcel;
 import VentanaEmergente.CalidadNew.inicioCalidad;
+import VentanaEmergente.Costos.Costeo;
 import VentanaEmergente.Diseño.InicioDiseño;
 import VentanaEmergente.Inicio1.Configuracion;
 import VentanaEmergente.Inicio1.InicioAlmacen;
@@ -43,6 +44,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.util.prefs.Preferences;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 
 public final class Inicio1 extends javax.swing.JFrame implements Observer,ActionListener{
@@ -331,6 +333,19 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             }
         });
         hilo.start();
+    }
+    
+    public void inicioCostos(JInternalFrame c){
+        JInternalFrame cla = c;
+        jDesktopPane1.add(cla);
+        cla.toFront();
+        cla.setLocation(jDesktopPane1.getWidth() / 2 - cla.getWidth() / 2, jDesktopPane1.getHeight() / 2 - cla.getHeight() / 2);
+        try{
+            cla.setMaximum(true);
+        }catch(PropertyVetoException ex){
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,ex);
+        }
+        cla.setVisible(true);
     }
     
     public Inicio1(String numero, String nombre) {
@@ -3050,6 +3065,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         inicioCostos.setLocationRelativeTo(f);
         inicioCostos.btnCostos.addActionListener(this);
         inicioCostos.btnEvaluacion.addActionListener(this);
+        inicioCostos.btnCosteo.addActionListener(this);
         inicioCostos.setVisible(true);
     }//GEN-LAST:event_btnCostosActionPerformed
 
@@ -3333,31 +3349,15 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             if(e.getSource() == inicioCostos.btnCostos){
                 inicioCostos.dispose();
                 Costos c = new Costos(lblId.getText());
-                jDesktopPane1.add(c);
-                c.toFront();
-                c.setLocation(jDesktopPane1.getWidth() / 2 - c.getWidth() / 2, jDesktopPane1.getHeight() / 2 - c.getHeight() / 2);
-                try{
-                    c.setMaximum(true);
-                }catch(PropertyVetoException ex){
-                    Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
-                }
-        //        c.insertarSemanas();
-                c.setVisible(true);
+                inicioCostos(c);
             }else if(e.getSource() == inicioCostos.btnEvaluacion){
                 inicioCostos.dispose();
                 evaluacion = new Evaluacion(lblId.getText());
-                evaluacion.btnAceptar.addActionListener(this);
-                evaluacion.btnRechazar.addActionListener(this);
-                jDesktopPane1.add(evaluacion);
-                evaluacion.toFront();
-                evaluacion.setLocation(jDesktopPane1.getWidth() / 2 - evaluacion.getWidth() / 2, jDesktopPane1.getHeight() / 2 - evaluacion.getHeight() / 2);
-                try{
-                    evaluacion.setMaximum(true);
-                }catch(PropertyVetoException ex){
-                    Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
-                }
-        //        c.insertarSemanas();
-                evaluacion.setVisible(true);
+                inicioCostos(evaluacion);
+            }else if(e.getSource() == inicioCostos.btnCosteo){
+                inicioCostos.dispose();
+                Costeo c = new Costeo(lblId.getText());
+                inicioCostos(c);
             }
         }
         

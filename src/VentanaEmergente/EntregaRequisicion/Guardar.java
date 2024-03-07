@@ -73,6 +73,8 @@ public class Guardar extends javax.swing.JDialog {
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Guardar.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

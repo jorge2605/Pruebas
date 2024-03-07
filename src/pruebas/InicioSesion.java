@@ -102,7 +102,7 @@ public class InicioSesion extends javax.swing.JFrame  {
                          }
                      }  
                  }catch(Exception e){
-                     System.out.println("ERROR: "+e);
+                     JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
                      espera.dispose();
                  }
 
@@ -413,7 +413,6 @@ public class InicioSesion extends javax.swing.JFrame  {
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "Error al conectarse a al base de datos");
         }
-        System.out.println(ERROR_AL_CONECTARSE);
     }
 
     

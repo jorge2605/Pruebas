@@ -14,6 +14,10 @@ public class InicioCostos extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jPanel9 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        pnlX = new javax.swing.JPanel();
+        btnX = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -24,16 +28,48 @@ public class InicioCostos extends javax.swing.JDialog {
         jPanel3 = new javax.swing.JPanel();
         btnEvaluacion = new javax.swing.JButton();
         lblNotiCostos = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        pnlX = new javax.swing.JPanel();
-        btnX = new javax.swing.JButton();
+        jPanel8 = new javax.swing.JPanel();
+        btnCosteo = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
-        setPreferredSize(new java.awt.Dimension(699, 396));
+
+        jPanel9.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(222, 222, 222), 3, true));
+        jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        pnlX.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnX.setBackground(new java.awt.Color(255, 255, 255));
+        btnX.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        btnX.setText(" X ");
+        btnX.setBorder(null);
+        btnX.setBorderPainted(false);
+        btnX.setContentAreaFilled(false);
+        btnX.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnX.setFocusPainted(false);
+        btnX.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnXMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnXMouseExited(evt);
+            }
+        });
+        btnX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnXActionPerformed(evt);
+            }
+        });
+        pnlX.add(btnX);
+
+        jPanel4.add(pnlX);
+
+        jPanel9.add(jPanel4, java.awt.BorderLayout.PAGE_START);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(222, 222, 222), 3, true));
         jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
@@ -101,41 +137,36 @@ public class InicioCostos extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(17, 40, 17, 40);
         jPanel2.add(jPanel3, gridBagConstraints);
 
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnCosteo.setBackground(new java.awt.Color(255, 255, 255));
+        btnCosteo.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnCosteo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/cotizaciones_64.png"))); // NOI18N
+        btnCosteo.setText("Costeo");
+        btnCosteo.setBorder(null);
+        btnCosteo.setBorderPainted(false);
+        btnCosteo.setContentAreaFilled(false);
+        btnCosteo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCosteo.setFocusPainted(false);
+        btnCosteo.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnCosteo.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        btnCosteo.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnCosteo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCosteoActionPerformed(evt);
+            }
+        });
+        jPanel8.add(btnCosteo);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(17, 40, 17, 40);
+        jPanel2.add(jPanel8, gridBagConstraints);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        jPanel9.add(jPanel1, java.awt.BorderLayout.CENTER);
 
-        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        pnlX.setBackground(new java.awt.Color(255, 255, 255));
-
-        btnX.setBackground(new java.awt.Color(255, 255, 255));
-        btnX.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
-        btnX.setText(" X ");
-        btnX.setBorder(null);
-        btnX.setBorderPainted(false);
-        btnX.setContentAreaFilled(false);
-        btnX.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnX.setFocusPainted(false);
-        btnX.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                btnXMouseEntered(evt);
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                btnXMouseExited(evt);
-            }
-        });
-        btnX.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnXActionPerformed(evt);
-            }
-        });
-        pnlX.add(btnX);
-
-        jPanel4.add(pnlX);
-
-        getContentPane().add(jPanel4, java.awt.BorderLayout.PAGE_START);
+        getContentPane().add(jPanel9, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -153,6 +184,10 @@ public class InicioCostos extends javax.swing.JDialog {
         pnlX.setBackground(Color.white);
         btnX.setForeground(Color.black);
     }//GEN-LAST:event_btnXMouseExited
+
+    private void btnCosteoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCosteoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCosteoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -198,6 +233,7 @@ public class InicioCostos extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton btnCosteo;
     public javax.swing.JButton btnCostos;
     public javax.swing.JButton btnEvaluacion;
     public javax.swing.JButton btnX;
@@ -209,6 +245,8 @@ public class InicioCostos extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     public javax.swing.JLabel lblNotiCostos;
     private javax.swing.JPanel pnlX;
     // End of variables declaration//GEN-END:variables

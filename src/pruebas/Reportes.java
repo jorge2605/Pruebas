@@ -3,6 +3,7 @@ package pruebas;
 import Conexiones.Conexion;
 import VentanaEmergente.Reportes.Plano;
 import VentanaEmergente.Reportes.ReporteHerramienta;
+import VentanaEmergente.Reportes.ReporteHoras;
 import VentanaEmergente.Reportes.ReporteMensual;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
@@ -419,11 +420,14 @@ public class Reportes extends javax.swing.JInternalFrame {
         jPanel3 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        calen = new com.toedter.calendar.JDateChooser();
         btnBuscar = new javax.swing.JButton();
         jPanel12 = new javax.swing.JPanel();
         turno1 = new javax.swing.JRadioButton();
         turno2 = new javax.swing.JRadioButton();
+        jPanel14 = new javax.swing.JPanel();
+        calen = new com.toedter.calendar.JDateChooser();
+        jLabel5 = new javax.swing.JLabel();
+        txtProyecto = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         btnTerminados = new javax.swing.JToggleButton();
@@ -559,13 +563,10 @@ public class Reportes extends javax.swing.JInternalFrame {
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setLayout(new java.awt.BorderLayout(15, 15));
 
-        jLabel1.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 14)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Buscar");
+        jLabel1.setText("Buscar por fecha");
         jPanel9.add(jLabel1, java.awt.BorderLayout.NORTH);
-
-        calen.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel9.add(calen, java.awt.BorderLayout.CENTER);
 
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/buscar_24.png"))); // NOI18N
         btnBuscar.setBorder(null);
@@ -601,6 +602,30 @@ public class Reportes extends javax.swing.JInternalFrame {
         jPanel12.add(turno2);
 
         jPanel9.add(jPanel12, java.awt.BorderLayout.PAGE_END);
+
+        jPanel14.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel14.setLayout(new java.awt.GridLayout(3, 0, 10, 10));
+
+        calen.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel14.add(calen);
+
+        jLabel5.setFont(new java.awt.Font("Lexend", 1, 14)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("Buscar por proyecto");
+        jPanel14.add(jLabel5);
+
+        txtProyecto.setBackground(new java.awt.Color(255, 255, 255));
+        txtProyecto.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        txtProyecto.setPreferredSize(new java.awt.Dimension(300, 22));
+        txtProyecto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtProyectoActionPerformed(evt);
+            }
+        });
+        jPanel14.add(txtProyecto);
+
+        jPanel9.add(jPanel14, java.awt.BorderLayout.CENTER);
 
         jPanel3.add(jPanel9, java.awt.BorderLayout.PAGE_START);
 
@@ -2194,6 +2219,57 @@ public class Reportes extends javax.swing.JInternalFrame {
         
     }//GEN-LAST:event_TerminarPlanosActionPerformed
 
+    private void txtProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProyectoActionPerformed
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String proyecto = txtProyecto.getText();
+            String sql = "select Plano, Proyecto, Integracion, Fresadora, Torno, Cnc from Planos where Proyecto like '" + proyecto + "%'";
+            ResultSet rs = st.executeQuery(sql);
+            int fre = 0;
+            int cn = 0;
+            int tor = 0;
+            int planos = 0;
+            while(rs.next()){
+                String fresadora = rs.getString("Fresadora");
+                String torno = rs.getString("Fresadora");
+                String cnc = rs.getString("Fresadora");
+                boolean f = true,c = true,t = true;
+                int fr,c1,t1;
+                try{fr = Integer.parseInt(fresadora.substring(0, fresadora.indexOf("/")));}catch(Exception e){fr = 0;}
+                try{c1 = Integer.parseInt(cnc.substring(0, cnc.indexOf("/")));}catch(Exception e){c1 = 0;}
+                try{t1 = Integer.parseInt(torno.substring(0, torno.indexOf("/")));}catch(Exception e){t1 = 0;}
+                if(fr == 0){
+                    f = false;
+                }
+                if(c1 == 0){
+                    c = false;
+                }
+                if(t1 == 0){
+                    t = false;
+                }
+                fre += fr;
+                cn += c1;
+                tor += t1;
+                if(f == false && c == false && t == false){
+                    planos++;
+                }
+            }
+            JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+            ReporteHoras reporte = new ReporteHoras(f,true);
+            reporte.lblCnc.setText(String.valueOf((cn / 60)) + " HRS");
+            reporte.lblTorno.setText(String.valueOf((tor / 60)) + " HRS");
+            reporte.lblFresa.setText(String.valueOf((fre / 60)) + " HRS");
+            reporte.lblPlanos.setText(String.valueOf(planos));
+            reporte.setLocationRelativeTo(f);
+            reporte.setVisible(true);
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txtProyectoActionPerformed
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2217,6 +2293,7 @@ public class Reportes extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
@@ -2231,6 +2308,7 @@ public class Reportes extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -2257,6 +2335,7 @@ public class Reportes extends javax.swing.JInternalFrame {
     private javax.swing.JTextField txtFresa;
     private javax.swing.JTextField txtFresa1;
     private javax.swing.JTextField txtFresa2;
+    private javax.swing.JTextField txtProyecto;
     private javax.swing.JTextField txtTorno;
     private javax.swing.JTextField txtTorno1;
     private javax.swing.JTextField txtTorno2;
