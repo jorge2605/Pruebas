@@ -2236,24 +2236,14 @@ public class Reportes extends javax.swing.JInternalFrame {
                 String fresadora = rs.getString("Fresadora");
                 String torno = rs.getString("Fresadora");
                 String cnc = rs.getString("Fresadora");
-                boolean f = true,c = true,t = true;
                 int fr,c1,t1;
                 try{fr = Integer.parseInt(fresadora.substring(0, fresadora.indexOf("/")));}catch(Exception e){fr = 0;}
                 try{c1 = Integer.parseInt(cnc.substring(0, cnc.indexOf("/")));}catch(Exception e){c1 = 0;}
                 try{t1 = Integer.parseInt(torno.substring(0, torno.indexOf("/")));}catch(Exception e){t1 = 0;}
-                if(fr == 0){
-                    f = false;
-                }
-                if(c1 == 0){
-                    c = false;
-                }
-                if(t1 == 0){
-                    t = false;
-                }
                 fre += fr;
                 cn += c1;
                 tor += t1;
-                if(f == false && c == false && t == false){
+                if(fr == 0 && c1 == 0 && t1 == 0){
                     planos++;
                 }
             }
