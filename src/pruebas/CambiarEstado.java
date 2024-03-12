@@ -1133,12 +1133,6 @@ private TableRowSorter<TableModel> modeloOrdenado;
         String datos[] = new String[5];
         Statement st = con.createStatement();
         String sql = "select * from Planos";
-//        ResultSet rs = st.executeQuery(sql);
-//        while(rs.next()){
-//        datos[0] = rs.getString("Prioridad");
-//        datos[1] = rs.getString("Plano");
-//        datos[2] = rs.getString("Proyecto");
-//        }
         txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 2).toString());
         txtPlano.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
         btnVer.setEnabled(true);

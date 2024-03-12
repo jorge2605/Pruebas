@@ -46,7 +46,7 @@ public class PanelRound extends JPanel {
         this.roundBottomRight = roundBottomRight;
         repaint();
     }
-
+    
     private int roundTopLeft = 0;
     private int roundTopRight = 0;
     private int roundBottomLeft = 0;
@@ -72,7 +72,6 @@ public class PanelRound extends JPanel {
             area.intersect(new Area(createRoundBottomRight()));
         }
         g2.fill(area);
-        g2.dispose();
         super.paintComponent(grphcs);
     }
 

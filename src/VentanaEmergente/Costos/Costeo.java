@@ -4,6 +4,7 @@ import Conexiones.Conexion;
 import VentanaEmergente.Diseño.codigoBarras;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,17 +12,44 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import static org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
+import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.util.CellUtil;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pruebas.CambiarEstado;
 
 public class Costeo extends javax.swing.JInternalFrame implements MouseListener, ActionListener, PropertyChangeListener{
 
@@ -32,6 +60,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     public Stack<JLabel> precio;
     public Stack<JLabel> subtotal;
     public Stack<JTextArea> descripcion;
+    public Stack<String> proveedor;
     public TextAutoCompleter au;
     int cont = 0;
     public int parteSeleccionada;
@@ -166,15 +195,17 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
                 Statement st = con.createStatement();
-                String sql = "select Codigo, Descripcion, Precio from requisiciones where Codigo like '" + txtParte.getText() + "' and Precio is not null and Precio != '' and Precio != '0'";
+                String sql = "select Codigo, Descripcion, Precio, Proveedor from requisiciones where Codigo like '" + txtParte.getText() + "' and Precio is not null and Precio != '' and Precio != '0'";
                 ResultSet rs = st.executeQuery(sql);
                 String desc = null;
                 String codigo = null;
                 String prec = null;
+                String prov = null;
                 while(rs.next()){
                     desc = rs.getString("Descripcion");
                     codigo = rs.getString("Codigo");
                     prec = rs.getString("Precio");
+                    prov = rs.getString("Proveedor");
                 }
                 if(codigo == null){
                     JOptionPane.showMessageDialog(this, "No se encontraron datos para este numero de parte","Advertencia",JOptionPane.WARNING_MESSAGE);
@@ -189,6 +220,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
                         txtParte.setText("");
                     }else{
                         crearPanel(codigo, desc, "1", prec);
+                        this.proveedor.push(prov);
                         txtParte.setText("");
                     }
                 }
@@ -221,6 +253,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         precio = new Stack<>();
         descripcion = new Stack<>();
         subtotal = new Stack<>();
+        proveedor = new Stack<>();
         agregarPartes();
         panelPrincipal.removeAll();
         revalidate();
@@ -231,7 +264,6 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -243,23 +275,16 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         txtParte = new javax.swing.JTextField();
-        panelRound2 = new scrollPane.PanelRound();
-        jButton3 = new javax.swing.JButton();
+        botonRedondo5 = new scrollPane.BotonRedondo();
         scrollPrincipal = new javax.swing.JScrollPane();
         panelPrincipal = new javax.swing.JPanel();
-        jPanel9 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
         jPanel7 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         txtTotal = new javax.swing.JTextField();
         jPanel6 = new javax.swing.JPanel();
-        panelRound1 = new scrollPane.PanelRound();
-        jButton1 = new javax.swing.JButton();
+        botonRedondo2 = new scrollPane.BotonRedondo();
+        botonRedondo3 = new scrollPane.BotonRedondo();
+        botonRedondo4 = new scrollPane.BotonRedondo();
 
         setBorder(null);
 
@@ -322,28 +347,22 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         });
         jPanel3.add(txtParte);
 
-        panelRound2.setBackground(new java.awt.Color(204, 204, 255));
-        panelRound2.setRoundBottomLeft(20);
-        panelRound2.setRoundBottomRight(20);
-        panelRound2.setRoundTopLeft(20);
-
-        jButton3.setFont(new java.awt.Font("Lexend", 1, 14)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(51, 51, 51));
-        jButton3.setText("Agregar");
-        jButton3.setBorder(null);
-        jButton3.setBorderPainted(false);
-        jButton3.setContentAreaFilled(false);
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton3.setFocusPainted(false);
-        jButton3.setPreferredSize(new java.awt.Dimension(100, 25));
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        botonRedondo5.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo5.setForeground(new java.awt.Color(0, 102, 255));
+        botonRedondo5.setText("Agregar");
+        botonRedondo5.setBorderColor(new java.awt.Color(0, 102, 255));
+        botonRedondo5.setBorderColorSelected(new java.awt.Color(0, 51, 153));
+        botonRedondo5.setColor(new java.awt.Color(0, 102, 255));
+        botonRedondo5.setFocusPainted(false);
+        botonRedondo5.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo5.setPreferredSize(new java.awt.Dimension(100, 35));
+        botonRedondo5.setThickness(3);
+        botonRedondo5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                botonRedondo5ActionPerformed(evt);
             }
         });
-        panelRound2.add(jButton3);
-
-        jPanel3.add(panelRound2);
+        jPanel3.add(botonRedondo5);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.NORTH);
 
@@ -351,64 +370,6 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
 
         panelPrincipal.setBackground(new java.awt.Color(250, 250, 250));
         panelPrincipal.setLayout(new java.awt.GridBagLayout());
-
-        jPanel9.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel9.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 102, 153), 4, true));
-
-        jLabel4.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel4.setText("Numero de parte");
-        jLabel4.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(153, 153, 153)));
-        jLabel4.setPreferredSize(new java.awt.Dimension(300, 20));
-        jPanel9.add(jLabel4);
-
-        jScrollPane2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        jScrollPane2.setPreferredSize(new java.awt.Dimension(350, 74));
-
-        jTextArea2.setEditable(false);
-        jTextArea2.setBackground(new java.awt.Color(255, 255, 255));
-        jTextArea2.setColumns(20);
-        jTextArea2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jTextArea2.setLineWrap(true);
-        jTextArea2.setRows(5);
-        jTextArea2.setWrapStyleWord(true);
-        jTextArea2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
-        jScrollPane2.setViewportView(jTextArea2);
-
-        jPanel9.add(jScrollPane2);
-
-        jLabel5.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Cantidad");
-        jLabel5.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(153, 153, 153)));
-        jLabel5.setPreferredSize(new java.awt.Dimension(150, 20));
-        jLabel5.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jLabel5PropertyChange(evt);
-            }
-        });
-        jPanel9.add(jLabel5);
-
-        jLabel6.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel6.setText("Precio");
-        jLabel6.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(153, 153, 153)));
-        jLabel6.setPreferredSize(new java.awt.Dimension(150, 20));
-        jPanel9.add(jLabel6);
-
-        jLabel7.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel7.setText("subtotal");
-        jLabel7.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(153, 153, 153)));
-        jLabel7.setPreferredSize(new java.awt.Dimension(150, 20));
-        jPanel9.add(jLabel7);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 12, 5, 12);
-        panelPrincipal.add(jPanel9, gridBagConstraints);
-
         scrollPrincipal.setViewportView(panelPrincipal);
 
         jPanel2.add(scrollPrincipal, java.awt.BorderLayout.CENTER);
@@ -422,6 +383,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         txtTotal.setEditable(false);
         txtTotal.setBackground(new java.awt.Color(255, 255, 255));
         txtTotal.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        txtTotal.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtTotal.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 3, 0, new java.awt.Color(153, 153, 153)));
         txtTotal.setPreferredSize(new java.awt.Dimension(200, 40));
         jPanel7.add(txtTotal);
@@ -433,23 +395,46 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 50, 5));
 
-        panelRound1.setBackground(new java.awt.Color(204, 0, 0));
-        panelRound1.setRoundBottomLeft(20);
-        panelRound1.setRoundBottomRight(20);
-        panelRound1.setRoundTopLeft(20);
+        botonRedondo2.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo2.setForeground(new java.awt.Color(153, 153, 255));
+        botonRedondo2.setText("Guardar");
+        botonRedondo2.setBorderColor(new java.awt.Color(153, 153, 255));
+        botonRedondo2.setBorderColorSelected(new java.awt.Color(153, 51, 255));
+        botonRedondo2.setColor(new java.awt.Color(153, 153, 255));
+        botonRedondo2.setFocusPainted(false);
+        botonRedondo2.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo2.setPreferredSize(new java.awt.Dimension(100, 35));
+        botonRedondo2.setThickness(3);
+        jPanel6.add(botonRedondo2);
 
-        jButton1.setFont(new java.awt.Font("Lexend", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf_1.png"))); // NOI18N
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.setFocusPainted(false);
-        jButton1.setPreferredSize(new java.awt.Dimension(100, 25));
-        panelRound1.add(jButton1);
+        botonRedondo3.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo3.setForeground(new java.awt.Color(51, 204, 0));
+        botonRedondo3.setText("Excel");
+        botonRedondo3.setBorderColor(new java.awt.Color(51, 204, 0));
+        botonRedondo3.setBorderColorSelected(new java.awt.Color(0, 102, 0));
+        botonRedondo3.setColor(new java.awt.Color(51, 204, 0));
+        botonRedondo3.setFocusPainted(false);
+        botonRedondo3.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo3.setPreferredSize(new java.awt.Dimension(100, 35));
+        botonRedondo3.setThickness(3);
+        botonRedondo3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRedondo3ActionPerformed(evt);
+            }
+        });
+        jPanel6.add(botonRedondo3);
 
-        jPanel6.add(panelRound1);
+        botonRedondo4.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo4.setForeground(new java.awt.Color(51, 153, 255));
+        botonRedondo4.setText("Abrir");
+        botonRedondo4.setBorderColor(new java.awt.Color(51, 153, 255));
+        botonRedondo4.setBorderColorSelected(new java.awt.Color(0, 51, 153));
+        botonRedondo4.setColor(new java.awt.Color(51, 153, 255));
+        botonRedondo4.setFocusPainted(false);
+        botonRedondo4.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo4.setPreferredSize(new java.awt.Dimension(100, 35));
+        botonRedondo4.setThickness(3);
+        jPanel6.add(botonRedondo4);
 
         jPanel1.add(jPanel6, java.awt.BorderLayout.PAGE_END);
 
@@ -472,28 +457,236 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         lblSalir.setForeground(Color.black);
     }//GEN-LAST:event_lblSalirMouseExited
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        agregarParte();
-    }//GEN-LAST:event_jButton3ActionPerformed
-
     private void txtParteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtParteActionPerformed
         agregarParte();
     }//GEN-LAST:event_txtParteActionPerformed
 
-    private void jLabel5PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jLabel5PropertyChange
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jLabel5PropertyChange
+    private void botonRedondo5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo5ActionPerformed
+        agregarParte();
+    }//GEN-LAST:event_botonRedondo5ActionPerformed
+
+    private void botonRedondo3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo3ActionPerformed
+        Workbook book;
+        try {
+            JFileChooser fc = new JFileChooser();
+            File archivo = null;
+            fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
+            int n = fc.showSaveDialog(this);
+
+            if(n == JFileChooser.APPROVE_OPTION){
+                archivo = fc.getSelectedFile();
+            }
+            String a = ""+archivo;
+            if(a.endsWith("xls")){
+                book = new  HSSFWorkbook();
+            }else {
+                book = new XSSFWorkbook();
+                a = archivo + ".xlsx";
+            }
+
+            Sheet hoja = book.createSheet("Reporte de costos");
+
+            //-------------------------------ESTILOS
+            org.apache.poi.ss.usermodel.Font font = book.createFont();
+            CellStyle estilo1 = book.createCellStyle();
+
+            org.apache.poi.ss.usermodel.Font font3 = book.createFont();
+            CellStyle estilo3 = book.createCellStyle();
+
+            font.setBold(true);
+            font.setColor(IndexedColors.BLACK.getIndex());
+            font.setFontHeightInPoints((short)12);
+            estilo1.setFont(font);
+
+            estilo1.setAlignment(HorizontalAlignment.LEFT);
+
+            font3.setBold(false);
+            font3.setColor(IndexedColors.BLACK.getIndex());
+            font3.setFontHeightInPoints((short)15);
+            estilo3.setFont(font3);
+
+            estilo3.setAlignment(HorizontalAlignment.CENTER);
+            estilo3.setWrapText(true);
+
+            //--------------------------------------
+            //        hoja.setColumnWidth(2, 5000);
+            //---------------------------------------
+            int valorFijo = 28;
+
+            hoja.setColumnWidth(0, valorFijo * 120);
+            hoja.setColumnWidth(1, valorFijo * 261);
+            hoja.setColumnWidth(2, valorFijo * 390);
+            hoja.setColumnWidth(3, valorFijo * 71);
+            hoja.setColumnWidth(4, valorFijo * 200);
+            hoja.setColumnWidth(5, valorFijo * 104);
+            hoja.setColumnWidth(6, valorFijo * 251);
+            hoja.setColumnWidth(7, valorFijo * 251);
+            hoja.setColumnWidth(8, valorFijo * 150);
+            hoja.setColumnWidth(9, valorFijo * 150);
+            hoja.setColumnWidth(10, valorFijo * 150);
+            hoja.setColumnWidth(11, valorFijo * 150);
+
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+
+            properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+            properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+            properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+            properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+
+            for (int i = -1; i < parte.size(); i++) {
+                Row fila10=hoja.createRow(i+3);
+                for (int j = 0; j < 12; j++) {
+                    Cell celda=fila10.createCell(j);
+                    boolean band = false;
+                    if(i == -1){
+                        XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
+                        org.apache.poi.ss.usermodel.Font f = book.createFont();
+                        f.setBold(true);
+                        f.setColor(IndexedColors.WHITE.getIndex());
+                        s.setFont(f);
+                        XSSFColor customColor = new XSSFColor(new java.awt.Color(56, 118, 142));
+                        s.setWrapText(true);
+                        s.setFillForegroundColor(customColor);
+                        s.setFillPattern(SOLID_FOREGROUND);
+                        celda.setCellStyle(s);
+                        band = true;
+                    }
+                    String texto = "";
+                    boolean form = false;
+                    boolean total = false;
+                    boolean num = false;
+                    boolean conta = false;
+                    switch(j){
+                        case 0:
+                        if(band){
+                            texto = "Assembly Structure Path";
+                        }
+                        break;
+                        case 1:
+                        if(band){
+                            texto = "Part Number";
+                        }else{
+                            texto = parte.get(i).getText();
+                        }
+                        break;
+                        case 2:
+                        if(band){
+                            texto = "Description";
+                        }else{
+                            texto = descripcion.get(i).getText();
+                        }
+                        break;
+                        case 3:
+                        if(band){
+                            texto = "Quantity per subassembly";
+                        }else{
+                            texto = cantidad.get(i).getText();
+                            num = true;
+                        }
+                        break;
+                        case 4:
+                        if(band){
+                            texto = "Quantity per machine";
+                        }
+                        break;
+                        case 5:
+                        if(band){
+                            texto = "Unit";
+                        }
+                        break;
+                        case 6:
+                        if(band){
+                            texto = "Supplier";
+                        }else{
+                            texto = proveedor.get(i);
+                        }
+                        break;
+                        case 7:
+                        if(band){
+                            texto = "Comments";
+                        }
+                        break;
+                        case 8:
+                        if(band){
+                            texto = "costo";
+                        }else{
+                            texto = precio.get(i).getText();
+                            num = true;
+                        }
+                        break;
+                        case 9:
+                        if(band){
+                            texto = "TOTAL";
+                        }else{
+                            form = true;
+                        }
+                        break;
+                        case 10:
+                        if(band){
+                            texto = "margen";
+                        }else{
+                            texto = "30%";
+                        }
+                        break;
+                        case 11:
+                        if(band){
+                            texto = "total";
+                        }else{
+                            conta = true;
+                        }
+                        break;
+
+                    }
+                    if(form){
+                        celda.setCellFormula("D"+(i + 4)+" * I"+(i + 4));
+                    }else if(total){
+                        celda.setCellFormula("J"+(i + 4)+"*(1+K"+(i + 4)+")");
+                    }else if(conta){
+                        celda.setCellFormula("J"+(i + 4)+"*(1+K"+(i + 4)+")");
+                        CellStyle style = book.createCellStyle();
+                        style.setDataFormat(book.createDataFormat().getFormat("#,##0.00"));
+                        celda.setCellStyle(style);
+                    }else{
+                        if(num){
+                            celda.setCellValue(Double.parseDouble(texto));
+                        }else{
+                            celda.setCellValue(texto);
+                        }
+                    }
+                    book.write(new FileOutputStream(a));
+                }
+            }
+            book.close();
+            try {
+                Desktop desktop = Desktop.getDesktop();
+
+                if (desktop.isSupported(Desktop.Action.OPEN) && new File(a).exists()) {
+                    desktop.open(new File(a));
+                } else {
+                    JOptionPane.showMessageDialog(this,"No se puede abrir el archivo automáticamente. Abre manualmente en Excel.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_botonRedondo3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
+    private scrollPane.BotonRedondo botonRedondo2;
+    private scrollPane.BotonRedondo botonRedondo3;
+    private scrollPane.BotonRedondo botonRedondo4;
+    private scrollPane.BotonRedondo botonRedondo5;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -501,14 +694,9 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea jTextArea2;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelPrincipal;
-    private scrollPane.PanelRound panelRound1;
-    private scrollPane.PanelRound panelRound2;
     private javax.swing.JPanel panelSalir;
     private javax.swing.JScrollPane scrollPrincipal;
     private javax.swing.JTextField txtParte;
