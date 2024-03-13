@@ -2,6 +2,7 @@ package VentanaEmergente.Costos;
 
 import Conexiones.Conexion;
 import VentanaEmergente.Diseño.codigoBarras;
+import VentanaEmergente.Inicio1.Espera;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -27,6 +28,7 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -50,6 +52,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pruebas.CambiarEstado;
+import pruebas.Inicio1;
 
 public class Costeo extends javax.swing.JInternalFrame implements MouseListener, ActionListener, PropertyChangeListener{
 
@@ -61,10 +64,29 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     public Stack<JLabel> subtotal;
     public Stack<JTextArea> descripcion;
     public Stack<String> proveedor;
+    public Stack<String> proveedores;
     public TextAutoCompleter au;
     int cont = 0;
     public int parteSeleccionada;
     opciones opc;
+    Espera espera;
+    
+    public final void totalProveedores(){
+        try{
+            proveedores = new Stack<>();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from clientes";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                proveedores.push(rs.getString("Nombre"));
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+ e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
     
     public final void agregarPartes(){
         try{
@@ -243,6 +265,46 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         txtTotal.setText(formato.format(total));
     }
     
+    public void setEmpresa(String empresa){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from clientes where Nombre like '"+empresa+"'";
+            ResultSet rs = st.executeQuery(sql);
+            String nombre = null;
+            String contacto = null;
+            while(rs.next()){
+                nombre = rs.getString("Nombre");
+                contacto = rs.getString("Contacto");
+            }
+            if(nombre != null){
+                lblEmpresa.setText("<html>\n" +
+                "<style>\n" +
+                ".titulo{\n" +
+                "font-size: 8px;\n" +
+                "font-weight: 700;\n" +
+                "padding: 5px;\n" +
+                "color: rgb(7, 96, 124);\n" +
+                "}\n" +
+                "</style>\n" +
+                "<div style='width:200px;'>\n" +
+                "<div>\n" +
+                "<p class = 'titulo'>Empresa :</p>\n" +
+                "<p>" + nombre + "</p>\n" +
+                "</div>\n" +
+                "<div>\n" +
+                "<p  class = 'titulo'>Contacto: </p>\n" +
+                "<p>" + contacto + "</p>\n" +
+                "</div>\n" +
+                "</div>");
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public Costeo(String numEmpleado) {
         initComponents();
         this.numEmpleado = numEmpleado;
@@ -256,6 +318,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         proveedor = new Stack<>();
         agregarPartes();
         panelPrincipal.removeAll();
+        totalProveedores();
         revalidate();
         repaint();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
@@ -264,6 +327,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -278,13 +342,17 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         botonRedondo5 = new scrollPane.BotonRedondo();
         scrollPrincipal = new javax.swing.JScrollPane();
         panelPrincipal = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         txtTotal = new javax.swing.JTextField();
-        jPanel6 = new javax.swing.JPanel();
+        jPanel8 = new javax.swing.JPanel();
+        lblEmpresa = new javax.swing.JLabel();
         botonRedondo2 = new scrollPane.BotonRedondo();
         botonRedondo3 = new scrollPane.BotonRedondo();
         botonRedondo4 = new scrollPane.BotonRedondo();
+        botonRedondo6 = new scrollPane.BotonRedondo();
+        botonRedondo7 = new scrollPane.BotonRedondo();
 
         setBorder(null);
 
@@ -353,7 +421,6 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         botonRedondo5.setBorderColor(new java.awt.Color(0, 102, 255));
         botonRedondo5.setBorderColorSelected(new java.awt.Color(0, 51, 153));
         botonRedondo5.setColor(new java.awt.Color(0, 102, 255));
-        botonRedondo5.setFocusPainted(false);
         botonRedondo5.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
         botonRedondo5.setPreferredSize(new java.awt.Dimension(100, 35));
         botonRedondo5.setThickness(3);
@@ -374,26 +441,44 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
 
         jPanel2.add(scrollPrincipal, java.awt.BorderLayout.CENTER);
 
-        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel1.setFont(new java.awt.Font("Lexend", 1, 18)); // NOI18N
-        jLabel1.setText("Total: ");
-        jPanel7.add(jLabel1);
-
-        txtTotal.setEditable(false);
-        txtTotal.setBackground(new java.awt.Color(255, 255, 255));
-        txtTotal.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
-        txtTotal.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTotal.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 3, 0, new java.awt.Color(153, 153, 153)));
-        txtTotal.setPreferredSize(new java.awt.Dimension(200, 40));
-        jPanel7.add(txtTotal);
-
-        jPanel2.add(jPanel7, java.awt.BorderLayout.PAGE_END);
-
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 50, 5));
+        jPanel6.setLayout(new java.awt.BorderLayout());
+
+        jPanel7.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel7.setLayout(new java.awt.GridBagLayout());
+
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel1.setText("Total: ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel7.add(jLabel1, gridBagConstraints);
+
+        txtTotal.setEditable(false);
+        txtTotal.setBackground(new java.awt.Color(255, 255, 255));
+        txtTotal.setFont(new java.awt.Font("Lexend", 1, 18)); // NOI18N
+        txtTotal.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtTotal.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 3, 0, new java.awt.Color(204, 204, 204)));
+        txtTotal.setPreferredSize(new java.awt.Dimension(200, 40));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        jPanel7.add(txtTotal, gridBagConstraints);
+
+        jPanel6.add(jPanel7, java.awt.BorderLayout.PAGE_START);
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel8.setLayout(new java.awt.GridBagLayout());
+
+        lblEmpresa.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        lblEmpresa.setForeground(new java.awt.Color(113, 180, 202));
+        lblEmpresa.setText("<html>\n<style>\n.titulo{\nfont-size: 8px;\nfont-weight: 700;\npadding: 5px;\ncolor: rgb(7, 96, 124);\n}\n</style>\n<div style='width:200px;'>\n<div>\n<p class = 'titulo'>Empresa :</p>\n<p></p>\n</div>\n<div>\n<p  class = 'titulo'>Contacto: </p>\n<p></p>\n</div>\n</div>");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(lblEmpresa, gridBagConstraints);
 
         botonRedondo2.setBackground(new java.awt.Color(255, 255, 255));
         botonRedondo2.setForeground(new java.awt.Color(153, 153, 255));
@@ -401,11 +486,13 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         botonRedondo2.setBorderColor(new java.awt.Color(153, 153, 255));
         botonRedondo2.setBorderColorSelected(new java.awt.Color(153, 51, 255));
         botonRedondo2.setColor(new java.awt.Color(153, 153, 255));
-        botonRedondo2.setFocusPainted(false);
         botonRedondo2.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
         botonRedondo2.setPreferredSize(new java.awt.Dimension(100, 35));
         botonRedondo2.setThickness(3);
-        jPanel6.add(botonRedondo2);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(botonRedondo2, gridBagConstraints);
 
         botonRedondo3.setBackground(new java.awt.Color(255, 255, 255));
         botonRedondo3.setForeground(new java.awt.Color(51, 204, 0));
@@ -413,7 +500,6 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         botonRedondo3.setBorderColor(new java.awt.Color(51, 204, 0));
         botonRedondo3.setBorderColorSelected(new java.awt.Color(0, 102, 0));
         botonRedondo3.setColor(new java.awt.Color(51, 204, 0));
-        botonRedondo3.setFocusPainted(false);
         botonRedondo3.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
         botonRedondo3.setPreferredSize(new java.awt.Dimension(100, 35));
         botonRedondo3.setThickness(3);
@@ -422,7 +508,10 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
                 botonRedondo3ActionPerformed(evt);
             }
         });
-        jPanel6.add(botonRedondo3);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(botonRedondo3, gridBagConstraints);
 
         botonRedondo4.setBackground(new java.awt.Color(255, 255, 255));
         botonRedondo4.setForeground(new java.awt.Color(51, 153, 255));
@@ -430,13 +519,60 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         botonRedondo4.setBorderColor(new java.awt.Color(51, 153, 255));
         botonRedondo4.setBorderColorSelected(new java.awt.Color(0, 51, 153));
         botonRedondo4.setColor(new java.awt.Color(51, 153, 255));
-        botonRedondo4.setFocusPainted(false);
         botonRedondo4.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
         botonRedondo4.setPreferredSize(new java.awt.Dimension(100, 35));
         botonRedondo4.setThickness(3);
-        jPanel6.add(botonRedondo4);
+        botonRedondo4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRedondo4ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(botonRedondo4, gridBagConstraints);
 
-        jPanel1.add(jPanel6, java.awt.BorderLayout.PAGE_END);
+        botonRedondo6.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo6.setForeground(new java.awt.Color(255, 51, 51));
+        botonRedondo6.setText("Agregar Empresa");
+        botonRedondo6.setBorderColor(new java.awt.Color(255, 51, 51));
+        botonRedondo6.setBorderColorSelected(new java.awt.Color(153, 0, 0));
+        botonRedondo6.setColor(new java.awt.Color(255, 51, 51));
+        botonRedondo6.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo6.setPreferredSize(new java.awt.Dimension(170, 35));
+        botonRedondo6.setThickness(3);
+        botonRedondo6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRedondo6ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(botonRedondo6, gridBagConstraints);
+
+        botonRedondo7.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo7.setForeground(new java.awt.Color(255, 102, 255));
+        botonRedondo7.setText("Agregar Cliente");
+        botonRedondo7.setBorderColor(new java.awt.Color(255, 102, 255));
+        botonRedondo7.setBorderColorSelected(new java.awt.Color(204, 0, 204));
+        botonRedondo7.setColor(new java.awt.Color(255, 102, 255));
+        botonRedondo7.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo7.setPreferredSize(new java.awt.Dimension(170, 35));
+        botonRedondo7.setThickness(3);
+        botonRedondo7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRedondo7ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(botonRedondo7, gridBagConstraints);
+
+        jPanel6.add(jPanel8, java.awt.BorderLayout.SOUTH);
+
+        jPanel1.add(jPanel6, java.awt.BorderLayout.EAST);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -466,218 +602,254 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     }//GEN-LAST:event_botonRedondo5ActionPerformed
 
     private void botonRedondo3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo3ActionPerformed
-        Workbook book;
-        try {
-            JFileChooser fc = new JFileChooser();
-            File archivo = null;
-            fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
-            int n = fc.showSaveDialog(this);
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        Thread hilo = new Thread(){
+          public void run(){
+                espera = new Espera();
+                espera.activar();
+                espera.setLocationRelativeTo(f);
+                espera.setExtendedState(Inicio1.MAXIMIZED_BOTH);
+                espera.setVisible(true);
+                Workbook book;
+                try {
+                    JFileChooser fc = new JFileChooser();
+                    File archivo = null;
+                    fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
+                    int n = fc.showSaveDialog(f);
 
-            if(n == JFileChooser.APPROVE_OPTION){
-                archivo = fc.getSelectedFile();
-            }
-            String a = ""+archivo;
-            if(a.endsWith("xls")){
-                book = new  HSSFWorkbook();
-            }else {
-                book = new XSSFWorkbook();
-                a = archivo + ".xlsx";
-            }
+                    if(n == JFileChooser.APPROVE_OPTION){
+                        archivo = fc.getSelectedFile();
+                        String a = ""+archivo;
+                        if(a.endsWith("xls")){
+                            book = new  HSSFWorkbook();
+                        }else {
+                            book = new XSSFWorkbook();
+                            a = archivo + ".xlsx";
+                        }
 
-            Sheet hoja = book.createSheet("Reporte de costos");
+                        Sheet hoja = book.createSheet("Reporte de costos");
 
-            //-------------------------------ESTILOS
-            org.apache.poi.ss.usermodel.Font font = book.createFont();
-            CellStyle estilo1 = book.createCellStyle();
+                        //-------------------------------ESTILOS
+                        org.apache.poi.ss.usermodel.Font font = book.createFont();
+                        CellStyle estilo1 = book.createCellStyle();
 
-            org.apache.poi.ss.usermodel.Font font3 = book.createFont();
-            CellStyle estilo3 = book.createCellStyle();
+                        org.apache.poi.ss.usermodel.Font font3 = book.createFont();
+                        CellStyle estilo3 = book.createCellStyle();
 
-            font.setBold(true);
-            font.setColor(IndexedColors.BLACK.getIndex());
-            font.setFontHeightInPoints((short)12);
-            estilo1.setFont(font);
+                        font.setBold(true);
+                        font.setColor(IndexedColors.BLACK.getIndex());
+                        font.setFontHeightInPoints((short)12);
+                        estilo1.setFont(font);
 
-            estilo1.setAlignment(HorizontalAlignment.LEFT);
+                        estilo1.setAlignment(HorizontalAlignment.LEFT);
 
-            font3.setBold(false);
-            font3.setColor(IndexedColors.BLACK.getIndex());
-            font3.setFontHeightInPoints((short)15);
-            estilo3.setFont(font3);
+                        font3.setBold(false);
+                        font3.setColor(IndexedColors.BLACK.getIndex());
+                        font3.setFontHeightInPoints((short)15);
+                        estilo3.setFont(font3);
 
-            estilo3.setAlignment(HorizontalAlignment.CENTER);
-            estilo3.setWrapText(true);
+                        estilo3.setAlignment(HorizontalAlignment.CENTER);
+                        estilo3.setWrapText(true);
 
-            //--------------------------------------
-            //        hoja.setColumnWidth(2, 5000);
-            //---------------------------------------
-            int valorFijo = 28;
+                        //--------------------------------------
+                        //        hoja.setColumnWidth(2, 5000);
+                        //---------------------------------------
+                        int valorFijo = 28;
 
-            hoja.setColumnWidth(0, valorFijo * 120);
-            hoja.setColumnWidth(1, valorFijo * 261);
-            hoja.setColumnWidth(2, valorFijo * 390);
-            hoja.setColumnWidth(3, valorFijo * 71);
-            hoja.setColumnWidth(4, valorFijo * 200);
-            hoja.setColumnWidth(5, valorFijo * 104);
-            hoja.setColumnWidth(6, valorFijo * 251);
-            hoja.setColumnWidth(7, valorFijo * 251);
-            hoja.setColumnWidth(8, valorFijo * 150);
-            hoja.setColumnWidth(9, valorFijo * 150);
-            hoja.setColumnWidth(10, valorFijo * 150);
-            hoja.setColumnWidth(11, valorFijo * 150);
+                        hoja.setColumnWidth(0, valorFijo * 120);
+                        hoja.setColumnWidth(1, valorFijo * 261);
+                        hoja.setColumnWidth(2, valorFijo * 390);
+                        hoja.setColumnWidth(3, valorFijo * 71);
+                        hoja.setColumnWidth(4, valorFijo * 200);
+                        hoja.setColumnWidth(5, valorFijo * 104);
+                        hoja.setColumnWidth(6, valorFijo * 251);
+                        hoja.setColumnWidth(7, valorFijo * 251);
+                        hoja.setColumnWidth(8, valorFijo * 150);
+                        hoja.setColumnWidth(9, valorFijo * 150);
+                        hoja.setColumnWidth(10, valorFijo * 150);
+                        hoja.setColumnWidth(11, valorFijo * 150);
 
-            Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+                        Map<String, Object> properties = new HashMap<String, Object>();
+                        properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+                        properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+                        properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+                        properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
 
-            properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-            properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-            properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-            properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                        properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                        properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                        properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
 
-            for (int i = -1; i < parte.size(); i++) {
-                Row fila10=hoja.createRow(i+3);
-                for (int j = 0; j < 12; j++) {
-                    Cell celda=fila10.createCell(j);
-                    boolean band = false;
-                    if(i == -1){
-                        XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
-                        org.apache.poi.ss.usermodel.Font f = book.createFont();
-                        f.setBold(true);
-                        f.setColor(IndexedColors.WHITE.getIndex());
-                        s.setFont(f);
-                        XSSFColor customColor = new XSSFColor(new java.awt.Color(56, 118, 142));
-                        s.setWrapText(true);
-                        s.setFillForegroundColor(customColor);
-                        s.setFillPattern(SOLID_FOREGROUND);
-                        celda.setCellStyle(s);
-                        band = true;
+                        for (int i = -1; i < parte.size(); i++) {
+                            Row fila10=hoja.createRow(i+3);
+                            for (int j = 0; j < 12; j++) {
+                                Cell celda=fila10.createCell(j);
+                                boolean band = false;
+                                if(i == -1){
+                                    XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
+                                    org.apache.poi.ss.usermodel.Font f = book.createFont();
+                                    f.setBold(true);
+                                    f.setColor(IndexedColors.WHITE.getIndex());
+                                    s.setFont(f);
+                                    XSSFColor customColor = new XSSFColor(new java.awt.Color(56, 118, 142));
+                                    s.setWrapText(true);
+                                    s.setFillForegroundColor(customColor);
+                                    s.setFillPattern(SOLID_FOREGROUND);
+                                    celda.setCellStyle(s);
+                                    band = true;
+                                }
+                                String texto = "";
+                                boolean form = false;
+                                boolean total = false;
+                                boolean num = false;
+                                boolean conta = false;
+                                switch(j){
+                                    case 0:
+                                    if(band){
+                                        texto = "Assembly Structure Path";
+                                    }
+                                    break;
+                                    case 1:
+                                    if(band){
+                                        texto = "Part Number";
+                                    }else{
+                                        texto = parte.get(i).getText();
+                                    }
+                                    break;
+                                    case 2:
+                                    if(band){
+                                        texto = "Description";
+                                    }else{
+                                        texto = descripcion.get(i).getText();
+                                    }
+                                    break;
+                                    case 3:
+                                    if(band){
+                                        texto = "Quantity per subassembly";
+                                    }else{
+                                        texto = cantidad.get(i).getText();
+                                        num = true;
+                                    }
+                                    break;
+                                    case 4:
+                                    if(band){
+                                        texto = "Quantity per machine";
+                                    }
+                                    break;
+                                    case 5:
+                                    if(band){
+                                        texto = "Unit";
+                                    }
+                                    break;
+                                    case 6:
+                                    if(band){
+                                        texto = "Supplier";
+                                    }else{
+                                        texto = proveedor.get(i);
+                                    }
+                                    break;
+                                    case 7:
+                                    if(band){
+                                        texto = "Comments";
+                                    }
+                                    break;
+                                    case 8:
+                                    if(band){
+                                        texto = "costo";
+                                    }else{
+                                        texto = precio.get(i).getText();
+                                        num = true;
+                                    }
+                                    break;
+                                    case 9:
+                                    if(band){
+                                        texto = "TOTAL";
+                                    }else{
+                                        form = true;
+                                    }
+                                    break;
+                                    case 10:
+                                    if(band){
+                                        texto = "margen";
+                                    }else{
+                                        texto = "30%";
+                                    }
+                                    break;
+                                    case 11:
+                                    if(band){
+                                        texto = "total";
+                                    }else{
+                                        conta = true;
+                                    }
+                                    break;
+
+                                }
+                                if(form){
+                                    celda.setCellFormula("D"+(i + 4)+" * I"+(i + 4));
+                                }else if(total){
+                                    celda.setCellFormula("J"+(i + 4)+"*(1+K"+(i + 4)+")");
+                                }else if(conta){
+                                    celda.setCellFormula("J"+(i + 4)+"*(1+K"+(i + 4)+")");
+                                    CellStyle style = book.createCellStyle();
+                                    style.setDataFormat(book.createDataFormat().getFormat("#,##0.00"));
+                                    celda.setCellStyle(style);
+                                }else{
+                                    if(num){
+                                        celda.setCellValue(Double.parseDouble(texto));
+                                    }else{
+                                        celda.setCellValue(texto);
+                                    }
+                                }
+                                book.write(new FileOutputStream(a));
+                            }
+                        }
+                        book.close();
+                        try {
+                            Desktop desktop = Desktop.getDesktop();
+
+                            if (desktop.isSupported(Desktop.Action.OPEN) && new File(a).exists()) {
+                                desktop.open(new File(a));
+                            } else {
+                                JOptionPane.showMessageDialog(null,"No se puede abrir el archivo automáticamente. Abre manualmente en Excel.");
+                            }
+                        } catch (IOException e) {
+                            espera.dispose();
+                            e.printStackTrace();
+                        }
                     }
-                    String texto = "";
-                    boolean form = false;
-                    boolean total = false;
-                    boolean num = false;
-                    boolean conta = false;
-                    switch(j){
-                        case 0:
-                        if(band){
-                            texto = "Assembly Structure Path";
-                        }
-                        break;
-                        case 1:
-                        if(band){
-                            texto = "Part Number";
-                        }else{
-                            texto = parte.get(i).getText();
-                        }
-                        break;
-                        case 2:
-                        if(band){
-                            texto = "Description";
-                        }else{
-                            texto = descripcion.get(i).getText();
-                        }
-                        break;
-                        case 3:
-                        if(band){
-                            texto = "Quantity per subassembly";
-                        }else{
-                            texto = cantidad.get(i).getText();
-                            num = true;
-                        }
-                        break;
-                        case 4:
-                        if(band){
-                            texto = "Quantity per machine";
-                        }
-                        break;
-                        case 5:
-                        if(band){
-                            texto = "Unit";
-                        }
-                        break;
-                        case 6:
-                        if(band){
-                            texto = "Supplier";
-                        }else{
-                            texto = proveedor.get(i);
-                        }
-                        break;
-                        case 7:
-                        if(band){
-                            texto = "Comments";
-                        }
-                        break;
-                        case 8:
-                        if(band){
-                            texto = "costo";
-                        }else{
-                            texto = precio.get(i).getText();
-                            num = true;
-                        }
-                        break;
-                        case 9:
-                        if(band){
-                            texto = "TOTAL";
-                        }else{
-                            form = true;
-                        }
-                        break;
-                        case 10:
-                        if(band){
-                            texto = "margen";
-                        }else{
-                            texto = "30%";
-                        }
-                        break;
-                        case 11:
-                        if(band){
-                            texto = "total";
-                        }else{
-                            conta = true;
-                        }
-                        break;
-
-                    }
-                    if(form){
-                        celda.setCellFormula("D"+(i + 4)+" * I"+(i + 4));
-                    }else if(total){
-                        celda.setCellFormula("J"+(i + 4)+"*(1+K"+(i + 4)+")");
-                    }else if(conta){
-                        celda.setCellFormula("J"+(i + 4)+"*(1+K"+(i + 4)+")");
-                        CellStyle style = book.createCellStyle();
-                        style.setDataFormat(book.createDataFormat().getFormat("#,##0.00"));
-                        celda.setCellStyle(style);
-                    }else{
-                        if(num){
-                            celda.setCellValue(Double.parseDouble(texto));
-                        }else{
-                            celda.setCellValue(texto);
-                        }
-                    }
-                    book.write(new FileOutputStream(a));
+                    espera.dispose();
+                } catch (FileNotFoundException ex) {
+                    espera.dispose();
+                    Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    espera.dispose();
+                    Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            book.close();
-            try {
-                Desktop desktop = Desktop.getDesktop();
-
-                if (desktop.isSupported(Desktop.Action.OPEN) && new File(a).exists()) {
-                    desktop.open(new File(a));
-                } else {
-                    JOptionPane.showMessageDialog(this,"No se puede abrir el archivo automáticamente. Abre manualmente en Excel.");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        };
+        hilo.start();
     }//GEN-LAST:event_botonRedondo3ActionPerformed
+
+    private void botonRedondo4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_botonRedondo4ActionPerformed
+
+    private void botonRedondo6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo6ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        agregarProveedor agregar = new agregarProveedor(f, true);
+        agregar.setLocationRelativeTo(f);
+        agregar.autocompletar(proveedores);
+        String cliente = agregar.getProveedor();
+        setEmpresa(cliente);
+    }//GEN-LAST:event_botonRedondo6ActionPerformed
+
+    private void botonRedondo7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo7ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        AgregarCliente add = new AgregarCliente(f,true);
+        add.setLocationRelativeTo(f);
+        add.setVisible(true);
+        totalProveedores();
+    }//GEN-LAST:event_botonRedondo7ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -685,6 +857,8 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     private scrollPane.BotonRedondo botonRedondo3;
     private scrollPane.BotonRedondo botonRedondo4;
     private scrollPane.BotonRedondo botonRedondo5;
+    private scrollPane.BotonRedondo botonRedondo6;
+    private scrollPane.BotonRedondo botonRedondo7;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JPanel jPanel1;
@@ -694,6 +868,8 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JLabel lblEmpresa;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelPrincipal;
