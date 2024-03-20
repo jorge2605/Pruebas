@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.rowset.serial.SerialBlob;
 import javax.swing.JOptionPane;
 import javax.swing.ImageIcon;
@@ -220,6 +222,8 @@ public class RegistrarEmpleado extends javax.swing.JFrame {
 
                     JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR DATOS"+ex);
 
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(RegistrarEmpleado.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             }

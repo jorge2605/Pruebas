@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -55,6 +57,8 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
                 pst.executeUpdate();
             }catch(SQLException e){
                 JOptionPane.showMessageDialog(this, "ERROR: "+e);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Bloqueos.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -78,6 +82,8 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Bloqueos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -97,6 +103,8 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Bloqueos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

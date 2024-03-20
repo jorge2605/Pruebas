@@ -144,6 +144,8 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             }
         }catch(SQLException e){
             System.out.println("ERROR: "+e);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(requisicionDeCompra.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return ban;

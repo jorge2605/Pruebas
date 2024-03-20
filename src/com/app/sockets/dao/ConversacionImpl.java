@@ -15,21 +15,22 @@ public class ConversacionImpl implements ConversacionDAO {
    
     @Override
     public void registrarConversacionA(String mensaje,String chat,String usuario) {
-        con = con1.getConnection();
         try {
+            con = con1.getConnection();
             String sql = "insert into `chat`.`" + chat + "` (`" + usuario + "`) values('"+mensaje+"')";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.executeUpdate();
         } catch (SQLException error) {
             Logger.getLogger(ConversacionImpl.class.getName()).log(Level.SEVERE, null, error);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ConversacionImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     @Override
     public void registrarConversacionB(String mensaje,String chat,String usuario) {
-        con = con1.getConnection();
-        
         try {
+            con = con1.getConnection();
             String sql = "insert into " + chat + "(" + usuario + ") values(?)";
             PreparedStatement pst = con.prepareStatement(sql);
 
@@ -37,6 +38,8 @@ public class ConversacionImpl implements ConversacionDAO {
             pst.executeUpdate();
         } catch (SQLException error) {
             System.out.println(error);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ConversacionImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

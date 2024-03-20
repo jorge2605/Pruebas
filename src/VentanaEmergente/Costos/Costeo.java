@@ -18,10 +18,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -68,8 +71,15 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     public TextAutoCompleter au;
     int cont = 0;
     public int parteSeleccionada;
+    public String empresa;
     opciones opc;
     Espera espera;
+    
+    public void limpiarPanel(){
+        panelPrincipal.removeAll();
+        revalidate();
+        repaint();
+    }
     
     public final void totalProveedores(){
         try{
@@ -305,6 +315,56 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         }
     }
     
+    public void verCotizacion(String cotizacion){
+        try{
+            panel = new Stack<>();
+            parte = new Stack<>();
+            cantidad = new Stack<>();
+            precio = new Stack<>();
+            descripcion = new Stack<>();
+            subtotal = new Stack<>();
+            proveedor = new Stack<>();
+            cont = 0;
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            Statement st2 = con.createStatement();
+            String sql = "select * from costeoparte where idcosteoparte like '" + cotizacion + "'";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                String emp = rs.getString("Empresa");
+                this.empresa = emp;
+                setEmpresa(emp);
+            }
+            
+            limpiarPanel();
+            
+            String sql2 = "select * from costeopartes where IdCosteo like '" + cotizacion + "'";
+            ResultSet rs2 = st2.executeQuery(sql2);
+            while(rs2.next()){
+                String codigo = rs2.getString("IdParte");
+                String precio = rs2.getString("Precio");
+                String cantidad = rs2.getString("Cantidad");
+                String desc = "";
+                String prov = "";
+                String sql3 = "select Codigo, Descripcion, Precio, Proveedor from requisiciones where Codigo like '" + codigo + "' and Precio is not null and Precio != '' and Precio != '0'";
+                Statement st3 = con.createStatement();
+                ResultSet rs3 = st3.executeQuery(sql3);
+                while(rs3.next()){
+                    desc = rs3.getString("Descripcion");
+                    prov = rs3.getString("Proveedor");
+                }
+                crearPanel(codigo, desc, cantidad, precio);
+                this.proveedor.push(prov);
+                txtParte.setText("");
+            }
+            
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public Costeo(String numEmpleado) {
         initComponents();
         this.numEmpleado = numEmpleado;
@@ -318,6 +378,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         proveedor = new Stack<>();
         agregarPartes();
         panelPrincipal.removeAll();
+        panelCoti.setVisible(false);
         totalProveedores();
         revalidate();
         repaint();
@@ -347,12 +408,16 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         jLabel1 = new javax.swing.JLabel();
         txtTotal = new javax.swing.JTextField();
         jPanel8 = new javax.swing.JPanel();
+        panelCoti = new javax.swing.JPanel();
+        lbl = new javax.swing.JLabel();
+        lblCotizacion = new javax.swing.JLabel();
         lblEmpresa = new javax.swing.JLabel();
-        botonRedondo2 = new scrollPane.BotonRedondo();
-        botonRedondo3 = new scrollPane.BotonRedondo();
-        botonRedondo4 = new scrollPane.BotonRedondo();
-        botonRedondo6 = new scrollPane.BotonRedondo();
-        botonRedondo7 = new scrollPane.BotonRedondo();
+        btnGuardar = new scrollPane.BotonRedondo();
+        btnExcel = new scrollPane.BotonRedondo();
+        btnAbrir = new scrollPane.BotonRedondo();
+        btnNuevo = new scrollPane.BotonRedondo();
+        btnEmplesa = new scrollPane.BotonRedondo();
+        btnCliente = new scrollPane.BotonRedondo();
 
         setBorder(null);
 
@@ -472,6 +537,22 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setLayout(new java.awt.GridBagLayout());
 
+        panelCoti.setBackground(new java.awt.Color(255, 255, 255));
+
+        lbl.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        lbl.setForeground(new java.awt.Color(113, 180, 202));
+        lbl.setText("Cotizacion No");
+        panelCoti.add(lbl);
+
+        lblCotizacion.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        lblCotizacion.setForeground(new java.awt.Color(113, 180, 202));
+        lblCotizacion.setText("#");
+        panelCoti.add(lblCotizacion);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        jPanel8.add(panelCoti, gridBagConstraints);
+
         lblEmpresa.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
         lblEmpresa.setForeground(new java.awt.Color(113, 180, 202));
         lblEmpresa.setText("<html>\n<style>\n.titulo{\nfont-size: 8px;\nfont-weight: 700;\npadding: 5px;\ncolor: rgb(7, 96, 124);\n}\n</style>\n<div style='width:200px;'>\n<div>\n<p class = 'titulo'>Empresa :</p>\n<p></p>\n</div>\n<div>\n<p  class = 'titulo'>Contacto: </p>\n<p></p>\n</div>\n</div>");
@@ -480,95 +561,120 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
         jPanel8.add(lblEmpresa, gridBagConstraints);
 
-        botonRedondo2.setBackground(new java.awt.Color(255, 255, 255));
-        botonRedondo2.setForeground(new java.awt.Color(153, 153, 255));
-        botonRedondo2.setText("Guardar");
-        botonRedondo2.setBorderColor(new java.awt.Color(153, 153, 255));
-        botonRedondo2.setBorderColorSelected(new java.awt.Color(153, 51, 255));
-        botonRedondo2.setColor(new java.awt.Color(153, 153, 255));
-        botonRedondo2.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
-        botonRedondo2.setPreferredSize(new java.awt.Dimension(100, 35));
-        botonRedondo2.setThickness(3);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
-        jPanel8.add(botonRedondo2, gridBagConstraints);
-
-        botonRedondo3.setBackground(new java.awt.Color(255, 255, 255));
-        botonRedondo3.setForeground(new java.awt.Color(51, 204, 0));
-        botonRedondo3.setText("Excel");
-        botonRedondo3.setBorderColor(new java.awt.Color(51, 204, 0));
-        botonRedondo3.setBorderColorSelected(new java.awt.Color(0, 102, 0));
-        botonRedondo3.setColor(new java.awt.Color(51, 204, 0));
-        botonRedondo3.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
-        botonRedondo3.setPreferredSize(new java.awt.Dimension(100, 35));
-        botonRedondo3.setThickness(3);
-        botonRedondo3.addActionListener(new java.awt.event.ActionListener() {
+        btnGuardar.setBackground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setForeground(new java.awt.Color(153, 153, 255));
+        btnGuardar.setText("Guardar");
+        btnGuardar.setBorderColor(new java.awt.Color(153, 153, 255));
+        btnGuardar.setBorderColorSelected(new java.awt.Color(153, 51, 255));
+        btnGuardar.setColor(new java.awt.Color(153, 153, 255));
+        btnGuardar.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnGuardar.setPreferredSize(new java.awt.Dimension(100, 35));
+        btnGuardar.setThickness(3);
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonRedondo3ActionPerformed(evt);
+                btnGuardarActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
-        jPanel8.add(botonRedondo3, gridBagConstraints);
+        jPanel8.add(btnGuardar, gridBagConstraints);
 
-        botonRedondo4.setBackground(new java.awt.Color(255, 255, 255));
-        botonRedondo4.setForeground(new java.awt.Color(51, 153, 255));
-        botonRedondo4.setText("Abrir");
-        botonRedondo4.setBorderColor(new java.awt.Color(51, 153, 255));
-        botonRedondo4.setBorderColorSelected(new java.awt.Color(0, 51, 153));
-        botonRedondo4.setColor(new java.awt.Color(51, 153, 255));
-        botonRedondo4.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
-        botonRedondo4.setPreferredSize(new java.awt.Dimension(100, 35));
-        botonRedondo4.setThickness(3);
-        botonRedondo4.addActionListener(new java.awt.event.ActionListener() {
+        btnExcel.setBackground(new java.awt.Color(255, 255, 255));
+        btnExcel.setForeground(new java.awt.Color(51, 204, 0));
+        btnExcel.setText("Excel");
+        btnExcel.setBorderColor(new java.awt.Color(51, 204, 0));
+        btnExcel.setBorderColorSelected(new java.awt.Color(0, 102, 0));
+        btnExcel.setColor(new java.awt.Color(51, 204, 0));
+        btnExcel.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnExcel.setPreferredSize(new java.awt.Dimension(100, 35));
+        btnExcel.setThickness(3);
+        btnExcel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonRedondo4ActionPerformed(evt);
+                btnExcelActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
-        jPanel8.add(botonRedondo4, gridBagConstraints);
+        jPanel8.add(btnExcel, gridBagConstraints);
 
-        botonRedondo6.setBackground(new java.awt.Color(255, 255, 255));
-        botonRedondo6.setForeground(new java.awt.Color(255, 51, 51));
-        botonRedondo6.setText("Agregar Empresa");
-        botonRedondo6.setBorderColor(new java.awt.Color(255, 51, 51));
-        botonRedondo6.setBorderColorSelected(new java.awt.Color(153, 0, 0));
-        botonRedondo6.setColor(new java.awt.Color(255, 51, 51));
-        botonRedondo6.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
-        botonRedondo6.setPreferredSize(new java.awt.Dimension(170, 35));
-        botonRedondo6.setThickness(3);
-        botonRedondo6.addActionListener(new java.awt.event.ActionListener() {
+        btnAbrir.setBackground(new java.awt.Color(255, 255, 255));
+        btnAbrir.setForeground(new java.awt.Color(51, 153, 255));
+        btnAbrir.setText("Abrir");
+        btnAbrir.setBorderColor(new java.awt.Color(51, 153, 255));
+        btnAbrir.setBorderColorSelected(new java.awt.Color(0, 51, 153));
+        btnAbrir.setColor(new java.awt.Color(51, 153, 255));
+        btnAbrir.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnAbrir.setPreferredSize(new java.awt.Dimension(100, 35));
+        btnAbrir.setThickness(3);
+        btnAbrir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonRedondo6ActionPerformed(evt);
+                btnAbrirActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
-        jPanel8.add(botonRedondo6, gridBagConstraints);
+        jPanel8.add(btnAbrir, gridBagConstraints);
 
-        botonRedondo7.setBackground(new java.awt.Color(255, 255, 255));
-        botonRedondo7.setForeground(new java.awt.Color(255, 102, 255));
-        botonRedondo7.setText("Agregar Cliente");
-        botonRedondo7.setBorderColor(new java.awt.Color(255, 102, 255));
-        botonRedondo7.setBorderColorSelected(new java.awt.Color(204, 0, 204));
-        botonRedondo7.setColor(new java.awt.Color(255, 102, 255));
-        botonRedondo7.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
-        botonRedondo7.setPreferredSize(new java.awt.Dimension(170, 35));
-        botonRedondo7.setThickness(3);
-        botonRedondo7.addActionListener(new java.awt.event.ActionListener() {
+        btnNuevo.setBackground(new java.awt.Color(255, 255, 255));
+        btnNuevo.setForeground(new java.awt.Color(0, 153, 0));
+        btnNuevo.setText("Nuevo");
+        btnNuevo.setBorderColor(new java.awt.Color(0, 153, 0));
+        btnNuevo.setBorderColorSelected(new java.awt.Color(0, 102, 0));
+        btnNuevo.setColor(new java.awt.Color(0, 153, 0));
+        btnNuevo.setEnabled(false);
+        btnNuevo.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnNuevo.setPreferredSize(new java.awt.Dimension(100, 35));
+        btnNuevo.setThickness(3);
+        btnNuevo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botonRedondo7ActionPerformed(evt);
+                btnNuevoActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
-        jPanel8.add(botonRedondo7, gridBagConstraints);
+        jPanel8.add(btnNuevo, gridBagConstraints);
+
+        btnEmplesa.setBackground(new java.awt.Color(255, 255, 255));
+        btnEmplesa.setForeground(new java.awt.Color(255, 51, 51));
+        btnEmplesa.setText("Agregar Empresa");
+        btnEmplesa.setBorderColor(new java.awt.Color(255, 51, 51));
+        btnEmplesa.setBorderColorSelected(new java.awt.Color(153, 0, 0));
+        btnEmplesa.setColor(new java.awt.Color(255, 51, 51));
+        btnEmplesa.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnEmplesa.setPreferredSize(new java.awt.Dimension(170, 35));
+        btnEmplesa.setThickness(3);
+        btnEmplesa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEmplesaActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(btnEmplesa, gridBagConstraints);
+
+        btnCliente.setBackground(new java.awt.Color(255, 255, 255));
+        btnCliente.setForeground(new java.awt.Color(255, 102, 255));
+        btnCliente.setText("Agregar Cliente");
+        btnCliente.setBorderColor(new java.awt.Color(255, 102, 255));
+        btnCliente.setBorderColorSelected(new java.awt.Color(204, 0, 204));
+        btnCliente.setColor(new java.awt.Color(255, 102, 255));
+        btnCliente.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnCliente.setPreferredSize(new java.awt.Dimension(170, 35));
+        btnCliente.setThickness(3);
+        btnCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnClienteActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
+        jPanel8.add(btnCliente, gridBagConstraints);
 
         jPanel6.add(jPanel8, java.awt.BorderLayout.SOUTH);
 
@@ -601,7 +707,7 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
         agregarParte();
     }//GEN-LAST:event_botonRedondo5ActionPerformed
 
-    private void botonRedondo3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo3ActionPerformed
+    private void btnExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         Thread hilo = new Thread(){
           public void run(){
@@ -828,37 +934,161 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
             }
         };
         hilo.start();
-    }//GEN-LAST:event_botonRedondo3ActionPerformed
+    }//GEN-LAST:event_btnExcelActionPerformed
 
-    private void botonRedondo4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_botonRedondo4ActionPerformed
+    private void btnAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        verCotizacionesCosteos ver = new verCotizacionesCosteos(f,true);
+        ver.setLocationRelativeTo(f);
+        String id = ver.getCotizacion();
+        if(id != null){
+            verCotizacion(id);
+            btnGuardar.setText("Actualizar");
+            lblCotizacion.setText(""+id);
+            panelCoti.setVisible(true);
+        }
+    }//GEN-LAST:event_btnAbrirActionPerformed
 
-    private void botonRedondo6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo6ActionPerformed
+    private void btnEmplesaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEmplesaActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         agregarProveedor agregar = new agregarProveedor(f, true);
         agregar.setLocationRelativeTo(f);
         agregar.autocompletar(proveedores);
         String cliente = agregar.getProveedor();
+        empresa = cliente;
         setEmpresa(cliente);
-    }//GEN-LAST:event_botonRedondo6ActionPerformed
+    }//GEN-LAST:event_btnEmplesaActionPerformed
 
-    private void botonRedondo7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo7ActionPerformed
+    private void btnClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClienteActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         AgregarCliente add = new AgregarCliente(f,true);
         add.setLocationRelativeTo(f);
         add.setVisible(true);
         totalProveedores();
-    }//GEN-LAST:event_botonRedondo7ActionPerformed
+    }//GEN-LAST:event_btnClienteActionPerformed
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+        if(btnGuardar.getText().equals("Guardar")){
+            try{
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                String sql = "insert into costeoparte(Empleado, Fecha, Empresa) values(?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+                SimpleDateFormat sdf = new SimpleDateFormat();
+                Date d = new Date();
+                String fecha = sdf.format(d);
+
+                pst.setString(1, this.numEmpleado);
+                pst.setString(2, fecha);
+                pst.setString(3, empresa);
+
+                int n = pst.executeUpdate();
+
+                if(n <= 0){
+                    JOptionPane.showMessageDialog(this, "Datos Sin Guardar","Error",JOptionPane.ERROR_MESSAGE);
+                }else{
+                    ResultSet rs = pst.getGeneratedKeys();
+                    if(rs.next()){
+                        int id = rs.getInt(1);
+                        lblCotizacion.setText(""+id);
+                        panelCoti.setVisible(true);
+                        btnNuevo.setEnabled(true);
+                        btnGuardar.setText("Actualizar");
+                        String sql1 = "insert into costeopartes(IdCosteo, IdParte, Precio, Cantidad) values(?,?,?,?)";
+                        PreparedStatement pst1 = con.prepareStatement(sql1);
+                        int n1 = 0;
+                        for (int i = 0; i < parte.size(); i++) {
+                            if(panel.get(i).isVisible()){
+                                pst1.setInt(1, id);
+                                pst1.setString(2, parte.get(i).getText());
+                                pst1.setDouble(3, Double.parseDouble(precio.get(i).getText()));
+                                pst1.setDouble(4, Double.parseDouble(cantidad.get(i).getText()));
+                                n1 += pst1.executeUpdate();
+                            }
+                        }
+                        if(n1 > 0){
+                            JOptionPane.showMessageDialog(this, "Datos guardados correctamente");
+                        }
+
+                    }
+                }
+
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                System.out.println(e);
+                Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }else if(btnGuardar.getText().equals("Actualizar")){
+            try{
+                int id = Integer.parseInt(lblCotizacion.getText());
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                String sql = "update costeoparte set Empresa = ? where idCosteoparte = ?";
+                PreparedStatement pst = con.prepareStatement(sql);
+                
+                pst.setString(1, empresa);
+                pst.setInt(2, id);
+                
+                int n = pst.executeUpdate();
+                
+                if(n <= 0){
+                    JOptionPane.showMessageDialog(this, "Datos no Actualizados","Error",JOptionPane.ERROR_MESSAGE);
+                }else{
+                    String sql2 = "update costeopartes set Precio = ?, Cantidad = ? where IdParte = ?";
+                    PreparedStatement pst2 = con.prepareStatement(sql2);
+                    boolean band = false;
+                    for (int i = 0; i < parte.size(); i++) {
+                        if(panel.get(i).isVisible()){
+                            pst2.setDouble(1, Double.parseDouble(precio.get(i).getText()));
+                            pst2.setDouble(2, Double.parseDouble(cantidad.get(i).getText()));
+                            pst2.setString(3, parte.get(i).getText());
+                            
+                            int n1 = pst2.executeUpdate();
+                            if(n1 == 0){
+                                band = true;
+                                
+                                String sql1 = "insert into costeopartes(IdCosteo, IdParte, Precio, Cantidad) values(?,?,?,?)";
+                                PreparedStatement pst1 = con.prepareStatement(sql1);
+                                pst1.setInt(1, id);
+                                pst1.setString(2, parte.get(i).getText());
+                                pst1.setDouble(3, Double.parseDouble(precio.get(i).getText()));
+                                pst1.setDouble( 4, Double.parseDouble(cantidad.get(i).getText()));
+                                
+                                pst1.executeUpdate();
+                            }
+                        }
+                    }
+                    String mensaje = "";
+                    if(band){
+                        mensaje = "\nSe han agregado numeros de parte extra";
+                    }
+                    JOptionPane.showMessageDialog(this, "Datos Actualizados Correctamente" + mensaje);
+                }
+                
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                System.out.println(e);
+                Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+    }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnNuevoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private scrollPane.BotonRedondo botonRedondo2;
-    private scrollPane.BotonRedondo botonRedondo3;
-    private scrollPane.BotonRedondo botonRedondo4;
     private scrollPane.BotonRedondo botonRedondo5;
-    private scrollPane.BotonRedondo botonRedondo6;
-    private scrollPane.BotonRedondo botonRedondo7;
+    private scrollPane.BotonRedondo btnAbrir;
+    private scrollPane.BotonRedondo btnCliente;
+    private scrollPane.BotonRedondo btnEmplesa;
+    private scrollPane.BotonRedondo btnExcel;
+    private scrollPane.BotonRedondo btnGuardar;
+    private scrollPane.BotonRedondo btnNuevo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JPanel jPanel1;
@@ -869,9 +1099,12 @@ public class Costeo extends javax.swing.JInternalFrame implements MouseListener,
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JLabel lbl;
+    private javax.swing.JLabel lblCotizacion;
     private javax.swing.JLabel lblEmpresa;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JPanel pan;
+    private javax.swing.JPanel panelCoti;
     private javax.swing.JPanel panelPrincipal;
     private javax.swing.JPanel panelSalir;
     private javax.swing.JScrollPane scrollPrincipal;

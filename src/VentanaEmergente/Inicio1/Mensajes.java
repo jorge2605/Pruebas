@@ -90,6 +90,8 @@ public class Mensajes extends javax.swing.JFrame implements Observer,ActionListe
             
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Mensajes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -124,7 +126,7 @@ public class Mensajes extends javax.swing.JFrame implements Observer,ActionListe
         repaint();
     }
     
-    public static boolean tableExist(String tableName) throws SQLException { 
+    public static boolean tableExist(String tableName) throws SQLException, ClassNotFoundException { 
         Connection con = null;
         ConexionChat con1 = new ConexionChat();
         con = con1.getConnection();
@@ -184,6 +186,8 @@ public class Mensajes extends javax.swing.JFrame implements Observer,ActionListe
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
             System.out.println("aqui es el error");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Mensajes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -205,6 +209,8 @@ public class Mensajes extends javax.swing.JFrame implements Observer,ActionListe
             }else{
             }
         } catch (SQLException ex) {
+            Logger.getLogger(Mensajes.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(Mensajes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -503,6 +509,8 @@ public class Mensajes extends javax.swing.JFrame implements Observer,ActionListe
             
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Mensajes.class.getName()).log(Level.SEVERE, null, ex);
         }
         verificarUsuario(num);
         jScrollPane1.getVerticalScrollBar().setValue(jScrollPane1.getVerticalScrollBar().getMaximum());
