@@ -2377,7 +2377,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     }//GEN-LAST:event_lblId1MouseClicked
 
     private void btnCotizacionVentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCotizacionVentasActionPerformed
-        CotizacionVentas c = new CotizacionVentas();
+        CotizacionVentas c = new CotizacionVentas(lblId.getText());
         jDesktopPane1.add(c);
         c.toFront();
         c.setLocation(jDesktopPane1.getWidth() / 2 - c.getWidth() / 2, jDesktopPane1.getHeight() / 2 - c.getHeight() / 2);

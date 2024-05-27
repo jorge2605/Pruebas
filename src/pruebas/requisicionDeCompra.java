@@ -400,9 +400,14 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jLabel6 = new javax.swing.JLabel();
         txtCodigo = new javax.swing.JTextField();
         jPanel10 = new javax.swing.JPanel();
-        jLabel7 = new javax.swing.JLabel();
+        jPanel24 = new javax.swing.JPanel();
+        rbFecha = new javax.swing.JRadioButton();
+        jLabel1 = new javax.swing.JLabel();
+        fecha = new rojeru_san.rsdate.RSDateChooser();
+        jPanel25 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDescripcion = new javax.swing.JTextArea();
+        jLabel7 = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
@@ -499,7 +504,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         jLabel2.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("FECHA");
+        jLabel2.setText("Fecha");
         jPanel4.add(jLabel2);
 
         txtFecha.setBackground(new java.awt.Color(204, 204, 204));
@@ -514,13 +519,13 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jRadioButton1.setBackground(new java.awt.Color(180, 198, 231));
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
-        jRadioButton1.setText("URGENTE");
+        jRadioButton1.setText("Urgente");
         jPanel6.add(jRadioButton1);
 
         jRadioButton2.setBackground(new java.awt.Color(180, 198, 231));
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
-        jRadioButton2.setText("NORMAL");
+        jRadioButton2.setText("Normal");
         jPanel6.add(jRadioButton2);
 
         panelEstados.add(jPanel6);
@@ -530,7 +535,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         rbtCompra.setBackground(new java.awt.Color(142, 169, 219));
         buttonGroup2.add(rbtCompra);
         rbtCompra.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
-        rbtCompra.setText("COMPRA");
+        rbtCompra.setText("Compra");
         rbtCompra.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbtCompraActionPerformed(evt);
@@ -541,7 +546,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         rbtCotizar.setBackground(new java.awt.Color(142, 169, 219));
         buttonGroup2.add(rbtCotizar);
         rbtCotizar.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
-        rbtCotizar.setText("SOLO COTIZAR");
+        rbtCotizar.setText("Solo cotizar");
         jPanel7.add(rbtCotizar);
 
         panelEstados.add(jPanel7);
@@ -550,7 +555,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         rbtEditar.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         rbtEditar.setForeground(new java.awt.Color(255, 255, 255));
         rbtEditar.setSelected(true);
-        rbtEditar.setText("EDITAR REQUISICION");
+        rbtEditar.setText("Editar requisicion");
         rbtEditar.setToolTipText("Al seleccionar esta opcion se dara permiso a compras para poder realizar cualquier cambio al momento de hacer la compra");
         rbtEditar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -572,9 +577,10 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("REQUISITOR");
+        jLabel4.setText("Requisitor");
         jPanel3.add(jLabel4);
 
+        txtNumeroEmpleado.setBackground(new java.awt.Color(255, 255, 255));
         txtNumeroEmpleado.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtNumeroEmpleado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtNumeroEmpleado.setBorder(null);
@@ -592,13 +598,14 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         jLabel10.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel10.setText("PROYECTO");
+        jLabel10.setText("Proyecto");
         jLabel10.setMaximumSize(new java.awt.Dimension(74, 18));
         jLabel10.setMinimumSize(new java.awt.Dimension(74, 18));
         jLabel10.setName(""); // NOI18N
         jLabel10.setPreferredSize(new java.awt.Dimension(74, 18));
         jPanel5.add(jLabel10, java.awt.BorderLayout.NORTH);
 
+        txtProyecto.setBackground(new java.awt.Color(255, 255, 255));
         txtProyecto.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtProyecto.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
@@ -629,7 +636,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         jLabel8.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("ARCHIVO DE COTIZACION");
+        jLabel8.setText("Archivo de cotizacion");
         jLabel8.setMaximumSize(new java.awt.Dimension(74, 18));
         jLabel8.setMinimumSize(new java.awt.Dimension(74, 18));
         jLabel8.setName(""); // NOI18N
@@ -678,11 +685,12 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setLayout(new java.awt.GridLayout(2, 0));
 
-        jLabel6.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("          NUMERO DE PARTE          ");
+        jLabel6.setText("          Numero de parte          ");
         jPanel9.add(jLabel6);
 
+        txtCodigo.setBackground(new java.awt.Color(255, 255, 255));
         txtCodigo.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCodigo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtCodigo.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
@@ -696,15 +704,36 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         panelArticulos.add(jPanel9, java.awt.BorderLayout.WEST);
 
         jPanel10.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel10.setLayout(new java.awt.BorderLayout());
+        jPanel10.setLayout(new java.awt.BorderLayout(15, 0));
 
-        jLabel7.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("DESCRIPCION");
-        jPanel10.add(jLabel7, java.awt.BorderLayout.NORTH);
+        jPanel24.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel24.setLayout(new java.awt.BorderLayout());
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(204, 204, 204)));
+        rbFecha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbFechaActionPerformed(evt);
+            }
+        });
+        jPanel24.add(rbFecha, java.awt.BorderLayout.WEST);
 
+        jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Fecha de llegada");
+        jPanel24.add(jLabel1, java.awt.BorderLayout.CENTER);
+
+        fecha.setFormatoFecha("dd-MM-yyyy");
+        fecha.setFuente(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        fecha.setPreferredSize(new java.awt.Dimension(130, 40));
+        jPanel24.add(fecha, java.awt.BorderLayout.PAGE_END);
+
+        jPanel10.add(jPanel24, java.awt.BorderLayout.EAST);
+
+        jPanel25.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel25.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(204, 204, 204), 2, true));
+
+        txtDescripcion.setBackground(new java.awt.Color(255, 255, 255));
         txtDescripcion.setColumns(20);
         txtDescripcion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtDescripcion.setLineWrap(true);
@@ -720,7 +749,14 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         });
         jScrollPane1.setViewportView(txtDescripcion);
 
-        jPanel10.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jPanel25.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jLabel7.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setText("Descripcion");
+        jPanel25.add(jLabel7, java.awt.BorderLayout.NORTH);
+
+        jPanel10.add(jPanel25, java.awt.BorderLayout.CENTER);
 
         panelArticulos.add(jPanel10, java.awt.BorderLayout.CENTER);
 
@@ -729,11 +765,12 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jPanel11.setBackground(new java.awt.Color(255, 255, 255));
         jPanel11.setLayout(new java.awt.GridLayout(2, 0));
 
-        jLabel11.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jLabel11.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel11.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel11.setText("U.M.");
         jPanel11.add(jLabel11);
 
+        txtUM.setBackground(new java.awt.Color(255, 255, 255));
         txtUM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtUM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtUM.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
@@ -749,11 +786,12 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jPanel12.setBackground(new java.awt.Color(255, 255, 255));
         jPanel12.setLayout(new java.awt.GridLayout(2, 0));
 
-        jLabel9.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setText("CANTIDAD");
+        jLabel9.setText("Cantidad");
         jPanel12.add(jLabel9);
 
+        txtCantidad.setBackground(new java.awt.Color(255, 255, 255));
         txtCantidad.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCantidad.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtCantidad.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
@@ -823,6 +861,8 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         panelTabla.setBackground(new java.awt.Color(255, 255, 255));
         panelTabla.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1571,6 +1611,14 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         }
     }//GEN-LAST:event_Tabla1MouseClicked
 
+    private void rbFechaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbFechaActionPerformed
+        if(rbFecha.isSelected()){
+            fecha.setVisible(true);
+        }else{
+            fecha.setVisible(false);
+        }
+    }//GEN-LAST:event_rbFechaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
@@ -1580,9 +1628,11 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     private javax.swing.JButton btnX2;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private rojeru_san.rsdate.RSDateChooser fecha;
     private javax.swing.JMenuItem importarExcel;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -1618,6 +1668,8 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     private javax.swing.JPanel jPanel21;
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -1637,6 +1689,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     private javax.swing.JPanel panelNorte;
     private javax.swing.JPanel panelSalir;
     private javax.swing.JPanel panelTabla;
+    private javax.swing.JRadioButton rbFecha;
     private javax.swing.JRadioButton rbtCompra;
     private javax.swing.JRadioButton rbtCotizar;
     private javax.swing.JRadioButton rbtEditar;

@@ -636,7 +636,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
                 Statement st = con.createStatement();
-                String sql = "insert into cantidad_requisiciones (Cantidad, Requisicion, Codigo, Almacenista, Fecha) values(?,?,?,?,?)";
+                String sql = "insert into cantidad_requisiciones (Cantidad, Requisicion, Codigo, Almacenista, Fecha,Ubicacion) values(?,?,?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
                 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -652,6 +652,8 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                     try{cantidadTabla = Tabla1.getValueAt(i, 2).toString();}catch(Exception e){cantidadTabla = "";}
                     String codigo;
                     try{codigo = Tabla1.getValueAt(i, 0).toString();}catch(Exception e){codigo = "";}
+                    String ubicacion;
+                    try{ubicacion = Tabla1.getValueAt(i, 5).toString();}catch(Exception e){ubicacion = "";}
                     
                     if(!cantidad.equals("0")){
                         pila.push(codigo);
@@ -662,6 +664,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                     pst.setString(3, codigo);
                     pst.setString(4, numEmpleado);
                     pst.setString(5, fecha);
+                    pst.setString(6, ubicacion);
                     
                     n += pst.executeUpdate();
                     

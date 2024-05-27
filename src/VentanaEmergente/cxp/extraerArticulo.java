@@ -14,7 +14,6 @@ public class extraerArticulo {
     public Stack<articulos> articulos;
     public totales total;
     Connection con;
-    Conexion con1 = new Conexion();
     
     public void agregarATabla(String id){
         int pos = id.indexOf(':');
@@ -74,9 +73,6 @@ public class extraerArticulo {
             double isr = 0;
             double iva = 0;
             try{
-                Connection con;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
                 Statement st = con.createStatement();
                 String sql = "select * from registroprov_compras where Nombre like '" + articulos.get(0).getProveedor() + "'";
                 ResultSet rs = st.executeQuery(sql);
@@ -104,9 +100,9 @@ public class extraerArticulo {
         return null;
     }
     
-    public extraerArticulo(String code){
+    public extraerArticulo(String code, Connection con){
         articulos = new Stack<>();
-        con = con1.getConnection();
+        this.con = con;
         decoder(code);
     }
 }

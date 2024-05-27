@@ -11,7 +11,7 @@ public class Conexion {
     public Connection getConnection(){
     con = null;
     try{
-    Class.forName("com.mysql.jdbc.Driver");
+        Class.forName("com.mysql.jdbc.Driver");
     con = (Connection) DriverManager.getConnection("jdbc:mysql://192.168.100.40:3306/towi?autoReconnect=true&useSSL=false","Jorge","123456789Aa.");
     
     }catch(Exception e){

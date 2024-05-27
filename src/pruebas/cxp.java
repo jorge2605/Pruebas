@@ -1,6 +1,7 @@
 package pruebas;
 
 import Conexiones.Conexion;
+import VentanaEmergente.Inicio1.Espera;
 import VentanaEmergente.cxp.extraerArticulo;
 import VentanaEmergente.cxp.info;
 import java.awt.Color;
@@ -14,11 +15,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.DateFormatSymbols;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,11 +67,22 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class cxp extends javax.swing.JInternalFrame {
 
     public boolean bandView = true;
-    
     public int filaSeleccionada = 0;
+    Espera espera;
+    boolean band = false;
+    
+    public void insertarMeses(int mes){
+        cmbMes.removeAllItems();
+        String[] spanishMonthNames = DateFormatSymbols.getInstance(new Locale("es")).getMonths();
+        for (int i = spanishMonthNames.length-1; i >= 0; i--) {
+            if(i <= mes){
+                cmbMes.addItem(spanishMonthNames[i]);
+            }
+        }
+        cmbMes.removeItemAt(0);
+    }
     
     public final void insertarSemanas(){
-        cmbMes.removeAllItems();
         cmbAnio.removeAllItems();
         Calendar calendar = Calendar.getInstance();
         calendar.setFirstDayOfWeek( Calendar.MONDAY);
@@ -76,19 +91,10 @@ public class cxp extends javax.swing.JInternalFrame {
         for (int i = numberWeekOfYear; i >= 2020; i--) {
             cmbAnio.addItem(String.valueOf(i));
         }
-        
         Date d = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MM");
         int mes = Integer.parseInt(sdf.format(d));
-        
-        String[] spanishMonthNames = DateFormatSymbols.getInstance(new Locale("es")).getMonths();
-        for (int i = spanishMonthNames.length-1; i >= 0; i--) {
-            if(i <= mes){
-                cmbMes.addItem(spanishMonthNames[i]);
-            }
-        }
-        
-        cmbMes.removeItemAt(0);
+        insertarMeses(mes);
     }
     
     public final void limpiarTabla(){
@@ -172,29 +178,29 @@ public class cxp extends javax.swing.JInternalFrame {
         }
     }
     
-    private void applyBorderToRows(JTable table, int numRowsToBorder) {
-        DefaultTableCellRenderer defaultRenderer = new DefaultTableCellRenderer();
-
-        DefaultTableCellRenderer customRenderer = new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
-                                                           boolean hasFocus, int row, int column) {
-                Component c = defaultRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                // Cambiar el borde para las filas específicas
-                if (row >= filaSeleccionada && row < (numRowsToBorder + filaSeleccionada)) {
-                    Border border = BorderFactory.createLineBorder(Color.RED); // Puedes cambiar el color del borde según tus preferencias
-                    ((JComponent) c).setBorder(border);
-                } else {
-                    ((JComponent) c).setBorder(null); // Restaurar el borde a null para las demás filas
-                }
-
-                return c;
+    public void marcarVisto(){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            String sql = "update facturacion set visto = ? where idfacturacion = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            int n = 0;
+            
+            for (int i = 0; i < Tabla1.getRowCount(); i++) {
+                pst.setBoolean(1, true);
+                pst.setString(2, Tabla1.getValueAt(i, 6).toString());
+                
+                n = pst.executeUpdate();
             }
-        };
-
-        // Aplicar el renderizador personalizado a todas las columnas
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumnModel().getColumn(i).setCellRenderer(customRenderer);
+            
+            if(n > 0){
+                JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
+                dispose();
+            }
+            
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -203,7 +209,6 @@ public class cxp extends javax.swing.JInternalFrame {
         insertarSemanas();
         limpiarTabla();
         verDatos("select * from facturacion where Visto is null order by idfacturacion desc");
-        applyBorderToRows(Tabla1, 15);
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
     }
     
@@ -429,18 +434,48 @@ public class cxp extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_lblSalirMouseExited
 
     private void cmbMesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMesActionPerformed
-        
+        if(this.isVisible()){
+            if(band){
+                limpiarTabla();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM");
+                SimpleDateFormat sdf2 = new SimpleDateFormat("MM");
+                Date d;
+                String mes = "";
+                try {
+                    d = sdf.parse((String) cmbMes.getSelectedItem());
+                    mes = sdf2.format(d);
+                } catch (ParseException ex) {
+                    Logger.getLogger(cxp.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                int dias = LocalDate.of(Integer.parseInt(cmbAnio.getSelectedItem().toString()), Integer.parseInt(mes), 1).lengthOfMonth();
+                String fechaInicio = cmbAnio.getSelectedItem().toString() + "-" + mes + "-01";
+                String fechaFinal = cmbAnio.getSelectedItem().toString() + "-" + mes + "-" + dias;
+                verDatos("select * from facturacion where FechaCaptura between '" + fechaInicio + "' and '" + fechaFinal + "'");
+            }
+        }
     }//GEN-LAST:event_cmbMesActionPerformed
 
     private void cmbAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbAnioActionPerformed
-        
+        if(this.isVisible()){
+            band = false;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setFirstDayOfWeek( Calendar.MONDAY);
+            calendar.setMinimalDaysInFirstWeek( 4);
+            int numberWeekOfYear = calendar.get(Calendar.YEAR);
+            if(!cmbAnio.getSelectedItem().equals(String.valueOf(numberWeekOfYear))){
+                System.out.println("entra");
+                insertarMeses(12);
+            }else{
+                insertarSemanas();
+            }
+            band = true;
+        }
     }//GEN-LAST:event_cmbAnioActionPerformed
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
         filaSeleccionada = Tabla1.getSelectedRow();
         limpiarTabla();
         verDatos("select * from facturacion where Visto is null order by idfacturacion desc");
-        applyBorderToRows(Tabla1, 15);
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void btnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewActionPerformed
@@ -458,326 +493,341 @@ public class cxp extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnViewActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Workbook book;
-        try {
-            JFileChooser fc = new JFileChooser();
-            File archivo = null;
-            fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
-            int n = fc.showSaveDialog(this);
+        int opc = JOptionPane.showConfirmDialog(this, "¿Deseas marcar como visto todas las facturas?");
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        Thread hilo = new Thread(){
+            public void run(){
+                espera = new Espera();
+                espera.activar();
+                espera.setLocationRelativeTo(f);
+                espera.setExtendedState(Inicio1.MAXIMIZED_BOTH);
+                espera.setVisible(true);
+                Workbook book;
+                try {
+                    JFileChooser fc = new JFileChooser();
+                    File archivo = null;
+                    fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
+                    int n = fc.showSaveDialog(f);
 
-            if(n == JFileChooser.APPROVE_OPTION){
-                archivo = fc.getSelectedFile();
-            }
-            String a = ""+archivo;
-            if(a.endsWith("xls")){
-                book = new  HSSFWorkbook();
-            }else {
-            book = new XSSFWorkbook();
-                a = archivo + ".xlsx";
-            }
-
-            //-------------------------------ESTILOS
-            org.apache.poi.ss.usermodel.Font font = book.createFont();
-            CellStyle estilo1 = book.createCellStyle();
-
-            org.apache.poi.ss.usermodel.Font font3 = book.createFont();
-            CellStyle estilo3 = book.createCellStyle();
-
-
-            font.setBold(true);
-            font.setColor(IndexedColors.BLACK.getIndex());
-            font.setFontHeightInPoints((short)12);
-            estilo1.setFont(font);
-
-            estilo1.setAlignment(HorizontalAlignment.LEFT);
-
-            font3.setBold(false);
-            font3.setColor(IndexedColors.BLACK.getIndex());
-            font3.setFontHeightInPoints((short)15);
-            estilo3.setFont(font3);
-
-            estilo3.setAlignment(HorizontalAlignment.CENTER);
-            estilo3.setWrapText(true);
-            
-            //------------------------------------------------------------------
-            org.apache.poi.ss.usermodel.Font font1 = book.createFont();
-            CellStyle style = book.createCellStyle();
-
-            font1.setBold(true);
-            font1.setColor(IndexedColors.BLACK.getIndex());
-            font1.setFontHeightInPoints((short)18);
-            font1.setFontName("Bahnschrift");
-            style.setFont(font1);
-
-            style.setVerticalAlignment(VerticalAlignment.BOTTOM);
-            style.setAlignment(HorizontalAlignment.CENTER);
-            
-            //------------------------------------------------------------------
-            org.apache.poi.ss.usermodel.Font font2 = book.createFont();
-            CellStyle styleTituloFondoAzul = book.createCellStyle();
-
-            font2.setBold(true);
-            font2.setColor(IndexedColors.WHITE.getIndex());
-            font2.setFontHeightInPoints((short)14);
-            font2.setFontName("Bahnschrift");
-            styleTituloFondoAzul.setFont(font2);
-
-            ((XSSFCellStyle) styleTituloFondoAzul).setFillForegroundColor(new XSSFColor(new java.awt.Color(70, 112, 182)));
-            styleTituloFondoAzul.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-            styleTituloFondoAzul.setVerticalAlignment(VerticalAlignment.BOTTOM);
-            styleTituloFondoAzul.setAlignment(HorizontalAlignment.CENTER);
-            styleTituloFondoAzul.setWrapText(true);
-            //--------------------------------------
-            
-            Sheet hoja = book.createSheet("REPORTE DE FACTURACION");
-            
-            Row fila = hoja.createRow(1);
-            Cell col = fila.createCell(1);
-
-            col.setCellStyle(style);
-            col.setCellValue("Facturas Capturadas");
-            
-            Row fila31 = hoja.createRow(3);
-            Cell col31 = fila31.createCell(1);
-
-            col31.setCellStyle(styleTituloFondoAzul);
-            col31.setCellValue("Folio");
-            
-//            fila31 = hoja.createRow(3);
-            col31 = fila31.createCell(2);
-
-            col31.setCellStyle(styleTituloFondoAzul);
-            col31.setCellValue("Fecha Factura");
-            
-//            fila31 = hoja.createRow(3);
-            col31 = fila31.createCell(3);
-
-            col31.setCellStyle(styleTituloFondoAzul);
-            col31.setCellValue("Fecha Captura");
-            
-//            fila31 = hoja.createRow(3);
-            col31 = fila31.createCell(4);
-
-            col31.setCellStyle(styleTituloFondoAzul);
-            col31.setCellValue("Articulos");
-            
-//            fila31 = hoja.createRow(3);
-            col31 = fila31.createCell(7);
-
-            col31.setCellStyle(styleTituloFondoAzul);
-            col31.setCellValue("Total");
-            
-            col31 = fila31.createCell(8);
-
-            col31.setCellStyle(styleTituloFondoAzul);
-            col31.setCellValue("Proveedor");
-            //---------------------------------------
-            int valorFijo = 28;
-            
-            hoja.setColumnWidth(0, valorFijo * 27);
-            hoja.setColumnWidth(1, valorFijo * 220);
-            hoja.setColumnWidth(2, valorFijo * 220);
-            hoja.setColumnWidth(3, valorFijo * 220);
-            hoja.setColumnWidth(4, valorFijo * 210);
-            hoja.setColumnWidth(5, valorFijo * 210);
-            hoja.setColumnWidth(6, valorFijo * 210);
-            hoja.setColumnWidth(7, valorFijo * 280);
-            hoja.setColumnWidth(8, valorFijo * 280);
-
-            hoja.addMergedRegion(new CellRangeAddress (
-            1,
-            1,
-            1,
-            8
-            ));
-            
-            //---------------Articulos
-            hoja.addMergedRegion(new CellRangeAddress (
-            3,
-            3,
-            4,
-            6
-            ));
-
-            Map<String, Object> properties = new HashMap<String, Object>();
-            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
-            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-
-            properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-            properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-            properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-            properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());  
-
-            int acumFilaTotal = 0;
-            int inicio = 0;
-            int totalArticulos = 0;
-            
-            for (int i = filaSeleccionada; i < (15 + filaSeleccionada); i++) {
-                Row fila10=hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
-                inicio = (i-filaSeleccionada) + 4 + acumFilaTotal;
-                for (int j = 0; j < 4; j++) {
-                    Cell celda=fila10.createCell(j+1);
-                    CellStyle s;
-                    if((i-filaSeleccionada) == -1 && (j >= 0 && j <=5)){
-                        s = book.createCellStyle();
-                        org.apache.poi.ss.usermodel.Font f = book.createFont();
-                        f.setBold(true);
-                        f.setColor(IndexedColors.WHITE.getIndex());
-                        s.setFont(f);
-                        s.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-                        s.setFillPattern(SOLID_FOREGROUND);
-                        s.setAlignment(HorizontalAlignment.CENTER);
-                        s.setVerticalAlignment(VerticalAlignment.CENTER);
-                        celda.setCellStyle(s);
+                    if(n == JFileChooser.APPROVE_OPTION){
+                        archivo = fc.getSelectedFile();
                     }
-                    if((i-filaSeleccionada) > -1 && (j > -1 && j <= 5) && (i%2 == 0)){
-                        s = book.createCellStyle();
-                        s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                        s.setAlignment(HorizontalAlignment.CENTER);
-                        s.setVerticalAlignment(VerticalAlignment.CENTER);
-                        s.setFillPattern(SOLID_FOREGROUND);
-                        celda.setCellStyle(s);
+                    String a = ""+archivo;
+                    if(a.endsWith("xls")){
+                        book = new  HSSFWorkbook();
+                    }else {
+                    book = new XSSFWorkbook();
+                        a = archivo + ".xlsx";
                     }
-//                    CellStyle ss;
-                    if((i-filaSeleccionada)==-1){
-                        celda.setCellValue(String.valueOf(Tabla1.getColumnName(j)));
-                    }else{
-                            s = book.createCellStyle();
-                            s.setWrapText(true);
-                            s.setAlignment(HorizontalAlignment.CENTER);
-                            s.setVerticalAlignment(VerticalAlignment.CENTER);
-//                            if(i%2 == 0){
-                                s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                                ((XSSFCellStyle) s).setFillForegroundColor(new XSSFColor(new java.awt.Color(235, 235, 235)));
+
+                    //-------------------------------ESTILOS
+                    org.apache.poi.ss.usermodel.Font font = book.createFont();
+                    CellStyle estilo1 = book.createCellStyle();
+
+                    org.apache.poi.ss.usermodel.Font font3 = book.createFont();
+                    CellStyle estilo3 = book.createCellStyle();
+
+
+                    font.setBold(true);
+                    font.setColor(IndexedColors.BLACK.getIndex());
+                    font.setFontHeightInPoints((short)12);
+                    estilo1.setFont(font);
+
+                    estilo1.setAlignment(HorizontalAlignment.LEFT);
+
+                    font3.setBold(false);
+                    font3.setColor(IndexedColors.BLACK.getIndex());
+                    font3.setFontHeightInPoints((short)15);
+                    estilo3.setFont(font3);
+
+                    estilo3.setAlignment(HorizontalAlignment.CENTER);
+                    estilo3.setWrapText(true);
+
+                    //------------------------------------------------------------------
+                    org.apache.poi.ss.usermodel.Font font1 = book.createFont();
+                    CellStyle style = book.createCellStyle();
+
+                    font1.setBold(true);
+                    font1.setColor(IndexedColors.BLACK.getIndex());
+                    font1.setFontHeightInPoints((short)18);
+                    font1.setFontName("Bahnschrift");
+                    style.setFont(font1);
+
+                    style.setVerticalAlignment(VerticalAlignment.BOTTOM);
+                    style.setAlignment(HorizontalAlignment.CENTER);
+
+                    //------------------------------------------------------------------
+                    org.apache.poi.ss.usermodel.Font font2 = book.createFont();
+                    CellStyle styleTituloFondoAzul = book.createCellStyle();
+
+                    font2.setBold(true);
+                    font2.setColor(IndexedColors.WHITE.getIndex());
+                    font2.setFontHeightInPoints((short)14);
+                    font2.setFontName("Bahnschrift");
+                    styleTituloFondoAzul.setFont(font2);
+
+                    ((XSSFCellStyle) styleTituloFondoAzul).setFillForegroundColor(new XSSFColor(new java.awt.Color(70, 112, 182)));
+                    styleTituloFondoAzul.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                    styleTituloFondoAzul.setVerticalAlignment(VerticalAlignment.BOTTOM);
+                    styleTituloFondoAzul.setAlignment(HorizontalAlignment.CENTER);
+                    styleTituloFondoAzul.setWrapText(true);
+                    //--------------------------------------
+
+                    Sheet hoja = book.createSheet("REPORTE DE FACTURACION");
+
+                    Row fila = hoja.createRow(1);
+                    Cell col = fila.createCell(1);
+
+                    col.setCellStyle(style);
+                    col.setCellValue("Facturas Capturadas");
+
+                    Row fila31 = hoja.createRow(3);
+                    Cell col31 = fila31.createCell(1);
+
+                    col31.setCellStyle(styleTituloFondoAzul);
+                    col31.setCellValue("Folio");
+
+                    col31 = fila31.createCell(2);
+
+                    col31.setCellStyle(styleTituloFondoAzul);
+                    col31.setCellValue("Fecha Factura");
+
+                    col31 = fila31.createCell(3);
+
+                    col31.setCellStyle(styleTituloFondoAzul);
+                    col31.setCellValue("Fecha Captura");
+
+                    col31 = fila31.createCell(4);
+
+                    col31.setCellStyle(styleTituloFondoAzul);
+                    col31.setCellValue("Articulos");
+
+                    col31 = fila31.createCell(7);
+
+                    col31.setCellStyle(styleTituloFondoAzul);
+                    col31.setCellValue("Total");
+
+                    col31 = fila31.createCell(8);
+
+                    col31.setCellStyle(styleTituloFondoAzul);
+                    col31.setCellValue("Proveedor");
+                    //---------------------------------------
+                    int valorFijo = 28;
+
+                    hoja.setColumnWidth(0, valorFijo * 27);
+                    hoja.setColumnWidth(1, valorFijo * 220);
+                    hoja.setColumnWidth(2, valorFijo * 220);
+                    hoja.setColumnWidth(3, valorFijo * 220);
+                    hoja.setColumnWidth(4, valorFijo * 210);
+                    hoja.setColumnWidth(5, valorFijo * 210);
+                    hoja.setColumnWidth(6, valorFijo * 210);
+                    hoja.setColumnWidth(7, valorFijo * 280);
+                    hoja.setColumnWidth(8, valorFijo * 280);
+
+                    hoja.addMergedRegion(new CellRangeAddress (
+                    1,
+                    1,
+                    1,
+                    8
+                    ));
+
+                    //---------------Articulos
+                    hoja.addMergedRegion(new CellRangeAddress (
+                    3,
+                    3,
+                    4,
+                    6
+                    ));
+
+                    Map<String, Object> properties = new HashMap<String, Object>();
+                    properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+                    properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+                    properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+                    properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+
+                    properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                    properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                    properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                    properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());  
+
+                    int acumFilaTotal = 0;
+                    int inicio = 0;
+                    int totalArticulos = 0;
+                    Connection con;
+                    Conexion con1 = new Conexion();
+                    con = con1.getConnection();
+                    for (int i = 0; i < Tabla1.getRowCount(); i++) {
+                        Row fila10=hoja.createRow(i+4+acumFilaTotal);
+                        inicio = i + 4 + acumFilaTotal;
+                        for (int j = 0; j < 4; j++) {
+                            Cell celda=fila10.createCell(j+1);
+                            CellStyle s;
+                            if(i == -1 && (j >= 0 && j <=5)){
+                                s = book.createCellStyle();
+                                org.apache.poi.ss.usermodel.Font f = book.createFont();
+                                f.setBold(true);
+                                f.setColor(IndexedColors.WHITE.getIndex());
+                                s.setFont(f);
+                                s.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
                                 s.setFillPattern(SOLID_FOREGROUND);
-//                            }
-                            celda.setCellStyle(s);
-
-                        if(j == 3){
-                            extraerArticulo extraer = new extraerArticulo(String.valueOf(Tabla1.getValueAt(i, j)));
-                            for (int k = 0; k < extraer.articulos.size(); k++) {
-                                if(k == 0){
-                                    String codigo = extraer.articulos.get(k).getCodigo();
+                                s.setAlignment(HorizontalAlignment.CENTER);
+                                s.setVerticalAlignment(VerticalAlignment.CENTER);
+                                celda.setCellStyle(s);
+                            }
+                            if((i) > -1 && (j > -1 && j <= 5) && (i%2 == 0)){
+                                s = book.createCellStyle();
+                                s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                                s.setAlignment(HorizontalAlignment.CENTER);
+                                s.setVerticalAlignment(VerticalAlignment.CENTER);
+                                s.setFillPattern(SOLID_FOREGROUND);
+                                celda.setCellStyle(s);
+                            }
+        //                    CellStyle ss;
+                            if((i)==-1){
+                                celda.setCellValue(String.valueOf(Tabla1.getColumnName(j)));
+                            }else{
+                                    s = book.createCellStyle();
+                                    s.setWrapText(true);
+                                    s.setAlignment(HorizontalAlignment.CENTER);
+                                    s.setVerticalAlignment(VerticalAlignment.CENTER);
+        //                            if(i%2 == 0){
+                                        s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                                        ((XSSFCellStyle) s).setFillForegroundColor(new XSSFColor(new java.awt.Color(235, 235, 235)));
+                                        s.setFillPattern(SOLID_FOREGROUND);
+        //                            }
                                     celda.setCellStyle(s);
-                                    celda.setCellValue(codigo);
-                                    double cantidad = extraer.articulos.get(k).getCantidad();
-                                    double precio = extraer.articulos.get(k).getPrecio();
-                                    double total = extraer.articulos.get(k).getTotal();
-                                    
-                                    celda=fila10.createCell(j+4);
-                                    
-                                    int cant = extraer.articulos.size();
-                                    String rango = "";
-                                    for (int l = 0; l < cant; l++) {
-                                        if(l == 0){
-                                            rango += "G"+(inicio+2);
+
+                                if(j == 3){
+                                    extraerArticulo extraer = new extraerArticulo(String.valueOf(Tabla1.getValueAt(i, j)), con);
+                                    for (int k = 0; k < extraer.articulos.size(); k++) {
+                                        if(k == 0){
+                                            String codigo = extraer.articulos.get(k).getCodigo();
+                                            celda.setCellStyle(s);
+                                            celda.setCellValue(codigo);
+                                            double cantidad = extraer.articulos.get(k).getCantidad();
+                                            double precio = extraer.articulos.get(k).getPrecio();
+                                            double total = extraer.articulos.get(k).getTotal();
+
+                                            celda=fila10.createCell(j+4);
+
+                                            int cant = extraer.articulos.size();
+                                            String rango = "";
+                                            for (int l = 0; l < cant; l++) {
+                                                if(l == 0){
+                                                    rango += "G"+(inicio+2);
+                                                }else{
+                                                    rango += "+G"+(inicio+(2+(l * 2)));
+                                                }
+                                            }
+
+                                            celda.setCellStyle(s);
+                                            double iva = extraer.total.getIva();
+                                            double isr = extraer.total.getIsr();
+                                            celda.setCellFormula("("+rango+") + "+iva+"-"+isr);
+
+                                            celda=fila10.createCell(j+5);
+                                            celda.setCellStyle(s);
+                                            celda.setCellValue(extraer.articulos.get(0).getProveedor());
+
+                                            hoja.addMergedRegion(new CellRangeAddress (
+                                            (i-filaSeleccionada)+4+acumFilaTotal,
+                                            (i-filaSeleccionada)+4+acumFilaTotal,
+                                            4,
+                                            6
+                                            ));
+
+
+                                            acumFilaTotal++;
+
+                                            fila10 = hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
+
+                                            celda=fila10.createCell(j+1);
+                                            celda.setCellStyle(celda.getCellStyle());
+                                            celda.setCellValue(precio);
+
+                                            celda=fila10.createCell(j+2);
+                                            celda.setCellStyle(celda.getCellStyle());
+                                            celda.setCellValue(cantidad);
+
+                                            celda=fila10.createCell(j+3);
+                                            celda.setCellStyle(celda.getCellStyle());
+                                            celda.setCellValue(total);
                                         }else{
-                                            rango += "+G"+(inicio+(2+(l * 2)));
+                                            acumFilaTotal++;
+                                            fila10 = hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
+
+                                            String codigo = extraer.articulos.get(k).getCodigo();
+        //                                    celda.setCellValue(codigo);
+
+                                            double cantidad = extraer.articulos.get(k).getCantidad();
+                                            double precio = extraer.articulos.get(k).getPrecio();
+                                            double total = extraer.articulos.get(k).getTotal();
+
+                                            celda=fila10.createCell(j+1);
+                                            celda.setCellStyle(s);
+                                            celda.setCellValue(codigo);
+
+                                            hoja.addMergedRegion(new CellRangeAddress (
+                                            (i-filaSeleccionada)+4+acumFilaTotal,
+                                            (i-filaSeleccionada)+4+acumFilaTotal,
+                                            4,
+                                            6
+                                            ));
+
+
+                                            acumFilaTotal++;
+
+                                            fila10 = hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
+
+                                            celda=fila10.createCell(j+1);
+                                            celda.setCellStyle(celda.getCellStyle());
+                                            celda.setCellValue(precio);
+
+                                            celda=fila10.createCell(j+2);
+                                            celda.setCellStyle(celda.getCellStyle());
+                                            celda.setCellValue(cantidad);
+
+                                            celda=fila10.createCell(j+3);
+                                            celda.setCellStyle(celda.getCellStyle());
+                                            celda.setCellValue(total);
                                         }
                                     }
-                                    
-                                    celda.setCellStyle(s);
-                                    double iva = extraer.total.getIva();
-                                    double isr = extraer.total.getIsr();
-                                    celda.setCellFormula("("+rango+") + "+iva+"-"+isr);
-                                    
-                                    celda=fila10.createCell(j+5);
-                                    celda.setCellStyle(s);
-                                    celda.setCellValue(extraer.articulos.get(0).getProveedor());
-                                    
-                                    hoja.addMergedRegion(new CellRangeAddress (
-                                    (i-filaSeleccionada)+4+acumFilaTotal,
-                                    (i-filaSeleccionada)+4+acumFilaTotal,
-                                    4,
-                                    6
-                                    ));
-                                    
-                                    
-                                    acumFilaTotal++;
-                                    
-                                    fila10 = hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
-                                    
-                                    celda=fila10.createCell(j+1);
-                                    celda.setCellStyle(celda.getCellStyle());
-                                    celda.setCellValue(precio);
-                                    
-                                    celda=fila10.createCell(j+2);
-                                    celda.setCellStyle(celda.getCellStyle());
-                                    celda.setCellValue(cantidad);
-                                    
-                                    celda=fila10.createCell(j+3);
-                                    celda.setCellStyle(celda.getCellStyle());
-                                    celda.setCellValue(total);
+
                                 }else{
-                                    acumFilaTotal++;
-                                    fila10 = hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
-                                    
-                                    String codigo = extraer.articulos.get(k).getCodigo();
-//                                    celda.setCellValue(codigo);
-                                    
-                                    double cantidad = extraer.articulos.get(k).getCantidad();
-                                    double precio = extraer.articulos.get(k).getPrecio();
-                                    double total = extraer.articulos.get(k).getTotal();
-                                    
-                                    celda=fila10.createCell(j+1);
-                                    celda.setCellStyle(s);
-                                    celda.setCellValue(codigo);
-                                    
-                                    hoja.addMergedRegion(new CellRangeAddress (
-                                    (i-filaSeleccionada)+4+acumFilaTotal,
-                                    (i-filaSeleccionada)+4+acumFilaTotal,
-                                    4,
-                                    6
-                                    ));
-                                    
-                                    
-                                    acumFilaTotal++;
-                                    
-                                    fila10 = hoja.createRow((i-filaSeleccionada)+4+acumFilaTotal);
-                                    
-                                    celda=fila10.createCell(j+1);
-                                    celda.setCellStyle(celda.getCellStyle());
-                                    celda.setCellValue(precio);
-                                    
-                                    celda=fila10.createCell(j+2);
-                                    celda.setCellStyle(celda.getCellStyle());
-                                    celda.setCellValue(cantidad);
-                                    
-                                    celda=fila10.createCell(j+3);
-                                    celda.setCellStyle(celda.getCellStyle());
-                                    celda.setCellValue(total);
+                                    celda.setCellValue(String.valueOf(Tabla1.getValueAt(i, j)));
                                 }
                             }
-                            
-                        }else{
-                            celda.setCellValue(String.valueOf(Tabla1.getValueAt(i, j)));
+
                         }
                     }
-                    
+                    book.write(new FileOutputStream(a));
+                    book.close();
+
+                    try {
+                        Desktop desktop = Desktop.getDesktop();
+                        if (desktop.isSupported(Desktop.Action.OPEN) && new File(a).exists()) {
+                            desktop.open(new File(a));
+                        } else {
+                            System.out.println("No se puede abrir el archivo automáticamente. Abre manualmente en Excel.");
+                        }
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(f, "Error al tratar de abrir el documento creado","Error",JOptionPane.ERROR_MESSAGE);
+                        espera.dispose();
+                    }
+                    if(opc == JOptionPane.OK_OPTION){
+                        marcarVisto();
+                    }
+                    espera.dispose();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+                    espera.dispose();
+                } catch (IOException ex) {
+                    Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+                    espera.dispose();
                 }
             }
-            book.write(new FileOutputStream(a));
-            book.close();
-            
-            try {
-            Desktop desktop = Desktop.getDesktop();
-
-            if (desktop.isSupported(Desktop.Action.OPEN) && new File(a).exists()) {
-                desktop.open(new File(a));
-            } else {
-                System.out.println("No se puede abrir el archivo automáticamente. Abre manualmente en Excel.");
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        };
+        hilo.start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
 

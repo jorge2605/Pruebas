@@ -86,6 +86,7 @@ public class Pedidos extends javax.swing.JInternalFrame implements ActionListene
             String ruta = "C:/Pruebas/DOCS/Imprimir.pdf";
             Document document = new Document(PageSize.A4, 36, 36, 90, 36);
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
+            
             CabezeraRemisiones encabezado = new CabezeraRemisiones();
             encabezado.setEncabezado("ENCABEZADO DE ENTREGA DE REQUISICION");
             writer.setPageEvent(encabezado);

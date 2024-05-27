@@ -472,7 +472,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         DecimalFormatSymbols separador = new DecimalFormatSymbols();
                         separador.setDecimalSeparator('.');
                         DecimalFormat formato = new DecimalFormat("#.##",separador);
-
+                        reducirCantidad();
                     for (int i = 0; i < Tabla2.getRowCount(); i++) {
 
                         if(Tabla2.getValueAt(i, 5) != null ){
@@ -610,18 +610,16 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     DecimalFormatSymbols separador = new DecimalFormatSymbols();
                     separador.setDecimalSeparator('.');
                     DecimalFormat formato = new DecimalFormat("#.##",separador);
-
+                    reducirCantidad();
                 for (int i = 0; i < Tabla2.getRowCount(); i++) {
 
                     if(Tabla2.getValueAt(i, 5) != null ){
                         if(Tabla2.getValueAt(i, 5).toString().equals("")){
-
                         }else{
-                        double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
-                        double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
-                        double total = precio * cantidad;
-
-                        Tabla2.setValueAt(formato.format(total), i, 6);
+                            double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
+                            double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                            double total = precio * cantidad;
+                            Tabla2.setValueAt(formato.format(total), i, 6);
                         }
                     }
                 }
@@ -632,13 +630,13 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 }
                 }
             }
-            reducirCantidad();
+            
             verGastos();
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
     }
-    //h
+    
     public void guardarListaImportada(){
         try{
             Connection con = null;
@@ -5189,6 +5187,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         EditarPO e = new EditarPO(f,true,numEmpleado);
+        e.setLocationRelativeTo(e);
         e.setVisible(true);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 

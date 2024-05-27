@@ -1,6 +1,8 @@
 package pruebas;
 
 import Conexiones.Conexion;
+import java.awt.Color;
+import java.awt.Font;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -159,7 +161,51 @@ public class EditarPO extends javax.swing.JDialog {
         return canEdit [columnIndex];
     }
     });
-    Tabla1.setShowGrid(false);
+    Tabla1.getTableHeader().setFont(new Font("Lexend", Font.BOLD, 14));
+    Tabla1.getTableHeader().setOpaque(false);
+    Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
+    Tabla1.getTableHeader().setForeground(Color.white);
+    Tabla1.setRowHeight(25);
+    Tabla1.setShowVerticalLines(false);
+    Tabla1.setGridColor(new Color(240,240,240));
+
+    jScrollPane1.getViewport().setBackground(new Color(255,255,255));
+    }
+    
+    public void guardarPO(){
+        if(po != null){
+            try{
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                Statement st2 = con.createStatement();
+
+                String sql4 = "select * from edicionpo where PO like '"+po+"'";
+                ResultSet rs2 = st2.executeQuery(sql4);
+                String d = "";
+                while(rs2.next()){
+                    d = rs2.getString("PO");
+                }
+
+                if(d != null){
+                    editarOrden();
+                }else{
+                    JOptionPane.showMessageDialog(this, "YA EXISTE UNA ORDEN DE COMPRA EDITADA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+                }
+            }catch(SQLException e){
+                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+            }
+        }else{
+            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA PO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    
+    public void agregarFila(){
+        if(Tabla1.getRowCount() > 0){
+        DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+        String d[] = {""};
+        miModelo.addRow(d);
+        }
     }
     
     public EditarPO(java.awt.Frame parent, boolean modal,String NumEmpleado) {
@@ -176,15 +222,14 @@ public class EditarPO extends javax.swing.JDialog {
         jPopupMenu1 = new javax.swing.JPopupMenu();
         eliminarPartida = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         txtPO = new javax.swing.JTextField();
-        jSeparator1 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
         Tabla1 = new javax.swing.JTable();
-        btnGuardar = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        botonRedondo1 = new scrollPane.BotonRedondo();
+        botonRedondo2 = new scrollPane.BotonRedondo();
 
         eliminarPartida.setText("Agregar partida                ");
         eliminarPartida.addActionListener(new java.awt.event.ActionListener() {
@@ -195,41 +240,19 @@ public class EditarPO extends javax.swing.JDialog {
         jPopupMenu1.add(eliminarPartida);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setResizable(false);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel3.setBackground(new java.awt.Color(0, 165, 252));
-
-        jLabel9.setFont(new java.awt.Font("Roboto Light", 1, 60)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("MODIFICAR PO");
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(115, Short.MAX_VALUE)
-                .addComponent(jLabel9)
-                .addGap(110, 110, 110))
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addGap(0, 9, Short.MAX_VALUE)
-                .addComponent(jLabel9))
-        );
-
-        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 20, -1, -1));
-
-        jLabel1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
         jLabel1.setText("INGRESA PO:");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, -1, -1));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 130, -1, -1));
 
         txtPO.setBackground(new java.awt.Color(255, 255, 255));
+        txtPO.setFont(new java.awt.Font("Lexend", 0, 12)); // NOI18N
         txtPO.setHorizontalAlignment(javax.swing.JTextField.LEFT);
-        txtPO.setBorder(null);
+        txtPO.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         txtPO.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtPOActionPerformed(evt);
@@ -240,8 +263,9 @@ public class EditarPO extends javax.swing.JDialog {
                 txtPOKeyTyped(evt);
             }
         });
-        jPanel1.add(txtPO, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, 170, 20));
-        jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, 170, 10));
+        jPanel1.add(txtPO, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 170, 20));
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(255, 255, 255)));
 
         Tabla1.setBackground(new java.awt.Color(255, 255, 255));
         Tabla1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
@@ -277,35 +301,43 @@ public class EditarPO extends javax.swing.JDialog {
 
         jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 190, 1130, 310));
 
-        btnGuardar.setText("MANDAR PO");
-        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 520, -1, -1));
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
-        jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(0, 0, 0));
-        jButton1.setText("Agregar partida");
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
-        jButton1.setContentAreaFilled(false);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.setFocusPainted(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jLabel9.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 165, 252));
+        jLabel9.setText("Modificacion de PO");
+        jPanel3.add(jLabel9);
+
+        jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1160, -1));
+
+        botonRedondo1.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo1.setForeground(new java.awt.Color(0, 153, 0));
+        botonRedondo1.setText("Agregar Partida");
+        botonRedondo1.setBorderColor(new java.awt.Color(0, 153, 0));
+        botonRedondo1.setBorderColorSelected(new java.awt.Color(0, 102, 0));
+        botonRedondo1.setColor(new java.awt.Color(0, 153, 0));
+        botonRedondo1.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                botonRedondo1ActionPerformed(evt);
             }
         });
-        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 150, -1, -1));
+        jPanel1.add(botonRedondo1, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 150, -1, -1));
+
+        botonRedondo2.setBackground(new java.awt.Color(255, 255, 255));
+        botonRedondo2.setForeground(new java.awt.Color(0, 153, 255));
+        botonRedondo2.setText("Enviar PO");
+        botonRedondo2.setBorderColor(new java.awt.Color(0, 153, 255));
+        botonRedondo2.setBorderColorSelected(new java.awt.Color(0, 102, 204));
+        botonRedondo2.setColor(new java.awt.Color(0, 153, 255));
+        botonRedondo2.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        jPanel1.add(botonRedondo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 530, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1163, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1176, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -386,35 +418,6 @@ public class EditarPO extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_txtPOKeyTyped
 
-    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if(po != null){
-            try{
-                Connection con = null;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                Statement st = con.createStatement();
-                Statement st2 = con.createStatement();
-
-                String sql4 = "select * from edicionpo where PO like '"+po+"'";
-                ResultSet rs2 = st2.executeQuery(sql4);
-                String d = "";
-                while(rs2.next()){
-                    d = rs2.getString("PO");
-                }
-
-                if(d != null){
-                editarOrden();
-                }else{
-                    JOptionPane.showMessageDialog(this, "YA EXISTE UNA ORDEN DE COMPRA EDITADA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-                }
-            }catch(SQLException e){
-                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-            }
-        }else{
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA PO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }
-    }//GEN-LAST:event_btnGuardarActionPerformed
-
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_Tabla1MouseClicked
@@ -426,13 +429,9 @@ public class EditarPO extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_eliminarPartidaActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if(Tabla1.getRowCount() > 0){
-        DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-        String d[] = {""};
-        miModelo.addRow(d);
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void botonRedondo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo1ActionPerformed
+        agregarFila();
+    }//GEN-LAST:event_botonRedondo1ActionPerformed
 
     public static void main(String args[]) {
         
@@ -475,16 +474,15 @@ public class EditarPO extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
-    private javax.swing.JButton btnGuardar;
+    private scrollPane.BotonRedondo botonRedondo1;
+    private scrollPane.BotonRedondo botonRedondo2;
     private javax.swing.JMenuItem eliminarPartida;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField txtPO;
     // End of variables declaration//GEN-END:variables
 }

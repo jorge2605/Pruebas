@@ -244,9 +244,6 @@ public final class Costos extends javax.swing.JInternalFrame {
     }
     
     public void limpiarTablaNominas(String h1, String h2,String h3, String h4, String h5, String s1, String s2, String s3, String s4, String s5){
-//        ConfTabla conf = new ConfTabla();
-//        conf.text = txtNominas;
-//        TablaNominas = conf;
         TablaNominas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
             },
@@ -261,13 +258,6 @@ public final class Costos extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-//        Action pasteAction = new AbstractAction() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    pasteClipboard(TablaNominas);
-//                }
-//            };
-//        TablaNominas.getActionMap().put("paste", pasteAction);
         TablaNominas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), "paste");
         
         if (TablaNominas.getColumnModel().getColumnCount() > 0) {
@@ -550,6 +540,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                     datos[15] = rs2.getString("Precio");
                     datos[16] = rs2.getString("FechaRecibo");
                     datos[17] = rs2.getString("NumRequisicion");
+                    datos[18] = rs2.getString("Proveedor");
                     String sql3 = "SELECT * FROM registroprov_compras where Nombre like '"+datos[9]+"'";
                     Statement st3 = con.createStatement();
                     ResultSet rs3 = st3.executeQuery(sql3);
@@ -604,13 +595,13 @@ public final class Costos extends javax.swing.JInternalFrame {
                     dat[4] = datos[13];
                     dat[6] = datos[14];
                     dat[7] = String.valueOf(precio);
-                    dat[8] = String.valueOf(t1);
+//                    dat[8] = String.valueOf(t1);
                     dat[9] = String.valueOf(t2);
                     dat[10] = numrequi;
                     dat[11] = datos[16];
                     dat[12] = datos[10];
-                
-                total += precioTotal;
+                    dat[8] = datos[18];
+                    total += precioTotal;
                 if(total2 != 0){
                     miModelo.addRow(dat); 
                 }
@@ -674,6 +665,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                 datos[15] = rs2.getString("Precio");
                 datos[16] = rs2.getString("FechaRecibo");
                 datos[17] = rs2.getString("NumRequisicion");
+                datos[18] = rs2.getString("Proveedor");
                 String sql3 = "SELECT * FROM registroprov_compras where Nombre like '"+datos[9]+"'";
                 Statement st3 = con.createStatement();
                 ResultSet rs3 = st3.executeQuery(sql3);
@@ -728,7 +720,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                 dat[4] = datos[13];
                 dat[6] = datos[14];
                 dat[7] = String.valueOf(precio);
-                dat[8] = String.valueOf(t1);
+                dat[8] = datos[18];
                 dat[9] = String.valueOf(t2);
                 dat[10] = numrequi;
                 dat[11] = datos[16];
