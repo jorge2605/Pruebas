@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import VentanaEmergente.htpp.Agregar;
+import VentanaEmergente.htpp.agregarMaquinados;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -28,7 +29,9 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
 
     String numEmpleado;
     Agregar ag;
+    agregarMaquinados addMaq;
     int tabla = 1;
+    
     public void setFecha(){
         int numeroSemana = Integer.parseInt(cmbSemanas.getSelectedItem().toString());
         int anio = Integer.parseInt(lblYear.getText());
@@ -77,6 +80,7 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         tabla.setRowHeight(25);
         tabla.setShowVerticalLines(false);
         scrol.getViewport().setBackground(new Color(255,255,255));
+        scrol.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(235, 235, 235),2));
     }
     
     public void insertarSemanas(){
@@ -96,36 +100,66 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
     public void evento(MouseEvent evt, int tab, JTable tabla){
         this.tabla = tab;
         deseleccionar();
+        int fila = -1;
         if(evt.getClickCount() == 2){
             JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-            ag = new Agregar(f, true);
-            ag.setLocation(evt.getLocationOnScreen());
-            int fila = tabla.getSelectedRow();
-            ag.btnComentarios.addActionListener(this);
-            ag.btnHoras.addActionListener(this);
-            ag.btnProyecto.addActionListener(this);
+            if(lblDepa.getText().equals("HERRAMENTISTA")){
+                addMaq = new agregarMaquinados(f, true);
+                addMaq.setLocationRelativeTo(f);
+                fila = tabla.getSelectedRow();
+                addMaq.btnGuardar.addActionListener(this);
+                String id;
+                String dimensiones = "";
+                String material = "";
+                String cantidad = "";
+                boolean band = false;
+                try{
+                    Connection con;
+                    Conexion con1 = new Conexion();
+                    con = con1.getConnection();
+                    Statement st = con.createStatement();
+                    try{id = tabla.getValueAt(fila, 3).toString();}catch(Exception e){id = "";}
+                    String sql = "select * from htpp where Id like '"+id+"'";
+                    ResultSet rs = st.executeQuery(sql);
+                    while(rs.next()){
+                        dimensiones = rs.getString("Dimensiones");
+                        material = rs.getString("Material");
+                        cantidad = rs.getString("Cantidad");
+                    }
+                }catch(SQLException e){
+                    JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+                }
+                try{addMaq.txtComentarios.setText(tabla.getValueAt(fila, 2).toString());}catch(Exception e){addMaq.txtComentarios.setText("");}
+                try{addMaq.txtTiempo.setText(tabla.getValueAt(fila, 0).toString());}catch(Exception e){addMaq.txtTiempo.setText("");}
+                try{addMaq.txtPlano.setText(tabla.getValueAt(fila, 1).toString());}catch(Exception e){addMaq.txtPlano.setText("");}
+                try{
+                    addMaq.lblId.setVisible(true);
+                    addMaq.lblId.setText(tabla.getValueAt(fila, 3).toString());
+                    band = true;
+                }catch(Exception e){
+                    addMaq.lblId.setText(""); 
+                    addMaq.lblId.setVisible(false);
+                }
+                if(band){
+                    addMaq.txtDimensiones.setText(dimensiones);
+                    addMaq.txtMaterial.setText(material);
+                    addMaq.txtCantidad.setText(cantidad);
+                }
+                addMaq.setVisible(true);
+            }else{
+                ag = new Agregar(f, true);
+                ag.setLocation(evt.getLocationOnScreen());
+                fila = tabla.getSelectedRow();
+                ag.btnComentarios.addActionListener(this);
+                ag.btnHoras.addActionListener(this);
+                ag.btnProyecto.addActionListener(this);
             
-            try{
-                ag.btnHoras.setText(tabla.getValueAt(fila, 0).toString());
-            }catch(Exception e){
-                ag.btnHoras.setText("");
+                try{ag.btnHoras.setText(tabla.getValueAt(fila, 0).toString());}catch(Exception e){ag.btnHoras.setText("");}
+                try{ag.btnProyecto.setText(tabla.getValueAt(fila, 1).toString());}catch(Exception e){ag.btnProyecto.setText("");}
+                try{ag.btnComentarios.setText(tabla.getValueAt(fila, 2).toString());}catch(Exception e){ag.btnComentarios.setText("");}
+                try{ag.lblID.setText(tabla.getValueAt(fila, 3).toString());}catch(Exception e){ag.lblID.setText("");}
+                ag .setVisible(true);
             }
-            try{
-                ag.btnProyecto.setText(tabla.getValueAt(fila, 1).toString());
-            }catch(Exception e){
-                ag.btnProyecto.setText("");
-            }
-            try{
-                ag.btnComentarios.setText(tabla.getValueAt(fila, 2).toString());
-            }catch(Exception e){
-                ag.btnComentarios.setText("");
-            }
-            try{
-                ag.lblID.setText(tabla.getValueAt(fila, 3).toString());
-            }catch(Exception e){
-                ag.btnComentarios.setText("");
-            }
-            ag .setVisible(true);
         }
     }
     
@@ -403,7 +437,7 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         return depa;
     }
     
-    public String agregarBD(int hora, String proyecto, String nota, String id, String fecha){
+    public String agregarBD(int hora, String proyecto, String nota, String id, String fecha, String dimensiones, int cantidad, String material){
         String key = "";
         try{
             Connection con;
@@ -411,6 +445,9 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
             con = con1.getConnection();
             if(id == null || id.equals("")){
                 String sql = "insert into htpp (Fecha, NumEmpleado, Proyecto, Hora, Notas, Departamento) values(?,?,?,?,?,?)";
+                if(dimensiones != null){
+                    sql = "insert into htpp (Fecha, NumEmpleado, Proyecto, Hora, Notas, Departamento, Dimensiones, Material, Cantidad) values(?,?,?,?,?,?,?,?,?)";
+                }
                 PreparedStatement pst = con.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);
 
                 pst.setString(1, fecha);
@@ -419,6 +456,11 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                 pst.setInt(4, hora);
                 pst.setString(5, nota);
                 pst.setString(6, getDepa());
+                if(dimensiones != null){
+                    pst.setString(7, dimensiones);
+                    pst.setString(8, material);
+                    pst.setInt(9, cantidad);
+                }
 
                 int n = pst.executeUpdate();
                 
@@ -433,6 +475,9 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                 }
             }else{
                 String sql = "update htpp set Fecha = ?, NumEmpleado = ?, Proyecto = ?, Hora = ?, Notas = ?, Departamento = ? where Id = ?";
+                if(dimensiones != null){
+                    sql = "update htpp set Fecha = ?, NumEmpleado = ?, Proyecto = ?, Hora = ?, Notas = ?, Departamento = ?, Dimensiones = ?, Material = ?, Cantidad = ? where Id = ?";
+                }
                 PreparedStatement pst = con.prepareStatement(sql);
 
                 pst.setString(1, fecha);
@@ -441,7 +486,14 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                 pst.setInt(4, hora);
                 pst.setString(5, nota);
                 pst.setString(6, getDepa());
-                pst.setString(7, id);
+                if(dimensiones == null){
+                    pst.setString(7, id);
+                }else{
+                    pst.setString(7, dimensiones);
+                    pst.setString(8, material);
+                    pst.setInt(9, cantidad);
+                    pst.setString(10, id);
+                }
 
                 int n = pst.executeUpdate();
                 
@@ -457,6 +509,78 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
         return key;
+    }
+    
+    public void clicVentana(String horas, String proyecto, String comentarios, String idB, String depa, String dimensiones, String material, int cantidad){
+        try{
+            int d = Integer.parseInt(horas);
+            String dat[] = new String[4];
+            dat[0] = horas;
+            dat[1] = proyecto;
+            dat[2] = comentarios;
+            if(dat[0].equals("")){
+                JOptionPane.showMessageDialog(this, "Debes llenar las horas","Advertencia",JOptionPane.WARNING_MESSAGE);
+            }else if(dat[1].equals("")){
+                JOptionPane.showMessageDialog(this, "Debes llenar el proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
+            }else{
+                String id;
+                if(depa.equals("maquinados")){
+                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla), dimensiones, cantidad, material);
+                }else{
+                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla),null,0,null);
+                }
+                switch (tabla) {
+                    case 1:
+                        Tabla1.setValueAt(dat[0], Tabla1.getSelectedRow(), 0);
+                        Tabla1.setValueAt(dat[1], Tabla1.getSelectedRow(), 1);
+                        Tabla1.setValueAt(dat[2], Tabla1.getSelectedRow(), 2);
+                        Tabla1.setValueAt(id, Tabla1.getSelectedRow(), 3);
+                        break;
+                    case 2:
+                        Tabla2.setValueAt(dat[0], Tabla2.getSelectedRow(), 0);
+                        Tabla2.setValueAt(dat[1], Tabla2.getSelectedRow(), 1);
+                        Tabla2.setValueAt(dat[2], Tabla2.getSelectedRow(), 2);
+                        Tabla2.setValueAt(id, Tabla2.getSelectedRow(), 3);
+                        break;
+                    case 3:
+                        Tabla3.setValueAt(dat[0], Tabla3.getSelectedRow(), 0);
+                        Tabla3.setValueAt(dat[1], Tabla3.getSelectedRow(), 1);
+                        Tabla3.setValueAt(dat[2], Tabla3.getSelectedRow(), 2);
+                        Tabla3.setValueAt(id, Tabla3.getSelectedRow(), 3);
+                        break;
+                    case 4:
+                        Tabla4.setValueAt(dat[0], Tabla4.getSelectedRow(), 0);
+                        Tabla4.setValueAt(dat[1], Tabla4.getSelectedRow(), 1);
+                        Tabla4.setValueAt(dat[2], Tabla4.getSelectedRow(), 2);
+                        Tabla4.setValueAt(id, Tabla4.getSelectedRow(), 3);
+                        break;
+                    case 5:
+                        Tabla5.setValueAt(dat[0], Tabla5.getSelectedRow(), 0);
+                        Tabla5.setValueAt(dat[1], Tabla5.getSelectedRow(), 1);
+                        Tabla5.setValueAt(dat[2], Tabla5.getSelectedRow(), 2);
+                        Tabla5.setValueAt(id, Tabla5.getSelectedRow(), 3);
+                        break;
+                    case 6:
+                        Tabla6.setValueAt(dat[0], Tabla6.getSelectedRow(), 0);
+                        Tabla6.setValueAt(dat[1], Tabla6.getSelectedRow(), 1);
+                        Tabla6.setValueAt(dat[2], Tabla6.getSelectedRow(), 2);
+                        Tabla6.setValueAt(id, Tabla6.getSelectedRow(), 3);
+                        break;
+                    case 7:
+                        Tabla7.setValueAt(dat[0], Tabla7.getSelectedRow(), 0);
+                        Tabla7.setValueAt(dat[1], Tabla7.getSelectedRow(), 1);
+                        Tabla7.setValueAt(dat[2], Tabla7.getSelectedRow(), 2);
+                        Tabla7.setValueAt(id, Tabla7.getSelectedRow(), 3);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }catch(Exception ex){
+            Logger.getLogger(HTPP.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, "Cantidad errorena","Error",JOptionPane.WARNING_MESSAGE);
+//            ag.btnHoras.setText("");
+        }
     }
     
     public HTPP(String numEmpleado) {
@@ -711,6 +835,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         jPanel16.setBackground(new java.awt.Color(255, 255, 255));
         jPanel16.setLayout(new java.awt.BorderLayout());
 
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null}
@@ -775,6 +901,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
 
         jPanel22.setBackground(new java.awt.Color(255, 255, 255));
         jPanel22.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane2.setBorder(null);
 
         Tabla2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -848,6 +976,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         jPanel25.setBackground(new java.awt.Color(255, 255, 255));
         jPanel25.setLayout(new java.awt.BorderLayout());
 
+        jScrollPane3.setBorder(null);
+
         Tabla3.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null}
@@ -919,6 +1049,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
 
         jPanel28.setBackground(new java.awt.Color(255, 255, 255));
         jPanel28.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane4.setBorder(null);
 
         Tabla4.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -997,6 +1129,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         jPanel31.setBackground(new java.awt.Color(255, 255, 255));
         jPanel31.setLayout(new java.awt.BorderLayout());
 
+        jScrollPane5.setBorder(null);
+
         Tabla5.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null}
@@ -1069,6 +1203,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         jPanel34.setBackground(new java.awt.Color(255, 255, 255));
         jPanel34.setLayout(new java.awt.BorderLayout());
 
+        jScrollPane6.setBorder(null);
+
         Tabla6.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null}
@@ -1140,6 +1276,8 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
 
         jPanel37.setBackground(new java.awt.Color(255, 255, 255));
         jPanel37.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane7.setBorder(null);
 
         Tabla7.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1608,77 +1746,17 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
     public void actionPerformed(ActionEvent e) {
         if(ag != null){
             if(e.getSource() == ag.btnComentarios || e.getSource() == ag.btnHoras || e.getSource() == ag.btnProyecto){
-                try{
-                    int d = Integer.parseInt(ag.btnHoras.getText());
-                    String dat[] = new String[4];
-                    dat[0] = ag.btnHoras.getText();
-                    dat[1] = ag.btnProyecto.getText();
-                    dat[2] = ag.btnComentarios.getText();
-                    if(dat[0].equals("")){
-                        JOptionPane.showMessageDialog(this, "Debes llenar las horas","Advertencia",JOptionPane.WARNING_MESSAGE);
-                    }else if(dat[1].equals("")){
-                        JOptionPane.showMessageDialog(this, "Debes llenar el proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
-                    }else{
-                        String id = agregarBD(d, dat[1], dat[2], ag.lblID.getText(), getFechaTabla(tabla));
-                        switch (tabla) {
-                            case 1:
-                                Tabla1.setValueAt(dat[0], Tabla1.getSelectedRow(), 0);
-                                Tabla1.setValueAt(dat[1], Tabla1.getSelectedRow(), 1);
-                                Tabla1.setValueAt(dat[2], Tabla1.getSelectedRow(), 2);
-                                Tabla1.setValueAt(id, Tabla1.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            case 2:
-                                Tabla2.setValueAt(dat[0], Tabla2.getSelectedRow(), 0);
-                                Tabla2.setValueAt(dat[1], Tabla2.getSelectedRow(), 1);
-                                Tabla2.setValueAt(dat[2], Tabla2.getSelectedRow(), 2);
-                                Tabla2.setValueAt(id, Tabla2.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            case 3:
-                                Tabla3.setValueAt(dat[0], Tabla3.getSelectedRow(), 0);
-                                Tabla3.setValueAt(dat[1], Tabla3.getSelectedRow(), 1);
-                                Tabla3.setValueAt(dat[2], Tabla3.getSelectedRow(), 2);
-                                Tabla3.setValueAt(id, Tabla3.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            case 4:
-                                Tabla4.setValueAt(dat[0], Tabla4.getSelectedRow(), 0);
-                                Tabla4.setValueAt(dat[1], Tabla4.getSelectedRow(), 1);
-                                Tabla4.setValueAt(dat[2], Tabla4.getSelectedRow(), 2);
-                                Tabla4.setValueAt(id, Tabla4.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            case 5:
-                                Tabla5.setValueAt(dat[0], Tabla5.getSelectedRow(), 0);
-                                Tabla5.setValueAt(dat[1], Tabla5.getSelectedRow(), 1);
-                                Tabla5.setValueAt(dat[2], Tabla5.getSelectedRow(), 2);
-                                Tabla5.setValueAt(id, Tabla5.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            case 6:
-                                Tabla6.setValueAt(dat[0], Tabla6.getSelectedRow(), 0);
-                                Tabla6.setValueAt(dat[1], Tabla6.getSelectedRow(), 1);
-                                Tabla6.setValueAt(dat[2], Tabla6.getSelectedRow(), 2);
-                                Tabla6.setValueAt(id, Tabla6.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            case 7:
-                                Tabla7.setValueAt(dat[0], Tabla7.getSelectedRow(), 0);
-                                Tabla7.setValueAt(dat[1], Tabla7.getSelectedRow(), 1);
-                                Tabla7.setValueAt(dat[2], Tabla7.getSelectedRow(), 2);
-                                Tabla7.setValueAt(id, Tabla7.getSelectedRow(), 3);
-                                ag.dispose();
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }catch(Exception ex){
-                    JOptionPane.showMessageDialog(this, "Cantidad errorena","Error",JOptionPane.WARNING_MESSAGE);
-                    ag.btnHoras.setText("");
-                }
+                clicVentana(ag.btnHoras.getText(), ag.btnProyecto.getText(), ag.btnComentarios.getText(), 
+                        ag.lblID.getText(),"",null,null,0);
+                ag.dispose();
             }
+        }
+        if(addMaq != null){
+            if(e.getSource() == addMaq.btnGuardar){
+                clicVentana(addMaq.txtTiempo.getText(), addMaq.txtPlano.getText(), addMaq.txtComentarios.getText(), 
+                        addMaq.lblId.getText(),"maquinados",addMaq.txtDimensiones.getText(),addMaq.txtMaterial.getText(),Integer.parseInt(addMaq.txtCantidad.getText()));
+            }
+            addMaq.dispose();
         }
     }
 }
