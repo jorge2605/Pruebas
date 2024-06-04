@@ -31,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTabbedPane;
 import javax.swing.plaf.basic.BasicTabbedPaneUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
@@ -622,7 +623,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         }
     }
     
-    public void setTabbed(){
+    public void setTabbed(JTabbedPane tabbed){
         tabbed.setUI(new BasicTabbedPaneUI() {
                 @Override
                 protected void paintContentBorder(Graphics g, int tabPlacement, int selectedIndex) {}
@@ -1397,7 +1398,8 @@ public final class Costos extends javax.swing.JInternalFrame {
         enchular(TablaDiseño,jScrollPane11);
         enchular(TablaCalidad,jScrollPane12);
         
-        setTabbed();
+        setTabbed(tabbed);
+        setTabbed(tabbed2);
         precioDolar();
         autoCompletar();
         getAllEmployes();
@@ -1444,7 +1446,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel8 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        tabbed2 = new javax.swing.JTabbedPane();
         jPanel27 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         TablaHoras = new javax.swing.JTable();
@@ -1732,9 +1734,9 @@ public final class Costos extends javax.swing.JInternalFrame {
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setLayout(new java.awt.BorderLayout());
 
-        jTabbedPane1.setBackground(new java.awt.Color(255, 255, 255));
-        jTabbedPane1.setForeground(new java.awt.Color(255, 255, 255));
-        jTabbedPane1.setTabPlacement(javax.swing.JTabbedPane.LEFT);
+        tabbed2.setBackground(new java.awt.Color(255, 255, 255));
+        tabbed2.setForeground(new java.awt.Color(255, 255, 255));
+        tabbed2.setTabPlacement(javax.swing.JTabbedPane.LEFT);
 
         jPanel27.setBackground(new java.awt.Color(255, 255, 255));
         jPanel27.setLayout(new java.awt.BorderLayout());
@@ -1806,7 +1808,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         jLabel22.setText("Todos");
         jPanel27.add(jLabel22, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/all_16.png")), jPanel27); // NOI18N
+        tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/all_16.png")), jPanel27); // NOI18N
 
         jPanel28.setBackground(new java.awt.Color(255, 255, 255));
         jPanel28.setLayout(new java.awt.BorderLayout());
@@ -1865,7 +1867,7 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel28.add(jPanel32, java.awt.BorderLayout.PAGE_END);
 
-        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/torno_16.png")), jPanel28); // NOI18N
+        tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/torno_16.png")), jPanel28); // NOI18N
 
         jPanel29.setBackground(new java.awt.Color(255, 255, 255));
         jPanel29.setLayout(new java.awt.BorderLayout());
@@ -1904,7 +1906,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         jLabel19.setText("Integracion");
         jPanel29.add(jLabel19, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/integracion_16.png")), jPanel29); // NOI18N
+        tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/integracion_16.png")), jPanel29); // NOI18N
 
         jPanel30.setBackground(new java.awt.Color(255, 255, 255));
         jPanel30.setLayout(new java.awt.BorderLayout());
@@ -1943,7 +1945,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         jLabel20.setText("Diseño");
         jPanel30.add(jLabel20, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/diseño_16.png")), jPanel30); // NOI18N
+        tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/diseño_16.png")), jPanel30); // NOI18N
 
         jPanel31.setBackground(new java.awt.Color(255, 255, 255));
         jPanel31.setLayout(new java.awt.BorderLayout());
@@ -1982,9 +1984,9 @@ public final class Costos extends javax.swing.JInternalFrame {
         jLabel21.setText("Calidad");
         jPanel31.add(jLabel21, java.awt.BorderLayout.PAGE_START);
 
-        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/calidad_16.png")), jPanel31); // NOI18N
+        tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/calidad_16.png")), jPanel31); // NOI18N
 
-        jPanel9.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+        jPanel9.add(tabbed2, java.awt.BorderLayout.CENTER);
 
         jPanel8.add(jPanel9, java.awt.BorderLayout.CENTER);
 
@@ -2969,7 +2971,6 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblPrecioDolar;
@@ -2983,6 +2984,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JRadioButton rbMes;
     private javax.swing.JRadioButton rbProyecto;
     private javax.swing.JTabbedPane tabbed;
+    private javax.swing.JTabbedPane tabbed2;
     private javax.swing.JFormattedTextField txtImpuestos;
     private javax.swing.JFormattedTextField txtLuz;
     private javax.swing.JFormattedTextField txtNominas;
