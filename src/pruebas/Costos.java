@@ -64,6 +64,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     TextAutoCompleter au;
     boolean band =  false;
     Espera espera = new Espera();
+    Stack<String[]> empleados;
     
     private void pasteClipboard(JTable table) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -273,6 +274,94 @@ public final class Costos extends javax.swing.JInternalFrame {
         }
     }
     
+    public void limpiarTablaMaquinados(){
+        TablaMaquinados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Dimensiones", "Material", "Cantidad", "Costo", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, true, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        if (TablaMaquinados.getColumnModel().getColumnCount() > 0) {
+            TablaMaquinados.getColumnModel().getColumn(7).setMinWidth(0);
+            TablaMaquinados.getColumnModel().getColumn(7).setPreferredWidth(0);
+            TablaMaquinados.getColumnModel().getColumn(7).setMaxWidth(0);
+        }
+    }
+    
+    public void limpiarTablaIntegracion(){
+        TablaIntegracion.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Ocupacion", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        if (TablaIntegracion.getColumnModel().getColumnCount() > 0) {
+            TablaIntegracion.getColumnModel().getColumn(4).setMinWidth(0);
+            TablaIntegracion.getColumnModel().getColumn(4).setPreferredWidth(0);
+            TablaIntegracion.getColumnModel().getColumn(4).setMaxWidth(0);
+        }
+    }
+    
+    public void limpiarTablaDiseño(){
+        TablaDiseño.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Comentarios", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        if (TablaDiseño.getColumnModel().getColumnCount() > 0) {
+            TablaDiseño.getColumnModel().getColumn(4).setMinWidth(0);
+            TablaDiseño.getColumnModel().getColumn(4).setPreferredWidth(0);
+            TablaDiseño.getColumnModel().getColumn(4).setMaxWidth(0);
+        }
+    }
+    
+    public void limpiarTablaCalidad(){
+        TablaCalidad.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Comentarios", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        if (TablaCalidad.getColumnModel().getColumnCount() > 0) {
+            TablaCalidad.getColumnModel().getColumn(4).setMinWidth(0);
+            TablaCalidad.getColumnModel().getColumn(4).setPreferredWidth(0);
+            TablaCalidad.getColumnModel().getColumn(4).setMaxWidth(0);
+        }
+    }
+    
     public int getColumna(String fecha){
         int col;
         String fe = fecha.substring(fecha.length()-2, fecha.length());
@@ -291,13 +380,161 @@ public final class Costos extends javax.swing.JInternalFrame {
     
     public int getSuma(int fila, int col, String hora){
         int suma = 0;
-        
         try{
+            try{suma = Integer.parseInt(TablaHoras.getValueAt(fila, col).toString());}catch(Exception e){suma = 0;}
             return Integer.parseInt(hora) + suma;
         }catch(Exception e){
             
         }
         return suma;
+    }
+    
+    public void getAllEmployes(){
+        empleados = new Stack<>();
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from registroempleados";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                String ad[] = new String[2];
+                ad[0] = rs.getString("NumEmpleado");
+                ad[1] = rs.getString("Nombre") + " " + rs.getString("Apellido");
+                empleados.add(ad);
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public String getEmploye(String numEmpleado){
+        for (int i = 0; i < empleados.size(); i++) {
+            if(empleados.get(i)[0].equals(numEmpleado)){
+                return empleados.get(i)[1];
+            }
+        }
+        return null;
+    }
+    
+    public void agregarMaquinados(String dia1, String dia2, String tipo){
+        try{
+            limpiarTablaMaquinados();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from htpp where Departamento like '2' and Fecha between '"+dia1+"' and '"+dia2+"'";
+            if(tipo.equals("proyecto")){
+                sql = "select * from htpp where Departamento like '2' and Proyecto like '" + txtProyecto.getText() + "'";
+            }
+            ResultSet rs = st.executeQuery(sql);
+            DefaultTableModel miModelo = (DefaultTableModel) TablaMaquinados.getModel();
+            String datos[] = new String[10];
+            while(rs.next()){
+                datos[0] = rs.getString("NumEmpleado");
+                datos[0] = getEmploye(datos[0]);
+                datos[1] = rs.getString("Proyecto");
+                datos[2] = rs.getString("Hora");
+                datos[3] = rs.getString("Dimensiones");
+                datos[4] = rs.getString("Material");
+                datos[5] = rs.getString("Cantidad");
+                datos[6] = rs.getString("Costo");
+                datos[7] = rs.getString("Id");
+                datos[8] = rs.getString("Fecha");
+                miModelo.addRow(datos);
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void agregarIntegracion(String dia1, String dia2, String tipo){
+        try{
+            limpiarTablaIntegracion();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from htpp where Departamento like '1' and Fecha between '"+dia1+"' and '"+dia2+"'";
+            if(tipo.equals("proyecto")){
+                sql = "select * from htpp where Departamento like '1' and Proyecto like '" + txtProyecto.getText() + "'";
+            }
+            ResultSet rs = st.executeQuery(sql);
+            DefaultTableModel miModelo = (DefaultTableModel) TablaIntegracion.getModel();
+            String datos[] = new String[10];
+            while(rs.next()){
+                datos[0] = rs.getString("NumEmpleado");
+                datos[0] = getEmploye(datos[0]);
+                datos[1] = rs.getString("Proyecto");
+                datos[2] = rs.getString("Hora");
+                datos[3] = rs.getString("Ocupacion");
+                datos[4] = rs.getString("Id");
+                datos[5] = rs.getString("Fecha");
+                miModelo.addRow(datos);
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void agregarDiseño(String dia1, String dia2, String tipo){
+        try{
+            limpiarTablaDiseño();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from htpp where Departamento like '3' and Fecha between '"+dia1+"' and '"+dia2+"'";
+            if(tipo.equals("proyecto")){
+                sql = "select * from htpp where Departamento like '3' and Proyecto like '" + txtProyecto.getText() + "'";
+            }
+            ResultSet rs = st.executeQuery(sql);
+            DefaultTableModel miModelo = (DefaultTableModel) TablaDiseño.getModel();
+            String datos[] = new String[10];
+            while(rs.next()){
+                datos[0] = rs.getString("NumEmpleado");
+                datos[0] = getEmploye(datos[0]);
+                datos[1] = rs.getString("Proyecto");
+                datos[2] = rs.getString("Hora");
+                datos[3] = rs.getString("Notas");
+                datos[4] = rs.getString("Id");
+                datos[5] = rs.getString("Fecha");
+                miModelo.addRow(datos);
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void agregarCalidad(String dia1, String dia2, String tipo){
+        try{
+            limpiarTablaCalidad();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from htpp where Departamento like '4' and Fecha between '"+dia1+"' and '"+dia2+"'";
+            if(tipo.equals("proyecto")){
+                sql = "select * from htpp where Departamento like '4' and Proyecto like '" + txtProyecto.getText() + "'";
+            }
+            ResultSet rs = st.executeQuery(sql);
+            DefaultTableModel miModelo = (DefaultTableModel) TablaCalidad.getModel();
+            String datos[] = new String[10];
+            while(rs.next()){
+                datos[0] = rs.getString("NumEmpleado");
+                datos[0] = getEmploye(datos[0]);
+                datos[1] = rs.getString("Proyecto");
+                datos[2] = rs.getString("Hora");
+                datos[3] = rs.getString("Notas");
+                datos[4] = rs.getString("Id");
+                datos[5] = rs.getString("Fecha");
+                miModelo.addRow(datos);
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     public void verHoras(String tipo){
@@ -327,7 +564,7 @@ public final class Costos extends javax.swing.JInternalFrame {
             
             String sql = "select * from htpp where Fecha between '"+dia1+"' and '"+dia2+"'";
             if(tipo.equals("proyecto")){
-                sql = "select * from htpp where Proyecto like '"+txtProyecto.getText()+"'";
+                sql = "select * from htpp where Proyecto like '%"+txtProyecto.getText()+"%'";
             }
             ResultSet rs = st.executeQuery(sql);
             DefaultTableModel miModelo = (DefaultTableModel) TablaHoras.getModel();
@@ -348,13 +585,15 @@ public final class Costos extends javax.swing.JInternalFrame {
                     miModelo.addRow(datos);
                     datos[0] = "Diseño";
                     miModelo.addRow(datos);
+                    datos[0] = "Calidad";
+                    miModelo.addRow(datos);
                 }
                 
             }
             
             String sql2 = "select * from htpp where Fecha between '"+dia1+"' and '"+dia2+"'";
             if(tipo.equals("proyecto")){
-                sql2 =    "select * from htpp where Proyecto like '"+txtProyecto.getText()+"'";
+                sql2 =    "select * from htpp where Proyecto like '%"+txtProyecto.getText()+"%'";
             }
             ResultSet rs2 = st2.executeQuery(sql2);
             while(rs2.next()){
@@ -368,8 +607,13 @@ public final class Costos extends javax.swing.JInternalFrame {
                 }
                 int fila = getFila(proy);
                 int col = getColumna(fecha);
-                TablaHoras.setValueAt(getSuma(fila, col, hora), fila + f, col);
+                TablaHoras.setValueAt(getSuma(fila + f, col, hora), fila + f, col);
             }
+            
+            agregarMaquinados(dia1, dia2, tipo);
+            agregarIntegracion(dia1, dia2, tipo);
+            agregarDiseño(dia1, dia2, tipo);
+            agregarCalidad(dia1, dia2, tipo);
             
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: " + e,"ERROR",JOptionPane.ERROR_MESSAGE);
@@ -484,7 +728,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         Date d = null;
         try {
             d = s1.parse(cmbMes.getSelectedItem().toString());
-        } catch (ParseException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(Costos.class.getName()).log(Level.SEVERE, null, ex);
         }
         int year = Integer.parseInt(cmbAnio.getSelectedItem().toString());
@@ -1148,11 +1392,15 @@ public final class Costos extends javax.swing.JInternalFrame {
         enchular(TablaAlmacen,jScrollPane5);
         enchular(TablaIndirecto,jScrollPane7);
         enchular(TablaNominas,jScrollPane8);
+        enchular(TablaMaquinados,jScrollPane9);
+        enchular(TablaIntegracion,jScrollPane10);
+        enchular(TablaDiseño,jScrollPane11);
+        enchular(TablaCalidad,jScrollPane12);
         
         setTabbed();
         precioDolar();
         autoCompletar();
-        
+        getAllEmployes();
         panelProyecto.setVisible(false);
     }
 
@@ -1196,8 +1444,29 @@ public final class Costos extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel8 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel27 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         TablaHoras = new javax.swing.JTable();
+        jLabel22 = new javax.swing.JLabel();
+        jPanel28 = new javax.swing.JPanel();
+        jLabel17 = new javax.swing.JLabel();
+        jScrollPane9 = new javax.swing.JScrollPane();
+        TablaMaquinados = new javax.swing.JTable();
+        jPanel32 = new javax.swing.JPanel();
+        btnGuardar1 = new scrollPane.BotonRedondo();
+        jPanel29 = new javax.swing.JPanel();
+        jScrollPane10 = new javax.swing.JScrollPane();
+        TablaIntegracion = new javax.swing.JTable();
+        jLabel19 = new javax.swing.JLabel();
+        jPanel30 = new javax.swing.JPanel();
+        jScrollPane11 = new javax.swing.JScrollPane();
+        TablaDiseño = new javax.swing.JTable();
+        jLabel20 = new javax.swing.JLabel();
+        jPanel31 = new javax.swing.JPanel();
+        jScrollPane12 = new javax.swing.JScrollPane();
+        TablaCalidad = new javax.swing.JTable();
+        jLabel21 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
@@ -1420,6 +1689,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         jPanel7.setBackground(new java.awt.Color(255, 255, 255));
         jPanel7.setLayout(new java.awt.BorderLayout());
 
+        tabbed.setBackground(new java.awt.Color(255, 255, 255));
         tabbed.setForeground(new java.awt.Color(200, 200, 200));
         tabbed.setFont(new java.awt.Font("Roboto", 0, 16)); // NOI18N
         tabbed.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -1457,10 +1727,17 @@ public final class Costos extends javax.swing.JInternalFrame {
         jScrollPane1.setBorder(null);
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel8.setLayout(new javax.swing.BoxLayout(jPanel8, javax.swing.BoxLayout.Y_AXIS));
+        jPanel8.setLayout(new java.awt.BorderLayout());
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setLayout(new java.awt.BorderLayout());
+
+        jTabbedPane1.setBackground(new java.awt.Color(255, 255, 255));
+        jTabbedPane1.setForeground(new java.awt.Color(255, 255, 255));
+        jTabbedPane1.setTabPlacement(javax.swing.JTabbedPane.LEFT);
+
+        jPanel27.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel27.setLayout(new java.awt.BorderLayout());
 
         jScrollPane2.setBorder(null);
 
@@ -1487,17 +1764,235 @@ public final class Costos extends javax.swing.JInternalFrame {
             TablaHoras.getColumnModel().getColumn(0).setMinWidth(150);
             TablaHoras.getColumnModel().getColumn(0).setPreferredWidth(150);
             TablaHoras.getColumnModel().getColumn(0).setMaxWidth(150);
+            TablaHoras.getColumnModel().getColumn(0).setHeaderValue("Proyecto");
+            TablaHoras.getColumnModel().getColumn(1).setHeaderValue("1");
+            TablaHoras.getColumnModel().getColumn(2).setHeaderValue("2");
+            TablaHoras.getColumnModel().getColumn(3).setHeaderValue("3");
+            TablaHoras.getColumnModel().getColumn(4).setHeaderValue("4");
+            TablaHoras.getColumnModel().getColumn(5).setHeaderValue("5");
+            TablaHoras.getColumnModel().getColumn(6).setHeaderValue("6");
+            TablaHoras.getColumnModel().getColumn(7).setHeaderValue("7");
+            TablaHoras.getColumnModel().getColumn(8).setHeaderValue("8");
+            TablaHoras.getColumnModel().getColumn(9).setHeaderValue("9");
+            TablaHoras.getColumnModel().getColumn(10).setHeaderValue("10");
+            TablaHoras.getColumnModel().getColumn(11).setHeaderValue("11");
+            TablaHoras.getColumnModel().getColumn(12).setHeaderValue("12");
+            TablaHoras.getColumnModel().getColumn(13).setHeaderValue("13");
+            TablaHoras.getColumnModel().getColumn(14).setHeaderValue("14");
+            TablaHoras.getColumnModel().getColumn(15).setHeaderValue("15");
+            TablaHoras.getColumnModel().getColumn(16).setHeaderValue("16");
+            TablaHoras.getColumnModel().getColumn(17).setHeaderValue("17");
+            TablaHoras.getColumnModel().getColumn(18).setHeaderValue("18");
+            TablaHoras.getColumnModel().getColumn(19).setHeaderValue("19");
+            TablaHoras.getColumnModel().getColumn(20).setHeaderValue("20");
+            TablaHoras.getColumnModel().getColumn(21).setHeaderValue("21");
+            TablaHoras.getColumnModel().getColumn(22).setHeaderValue("22");
+            TablaHoras.getColumnModel().getColumn(23).setHeaderValue("23");
+            TablaHoras.getColumnModel().getColumn(24).setHeaderValue("24");
+            TablaHoras.getColumnModel().getColumn(25).setHeaderValue("25");
+            TablaHoras.getColumnModel().getColumn(26).setHeaderValue("26");
+            TablaHoras.getColumnModel().getColumn(27).setHeaderValue("27");
+            TablaHoras.getColumnModel().getColumn(28).setHeaderValue("28");
+            TablaHoras.getColumnModel().getColumn(29).setHeaderValue("29");
+            TablaHoras.getColumnModel().getColumn(30).setHeaderValue("30");
+            TablaHoras.getColumnModel().getColumn(31).setHeaderValue("31");
         }
 
-        jPanel9.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+        jPanel27.add(jScrollPane2, java.awt.BorderLayout.CENTER);
+
+        jLabel22.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(153, 0, 0));
+        jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel22.setText("Todos");
+        jPanel27.add(jLabel22, java.awt.BorderLayout.PAGE_START);
+
+        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/all_16.png")), jPanel27); // NOI18N
+
+        jPanel28.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel28.setLayout(new java.awt.BorderLayout());
+
+        jLabel17.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(153, 0, 0));
+        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel17.setText("Maquinados");
+        jPanel28.add(jLabel17, java.awt.BorderLayout.PAGE_START);
+
+        jScrollPane9.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
+        TablaMaquinados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Dimensiones", "Material", "Cantidad", "Costo", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false, true, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane9.setViewportView(TablaMaquinados);
+        if (TablaMaquinados.getColumnModel().getColumnCount() > 0) {
+            TablaMaquinados.getColumnModel().getColumn(7).setMinWidth(0);
+            TablaMaquinados.getColumnModel().getColumn(7).setPreferredWidth(0);
+            TablaMaquinados.getColumnModel().getColumn(7).setMaxWidth(0);
+        }
+
+        jPanel28.add(jScrollPane9, java.awt.BorderLayout.CENTER);
+
+        jPanel32.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnGuardar1.setBackground(new java.awt.Color(255, 255, 255));
+        btnGuardar1.setForeground(new java.awt.Color(51, 153, 255));
+        btnGuardar1.setText("Guardar");
+        btnGuardar1.setBorderColor(new java.awt.Color(51, 153, 255));
+        btnGuardar1.setBorderColorSelected(new java.awt.Color(0, 51, 153));
+        btnGuardar1.setColor(new java.awt.Color(51, 153, 255));
+        btnGuardar1.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        btnGuardar1.setPreferredSize(new java.awt.Dimension(300, 35));
+        btnGuardar1.setThickness(3);
+        btnGuardar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardar1ActionPerformed(evt);
+            }
+        });
+        jPanel32.add(btnGuardar1);
+
+        jPanel28.add(jPanel32, java.awt.BorderLayout.PAGE_END);
+
+        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/torno_16.png")), jPanel28); // NOI18N
+
+        jPanel29.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel29.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane10.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane10.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
+        TablaIntegracion.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Ocupacion", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane10.setViewportView(TablaIntegracion);
+        if (TablaIntegracion.getColumnModel().getColumnCount() > 0) {
+            TablaIntegracion.getColumnModel().getColumn(4).setMinWidth(0);
+            TablaIntegracion.getColumnModel().getColumn(4).setPreferredWidth(0);
+            TablaIntegracion.getColumnModel().getColumn(4).setMaxWidth(0);
+        }
+
+        jPanel29.add(jScrollPane10, java.awt.BorderLayout.CENTER);
+
+        jLabel19.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel19.setForeground(new java.awt.Color(153, 0, 0));
+        jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel19.setText("Integracion");
+        jPanel29.add(jLabel19, java.awt.BorderLayout.PAGE_START);
+
+        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/integracion_16.png")), jPanel29); // NOI18N
+
+        jPanel30.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel30.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane11.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane11.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
+        TablaDiseño.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Comentarios", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane11.setViewportView(TablaDiseño);
+        if (TablaDiseño.getColumnModel().getColumnCount() > 0) {
+            TablaDiseño.getColumnModel().getColumn(4).setMinWidth(0);
+            TablaDiseño.getColumnModel().getColumn(4).setPreferredWidth(0);
+            TablaDiseño.getColumnModel().getColumn(4).setMaxWidth(0);
+        }
+
+        jPanel30.add(jScrollPane11, java.awt.BorderLayout.CENTER);
+
+        jLabel20.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(153, 0, 0));
+        jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel20.setText("Diseño");
+        jPanel30.add(jLabel20, java.awt.BorderLayout.PAGE_START);
+
+        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/diseño_16.png")), jPanel30); // NOI18N
+
+        jPanel31.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel31.setLayout(new java.awt.BorderLayout());
+
+        jScrollPane12.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane12.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
+        TablaCalidad.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Empleado", "Proyecto", "Horas", "Comentarios", "ID", "Fecha"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane12.setViewportView(TablaCalidad);
+        if (TablaCalidad.getColumnModel().getColumnCount() > 0) {
+            TablaCalidad.getColumnModel().getColumn(4).setMinWidth(0);
+            TablaCalidad.getColumnModel().getColumn(4).setPreferredWidth(0);
+            TablaCalidad.getColumnModel().getColumn(4).setMaxWidth(0);
+        }
+
+        jPanel31.add(jScrollPane12, java.awt.BorderLayout.CENTER);
+
+        jLabel21.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(153, 0, 0));
+        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel21.setText("Calidad");
+        jPanel31.add(jLabel21, java.awt.BorderLayout.PAGE_START);
+
+        jTabbedPane1.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/calidad_16.png")), jPanel31); // NOI18N
+
+        jPanel9.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
+
+        jPanel8.add(jPanel9, java.awt.BorderLayout.CENTER);
 
         jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 51, 153));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Horas");
-        jPanel9.add(jLabel1, java.awt.BorderLayout.PAGE_START);
-
-        jPanel8.add(jPanel9);
+        jPanel8.add(jLabel1, java.awt.BorderLayout.PAGE_START);
 
         jScrollPane1.setViewportView(jPanel8);
 
@@ -2359,18 +2854,50 @@ public final class Costos extends javax.swing.JInternalFrame {
         costo.setVisible(true);
     }//GEN-LAST:event_btnEditarEmpleadoActionPerformed
 
+    private void btnGuardar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardar1ActionPerformed
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            String sql = "update htpp set Costo = ? where Id = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            
+            int n = 0;
+            for (int i = 0; i < TablaMaquinados.getRowCount(); i++) {
+                double costo;
+                try{costo = Double.parseDouble(TablaMaquinados.getValueAt(i, 6).toString());}catch(Exception e){costo = 0;}
+                pst.setDouble(1, costo);
+                pst.setString(2, TablaMaquinados.getValueAt(i, 7).toString());
+                
+                n = pst.executeUpdate();
+            }
+            
+            if(n > 0){
+                JOptionPane.showMessageDialog(this, "Datos guardados correctamente");
+            }
+            
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnGuardar1ActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable TablaAlmacen;
+    private javax.swing.JTable TablaCalidad;
+    private javax.swing.JTable TablaDiseño;
     private javax.swing.JTable TablaHoras;
     private javax.swing.JTable TablaIndirecto;
+    private javax.swing.JTable TablaIntegracion;
+    private javax.swing.JTable TablaMaquinados;
     private javax.swing.JTable TablaNominas;
     private javax.swing.JTable TablaOrdenes;
     private javax.swing.JTable TablaPrincipal;
     private javax.swing.JButton btnCostoHoras;
     private javax.swing.JButton btnEditarEmpleado;
     private javax.swing.JButton btnGuardar;
+    public scrollPane.BotonRedondo btnGuardar1;
     private javax.swing.JButton btnTablaNominas;
     private javax.swing.ButtonGroup buttonGroup1;
     private RSMaterialComponent.RSComboBoxMaterial cmbAnio;
@@ -2383,8 +2910,13 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -2411,7 +2943,13 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel24;
     private javax.swing.JPanel jPanel25;
     private javax.swing.JPanel jPanel26;
+    private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel30;
+    private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -2420,6 +2958,9 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel9;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane10;
+    private javax.swing.JScrollPane jScrollPane11;
+    private javax.swing.JScrollPane jScrollPane12;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -2427,6 +2968,8 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JScrollPane jScrollPane9;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblPrecioDolar;

@@ -15,7 +15,7 @@ public class TablaHoras extends DefaultTableCellRenderer{
             Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
             // Personalizar el color de fondo de las filas pares e impares
-            if (row % 4 == 0) {
+            if (row % 5 == 0) {
                 comp.setFont(new Font("Roboto",Font.BOLD, 16));
             }else{
                 comp.setFont(new Font("Roboto",Font.PLAIN, 14));

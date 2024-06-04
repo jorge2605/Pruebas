@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import VentanaEmergente.htpp.Agregar;
+import VentanaEmergente.htpp.agregarIntegracion;
 import VentanaEmergente.htpp.agregarMaquinados;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,6 +31,7 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
     String numEmpleado;
     Agregar ag;
     agregarMaquinados addMaq;
+    agregarIntegracion adIn;
     int tabla = 1;
     
     public void setFecha(){
@@ -146,6 +148,43 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                     addMaq.txtCantidad.setText(cantidad);
                 }
                 addMaq.setVisible(true);
+            }else if(lblDepa.getText().equals("INTEGRACION")){
+                adIn = new agregarIntegracion(f, true);
+                adIn.setLocationRelativeTo(f);
+                fila = tabla.getSelectedRow();
+                adIn.btnGuardar.addActionListener(this);
+                String id;
+                String ocupacion = "";
+                boolean band = false;
+                try{
+                    Connection con;
+                    Conexion con1 = new Conexion();
+                    con = con1.getConnection();
+                    Statement st = con.createStatement();
+                    try{id = tabla.getValueAt(fila, 3).toString();}catch(Exception e){id = "";}
+                    String sql = "select * from htpp where Id like '"+id+"'";
+                    ResultSet rs = st.executeQuery(sql);
+                    while(rs.next()){
+                        ocupacion = rs.getString("Ocupacion");
+                    }
+                }catch(SQLException e){
+                    JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+                }
+                try{adIn.txtComentarios.setText(tabla.getValueAt(fila, 2).toString());}catch(Exception e){adIn.txtComentarios.setText("");}
+                try{adIn.txtTiempo.setText(tabla.getValueAt(fila, 0).toString());}catch(Exception e){adIn.txtTiempo.setText("");}
+                try{adIn.txtPlano.setText(tabla.getValueAt(fila, 1).toString());}catch(Exception e){adIn.txtPlano.setText("");}
+                try{
+                    adIn.lblId.setVisible(true);
+                    adIn.lblId.setText(tabla.getValueAt(fila, 3).toString());
+                    band = true;
+                }catch(Exception e){
+                    adIn.lblId.setText(""); 
+                    adIn.lblId.setVisible(false);
+                }
+                if(band){
+                    adIn.cmbOcupacion.setSelectedItem(ocupacion);
+                }
+                adIn.setVisible(true);
             }else{
                 ag = new Agregar(f, true);
                 ag.setLocation(evt.getLocationOnScreen());
@@ -430,6 +469,9 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
             case "DISEÑO":
                 depa = "3";
                 break;
+            case "CALIDAD":
+                depa = "4";
+                break;
             default:
                 depa = lblDepa.getText();
                 break;
@@ -437,7 +479,7 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         return depa;
     }
     
-    public String agregarBD(int hora, String proyecto, String nota, String id, String fecha, String dimensiones, int cantidad, String material){
+    public String agregarBD(int hora, String proyecto, String nota, String id, String fecha, String dimensiones, int cantidad, String material, String ocupacion){
         String key = "";
         try{
             Connection con;
@@ -445,8 +487,10 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
             con = con1.getConnection();
             if(id == null || id.equals("")){
                 String sql = "insert into htpp (Fecha, NumEmpleado, Proyecto, Hora, Notas, Departamento) values(?,?,?,?,?,?)";
-                if(dimensiones != null){
+                if(dimensiones != null && ocupacion == null){
                     sql = "insert into htpp (Fecha, NumEmpleado, Proyecto, Hora, Notas, Departamento, Dimensiones, Material, Cantidad) values(?,?,?,?,?,?,?,?,?)";
+                }else if(ocupacion != null){
+                    sql = "insert into htpp (Fecha, NumEmpleado, Proyecto, Hora, Notas, Departamento, Ocupacion) values(?,?,?,?,?,?,?)";
                 }
                 PreparedStatement pst = con.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);
 
@@ -456,10 +500,12 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                 pst.setInt(4, hora);
                 pst.setString(5, nota);
                 pst.setString(6, getDepa());
-                if(dimensiones != null){
+                if(dimensiones != null && ocupacion == null){
                     pst.setString(7, dimensiones);
                     pst.setString(8, material);
                     pst.setInt(9, cantidad);
+                }else if(ocupacion != null){
+                    pst.setString(7, ocupacion);
                 }
 
                 int n = pst.executeUpdate();
@@ -475,9 +521,12 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                 }
             }else{
                 String sql = "update htpp set Fecha = ?, NumEmpleado = ?, Proyecto = ?, Hora = ?, Notas = ?, Departamento = ? where Id = ?";
-                if(dimensiones != null){
+                if(dimensiones != null && ocupacion == null){
                     sql = "update htpp set Fecha = ?, NumEmpleado = ?, Proyecto = ?, Hora = ?, Notas = ?, Departamento = ?, Dimensiones = ?, Material = ?, Cantidad = ? where Id = ?";
+                }else if(ocupacion != null){
+                    sql = "update htpp set Fecha = ?, NumEmpleado = ?, Proyecto = ?, Hora = ?, Notas = ?, Departamento = ?, Ocupacion = ? where Id = ?";
                 }
+                
                 PreparedStatement pst = con.prepareStatement(sql);
 
                 pst.setString(1, fecha);
@@ -486,13 +535,16 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
                 pst.setInt(4, hora);
                 pst.setString(5, nota);
                 pst.setString(6, getDepa());
-                if(dimensiones == null){
-                    pst.setString(7, id);
-                }else{
+                if(dimensiones != null && ocupacion == null){
                     pst.setString(7, dimensiones);
                     pst.setString(8, material);
                     pst.setInt(9, cantidad);
                     pst.setString(10, id);
+                }else if(ocupacion != null){
+                    pst.setString(7, ocupacion);
+                    pst.setString(8, id);
+                }else{
+                    pst.setString(7, id);
                 }
 
                 int n = pst.executeUpdate();
@@ -511,7 +563,7 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         return key;
     }
     
-    public void clicVentana(String horas, String proyecto, String comentarios, String idB, String depa, String dimensiones, String material, int cantidad){
+    public void clicVentana(String horas, String proyecto, String comentarios, String idB, String depa, String dimensiones, String material, int cantidad, String ocupacion){
         try{
             int d = Integer.parseInt(horas);
             String dat[] = new String[4];
@@ -525,9 +577,11 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
             }else{
                 String id;
                 if(depa.equals("maquinados")){
-                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla), dimensiones, cantidad, material);
+                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla), dimensiones, cantidad, material, null);
+                }else if(depa.equals("integracion")){
+                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla), null, 0, null, ocupacion);
                 }else{
-                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla),null,0,null);
+                    id = agregarBD(d, dat[1], dat[2], idB, getFechaTabla(tabla),null,0,null, null);
                 }
                 switch (tabla) {
                     case 1:
@@ -1747,16 +1801,24 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
         if(ag != null){
             if(e.getSource() == ag.btnComentarios || e.getSource() == ag.btnHoras || e.getSource() == ag.btnProyecto){
                 clicVentana(ag.btnHoras.getText(), ag.btnProyecto.getText(), ag.btnComentarios.getText(), 
-                        ag.lblID.getText(),"",null,null,0);
+                        ag.lblID.getText(),"",null,null,0,null);
                 ag.dispose();
             }
         }
         if(addMaq != null){
             if(e.getSource() == addMaq.btnGuardar){
                 clicVentana(addMaq.txtTiempo.getText(), addMaq.txtPlano.getText(), addMaq.txtComentarios.getText(), 
-                        addMaq.lblId.getText(),"maquinados",addMaq.txtDimensiones.getText(),addMaq.txtMaterial.getText(),Integer.parseInt(addMaq.txtCantidad.getText()));
+                        addMaq.lblId.getText(),"maquinados",addMaq.txtDimensiones.getText(),addMaq.txtMaterial.getText(),
+                        Integer.parseInt(addMaq.txtCantidad.getText()),null);
             }
             addMaq.dispose();
+        }
+        if(adIn != null){
+            if(e.getSource() == adIn.btnGuardar){
+                clicVentana(adIn.txtTiempo.getText(), adIn.txtPlano.getText(), adIn.txtComentarios.getText(), 
+                        adIn.lblId.getText(),"integracion",null,null,0, adIn.cmbOcupacion.getSelectedItem().toString());
+            }
+            adIn.dispose();
         }
     }
 }
