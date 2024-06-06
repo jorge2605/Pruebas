@@ -300,24 +300,24 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     public void limpiarTabla() {
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
+            new Object [][] { },
             new String [] {
-                "PARTE", "CANTIDAD", "CODIGO", "DESCRIPCION", "PROYECTO", "UM", "PROVEEDOR", "MATERIAL"
+                "Parte", "Cantidad", "Codigo", "Descripcion", "Proyecto", "UM", "Proveedor", "Material", "Fecha Esperada"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, true, true, true
+                false, false, false, false, false, true, true, false, false
             };
-
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-
+        Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Tabla1MouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(Tabla1);
-
         if (Tabla1.getColumnModel().getColumnCount() > 0) {
             Tabla1.getColumnModel().getColumn(0).setResizable(false);
             Tabla1.getColumnModel().getColumn(1).setResizable(false);
@@ -330,8 +330,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             Tabla1.getColumnModel().getColumn(7).setPreferredWidth(0);
             Tabla1.getColumnModel().getColumn(7).setMaxWidth(0);
         }
-        
-//        lblIcono.setIcon(null); 
+
         txtSubir.setText("");
     }
     
@@ -709,6 +708,8 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jPanel24.setBackground(new java.awt.Color(255, 255, 255));
         jPanel24.setLayout(new java.awt.BorderLayout());
 
+        rbFecha.setBackground(new java.awt.Color(255, 255, 255));
+        rbFecha.setSelected(true);
         rbFecha.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbFechaActionPerformed(evt);
@@ -718,7 +719,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Fecha de llegada");
+        jLabel1.setText("Fecha esperada");
         jPanel24.add(jLabel1, java.awt.BorderLayout.CENTER);
 
         fecha.setFormatoFecha("dd-MM-yyyy");
@@ -869,11 +870,11 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
             },
             new String [] {
-                "PARTE", "CANTIDAD", "CODIGO", "DESCRIPCION", "PROYECTO", "UM", "PROVEEDOR", "MATERIAL"
+                "Parte", "Cantidad", "Codigo", "Descripcion", "Proyecto", "UM", "Proveedor", "Material", "Fecha Esperada"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, true, true, false
+                false, false, false, false, false, true, true, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -1043,20 +1044,31 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         boolean band = false;
+        String mensaje = "";
         if(buscarTornillos() == false){
             for (int i = 0; i < TablaReal.getRowCount(); i++) {
                 if(txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())){
                     band = true;
+                    mensaje = "ESTE NUMERO DE PARTE YA ESTA INCLUIDO";
                 }
             }
             for (int i = 0; i < Tabla1.getRowCount(); i++) {
                 if(txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())){
                     band = true;
+                    mensaje = "ESTE NUMERO DE PARTE YA ESTA INCLUIDO";
                 }
             }
-
+            if(!fecha.isVisible()){
+                band = false;
+            }else{
+                if(fecha.getDatoFecha() == null){
+                    band = true;
+                    mensaje = "Debes seleccionar la fecha esperada";
+                }
+            }
+            
             if(band == true){
-                JOptionPane.showMessageDialog(this, "ESTE NUMERO DE PARTE YA ESTA INCLUIDO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, mensaje, "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
                 txtCodigo.setText("");
                 txtDescripcion.setText("");
                 txtCantidad.setText("");
@@ -1074,6 +1086,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 String datos[] = new String[20];
                 DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
                 DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
                 datos[0] = parte;
                 datos[1] = txtCantidad.getText();
@@ -1083,6 +1096,11 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 datos[5] = txtUM.getText();
                 datos[6] = proveedor;
                 datos[7] = "";
+                if(fecha.isVisible()){
+                    datos[8] = sdf.format(fecha.getDatoFecha());
+                }else{
+                    datos[8] = "";
+                }
                 try{
                     Connection con;
                     Conexion con1 = new Conexion();
@@ -1118,6 +1136,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 txtDescripcion.setText("");
                 parte = "";
                 txtCodigo.setText("");
+                fecha.setDatoFecha(null);
             }
         }
     }//GEN-LAST:event_btnAgregarActionPerformed
@@ -1164,7 +1183,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
                 Statement st = con.createStatement();
-                String sql = "insert into Requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,NumParte,Requisitor,UM,Proveedor) values(?,?,?,?,?,?,?,?,?)";
+                String sql = "insert into Requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,NumParte,Requisitor,UM,Proveedor, FechaEsperada) values(?,?,?,?,?,?,?,?,?,?)";
                 String sql1 = "insert into Requisicion (NumeroEmpleado,Estatus,Estado,Progreso,Completado,Costo,NumeroCotizacion,Fecha,Comprar,Cotizacion,Modificar) values(?,?,?,?,?,?,?,?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
                 PreparedStatement pst1 = con.prepareStatement(sql1);
@@ -1238,17 +1257,17 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         }else{
                             codigo = (TablaReal.getValueAt(i, 0).toString());
                         }
-                        pst.setString(1, id);
-                        pst.setString(2, (TablaReal.getValueAt(i, 2).toString()));
-                        pst.setString(3, (TablaReal.getValueAt(i, 3).toString()));
-                        pst.setString(4, (TablaReal.getValueAt(i, 4).toString()));
-                        pst.setString(5, (TablaReal.getValueAt(i, 1).toString()));
-                        pst.setString(6, codigo);
-                        pst.setString(7,  requisitor);
-                        pst.setString(8, um);
-                        pst.setString(9, proveedor);
+                        pst3.setString(1, id);
+                        pst3.setString(2, (TablaReal.getValueAt(i, 2).toString()));
+                        pst3.setString(3, (TablaReal.getValueAt(i, 3).toString()));
+                        pst3.setString(4, (TablaReal.getValueAt(i, 4).toString()));
+                        pst3.setString(5, (TablaReal.getValueAt(i, 1).toString()));
+                        pst3.setString(6, codigo);
+                        pst3.setString(7,  requisitor);
+                        pst3.setString(8, um);
+                        pst3.setString(9, proveedor);
                         
-                        n = pst.executeUpdate();
+                        n = pst3.executeUpdate();
                         
                     }
                     
@@ -1272,15 +1291,16 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         }else{
                             codigo = (Tabla1.getValueAt(i, 0).toString());
                         }
-                        pst3.setString(1, (Tabla1.getValueAt(i, 1).toString()));
-                        pst3.setString(2, (Tabla1.getValueAt(i, 2).toString()));
-                        pst3.setString(3, (Tabla1.getValueAt(i, 3).toString()));
-                        pst3.setString(4, (Tabla1.getValueAt(i, 4).toString()));
-                        pst3.setString(5, um);
-                        pst3.setString(6, proveedor);
-                        pst3.setString(7,  id);
-                        pst3.setString(8, requisitor);
-                        n2 = pst3.executeUpdate();
+                        pst.setString(1, (Tabla1.getValueAt(i, 1).toString()));
+                        pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
+                        pst.setString(3, (Tabla1.getValueAt(i, 3).toString()));
+                        pst.setString(4, (Tabla1.getValueAt(i, 4).toString()));
+                        pst.setString(5, um);
+                        pst.setString(6, proveedor);
+                        pst.setString(7,  id);
+                        pst.setString(8, requisitor);
+                        pst.setString(9, (Tabla1.getValueAt(i, 8).toString()));
+                        n2 = pst.executeUpdate();
                         
                     }
                     }else{
@@ -1313,6 +1333,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         pst.setString(7,  requisitor);
                         pst.setString(8, um);
                         pst.setString(9, proveedor);
+                        pst.setString(10, (Tabla1.getValueAt(i, 8).toString()));
                         
                         n = pst.executeUpdate();
                     }

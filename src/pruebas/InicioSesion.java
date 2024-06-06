@@ -483,7 +483,7 @@ public class InicioSesion extends javax.swing.JFrame  {
         lblVersion.setBackground(new java.awt.Color(204, 204, 204));
         lblVersion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         lblVersion.setForeground(new java.awt.Color(204, 204, 204));
-        lblVersion.setText("2.5");
+        lblVersion.setText("2.5.1");
         lblVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblVersion.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {

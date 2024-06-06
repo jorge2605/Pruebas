@@ -2699,7 +2699,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     
     public void limpiarTabla(){
     DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        String titulos[] = {"REQUISITOR","CANTIDAD","U.M.","DESCRPCION/ ARTICULO","NO PARTE","PROVEEDOR","NO PROYECTO","ID","TE","PO","FECHA PROYECTO","NOTAS","LLEGO"};
+        String titulos[] = {"Requisitor","Cantidad","U.M.","Descripcion/ Articulo","No. Parte","Proveedor","No. Proyefto","ID","TE","PO","Fecha Proyecto","Notas","Llego","Fecha Esperada"};
         miModelo = new DefaultTableModel(null,titulos);
         
         Tabla2.setModel(miModelo);
@@ -2964,7 +2964,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     Statement st = con.createStatement();
                     Statement st1 = con.createStatement();
                     String datos[] = new String[20];
-                    String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor,Proyecto,Id,OC,Notas from requisiciones where OC like '"+numRequi+"'";
+                    String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor,Proyecto,Id,OC,Notas,FechaEsperada from requisiciones where OC like '"+numRequi+"'";
                     String sql1 = "select PO, Estado from edicionpo where PO like '"+numRequi+"'";
                     ResultSet rs = st.executeQuery(sql);
                     ResultSet rs1 = st1.executeQuery(sql1);
@@ -2981,6 +2981,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         datos[7] = rs.getString("Id");
                         datos[8] = rs.getString("OC");
                         datos[9] = rs.getString("Notas");
+                        datos[13] = rs.getString("FechaEsperada");
                         miModelo.addRow(datos);
                     }
                     }
@@ -3048,7 +3049,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     Statement st1 = con.createStatement();
                     String datos[] = new String[20];
                     String datos1[] = new String[20]; 
-                    String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor, Proyecto, Id, TE,OC,Notas, Llego from Requisiciones where NumRequisicion like '"+numRequi+"' and Estado is null";
+                    String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor, Proyecto, Id, TE,OC,Notas, Llego, FechaEsperada from Requisiciones where NumRequisicion like '"+numRequi+"' and Estado is null";
                     String sql1 = "select Id,Progreso, Cotizacion, Estado, Comentarios, Comprar from Requisicion where Id like '"+numRequi+"'";
                     ResultSet rs = st.executeQuery(sql);
                     ResultSet rs1 = st1.executeQuery(sql1);
@@ -3067,6 +3068,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             datos[9] = rs.getString("OC");
                             datos[11] = rs.getString("Notas");
                             datos[12] = rs.getString("Llego");
+                            datos[13] = rs.getString("FechaEsperada");
                             miModelo.addRow(datos);
                         }
                     }

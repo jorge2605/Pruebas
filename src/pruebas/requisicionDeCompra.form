@@ -720,6 +720,12 @@
                               <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout"/>
                               <SubComponents>
                                 <Component class="javax.swing.JRadioButton" name="rbFecha">
+                                  <Properties>
+                                    <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                                      <Color blue="ff" green="ff" red="ff" type="rgb"/>
+                                    </Property>
+                                    <Property name="selected" type="boolean" value="true"/>
+                                  </Properties>
                                   <Events>
                                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rbFechaActionPerformed"/>
                                   </Events>
@@ -735,7 +741,7 @@
                                       <Font name="Roboto" size="14" style="1"/>
                                     </Property>
                                     <Property name="horizontalAlignment" type="int" value="0"/>
-                                    <Property name="text" type="java.lang.String" value="Fecha de llegada"/>
+                                    <Property name="text" type="java.lang.String" value="Fecha esperada"/>
                                   </Properties>
                                   <Constraints>
                                     <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">
@@ -1099,15 +1105,16 @@
                                 <Component class="javax.swing.JTable" name="Tabla1">
                                   <Properties>
                                     <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                                      <Table columnCount="8" rowCount="0">
-                                        <Column editable="false" title="PARTE" type="java.lang.Object"/>
-                                        <Column editable="false" title="CANTIDAD" type="java.lang.Object"/>
-                                        <Column editable="false" title="CODIGO" type="java.lang.Object"/>
-                                        <Column editable="false" title="DESCRIPCION" type="java.lang.Object"/>
-                                        <Column editable="false" title="PROYECTO" type="java.lang.Object"/>
+                                      <Table columnCount="9" rowCount="0">
+                                        <Column editable="false" title="Parte" type="java.lang.Object"/>
+                                        <Column editable="false" title="Cantidad" type="java.lang.Object"/>
+                                        <Column editable="false" title="Codigo" type="java.lang.Object"/>
+                                        <Column editable="false" title="Descripcion" type="java.lang.Object"/>
+                                        <Column editable="false" title="Proyecto" type="java.lang.Object"/>
                                         <Column editable="true" title="UM" type="java.lang.Object"/>
-                                        <Column editable="true" title="PROVEEDOR" type="java.lang.Object"/>
-                                        <Column editable="false" title="MATERIAL" type="java.lang.Object"/>
+                                        <Column editable="true" title="Proveedor" type="java.lang.Object"/>
+                                        <Column editable="false" title="Material" type="java.lang.Object"/>
+                                        <Column editable="false" title="Fecha Esperada" type="java.lang.Object"/>
                                       </Table>
                                     </Property>
                                     <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -1148,6 +1155,11 @@
                                           <Renderer/>
                                         </Column>
                                         <Column maxWidth="0" minWidth="0" prefWidth="0" resizable="true">
+                                          <Title/>
+                                          <Editor/>
+                                          <Renderer/>
+                                        </Column>
+                                        <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                                           <Title/>
                                           <Editor/>
                                           <Renderer/>
