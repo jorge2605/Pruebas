@@ -10,6 +10,7 @@ import VentanaEmergente.Compras.Fecha;
 import VentanaEmergente.Compras.Historial;
 import VentanaEmergente.Compras.Noti;
 import VentanaEmergente.Compras.Reclamos;
+import VentanaEmergente.Compras.ReporteMes;
 import VentanaEmergente.Compras.enviarCorreo;
 import VentanaEmergente.Compras.verificarTotales;
 import com.app.sockets.chat.Cliente;
@@ -3540,6 +3541,8 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenuItem9 = new javax.swing.JMenuItem();
         jMenuItem10 = new javax.swing.JMenuItem();
         jMenuItem11 = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem12 = new javax.swing.JMenuItem();
 
         jMenuItem2.setText("jMenuItem2");
 
@@ -4225,6 +4228,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jMenu1.setText("Generar");
+        jMenu1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         jMenuItem1.setText("REQUISICIONES");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
@@ -4311,6 +4315,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Opciones");
+        jMenu2.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         jMenuItem8.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jMenuItem8.setText("Agregar proveedor");
@@ -4407,6 +4412,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Ver");
+        jMenu3.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         jMenu3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenu3ActionPerformed(evt);
@@ -4455,6 +4461,20 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenu3.add(jMenuItem11);
 
         jMenuBar1.add(jMenu3);
+
+        jMenu4.setText("Reportes");
+        jMenu4.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+
+        jMenuItem12.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/reporte_compras_16.png"))); // NOI18N
+        jMenuItem12.setText("Compras de mes                                             ");
+        jMenuItem12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem12ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem12);
+
+        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -5583,6 +5603,13 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         
     }//GEN-LAST:event_buscar1ActionPerformed
 
+    private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        ReporteMes reporte = new ReporteMes(f,true);
+        reporte.setLocationRelativeTo(f);
+        reporte.setVisible(true);
+    }//GEN-LAST:event_jMenuItem12ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem AbrirOrden;
@@ -5627,10 +5654,12 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
+    private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
