@@ -331,6 +331,11 @@ public class EditarPO extends javax.swing.JDialog {
         botonRedondo2.setBorderColorSelected(new java.awt.Color(0, 102, 204));
         botonRedondo2.setColor(new java.awt.Color(0, 153, 255));
         botonRedondo2.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        botonRedondo2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                botonRedondo2ActionPerformed(evt);
+            }
+        });
         jPanel1.add(botonRedondo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 530, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -432,6 +437,10 @@ public class EditarPO extends javax.swing.JDialog {
     private void botonRedondo1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo1ActionPerformed
         agregarFila();
     }//GEN-LAST:event_botonRedondo1ActionPerformed
+
+    private void botonRedondo2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonRedondo2ActionPerformed
+        editarOrden();
+    }//GEN-LAST:event_botonRedondo2ActionPerformed
 
     public static void main(String args[]) {
         

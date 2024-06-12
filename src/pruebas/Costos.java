@@ -54,6 +54,8 @@ import javax.swing.KeyStroke;
 import VentanaEmergente.Costos.ConfTabla;
 import VentanaEmergente.Costos.addEmpleado;
 import VentanaEmergente.Inicio1.Espera;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Stack;
 
 public final class Costos extends javax.swing.JInternalFrame {
@@ -66,6 +68,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     boolean band =  false;
     Espera espera = new Espera();
     Stack<String[]> empleados;
+    String tipoSeleccion;
     
     private void pasteClipboard(JTable table) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -2493,6 +2496,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                                 espera.setLocationRelativeTo(j);
                                 espera.setExtendedState(Inicio1.MAXIMIZED_BOTH);
                                 espera.setVisible(true);
+                                tipoSeleccion = "mes";
                                 obtenerFechas();
                                 verHoras("mes");
                                 ordenesDeCompra("mes");
@@ -2695,6 +2699,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                     if(txtProyecto.getText().equals("")){
                         JOptionPane.showMessageDialog(null, "Debes introducir un numero de proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
                     }else{
+                        tipoSeleccion = "proyecto";
                         verHoras("proyecto");
                         ordenesDeCompraProyecto();
                         almacen("proyecto");
@@ -2921,23 +2926,35 @@ public final class Costos extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnGuardar1ActionPerformed
 
     private void cmbSemanasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSemanasActionPerformed
-        if(cmbSemanas.getSelectedIndex() == 0){
-            int semanaSeleccionada;
-            try{
-                semanaSeleccionada = Integer.parseInt(cmbSemanas.getSelectedItem().toString());
-                String fi = fechaInicio;
-                String ff = fechaFinal;
-                int operacion = 7 * cmbSemanas.getSelectedIndex();
-                int totalCombo = cmbSemanas.getItemCount();
-                String fecha = fi.substring(0,ff.length() - 3);
-                if(cmbSemanas.getSelectedIndex() == (totalCombo - 1)){
-                    
-                }
-            }catch(Exception e){
-                JOptionPane.showMessageDialog(this, "Error al seleccionar Semana " + e, "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        if(espera.isVisible()){
+            
         }else{
-            JOptionPane.showMessageDialog(this, "Debes seleccionar una opcion", "Advertencia",JOptionPane.WARNING_MESSAGE);
+            if(cmbSemanas.getSelectedIndex() > 0){
+                try{
+                    String fi = fechaInicio;
+                    String ff;
+                    int operacion = 7 * (cmbSemanas.getSelectedIndex() - 1);
+
+                    LocalDate date = LocalDate.parse(fi, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    LocalDate newDate = date.plusDays(operacion);
+                    String newDateString = newDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    
+                    date = LocalDate.parse(newDateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                    newDate = date.plusDays(6);
+                    ff = newDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+                    agregarMaquinados(newDateString, ff, tipoSeleccion);
+                    agregarIntegracion(newDateString, ff, tipoSeleccion);
+                    agregarDiseño(newDateString, ff, tipoSeleccion);
+                    agregarCalidad(newDateString, ff, tipoSeleccion);
+                    
+                    System.out.println("Inicio: "+ newDateString + " ----- Termino: " + ff);
+                }catch(Exception e){
+                    JOptionPane.showMessageDialog(this, "Error al seleccionar Semana " + e, "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }else{
+                JOptionPane.showMessageDialog(this, "Debes seleccionar una opcion", "Advertencia",JOptionPane.WARNING_MESSAGE);
+            }
         }
     }//GEN-LAST:event_cmbSemanasActionPerformed
 
