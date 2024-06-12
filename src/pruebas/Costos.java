@@ -538,7 +538,16 @@ public final class Costos extends javax.swing.JInternalFrame {
         }
     }
     
+    public void insertarSemanasHoras(){
+        cmbSemanas.removeAllItems();
+        cmbSemanas.addItem("Todos");
+        for (int i = empieza; i < empieza + numeroSemanas; i++) {
+            cmbSemanas.addItem(String.valueOf(i));
+        }
+    }
+    
     public void verHoras(String tipo){
+        insertarSemanasHoras();
         try{
             limpiarTablaHoras();
             Connection con;
@@ -1271,13 +1280,11 @@ public final class Costos extends javax.swing.JInternalFrame {
             String s[] = new String[5];
             int cont = 0;
             for (int i = 3; i < numeroSemanas + 3; i++) {
-//                TablaNominas.getColumnModel().getColumn(i).setHeaderValue("HS"+(empieza + i - 3));
                 hs[cont] = "HS"+(empieza + i - 3);
                 cont++;
             }
             cont = 0;
             for (int i = 8; i < numeroSemanas + 8; i++) {
-//                TablaNominas.getColumnModel().getColumn(i).setHeaderValue("S"+(empieza + i - 8));
                 s[cont] = "S"+(empieza + i - 8);
                 cont++;
             }
@@ -1469,7 +1476,11 @@ public final class Costos extends javax.swing.JInternalFrame {
         jScrollPane12 = new javax.swing.JScrollPane();
         TablaCalidad = new javax.swing.JTable();
         jLabel21 = new javax.swing.JLabel();
+        jPanel33 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jPanel34 = new javax.swing.JPanel();
+        jLabel23 = new javax.swing.JLabel();
+        cmbSemanas = new javax.swing.JComboBox<>();
         jPanel12 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         TablaOrdenes = new javax.swing.JTable();
@@ -1990,11 +2001,37 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel8.add(jPanel9, java.awt.BorderLayout.CENTER);
 
+        jPanel33.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel33.setLayout(new java.awt.BorderLayout());
+
         jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 51, 153));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Horas");
-        jPanel8.add(jLabel1, java.awt.BorderLayout.PAGE_START);
+        jPanel33.add(jLabel1, java.awt.BorderLayout.PAGE_START);
+
+        jPanel34.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel23.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel23.setText("Seleccionar Semana:");
+        jPanel34.add(jLabel23);
+
+        cmbSemanas.setBackground(new java.awt.Color(255, 255, 255));
+        cmbSemanas.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        cmbSemanas.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar" }));
+        cmbSemanas.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        cmbSemanas.setPreferredSize(new java.awt.Dimension(180, 25));
+        cmbSemanas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbSemanasActionPerformed(evt);
+            }
+        });
+        jPanel34.add(cmbSemanas);
+
+        jPanel33.add(jPanel34, java.awt.BorderLayout.CENTER);
+
+        jPanel8.add(jPanel33, java.awt.BorderLayout.NORTH);
 
         jScrollPane1.setViewportView(jPanel8);
 
@@ -2883,6 +2920,27 @@ public final class Costos extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnGuardar1ActionPerformed
 
+    private void cmbSemanasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSemanasActionPerformed
+        if(cmbSemanas.getSelectedIndex() == 0){
+            int semanaSeleccionada;
+            try{
+                semanaSeleccionada = Integer.parseInt(cmbSemanas.getSelectedItem().toString());
+                String fi = fechaInicio;
+                String ff = fechaFinal;
+                int operacion = 7 * cmbSemanas.getSelectedIndex();
+                int totalCombo = cmbSemanas.getItemCount();
+                String fecha = fi.substring(0,ff.length() - 3);
+                if(cmbSemanas.getSelectedIndex() == (totalCombo - 1)){
+                    
+                }
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(this, "Error al seleccionar Semana " + e, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }else{
+            JOptionPane.showMessageDialog(this, "Debes seleccionar una opcion", "Advertencia",JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_cmbSemanasActionPerformed
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2904,6 +2962,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private RSMaterialComponent.RSComboBoxMaterial cmbAnio;
     private RSMaterialComponent.RSComboBoxMaterial cmbMes;
+    private javax.swing.JComboBox<String> cmbSemanas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -2919,6 +2978,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -2952,6 +3012,8 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
+    private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;

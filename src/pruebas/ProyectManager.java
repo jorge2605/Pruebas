@@ -7,6 +7,7 @@ import VentanaEmergente.ProyectoManager.addPrioridadCompras;
 import VentanaEmergente.ProyectoManager.filtrar;
 import VentanaEmergente.Ventas.verDocumentos;
 import VentanaEmergente.Ventas.ColorVentas;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -255,6 +256,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         Tabla1.setComponentPopupMenu(jPopupMenu1);
         Tabla1.setGridColor(new java.awt.Color(255, 255, 255));
         Tabla1.setRowHeight(25);
+        scrollTabla.getViewport().setBackground(Color.white);
         scrollTabla.setViewportView(Tabla1);
     }
     
@@ -267,8 +269,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         DefaultTableModel Modelo = (DefaultTableModel) Tabla1.getModel();
         elQueOrdena = new TableRowSorter<>(Modelo);
         Tabla1.setRowSorter(elQueOrdena);
-//        scrollComent.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
-//        scrollDescr.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
         scrollTabla.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
     }
 
@@ -282,15 +282,20 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         verDocumentos = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         filtrar = new javax.swing.JMenuItem();
+        jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         scrollTabla = new javax.swing.JScrollPane();
         Tabla1 = new ColorVentas();
-        jPanel16 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel19 = new javax.swing.JLabel();
-        jPanel17 = new javax.swing.JPanel();
-        btnSalir = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        pan = new javax.swing.JPanel();
+        panelSalir = new javax.swing.JPanel();
+        lblSalir = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -327,11 +332,16 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         jPopupMenu1.add(filtrar);
 
         setBorder(null);
-        getContentPane().setLayout(new java.awt.BorderLayout());
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setLayout(new java.awt.GridLayout(1, 0));
+        jPanel2.setLayout(new java.awt.BorderLayout());
 
+        scrollTabla.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
+        Tabla1.setBackground(new java.awt.Color(255, 255, 255));
         Tabla1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -362,48 +372,69 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         });
         scrollTabla.setViewportView(Tabla1);
 
-        jPanel2.add(scrollTabla);
-
-        getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
-
-        jPanel16.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel16.setLayout(new java.awt.BorderLayout());
+        jPanel2.add(scrollTabla, java.awt.BorderLayout.CENTER);
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jLabel19.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
-        jLabel19.setForeground(new java.awt.Color(0, 165, 252));
-        jLabel19.setText("Proyectos");
-        jPanel3.add(jLabel19);
+        jLabel1.setFont(new java.awt.Font("Lexend", 1, 14)); // NOI18N
+        jLabel1.setText("Buscar:");
+        jPanel3.add(jLabel1);
 
-        jPanel16.add(jPanel3, java.awt.BorderLayout.CENTER);
+        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
+        jTextField1.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        jTextField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        jTextField1.setPreferredSize(new java.awt.Dimension(300, 25));
+        jPanel3.add(jTextField1);
 
-        jPanel17.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
-        btnSalir.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
-        jLabel1.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("  X  ");
-        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jPanel5.setBackground(new java.awt.Color(255, 255, 255));
+
+        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel12.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(0, 165, 252));
+        jLabel12.setText("Proyectos");
+        jPanel6.add(jLabel12);
+
+        jPanel5.add(jPanel6);
+
+        jPanel4.add(jPanel5, java.awt.BorderLayout.CENTER);
+
+        pan.setBackground(new java.awt.Color(255, 255, 255));
+
+        panelSalir.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblSalir.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblSalir.setForeground(new java.awt.Color(0, 0, 0));
+        lblSalir.setText(" X ");
+        lblSalir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblSalir.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel1MouseClicked(evt);
+                lblSalirMouseClicked(evt);
             }
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jLabel1MouseEntered(evt);
+                lblSalirMouseEntered(evt);
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                jLabel1MouseExited(evt);
+                lblSalirMouseExited(evt);
             }
         });
-        btnSalir.add(jLabel1);
+        panelSalir.add(lblSalir);
 
-        jPanel17.add(btnSalir);
+        pan.add(panelSalir);
 
-        jPanel16.add(jPanel17, java.awt.BorderLayout.EAST);
+        jPanel4.add(pan, java.awt.BorderLayout.EAST);
 
-        getContentPane().add(jPanel16, java.awt.BorderLayout.PAGE_START);
+        jPanel1.add(jPanel4, java.awt.BorderLayout.NORTH);
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         jMenu1.setText("File");
 
@@ -436,105 +467,104 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     }// </editor-fold>//GEN-END:initComponents
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
+        System.out.println("ads");
         if(Tabla1.getSelectedColumn() == 14){
-            
-                JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                row = Tabla1.getSelectedRow();
-                col = Tabla1.getSelectedColumn();
-                s = new addFecha(f,true);
-                s.btnGuardar.addActionListener(this);
-                s.btnCancelar.addActionListener(this);
-                s.setLocation(evt.getLocationOnScreen().x-370,evt.getLocationOnScreen().y);
-                s.setVisible(true);
-            
+            JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+            row = Tabla1.getSelectedRow();
+            col = Tabla1.getSelectedColumn();
+            s = new addFecha(f,true);
+            s.btnGuardar.addActionListener(this);
+            s.btnCancelar.addActionListener(this);
+            s.setLocation(evt.getLocationOnScreen().x-370,evt.getLocationOnScreen().y);
+            s.setVisible(true);
         }else if(evt.getClickCount() == 2){
             JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        Editar editar = new Editar(f,true,this);
-        int fila = Tabla1.getSelectedRow();
-        String re,coti, oc,pro,des,est,fac,com,resp, valor,moneda;
-        if(Tabla1.getValueAt(fila, 0) == null){
-            re = "";
-        }else{
-            re = Tabla1.getValueAt(fila, 0).toString();
-        }
-        editar.txtId.setText(re);
-        
-        if(Tabla1.getValueAt(fila, 10) == null){
-            valor = "";
-        }else{
-            valor = Tabla1.getValueAt(fila, 10).toString();
-        }
-            System.out.println(valor);
-        editar.txtValor.setText(valor);
-        
-        if(Tabla1.getValueAt(fila, 11) == null){
-            moneda = "";
-        }else{
-            moneda = Tabla1.getValueAt(fila, 11).toString();
-        }
-        editar.jcbMoneda.setSelectedItem(moneda);
-        
-        if(Tabla1.getValueAt(fila, 1) == null){
-            coti = "";
-        }else{
-            coti = Tabla1.getValueAt(fila, 1).toString();
-        }
-        editar.txtCotizacion.setText(coti);
-        if(Tabla1.getValueAt(fila, 2) == null){
-            oc = "";
-        }else{
-            oc = Tabla1.getValueAt(fila, 2).toString();
-        }
-        editar.txtOrden.setText(oc);
-        if(Tabla1.getValueAt(fila, 3) == null){
-            pro = "";
-        }else{
-            pro = Tabla1.getValueAt(fila, 3).toString();
-        }
-        editar.txtProyecto.setText(pro);
-        if(Tabla1.getValueAt(fila, 4) == null){
-            des = "";
-        }else{
-            des = Tabla1.getValueAt(fila, 4).toString();
-        }
-        editar.txtDescripcion.setText(des);
-        if(Tabla1.getValueAt(fila, 8) == null){
-            est = "";
-        }else{
-            est = Tabla1.getValueAt(fila, 8).toString();
-        }
-        
-        if(Tabla1.getValueAt(fila, 9) == null){
-            fac = "";
-        }else{
-            fac = Tabla1.getValueAt(fila, 9).toString();
-        }
-        
-        if(Tabla1.getValueAt(fila, 13) == null){
-            com = "";
-        }else{
-            com = Tabla1.getValueAt(fila, 13).toString();
-        }
-        
-        if(Tabla1.getValueAt(fila, 15) == null){
-            resp = "";
-        }else{
-            resp = Tabla1.getValueAt(fila, 15).toString();
-        }
-        editar.txtResponsable.setText(resp);
-        editar.txtAcciones.setText(com);
-        if(est.equals("")){
-            editar.cmbEstatus.setSelectedIndex(0);
-        }else{
-            editar.cmbEstatus.setSelectedItem(est);
-        }
+            Editar editar = new Editar(f,true,this);
+            int fila = Tabla1.getSelectedRow();
+            String re,coti, oc,pro,des,est,fac,com,resp, valor,moneda;
+            if(Tabla1.getValueAt(fila, 0) == null){
+                re = "";
+            }else{
+                re = Tabla1.getValueAt(fila, 0).toString();
+            }
+            editar.txtId.setText(re);
 
-        if(fac.equals("") || fac.equals("NO")){
-            editar.facturado.setSelected(false);
-        }else if(fac.equals("SI")){
-            editar.facturado.setSelected(true);
-        }
-        editar.setVisible(true);
+            if(Tabla1.getValueAt(fila, 10) == null){
+                valor = "";
+            }else{
+                valor = Tabla1.getValueAt(fila, 10).toString();
+            }
+                System.out.println(valor);
+            editar.txtValor.setText(valor);
+
+            if(Tabla1.getValueAt(fila, 11) == null){
+                moneda = "";
+            }else{
+                moneda = Tabla1.getValueAt(fila, 11).toString();
+            }
+            editar.jcbMoneda.setSelectedItem(moneda);
+
+            if(Tabla1.getValueAt(fila, 1) == null){
+                coti = "";
+            }else{
+                coti = Tabla1.getValueAt(fila, 1).toString();
+            }
+            editar.txtCotizacion.setText(coti);
+            if(Tabla1.getValueAt(fila, 2) == null){
+                oc = "";
+            }else{
+                oc = Tabla1.getValueAt(fila, 2).toString();
+            }
+            editar.txtOrden.setText(oc);
+            if(Tabla1.getValueAt(fila, 3) == null){
+                pro = "";
+            }else{
+                pro = Tabla1.getValueAt(fila, 3).toString();
+            }
+            editar.txtProyecto.setText(pro);
+            if(Tabla1.getValueAt(fila, 4) == null){
+                des = "";
+            }else{
+                des = Tabla1.getValueAt(fila, 4).toString();
+            }
+            editar.txtDescripcion.setText(des);
+            if(Tabla1.getValueAt(fila, 8) == null){
+                est = "";
+            }else{
+                est = Tabla1.getValueAt(fila, 8).toString();
+            }
+
+            if(Tabla1.getValueAt(fila, 9) == null){
+                fac = "";
+            }else{
+                fac = Tabla1.getValueAt(fila, 9).toString();
+            }
+
+            if(Tabla1.getValueAt(fila, 13) == null){
+                com = "";
+            }else{
+                com = Tabla1.getValueAt(fila, 13).toString();
+            }
+
+            if(Tabla1.getValueAt(fila, 15) == null){
+                resp = "";
+            }else{
+                resp = Tabla1.getValueAt(fila, 15).toString();
+            }
+            editar.txtResponsable.setText(resp);
+            editar.txtAcciones.setText(com);
+            if(est.equals("")){
+                editar.cmbEstatus.setSelectedIndex(0);
+            }else{
+                editar.cmbEstatus.setSelectedItem(est);
+            }
+
+            if(fac.equals("") || fac.equals("NO")){
+                editar.facturado.setSelected(false);
+            }else if(fac.equals("SI")){
+                editar.facturado.setSelected(true);
+            }
+            editar.setVisible(true);
         }
     }//GEN-LAST:event_Tabla1MouseClicked
 
@@ -717,18 +747,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         // TODO add your handling code here:
     }//GEN-LAST:event_Tabla1MouseEntered
 
-    private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        dispose();
-    }//GEN-LAST:event_jLabel1MouseClicked
-
-    private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
-        btnSalir.setBackground(java.awt.Color.red);
-    }//GEN-LAST:event_jLabel1MouseEntered
-
-    private void jLabel1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseExited
-        btnSalir.setBackground(java.awt.Color.white);
-    }//GEN-LAST:event_jLabel1MouseExited
-
     private void editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         Editar editar = new Editar(f,true,this);
@@ -818,17 +836,16 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     }//GEN-LAST:event_editarActionPerformed
 
     private void verDocumentosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verDocumentosActionPerformed
+        System.out.println("empioea");
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-       
         verDoc = new verDocumentos(f,true,Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
         verDoc.lblProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
-        
         try{
             Connection con = null;
             Conexion  con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from archivosproyectos where Proyecto like '"+Tabla1.getValueAt(row, 3).toString()+"'";
+            String sql = "select Proyecto, Documento, Archivo from archivosproyectos where Proyecto like '"+Tabla1.getValueAt(row, 3).toString()+"'";
             ResultSet rs = st.executeQuery(sql);
             spec = null;
             coti = null;
@@ -836,6 +853,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             factura = null;
             while(rs.next()){
                 String archivo = rs.getString("Documento");
+                System.out.println(archivo);
                 if(archivo.equals("0")){
                     oc = rs.getBytes("Archivo");
                 }else if(archivo.equals("1")){
@@ -845,7 +863,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
                 }else if(archivo.equals("3")){
                     fac = rs.getBytes("Archivo");
                 }
-                
             }
             if(coti == null){
 //                verDoc.btnDes1.setEnabled(false);
@@ -872,26 +889,45 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         filtro.setVisible(true);
     }//GEN-LAST:event_filtrarActionPerformed
 
+    private void lblSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSalirMouseClicked
+        dispose();
+    }//GEN-LAST:event_lblSalirMouseClicked
+
+    private void lblSalirMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSalirMouseEntered
+        panelSalir.setBackground(Color.red);
+        lblSalir.setForeground(Color.white);
+    }//GEN-LAST:event_lblSalirMouseEntered
+
+    private void lblSalirMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblSalirMouseExited
+        panelSalir.setBackground(Color.white);
+        lblSalir.setForeground(Color.black);
+    }//GEN-LAST:event_lblSalirMouseExited
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
-    private javax.swing.JPanel btnSalir;
     private javax.swing.JMenuItem editar;
     private javax.swing.JMenuItem filtrar;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblSalir;
+    private javax.swing.JPanel pan;
+    private javax.swing.JPanel panelSalir;
     private javax.swing.JScrollPane scrollTabla;
     private javax.swing.JMenuItem verDocumentos;
     // End of variables declaration//GEN-END:variables

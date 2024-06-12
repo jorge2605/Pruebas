@@ -1099,7 +1099,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 if(fecha.isVisible()){
                     datos[8] = sdf.format(fecha.getDatoFecha());
                 }else{
-                    datos[8] = "";
+                    datos[8] = null;
                 }
                 try{
                     Connection con;
@@ -1275,6 +1275,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         String proveedor = "";
                         String um = "";
                         String codigo = "";
+                        String fech;
                         if((Tabla1.getValueAt(i, 6)) == null){
                             proveedor = "";
                         }else{
@@ -1291,6 +1292,13 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         }else{
                             codigo = (Tabla1.getValueAt(i, 0).toString());
                         }
+                        
+                        if((Tabla1.getValueAt(i, 8)) == null){
+                            fech = null;
+                        }else{
+                            fech = (Tabla1.getValueAt(i, 8).toString());
+                        }
+                        
                         pst.setString(1, (Tabla1.getValueAt(i, 1).toString()));
                         pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
                         pst.setString(3, (Tabla1.getValueAt(i, 3).toString()));
@@ -1299,7 +1307,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         pst.setString(6, proveedor);
                         pst.setString(7,  id);
                         pst.setString(8, requisitor);
-                        pst.setString(9, (Tabla1.getValueAt(i, 8).toString()));
+                        pst.setString(9, fech);
                         n2 = pst.executeUpdate();
                         
                     }
@@ -1308,6 +1316,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         String proveedor = "";
                         String um = "";
                         String codigo = "";
+                        String fech;
                         if((Tabla1.getValueAt(i, 6)) == null){
                             proveedor = "";
                         }else{
@@ -1323,6 +1332,12 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                             codigo = "";
                         }else{
                             codigo = (Tabla1.getValueAt(i, 0).toString());
+                        }
+                        
+                        if((Tabla1.getValueAt(i, 8)) == null){
+                            fech = null;
+                        }else{
+                            fech = (Tabla1.getValueAt(i, 8).toString());
                         }
                         pst.setString(1, id);
                         pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
@@ -1333,7 +1348,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                         pst.setString(7,  requisitor);
                         pst.setString(8, um);
                         pst.setString(9, proveedor);
-                        pst.setString(10, (Tabla1.getValueAt(i, 8).toString()));
+                        pst.setString(10, fech);
                         
                         n = pst.executeUpdate();
                     }
