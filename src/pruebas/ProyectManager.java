@@ -836,7 +836,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     }//GEN-LAST:event_editarActionPerformed
 
     private void verDocumentosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verDocumentosActionPerformed
-        System.out.println("empioea");
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         verDoc = new verDocumentos(f,true,Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
         verDoc.lblProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());

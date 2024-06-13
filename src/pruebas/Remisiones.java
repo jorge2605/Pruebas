@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import Modelo.CabezeraRemisiones;
+import VentanaEmergente.Ventas.verDocumentos;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -18,7 +19,10 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,8 +33,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import scrollPane.ScrollBarCustom;
 
@@ -127,6 +133,43 @@ public class Remisiones extends javax.swing.JInternalFrame implements ActionList
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void subirArchivo(String departamento, String ruta){
+        File documento = new File(ruta);
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Date f = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            String fecha = sdf.format(f);
+            String sql1 = "insert into archivosproyectos (NombreArchivo, Fecha, Proyecto, Documento, Archivo) values(?,?,?,?,?)";
+            PreparedStatement pst1 = con.prepareStatement(sql1);
+
+            byte[] pe;
+            pe = new byte[(int) documento.length()];
+            try{
+                InputStream input = new FileInputStream(documento);
+                input.read(pe);
+            }catch(IOException e){
+                JOptionPane.showMessageDialog(this,"Error archivo: "+e, "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            pst1.setString(1,documento.getName());
+            pst1.setString(2,fecha);
+            pst1.setString(3,txtProyecto.getText());
+            pst1.setString(4,departamento);
+            pst1.setBytes(5,pe);
+
+            int n2 = pst1.executeUpdate();
+            if(n2 > 0){
+                JOptionPane.showMessageDialog(this,"DOCUMENTOS GUARDADOS");
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(verDocumentos.class.getName()).log(Level.SEVERE,null,e);
         }
     }
     
@@ -379,8 +422,11 @@ public class Remisiones extends javax.swing.JInternalFrame implements ActionList
             document.add(tablaArticulos);
             //-------------------------------------------------------------------------------
             document.close();
+            int opc = JOptionPane.showConfirmDialog(this, "¿Deseas guardar la documentacion de la remision?");
+            if(opc == 0){
+                subirArchivo("4", ruta);
+            }
             Desktop.getDesktop().open(new File(ruta));
-            
         }catch(Exception e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }

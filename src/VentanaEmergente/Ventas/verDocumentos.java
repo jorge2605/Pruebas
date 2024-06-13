@@ -36,24 +36,29 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
     JButton[] btnPO;
     JButton[] btnSpec;
     JButton[] btnFactura;
+    JButton[] btnRemision;
     JPanel[] pnlCotizacion;
     JPanel[] pnlPO;
     JPanel[] pnlSpec;
     JPanel[] pnlFactura;
+    JPanel[] pnlRemision;
     String idCoti[];
     String idPO[];
     String idSpec[];
     String idFactura[];
+    String idRemision[];
     int contCoti;
     int contPO;
     int contSpec;
     int contFactura;
+    int contRemision;
     
     public void limpiarPaneles(){
         pnCo.removeAll();
         pnPo.removeAll();
         pnFa.removeAll();
         pnSp.removeAll();
+        pnRe.removeAll();
         revalidate();
         repaint();
     }
@@ -172,18 +177,22 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
             pnlCotizacion = new JPanel[30];
             pnlPO = new JPanel[30];
             pnlFactura = new JPanel[30];
+            pnlRemision = new JPanel[30];
             btnSpec = new JButton[30];
             btnCotizacion = new JButton[30];
             btnPO = new JButton[30];
             btnFactura = new JButton[30];
+            btnRemision = new JButton[30];
             idCoti = new String[30];
             idPO = new String[30];
             idSpec = new String[30];
             idFactura = new String[30];
+            idRemision = new String[30];
             contSpec =0;
             contCoti =0;
             contFactura =0;
             contPO =0;
+            contRemision =0;
             while(rs.next()){
                 doc = rs.getString("Documento");
                 nombre = rs.getString("NombreArchivo");
@@ -232,6 +241,17 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
                         pnFa.add(pnlFactura[contFactura]);
                         idFactura[contFactura] = String.valueOf(id);
                         contFactura++;
+                        break;
+                    case "4":
+                        btnRemision[contRemision] = new JButton(nombre);
+                        addPropiedades(btnRemision[contRemision]);
+                        pnlRemision[contRemision] = new JPanel();
+                        pnlRemision[contRemision].setLayout(new FlowLayout());
+                        pnlRemision[contRemision].setBackground(new java.awt.Color(255, 255, 255));
+                        pnlRemision[contRemision].add(btnRemision[contRemision]);
+                        pnRe.add(pnlRemision[contRemision]);
+                        idRemision[contRemision] = String.valueOf(id);
+                        contRemision++;
                         break;
                 }
             }
@@ -296,6 +316,7 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         scroll2.setVerticalScrollBar(new ScrollBarCustom(color));
         scroll3.setVerticalScrollBar(new ScrollBarCustom(color));
         scroll4.setVerticalScrollBar(new ScrollBarCustom(color));
+        scroll5.setVerticalScrollBar(new ScrollBarCustom(color));
         
         verDocumentos();
     }
@@ -351,12 +372,23 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         btnEliminarFactura = new javax.swing.JButton();
         scroll4 = new javax.swing.JScrollPane();
         pnFa = new javax.swing.JPanel();
+        panelRemision = new javax.swing.JPanel();
+        jPanel33 = new javax.swing.JPanel();
+        jPanel11 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jPanel34 = new javax.swing.JPanel();
+        btnSubirRemision = new javax.swing.JButton();
+        jPanel15 = new javax.swing.JPanel();
+        btnDescargarRemision = new javax.swing.JButton();
+        btnEliminarRemision = new javax.swing.JButton();
+        scroll5 = new javax.swing.JScrollPane();
+        pnRe = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
         jPanel19 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         lblProyecto = new javax.swing.JLabel();
 
-        setPreferredSize(new java.awt.Dimension(1095, 577));
+        setPreferredSize(new java.awt.Dimension(1132, 577));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
@@ -364,21 +396,22 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         });
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setLayout(new java.awt.GridLayout(1, 5));
+        jPanel1.setLayout(new java.awt.GridLayout(1, 5, 40, 0));
 
         panelCotizacion.setBackground(new java.awt.Color(255, 255, 255));
         panelCotizacion.setLayout(new java.awt.BorderLayout());
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel6.setLayout(new java.awt.BorderLayout());
 
         jPanel3.setBackground(new java.awt.Color(0, 165, 252));
 
         jLabel1.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("      COTIZACION      ");
+        jLabel1.setText("     Cotizacion     ");
         jPanel3.add(jLabel1);
 
-        jPanel6.add(jPanel3);
+        jPanel6.add(jPanel3, java.awt.BorderLayout.CENTER);
 
         panelCotizacion.add(jPanel6, java.awt.BorderLayout.NORTH);
 
@@ -463,15 +496,16 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         panelPO.setLayout(new java.awt.BorderLayout());
 
         jPanel23.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel23.setLayout(new java.awt.BorderLayout());
 
         jPanel5.setBackground(new java.awt.Color(0, 165, 252));
 
         jLabel2.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setText("      PO      ");
+        jLabel2.setText("     PO     ");
         jPanel5.add(jLabel2);
 
-        jPanel23.add(jPanel5);
+        jPanel23.add(jPanel5, java.awt.BorderLayout.CENTER);
 
         panelPO.add(jPanel23, java.awt.BorderLayout.NORTH);
 
@@ -547,15 +581,16 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         panelSpec.setLayout(new java.awt.BorderLayout());
 
         jPanel27.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel27.setLayout(new java.awt.BorderLayout());
 
         jPanel7.setBackground(new java.awt.Color(0, 165, 252));
 
         jLabel4.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("      SPEC      ");
+        jLabel4.setText("     Spec     ");
         jPanel7.add(jLabel4);
 
-        jPanel27.add(jPanel7);
+        jPanel27.add(jPanel7, java.awt.BorderLayout.CENTER);
 
         panelSpec.add(jPanel27, java.awt.BorderLayout.NORTH);
 
@@ -631,17 +666,19 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         panelFactura.setLayout(new java.awt.BorderLayout());
 
         jPanel31.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel31.setLayout(new java.awt.BorderLayout());
 
         jPanel8.setBackground(new java.awt.Color(0, 165, 252));
 
         jLabel5.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("      FACTURA      ");
+        jLabel5.setText("     Factura     ");
+        jLabel5.setToolTipText("");
         jPanel8.add(jLabel5);
 
-        jPanel31.add(jPanel8);
+        jPanel31.add(jPanel8, java.awt.BorderLayout.CENTER);
 
-        panelFactura.add(jPanel31, java.awt.BorderLayout.NORTH);
+        panelFactura.add(jPanel31, java.awt.BorderLayout.PAGE_START);
 
         jPanel32.setBackground(new java.awt.Color(255, 255, 255));
         jPanel32.setLayout(new java.awt.BorderLayout());
@@ -710,6 +747,92 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         panelFactura.add(scroll4, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(panelFactura);
+
+        panelRemision.setBackground(new java.awt.Color(255, 255, 255));
+        panelRemision.setLayout(new java.awt.BorderLayout());
+
+        jPanel33.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel33.setLayout(new java.awt.BorderLayout());
+
+        jPanel11.setBackground(new java.awt.Color(0, 165, 252));
+
+        jLabel6.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("     Remisiones     ");
+        jLabel6.setToolTipText("");
+        jPanel11.add(jLabel6);
+
+        jPanel33.add(jPanel11, java.awt.BorderLayout.CENTER);
+
+        panelRemision.add(jPanel33, java.awt.BorderLayout.PAGE_START);
+
+        jPanel34.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel34.setLayout(new java.awt.BorderLayout());
+
+        btnSubirRemision.setBackground(new java.awt.Color(255, 255, 255));
+        btnSubirRemision.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IconoC/subir-archivo.png"))); // NOI18N
+        btnSubirRemision.setText("SUBIR");
+        btnSubirRemision.setBorder(null);
+        btnSubirRemision.setBorderPainted(false);
+        btnSubirRemision.setContentAreaFilled(false);
+        btnSubirRemision.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSubirRemision.setFocusPainted(false);
+        btnSubirRemision.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSubirRemisionActionPerformed(evt);
+            }
+        });
+        jPanel34.add(btnSubirRemision, java.awt.BorderLayout.CENTER);
+
+        jPanel15.setBackground(new java.awt.Color(255, 255, 255));
+
+        btnDescargarRemision.setBackground(new java.awt.Color(255, 255, 255));
+        btnDescargarRemision.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf.png"))); // NOI18N
+        btnDescargarRemision.setText("Descargar");
+        btnDescargarRemision.setBorder(null);
+        btnDescargarRemision.setBorderPainted(false);
+        btnDescargarRemision.setComponentPopupMenu(jPopupMenu1);
+        btnDescargarRemision.setContentAreaFilled(false);
+        btnDescargarRemision.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnDescargarRemision.setFocusPainted(false);
+        btnDescargarRemision.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDescargarRemisionActionPerformed(evt);
+            }
+        });
+        jPanel15.add(btnDescargarRemision);
+
+        btnEliminarRemision.setBackground(new java.awt.Color(255, 255, 255));
+        btnEliminarRemision.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/eliminar (1).png"))); // NOI18N
+        btnEliminarRemision.setText("Eliminar");
+        btnEliminarRemision.setBorder(null);
+        btnEliminarRemision.setBorderPainted(false);
+        btnEliminarRemision.setComponentPopupMenu(jPopupMenu1);
+        btnEliminarRemision.setContentAreaFilled(false);
+        btnEliminarRemision.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminarRemision.setFocusPainted(false);
+        btnEliminarRemision.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarRemisionActionPerformed(evt);
+            }
+        });
+        jPanel15.add(btnEliminarRemision);
+
+        jPanel34.add(jPanel15, java.awt.BorderLayout.PAGE_START);
+
+        panelRemision.add(jPanel34, java.awt.BorderLayout.SOUTH);
+
+        scroll5.setBackground(new java.awt.Color(255, 255, 255));
+        scroll5.setBorder(null);
+        scroll5.setForeground(new java.awt.Color(255, 255, 255));
+
+        pnRe.setBackground(new java.awt.Color(255, 255, 255));
+        pnRe.setLayout(new javax.swing.BoxLayout(pnRe, javax.swing.BoxLayout.Y_AXIS));
+        scroll5.setViewportView(pnRe);
+
+        panelRemision.add(scroll5, java.awt.BorderLayout.CENTER);
+
+        jPanel1.add(panelRemision);
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -852,6 +975,34 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         eliminarDocumento(id);
     }//GEN-LAST:event_btnEliminarFacturaActionPerformed
 
+    private void btnSubirRemisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubirRemisionActionPerformed
+        subirArchivo("4");
+    }//GEN-LAST:event_btnSubirRemisionActionPerformed
+
+    private void btnDescargarRemisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDescargarRemisionActionPerformed
+        String id = "";
+        for (int i = 0; i < btnRemision.length; i++) {
+            if(pnlRemision[i] != null){
+                if(pnlRemision[i].getBackground().equals(Color.green)){
+                    id = String.valueOf(idRemision[i]);
+                }
+            }
+        }
+        descargarDocumento(id);
+    }//GEN-LAST:event_btnDescargarRemisionActionPerformed
+
+    private void btnEliminarRemisionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarRemisionActionPerformed
+        String id = "";
+        for (int i = 0; i < btnRemision.length; i++) {
+            if(pnlRemision[i] != null){
+                if(pnlRemision[i].getBackground().equals(Color.green)){
+                    id = String.valueOf(idRemision[i]);
+                }
+            }
+        }
+        eliminarDocumento(id);
+    }//GEN-LAST:event_btnEliminarRemisionActionPerformed
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -871,24 +1022,30 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
     public javax.swing.JButton btnDescargarCoti;
     public javax.swing.JButton btnDescargarFactura;
     public javax.swing.JButton btnDescargarPO;
+    public javax.swing.JButton btnDescargarRemision;
     public javax.swing.JButton btnDescargarSpec;
     public javax.swing.JButton btnEliminarCoti;
     public javax.swing.JButton btnEliminarFactura;
     public javax.swing.JButton btnEliminarPO;
+    public javax.swing.JButton btnEliminarRemision;
     public javax.swing.JButton btnEliminarSpec;
     public javax.swing.JButton btnSubirCotizacion;
     public javax.swing.JButton btnSubirFactura;
     public javax.swing.JButton btnSubirPO;
+    public javax.swing.JButton btnSubirRemision;
     public javax.swing.JButton btnSubirSpec;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
@@ -900,6 +1057,8 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
+    private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -911,15 +1070,18 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
     private javax.swing.JPanel panelCotizacion;
     private javax.swing.JPanel panelFactura;
     private javax.swing.JPanel panelPO;
+    private javax.swing.JPanel panelRemision;
     private javax.swing.JPanel panelSpec;
     private javax.swing.JPanel pnCo;
     private javax.swing.JPanel pnFa;
     private javax.swing.JPanel pnPo;
+    private javax.swing.JPanel pnRe;
     private javax.swing.JPanel pnSp;
     private javax.swing.JScrollPane scroll1;
     private javax.swing.JScrollPane scroll2;
     private javax.swing.JScrollPane scroll3;
     private javax.swing.JScrollPane scroll4;
+    private javax.swing.JScrollPane scroll5;
     // End of variables declaration//GEN-END:variables
 
     @Override
