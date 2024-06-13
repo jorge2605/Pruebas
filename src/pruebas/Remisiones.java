@@ -118,7 +118,7 @@ public class Remisiones extends javax.swing.JInternalFrame implements ActionList
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from registroclientes";
+            String sql = "select * from registroclientes"; 
             ResultSet rs = st.executeQuery(sql);
             String nombre, direccion,ciudad,condicion;
 //            au = null;
@@ -132,7 +132,7 @@ public class Remisiones extends javax.swing.JInternalFrame implements ActionList
     
     public void crearPdf(String noRemision){
         try{
-            String ruta = "C:/Pruebas/DOCS/R-"+noRemision;
+            String ruta = "C:/Pruebas/DOCS/Remisiones/R-" + noRemision + ".pdf";
             Document document = new Document(PageSize.A4, 36, 36, 90, 36);
             PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
             CabezeraRemisiones encabezado = new CabezeraRemisiones();
@@ -975,77 +975,74 @@ public class Remisiones extends javax.swing.JInternalFrame implements ActionList
     }//GEN-LAST:event_btnBorrarActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-                        Date fec = new Date();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        String fecha = sdf.format(fec);
-                        Date fe = null;
-                        try {
-                                fe = sdf.parse(fecha);
-                            } catch (ParseException ex) {
-                                Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                            
-                        java.sql.Date data = new java.sql.Date(fe.getTime());
+        Date fec = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fecha = sdf.format(fec);
+        Date fe = null;
+        try {
+            fe = sdf.parse(fecha);
+        } catch (ParseException ex) {
+            Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        java.sql.Date data = new java.sql.Date(fe.getTime());
         if(numeroRemision.equals("")){
-        if(txtCli.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN CLIENTE","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else if(Tabla1.getRowCount() < 0){
+            if(txtCli.getText().equals("")){
+                JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN CLIENTE","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+            }else if(Tabla1.getRowCount() < 0){
                 JOptionPane.showMessageDialog(this, "DEBES AGREGAR POR LO MENOS UN ARTICULO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
             }else if(txtProyecto.getText().equals("")){
                 JOptionPane.showMessageDialog(this, "DEBES AGREGAR UN PROYECTO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
             }else{
-                
-                    try{
-                        Connection con;
-                        Conexion con1 = new Conexion();
-                        con = con1.getConnection();
-                        Statement st = con.createStatement();
-                        String sql = "insert into remision (Cliente, NumEmpleado, NumRemision, Fecha, Estado, Proyecto) values(?,?,?,?,?,?)";
-                        PreparedStatement pst = con.prepareStatement(sql);
-                        String sql2 = "select * from remision";
-                        ResultSet rs2 = st.executeQuery(sql2);
-                        int remi = 0;
-                        while(rs2.next()){
-                            remi = rs2.getInt("NumRemision");
-                        }
-                        remi++;
-                        
-                        pst.setString(1, idCliente);
-                        pst.setString(2, numEmpleado);
-                        pst.setInt(3, remi);
-                        pst.setDate(4, data);
-                        pst.setString(5, "");
-                        pst.setString(6, txtProyecto.getText());
-                        int n = pst.executeUpdate();
-                        int n2 = 0;
-                        for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                            String sql3 = "insert into remisiones (NumRemision, Cantidad, Articulo, Fecha, Estado) values(?,?,?,?,?)";
-                            PreparedStatement pst3 = con.prepareStatement(sql3);
-
-                            pst3.setInt(1, remi);
-                            pst3.setInt(2, Integer.parseInt(Tabla1.getValueAt(i, 0).toString()));
-                            pst3.setString(3, Tabla1.getValueAt(i, 1).toString());
-                            pst3.setDate(4, data);
-                            pst3.setString(5, "");
-                            
-                            n2 = pst3.executeUpdate();
-                        }
-                        
-                        if(n > 0 && n2 > 0)
-                        {
-                            crearPdf(remi+"");
-                            JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
-                            limpiarPantalla();
-                            txtCliente.setEditable(true);
-                        }
-                        
-                    }catch(SQLException e){
-                        JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                try{
+                    Connection con;
+                    Conexion con1 = new Conexion();
+                    con = con1.getConnection();
+                    Statement st = con.createStatement();
+                    String sql = "insert into remision (Cliente, NumEmpleado, NumRemision, Fecha, Estado, Proyecto) values(?,?,?,?,?,?)";
+                    PreparedStatement pst = con.prepareStatement(sql);
+                    String sql2 = "select * from remision";
+                    ResultSet rs2 = st.executeQuery(sql2);
+                    int remi = 0;
+                    while(rs2.next()){
+                        remi = rs2.getInt("NumRemision");
                     }
-            
-        }
-        }else
-        {
+                    remi++;
+
+                    pst.setString(1, idCliente);
+                    pst.setString(2, numEmpleado);
+                    pst.setInt(3, remi);
+                    pst.setDate(4, data);
+                    pst.setString(5, "");
+                    pst.setString(6, txtProyecto.getText());
+                    int n = pst.executeUpdate();
+                    int n2 = 0;
+                    for (int i = 0; i < Tabla1.getRowCount(); i++) {
+                        String sql3 = "insert into remisiones (NumRemision, Cantidad, Articulo, Fecha, Estado) values(?,?,?,?,?)";
+                        PreparedStatement pst3 = con.prepareStatement(sql3);
+
+                        pst3.setInt(1, remi);
+                        pst3.setInt(2, Integer.parseInt(Tabla1.getValueAt(i, 0).toString()));
+                        pst3.setString(3, Tabla1.getValueAt(i, 1).toString());
+                        pst3.setDate(4, data);
+                        pst3.setString(5, "");
+
+                        n2 = pst3.executeUpdate();
+                    }
+
+                    if(n > 0 && n2 > 0)
+                    {
+                        crearPdf(remi+"");
+                        JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
+                        limpiarPantalla();
+                        txtCliente.setEditable(true);
+                    }
+
+                }catch(SQLException e){
+                    JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }else{
             try{
                 Connection con;
                 Conexion con1 = new Conexion();
