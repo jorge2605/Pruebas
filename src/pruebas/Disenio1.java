@@ -8,8 +8,16 @@ import VentanaEmergente.Diseño.InicioDiseño;
 import VentanaEmergente.Diseño.codigoBarras;
 import VentanaEmergente.Diseño.subirBOM;
 import VentanaEmergente.Reportes.dis;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfReader;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.Document;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
+import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Label;
 import java.awt.Rectangle;
@@ -27,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -47,6 +56,7 @@ import java.util.List;
 import java.util.Stack;
 import javax.swing.BorderFactory;
 import javax.swing.DropMode;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -57,7 +67,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import mivisorpdf.MiVisorPDF;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
+import org.krysalis.barcode4j.impl.code39.Code39Bean;
+import org.krysalis.barcode4j.output.bitmap.BitmapCanvasProvider;
 import technology.tabula.ObjectExtractor;
 import technology.tabula.Page;
 import technology.tabula.RectangularTextContainer;
@@ -166,6 +179,90 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
         }
     }
     
+    public String getDirectorio(String proyecto){
+        String path = "\\\\192.168.100.40\\03 Project\\04 DISENO\\" + proyecto;
+        File direccion = new File(path);
+        
+        if(!direccion.isDirectory()){
+            boolean res = direccion.mkdirs();
+            if(res){
+                return path;
+            }else{
+                return path;
+            }
+        }else{
+            return path;
+        }
+    }
+    
+    public static BufferedImage generateBarcode(String code) throws IOException {
+        Code39Bean barcodeBean = new Code39Bean();
+        final int dpi = 150;
+        
+        // Configuración del generador de código de barras
+        barcodeBean.setModuleWidth(0.2); // Reducir el ancho del módulo
+        barcodeBean.setWideFactor(3);  // Ajustar el factor de ampliación
+        barcodeBean.doQuietZone(false);  // Deshabilitar la zona de silencio
+        
+        // Deshabilitar el texto debajo del código de barras
+//        barcodeBean.setMsgPosition(org.krysalis.barcode4j.HumanReadablePlacement.HRP_NONE);
+        
+        // Crear el canvas para el código de barras
+        BitmapCanvasProvider canvas = new BitmapCanvasProvider(dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+        barcodeBean.generateBarcode(canvas, code);
+        canvas.finish();
+        
+        return canvas.getBufferedImage();
+    }
+    
+    public String convertirPdf(File selectedFile, String path, Dimension dim){
+            try {
+                String numeroPlano = txtProyecto.getText().substring(0, txtProyecto.getText().indexOf(" "));
+                String plano = selectedFile.getName().replace(".pdf", "");
+                String signo = "-";
+                if(empresa.equals("durol")){
+                    signo = " ";
+                    numeroPlano = txtProyecto.getText();
+                }
+                int pg = plano.indexOf(signo);
+                int sg = plano.indexOf(signo,pg+1);
+                numeroPlano = numeroPlano + plano.substring(sg, plano.length()).replace("-", " ");
+                
+                BufferedImage barcodeImage = generateBarcode(numeroPlano);
+                try (FileOutputStream out = new FileOutputStream("barcode.png")) {
+                    javax.imageio.ImageIO.write(barcodeImage, "png", out);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                
+                try {
+                // Crear un archivo temporal para la imagen del código de barras
+                    File tempFile = File.createTempFile("barcode", ".png");
+                    javax.imageio.ImageIO.write(barcodeImage, "png", tempFile);
+
+                    // Leer el archivo PDF original
+                    PdfDocument pdfDoc = new PdfDocument(new PdfReader(selectedFile), new PdfWriter("\\" + path + "\\" + numeroPlano + ".pdf"));
+                    Document doc = new Document(pdfDoc);
+
+                    // Agregar la imagen del código de barras
+                    ImageData imageData = ImageDataFactory.create(tempFile.getAbsolutePath());
+                    com.itextpdf.layout.element.Image im = new com.itextpdf.layout.element.Image(imageData);
+                        im.setFixedPosition(dim.width, dim.height);  // Ajusta la posición según tus necesidades
+                    doc.add(im);
+
+
+                    pdfDoc.close();
+                    tempFile.delete();
+                    return "\\" + path  + "\\" + numeroPlano + ".pdf";
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+    }
+    
     public void importarDocs(){
         if(txtProyecto.isEnabled()){
             JOptionPane.showMessageDialog(this, "Debes seleccionar un proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
@@ -175,47 +272,53 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
             SelectArchivo.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
             SelectArchivo.setMultiSelectionEnabled(true);
             if (SelectArchivo.showDialog(null, "Seleccionar Archivo") == JFileChooser.APPROVE_OPTION) {
-                archivos = SelectArchivo.getSelectedFiles();;
-            }
-            File ar = null;
-            botones = new JButton[archivos.length];
-            for (int i = 0; i < archivos.length; i++) {
-                String empresa = this.empresa;
-                String img = "";
-                String name = "";
-                botones[i] = new JButton();
-                String color = "";
-                if(empresa.equals("align")){
-//                    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/align.png"))); // NOI18N
-                    img = "/Iconos/align_16.png";
-                    name = "align";
-//                    subirAlign(archivo[i]);
-
-//                    barras.jLabel1.setText(l.getText()); 
-                }else if(empresa.equals("durol")){
-//                    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/durol.png"))); // NOI18N
-                    img = "/Iconos/durol_16.png";
-                    name = "durol";
-//                    subirDurol(archivo[i]);
-//                    barras.jLabel1.setText(l.getText());
-                }else if(empresa.equals("3i")){
-                    //----------------------------------------------------SERVICIOS INDUSTRIALES 3I----------------------------------------------------------------
-//                    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/3i.png"))); // NOI18N
-                    img = "/Iconos/3i_16.png";
-                    name = "3i";
-                }else{
-                    color = null;
+                archivos = SelectArchivo.getSelectedFiles();
+                if(empresa.equals("align") || empresa.equals("durol")){
+                    String direccion = getDirectorio(txtProyecto.getText());
+                    File[] archivosNuevos = new File[archivos.length];
+                    Dimension dim = new Dimension(10,750);
+                    if(empresa.equals("durol")){
+                        dim = new Dimension(5,570);
+                    }
+                    if(empresa.equals("durol")){
+                        
+                    }
+                    for (int i = 0; i < archivos.length; i++) {
+                        archivosNuevos[i] = new File(convertirPdf(archivos[i], direccion, dim));
+                    }
+                    archivos = archivosNuevos;
                 }
-                crearBoton(botones[i],archivos[i].getName(),img, name);
-                if(color == null){
-                    botones[i].setForeground(new Color(210,210,210));
+                botones = new JButton[archivos.length];
+                for (int i = 0; i < archivos.length; i++) {
+                    String image = "";
+                    String name = "";
+                    botones[i] = new JButton();
+                    String color = "";
+                    if(empresa.equals("align")){
+                        image = "/Iconos/align_16.png";
+                        name = "align";
+                        
+                    }else if(empresa.equals("durol")){
+                        image = "/Iconos/durol_16.png";
+                        name = "durol";
+                    }else if(empresa.equals("3i")){
+                        //----------------------------------------------------SERVICIOS INDUSTRIALES 3I----------------------------------------------------------------
+                        image = "/Iconos/3i_16.png";
+                        name = "3i";
+                    }else{
+                        color = null;
+                    }
+                    crearBoton(botones[i],archivos[i].getName(),image, name);
+                    if(color == null){
+                        botones[i].setForeground(new Color(210,210,210));
+                    }
+                    verificarPlanoEnFila(archivos[i].getName().replace(".pdf", ""));
+                    jPanel10.add(botones[i]);
+                    revalidate();
+                    repaint();
                 }
-                verificarPlanoEnFila(archivos[i].getName().replace(".pdf", ""));
-                jPanel10.add(botones[i]);
-                revalidate();
-                repaint();
+            iniciar();
             }
-        iniciar();
         }
     }
     
@@ -247,30 +350,34 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                             List<File> files = (List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                             botones = new JButton[files.size()];
                             archivos = new File[files.size()];
-                            for (int i = 0; i < files.size(); i++) {
-                                archivos[i] = files.get(i);
-                                if (files.get(i).getName().toLowerCase().endsWith(".pdf")) {
+                            if(empresa.equals("align") || empresa.equals("durol")){
+                                String direccion = getDirectorio(txtProyecto.getText());
+                                File[] archivosNuevos = new File[archivos.length];
+                                Dimension dim = new Dimension(10,750);
+                                if(empresa.equals("durol")){
+                                    dim = new Dimension(5,570);
+                                }
+                                for (int i = 0; i < files.size(); i++) {
+                                    archivosNuevos[i] = new File(convertirPdf(files.get(i), direccion,dim));
+                                }
+                                archivos = archivosNuevos;
+                            }
+                            for (int i = 0; i < archivos.length; i++) {
+//                                archivos[i] = files.get(i);
+                                if (archivos[i].getName().toLowerCase().endsWith(".pdf")) {
                                     // Procesar el archivo PDF aquí
                                     String img = "";
                                     String name = "";
                                     botones[i] = new JButton();
                                     String color = "";
                                     if(empresa.equals("align")){
-                    //                    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/align.png"))); // NOI18N
                                         img = "/Iconos/align_16.png";
                                         name = "align";
-                    //                    subirAlign(archivo[i]);
-
-                    //                    barras.jLabel1.setText(l.getText()); 
                                     }else if(empresa.equals("durol")){
-                    //                    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/durol.png"))); // NOI18N
                                         img = "/Iconos/durol_16.png";
                                         name = "durol";
-                    //                    subirDurol(archivo[i]);
-                    //                    barras.jLabel1.setText(l.getText());
                                     }else if(empresa.equals("3i")){
                                         //----------------------------------------------------SERVICIOS INDUSTRIALES 3I----------------------------------------------------------------
-                    //                    jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/3i.png"))); // NOI18N
                                         img = "/Iconos/3i_16.png";
                                         name = "3i";
                                     }else{
@@ -423,7 +530,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                         + "Maquina = ?, NoEnsamble = ?, Tratamiento = ?,Dimension = ? where Plano = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
 
-                String sql3 = "update pdfplanos Pdf = ? where Plano = ?";
+                String sql3 = "update pdfplanos set Pdf = ? where Plano = ?";
                 PreparedStatement pst3 = con.prepareStatement(sql3);
                 
                 pst.setString(1, l.getText());
@@ -459,13 +566,14 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                     JOptionPane.showMessageDialog(this, "PLANO ACTUALIZADO");
                 }
                 
-                if(n1 < 0){
+                if(n1 < 1){
                     JOptionPane.showMessageDialog(this, "EL PDF NO SE SUBIO CORRECTAMENTE","ERROR",JOptionPane.ERROR_MESSAGE);
                 }
 
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR DATOS: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }   
     
@@ -1202,75 +1310,6 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
             
               acomodar();
             }
-    }
-    
-    private String getEmpresa1(File file){
-        String texto;
-        String durol = "645";
-        boolean in = false;
-        boolean ou = false;
-        boolean al = false;
-        try {
-            try (PDDocument document = PDDocument.load(file)) {
-                PDFTextStripperByArea textStripper = new PDFTextStripperByArea();
-                Rectangle rect = new Rectangle(9, 342, 130, 7);
-                textStripper.addRegion("myRegion", rect);
-                PDPage page = document.getPage(0);
-                textStripper.extractRegions(page);
-                String extractedText = textStripper.getTextForRegion("myRegion");
-                durol = extractedText;
-                if(extractedText.contains("TODOS LOS CHAFLANES NO INDICADOS SON C.040")){
-                    in = true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        
-        try {
-            try (PDDocument document = PDDocument.load(file)) {
-                PDFTextStripperByArea textStripper = new PDFTextStripperByArea();
-                Rectangle rect = new Rectangle(7, 327, 130, 7);
-                textStripper.addRegion("myRegion", rect);
-                PDPage page = document.getPage(0);
-                textStripper.extractRegions(page);
-                String extractedText = textStripper.getTextForRegion("myRegion");
-                if(extractedText.contains("En espesores de material usar tolerancia de +/-.015")){
-                    ou = true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        
-        try {
-            try (PDDocument document = PDDocument.load(file)) {
-                PDFTextStripperByArea textStripper = new PDFTextStripperByArea();
-                Rectangle rect = new Rectangle(1007, 645, 164, 10);
-                textStripper.addRegion("myRegion", rect);
-                PDPage page = document.getPage(0);
-                textStripper.extractRegions(page);
-                String extractedText = textStripper.getTextForRegion("myRegion").replace("\n", "");
-                System.out.println(extractedText);
-                if(extractedText.contains("Global Automation Deparment")){
-                    al = true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println(e);
-        }
-        
-        
-        if(in){
-            texto =  "durol";
-        }else if(ou){
-            texto =  "3i";
-        }else if(al){
-            texto = "align";
-        }else{
-            texto = "NULL";
-        }
-        return texto;
     }
     
     public boolean existeProyecto(String proyecto){
