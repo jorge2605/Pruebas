@@ -697,6 +697,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: " + e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
+        System.out.println(campo);
         return campo;
     }
     
@@ -704,8 +705,8 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         try{
             Statement st = con.createStatement();
             String sql = "select * from empleadoscheck where NumSupervisor like '"+numEmpleado+"'";
-            if(numEmpleado.equals("61")){
-                sql = "select * from empleadoscheck";
+            if(numEmpleado.equals("61") || getSupervisor().equals("GERENCIA")){
+                sql = "select * from empleadoscheck WHERE Activo like 'true'";
             }
             ResultSet rs = st.executeQuery(sql);
             int cont = 0;
@@ -716,8 +717,8 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             Statement st2 = con.createStatement();
             String sql2 = "select * from empleadoscheck where NumSupervisor like '"+numEmpleado+"'";
             boolean redondeo = false;
-            if(numEmpleado.equals("61")){
-                sql2 = "select * from empleadoscheck";
+            if(numEmpleado.equals("61") || getSupervisor().equals("GERENCIA")){
+                sql2 = "select * from empleadoscheck WHERE Activo like 'true'";
                 redondeo = true;
             }
             ResultSet rs2 = st2.executeQuery(sql2);
@@ -820,6 +821,15 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         addSemana();
         limpiarTabla();
+        try{
+            if(getSupervisor().equals("GERENCIA")){
+                btnSubir.setEnabled(true);
+                btnSubir1.setEnabled(true);
+            }
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(this, "No tienes acceso para ingresar a este modulo", "Error", JOptionPane.ERROR_MESSAGE);
+            this.dispose();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1035,6 +1045,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         btnSubir1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf.png"))); // NOI18N
         btnSubir1.setText("Descargar Pdf");
         btnSubir1.setColorHover(new java.awt.Color(204, 0, 0));
+        btnSubir1.setEnabled(false);
         btnSubir1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSubir1ActionPerformed(evt);
@@ -1515,7 +1526,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "select * from dias where NumSemana like '"+cmbSemana.getSelectedItem()+"' and Inicio like '"+fecha.get(cmbSemana.getSelectedIndex())+"'";
-            System.out.println("Fecha - " + fecha.get(cmbSemana.getSelectedIndex()));
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[27];
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
@@ -1534,77 +1544,77 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                 }
                 cont++;
                 if(band){
-                datos[0] = config[nu].getNumEmpleado();
-                datos[1] = config[nu].getNombre();
-                datos[2] = rs.getString("Lunes");
-                datos[2] = getTiempo(datos[2]);
-                
-                datos[3] = rs.getString("SLunes");
-                datos[3] = getTiempo(datos[3]);
-                
-                datos[4] = "";
-                datos[5] = rs.getString("Martes");
-                datos[5] = getTiempo(datos[5]);
-                
-                datos[6] = rs.getString("SMartes");
-                datos[6] = getTiempo(datos[6]);
-                
-                datos[7] = "";
-                datos[8] = rs.getString("Miercoles");
-                datos[8] = getTiempo(datos[8]);
-                
-                datos[9] = rs.getString("SMiercoles");
-                datos[9] = getTiempo(datos[9]);
-                
-                datos[10] = "";
-                datos[11] = rs.getString("Jueves");
-                datos[11] = getTiempo(datos[11]);
-                
-                datos[12] = rs.getString("SJueves");
-                datos[12] = getTiempo(datos[12]);
-                
-                datos[13] = "";
-                datos[14] = rs.getString("Viernes");
-                datos[14] = getTiempo(datos[14]);
-                
-                datos[15] = rs.getString("SViernes");
-                datos[15] = getTiempo(datos[15]);
-                
-                datos[16] = "";
-                datos[17] = rs.getString("Sabado");
-                datos[17] = getTiempo(datos[17]);
-                
-                datos[18] = rs.getString("SSabado");
-                datos[18] = getTiempo(datos[18]);
-                
-                datos[19] = "";
-                datos[20] = rs.getString("Domingo");
-                datos[20] = getTiempo(datos[20]);
-                
-                datos[21]= rs.getString("SDomingo");
-                datos[21] = getTiempo(datos[21]);
-                
-                if(datos[20].equals("") && datos[21].equals("")){
-                    datos[20] = "";
-                    datos[21] = "";
-                }
-                if(tgRedondear.isSelected()){
-                    datos[2] = redondear(datos[2],datos[0]);
-                    datos[3] = redondear(datos[3],datos[0]);
-                    datos[5] = redondear(datos[5],datos[0]);
-                    datos[6] = redondear(datos[6],datos[0]);
-                    datos[8] = redondear(datos[8],datos[0]);
-                    datos[9] = redondear(datos[9],datos[0]);
-                    datos[11] = redondear(datos[11],datos[0]);
-                    datos[12] = redondear(datos[12],datos[0]);
-                    datos[14] = redondear(datos[14],datos[0]);
-                    datos[15] = redondear(datos[15],datos[0]);
-                    datos[17] = redondear(datos[17],datos[0]);
-                    datos[18] = redondear(datos[18],datos[0]);
-                    datos[20] = redondear(datos[20],datos[0]);
-                    datos[21] = redondear(datos[21],datos[0]);
-                }
-                miModelo.addRow(datos);
+                    datos[0] = config[nu].getNumEmpleado();
+                    datos[1] = config[nu].getNombre();
+                    datos[2] = rs.getString("Lunes");
+                    datos[2] = getTiempo(datos[2]);
+
+                    datos[3] = rs.getString("SLunes");
+                    datos[3] = getTiempo(datos[3]);
+
+                    datos[4] = "";
+                    datos[5] = rs.getString("Martes");
+                    datos[5] = getTiempo(datos[5]);
+
+                    datos[6] = rs.getString("SMartes");
+                    datos[6] = getTiempo(datos[6]);
+
+                    datos[7] = "";
+                    datos[8] = rs.getString("Miercoles");
+                    datos[8] = getTiempo(datos[8]);
+
+                    datos[9] = rs.getString("SMiercoles");
+                    datos[9] = getTiempo(datos[9]);
+
+                    datos[10] = "";
+                    datos[11] = rs.getString("Jueves");
+                    datos[11] = getTiempo(datos[11]);
+
+                    datos[12] = rs.getString("SJueves");
+                    datos[12] = getTiempo(datos[12]);
+
+                    datos[13] = "";
+                    datos[14] = rs.getString("Viernes");
+                    datos[14] = getTiempo(datos[14]);
+
+                    datos[15] = rs.getString("SViernes");
+                    datos[15] = getTiempo(datos[15]);
+
+                    datos[16] = "";
+                    datos[17] = rs.getString("Sabado");
+                    datos[17] = getTiempo(datos[17]);
+
+                    datos[18] = rs.getString("SSabado");
+                    datos[18] = getTiempo(datos[18]);
+
+                    datos[19] = "";
+                    datos[20] = rs.getString("Domingo");
+                    datos[20] = getTiempo(datos[20]);
+
+                    datos[21]= rs.getString("SDomingo");
+                    datos[21] = getTiempo(datos[21]);
+
+                    if(datos[20].equals("") && datos[21].equals("")){
+                        datos[20] = "";
+                        datos[21] = "";
+                    }
+                    if(tgRedondear.isSelected()){
+                        datos[2] = redondear(datos[2],datos[0]);
+                        datos[3] = redondear(datos[3],datos[0]);
+                        datos[5] = redondear(datos[5],datos[0]);
+                        datos[6] = redondear(datos[6],datos[0]);
+                        datos[8] = redondear(datos[8],datos[0]);
+                        datos[9] = redondear(datos[9],datos[0]);
+                        datos[11] = redondear(datos[11],datos[0]);
+                        datos[12] = redondear(datos[12],datos[0]);
+                        datos[14] = redondear(datos[14],datos[0]);
+                        datos[15] = redondear(datos[15],datos[0]);
+                        datos[17] = redondear(datos[17],datos[0]);
+                        datos[18] = redondear(datos[18],datos[0]);
+                        datos[20] = redondear(datos[20],datos[0]);
+                        datos[21] = redondear(datos[21],datos[0]);
+                    }
+                    miModelo.addRow(datos);
                 }
             }
             

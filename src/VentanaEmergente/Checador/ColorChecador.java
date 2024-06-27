@@ -368,7 +368,11 @@ public class ColorChecador extends rojerusan.RSTableMetro{
                         }
                         String h2 = conf[buscarNumero(getValueAt(rowIndex, 0).toString())].getEntrada();
                         hora1 = sdf.parse(val);
-                        hora2 = sdf.parse(h2);
+                        try{
+                            hora2 = sdf.parse(h2);
+                        }catch(Exception ex){
+                            hora2 = sdf.parse("00:00");
+                        }
                         if(ColumnIndex == 17){
                             h2 = conf[buscarNumero(getValueAt(rowIndex, 0).toString())].getEntradaSabado();
                             hora2 = sdf.parse(h2);
@@ -386,7 +390,11 @@ public class ColorChecador extends rojerusan.RSTableMetro{
                             val = "00:00";
                         }
                         String h2 = conf[buscarNumero(getValueAt(rowIndex, 0).toString())].getSalida();
-                        hora2 = sdf.parse(h2);
+                        try{
+                            hora2 = sdf.parse(h2);
+                        }catch(Exception ex){
+                            hora2 = sdf.parse("00:00");
+                        }
                         hora1 = sdf.parse(val);
                         if(ColumnIndex == 18){
                             h2 = conf[buscarNumero(getValueAt(rowIndex, 0).toString())].getSalidaSabado();

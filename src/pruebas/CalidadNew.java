@@ -707,16 +707,12 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
     public void limpiarPantalla2(){
         acomodar();
         txtPlano.setText("");
-//        btnRechazo.setEnabled(false);
-//        btnAprobado.setEnabled(false);
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
             String d = Tabla1.getValueAt(i, 0).toString();
             int f = Integer.parseInt(d);
             l[f].setText("");
             Panel3.remove(l[f]);
         }
-//        img.setImagen(null);
-//        acomodar();
         revalidate();
         repaint();
     }
@@ -724,16 +720,12 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
     public void limpiarPantalla(){
         acomodar();
         txtPlano.setText("");
-//        btnRechazo.setEnabled(false);
-//        btnAprobado.setEnabled(false);
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
             String d = Tabla1.getValueAt(i, 0).toString();
             int f = Integer.parseInt(d);
             l[f].setText("");
             Panel3.remove(l[f]);
         }
-//        img.setImagen(null);
-//        acomodar();
         limpiarTabla1();
         revalidate();
         repaint();
@@ -741,8 +733,6 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
     
     public void guardarBD(String estado){
         try{
-            
-        
             createPdf("C:\\Pruebas\\documento.pdf",estado,this.plan,tablas,this.nombre);
         
             Connection con = null;
@@ -1360,12 +1350,12 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from planos where Plano like '"+plan+"'";
+            String sql = "select * from pdfplanos where Plano like '"+plan+"'";
             ResultSet rs = st.executeQuery(sql);
-            String cant = "";
+            String cant = "1";
             while(rs.next()){
                 ruta = rs.getBytes("Pdf");
-                cant = rs.getString("Cantidad");
+//                cant = rs.getString("Cantidad");
             }
             
             int can = Integer.parseInt(cant);
@@ -1630,7 +1620,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         int cont = 0;
         
         btnEliminar.setEnabled(false);
-       btnEditar1.setEnabled(false);
+        btnEditar1.setEnabled(false);
         
         for (int i = 0; i < panel.length; i++) {
             if(panel[i].getBackground().equals(Color.gray)){
