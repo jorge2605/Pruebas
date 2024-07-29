@@ -979,8 +979,13 @@ public class Ventas extends javax.swing.JInternalFrame{
                         }
                         cont++;
                     }
-                    enviar.sendVentas(copia, "juan.rayos@si3i.com"+to, asunto, descripcion, oc,cotizacion.getAbsolutePath());
-                    JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE");
+                    String mns = "";
+                    try{
+                        enviar.sendVentas(copia, "juan.rayos@si3i.com"+to, asunto, descripcion, oc,cotizacion.getAbsolutePath());
+                    }catch(Exception e){
+                        mns = ", El correo no fue enviado: \n" + e;
+                    }
+                    JOptionPane.showMessageDialog(this, "Datos guardados correctamente"+mns);
                     verNumero();
                     txtCliente.setText("");
                     txtValor.setText("");

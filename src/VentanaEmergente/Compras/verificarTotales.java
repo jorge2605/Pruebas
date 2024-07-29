@@ -85,7 +85,6 @@ public class verificarTotales extends javax.swing.JDialog {
                     pilaProveedor.push(proveedor);
                 }
             }
-            System.out.println(pilaProveedor);
             for (int i = 0; i < pilaProveedor.size(); i++) {
                 //------------------------------------------------------------------------------------------------------------------------------------
                 //---------------------------------------------------PANEL----------------------------------------------------------------------------

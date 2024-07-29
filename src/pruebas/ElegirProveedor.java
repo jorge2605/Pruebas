@@ -53,23 +53,25 @@ public class ElegirProveedor extends javax.swing.JDialog implements ActionListen
         return band;
     }
     
-    public void iniciar(){
+    public final void iniciar(){
         PanelBotones.setLayout(new GridLayout(tamaño,0));
         botones = new JButton[tamaño];
         
         panel = new JPanel[tamaño];
         for (int i = 0; i < tamaño; i++) {
+            System.out.println(tamaño);
+            System.err.println(datos[i]);
             if(datos[i] == null){
                 
             }else{
-            botones[i] = new JButton(this.datos[i]);
-            panel[i] = new JPanel();
-            panel[i].setBackground(Color.white);
-            botones[i].setContentAreaFilled(false);
-            botones[i].setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-            botones[i].addActionListener(this);
-            panel[i].add(botones[i]);
-            PanelBotones.add(panel[i]);
+                botones[i] = new JButton(this.datos[i]);
+                panel[i] = new JPanel();
+                panel[i].setBackground(Color.white);
+                botones[i].setContentAreaFilled(false);
+                botones[i].setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                botones[i].addActionListener(this);
+                panel[i].add(botones[i]);
+                PanelBotones.add(panel[i]);
             }
         }
     }

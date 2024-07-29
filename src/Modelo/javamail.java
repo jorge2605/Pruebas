@@ -23,16 +23,11 @@ public class javamail {
     
     public File ordenDeCompra;
     
-    public static void main(String[] args) {
-//        sendAprobacion("1987","","");
-    }
-    
     public void sendVentas(Stack<String> copias, String destinatario, String asunto, String descripcion, File OC, String Cotizacion) {
         String PO = null;
         if(OC != null){
             PO = OC.getAbsolutePath();
         }
-        System.out.println(destinatario);
         Properties props = new Properties();
         props.put("mail.smtp.host", "mail.si3i.com");
         props.put("mail.smtp.port", "587");

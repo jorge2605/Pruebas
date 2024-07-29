@@ -3,6 +3,7 @@ package pruebas;
 import Conexiones.Conexion;
 import Modelo.CabezeraChecador;
 import VentanaEmergente.Checador.ColorChecador;
+import VentanaEmergente.Checador.Incidencias;
 import VentanaEmergente.Checador.confEmpleado;
 import VentanaEmergente.Checador.editarEmpleado;
 import com.itextpdf.text.BaseColor;
@@ -17,10 +18,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
@@ -28,12 +30,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +53,18 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     editarEmpleado e;
     String departamento;
     Stack<String> fecha;
+    Incidencias incidencias;
+    //26
+    Object matrizTabla[][];
+    
+    public void crearMatriz(){
+        matrizTabla = new Object[Tabla1.getRowCount()][Tabla1.getColumnCount()];
+        for (int i = 0; i < Tabla1.getRowCount(); i++) {
+            for (int j = 0; j < Tabla1.getColumnCount(); j++) {
+                matrizTabla[i][j] = Tabla1.getValueAt(i, j);
+            }
+        }
+    }
     
     public int buscarNumero(String numero){
         int num = 0;
@@ -697,7 +709,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: " + e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
-        System.out.println(campo);
         return campo;
     }
     
@@ -801,7 +812,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             Tabla1.setTableHeader(null);
             jScrollPane2.setViewportView(Tabla1);
             JViewport scroll =  (JViewport) Tabla1.getParent();
-            System.out.println(this.getWidth() + ", panel: "+panelRound1.getWidth());
             int ancho = ((this.getWidth() - panelRound1.getWidth())/10);
             if (Tabla1.getColumnModel().getColumnCount() > 0) {
                 Tabla1.getColumnModel().getColumn(0).setPreferredWidth(ancho);
@@ -811,6 +821,33 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                 Tabla1.getColumnModel().getColumn(1).setMinWidth(ancho);
                 Tabla1.getColumnModel().getColumn(1).setMaxWidth(ancho);
             }
+    }
+    
+    public final void addKeyPressed(){
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getID() == KeyEvent.KEY_PRESSED && (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN
+                         || e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_RIGHT)) {
+                    if (Tabla1.isEditing()) {
+                        Tabla1.getCellEditor().stopCellEditing();
+                    }
+                    int row = Tabla1.getSelectedRow();
+                    int col = Tabla1.getSelectedColumn();
+                    String nombre = Tabla1.getValueAt(row, 1).toString();
+                    String hora;
+                    String horaVieja;
+                    try{hora = Tabla1.getValueAt(row, col).toString();}catch(Exception ex){hora = "00:00";}
+                    try{horaVieja = (String) matrizTabla[row][col];}catch(Exception ex){horaVieja = "00:00";}
+                    
+                    incidencias = new Incidencias(null,true,horaVieja,hora,nombre);
+                    incidencias.setLocationRelativeTo(null);
+                    incidencias.setVisible(true);
+                }
+                return false;
+            }
+        });
     }
     
     public Checador(String numEmpleado) {
@@ -830,6 +867,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             JOptionPane.showMessageDialog(this, "No tienes acceso para ingresar a este modulo", "Error", JOptionPane.ERROR_MESSAGE);
             this.dispose();
         }
+        addKeyPressed();
     }
 
     @SuppressWarnings("unchecked")
@@ -1483,6 +1521,11 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                 Tabla1MouseClicked(evt);
             }
         });
+        Tabla1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                Tabla1KeyPressed(evt);
+            }
+        });
         jScrollPane2.setViewportView(Tabla1);
         if (Tabla1.getColumnModel().getColumnCount() > 0) {
             Tabla1.getColumnModel().getColumn(27).setMinWidth(100);
@@ -1704,6 +1747,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             }else{
             lblSemana.setText(cmbSemana.getSelectedItem().toString());
             }
+            crearMatriz();
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -1860,6 +1904,10 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private void cmbSemanaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSemanaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cmbSemanaActionPerformed
+
+    private void Tabla1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_Tabla1KeyPressed
+        
+    }//GEN-LAST:event_Tabla1KeyPressed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -61,6 +61,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Stack;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
@@ -74,14 +75,14 @@ import javax.swing.table.TableColumn;
 import scrollPane.ScrollBarCustom;
 
 public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionListener {
-    
-    int x,y;
-    
+
+    int x, y;
+
     String numEmpleado;
     public String id;
     public String num;
     public String proy;
-    public String cantidad,descripcion,proveedor,id2;
+    public String cantidad, descripcion, proveedor, id2;
     public int ta;
     public int id1 = -1;
     ElegirProveedor elegir;
@@ -96,24 +97,24 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     Agrupar agr;
     String correo;
     String pass;
-    
+
     String proyecto[] = new String[11];
-    
+
     boolean search = false;
-    
+
     public String[] dat;
-    
-    public void crearNotificacion(){
-        
-        try{
+
+    public void crearNotificacion() {
+
+        try {
             Connection con = null;
             ConexionChat con1 = new ConexionChat();
             con = con1.getConnection();
-            
+
             Connection con2 = null;
             Conexion con3 = new Conexion();
             con2 = con3.getConnection();
-            
+
             Statement st = con.createStatement();
             Date d = new Date();
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -124,61 +125,59 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             String ip;
             int port;
             String empleado;
-            while(rs2.next()){
+            while (rs2.next()) {
                 ip = rs2.getString("Ip");
                 port = rs2.getInt("Puerto");
                 empleado = rs2.getString("NumEmpleado");
-                
-                
-                String not = "noti"+empleado;
-                String sql = "insert into "+not+" (Departamento,Titulo,Texto,Fecha) values (?,?,?,?)";
+
+                String not = "noti" + empleado;
+                String sql = "insert into " + not + " (Departamento,Titulo,Texto,Fecha) values (?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
                 pst.setString(1, "1");
                 pst.setString(2, "NUEVA APROBACION");
-                pst.setString(3, "TIENES UNA NUEVA APROBACION, LA REQUISICION NUMERO: "+lblRequi.getText());
+                pst.setString(3, "TIENES UNA NUEVA APROBACION, LA REQUISICION NUMERO: " + lblRequi.getText());
                 pst.setString(4, fecha);
 
                 pst.executeUpdate();
-                Cliente cliente = new Cliente(port+1, "NUEVA APROBACION",ip);
+                Cliente cliente = new Cliente(port + 1, "NUEVA APROBACION", ip);
                 Thread hilo = new Thread(cliente);
                 hilo.start();
             }
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void verPorProyecto(Connection con, DefaultTableModel miModelo, boolean orden){
-            
-            try{
+
+    public void verPorProyecto(Connection con, DefaultTableModel miModelo, boolean orden) {
+
+        try {
             Statement st = con.createStatement();
             Statement st2 = con.createStatement();
-            String sql = "select * from requisiciones where Proyecto like '"+lblRequi.getText()+"' and OC is null and (Aux like  'APROBADO'  or Aux is null)";
+            String sql = "select * from requisiciones where Proyecto like '" + lblRequi.getText() + "' and OC is null and (Aux like  'APROBADO'  or Aux is null)";
             ResultSet rs = st.executeQuery(sql);
             String sql2 = "select * from registroprov_compras order by Nombre";
             ResultSet rs2 = st2.executeQuery(sql2);
             String proveedor;
-            
+
             JComboBox jcb = new JComboBox();
-            
-            
-            while(rs2.next()){
+
+            while (rs2.next()) {
                 proveedor = rs2.getString("Nombre");
                 jcb.addItem(proveedor);
-                
+
             }
             TableColumn tc = Tabla2.getColumnModel().getColumn(7);
             TableCellEditor tce = new DefaultCellEditor(jcb);
             tc.setCellEditor(tce);
-            
+
             int n = 0;
-            
+
             String datos[] = new String[10];
-            while(rs.next()){
+            while (rs.next()) {
                 datos[0] = rs.getString("Id");
                 datos[1] = rs.getString("Descripcion");
                 datos[2] = rs.getString("Codigo");
@@ -188,86 +187,86 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 datos[7] = rs.getString("Proveedor");
                 datos[8] = rs.getString("TE");
                 datos[9] = rs.getString("OC");
-                
+
                 miModelo.addRow(datos);
-                
+
                 Statement st20 = con.createStatement();
-                String sql20 = "select * from inventario where NumeroDeParte like '"+datos[2]+"'";
+                String sql20 = "select * from inventario where NumeroDeParte like '" + datos[2] + "'";
                 ResultSet rs20 = st20.executeQuery(sql20);
                 String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
                 PreparedStatement pst21 = con.prepareStatement(sql21);
                 String d[] = new String[10];
-                while(rs20.next()){
+                while (rs20.next()) {
                     d[0] = rs20.getString("NumeroDeParte");
                 }
-                if(d[0] == null){
+                if (d[0] == null) {
                     pst21.setString(1, datos[2]);
                     pst21.setString(2, datos[1]);
                     pst21.setString(3, datos[4]);
                     pst21.setString(4, datos[3]);
                     pst21.setString(5, datos[7]);
-                    
+
                     n = pst21.executeUpdate();
-                    
-                    if(n > 0){
+
+                    if (n > 0) {
                         JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
                     }
                 }
             }
-            
-            if(n > 0){
+
+            if (n > 0) {
                 JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
             }
-            
-                DecimalFormatSymbols separador = new DecimalFormatSymbols();
-                separador.setDecimalSeparator('.');
-                DecimalFormat formato = new DecimalFormat("#.##",separador);
-                
+
+            DecimalFormatSymbols separador = new DecimalFormatSymbols();
+            separador.setDecimalSeparator('.');
+            DecimalFormat formato = new DecimalFormat("#.##", separador);
+
             for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                
-                if(Tabla2.getValueAt(i, 5) != null ){
-                    if(Tabla2.getValueAt(i, 5).toString().equals("")){
-                        
-                    }else{
-                    double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
-                    double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
-                    double total = precio * cantidad;
-                    
-                    Tabla2.setValueAt(formato.format(total), i, 6);
+
+                if (Tabla2.getValueAt(i, 5) != null) {
+                    if (Tabla2.getValueAt(i, 5).toString().equals("")) {
+
+                    } else {
+                        double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
+                        double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                        double total = precio * cantidad;
+
+                        Tabla2.setValueAt(formato.format(total), i, 6);
                     }
                 }
             }
-                CrearOrden.setEnabled(true);
-            
-            }catch(SQLException e){
-                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-                Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, e);
-            }
-    }
-    
-    public void verOrdenProyecto(){
-        DefaultTableModel miModelo = new DefaultTableModel();
-        String titulos[] = {"ID","DESCRIPCION","NUMERO PARTE","U.M.","CANTIDAD","PRECIO","TOTAL","PROVEEDOR","TE"};
-        miModelo = (new DefaultTableModel(null,titulos){
-        boolean[] canEdit = new boolean [] {
-            false, true, true, true, true, true, true, true, true
-        };
+            CrearOrden.setEnabled(true);
 
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return canEdit [columnIndex];
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+
+    public void verOrdenProyecto() {
+        DefaultTableModel miModelo = new DefaultTableModel();
+        String titulos[] = {"ID", "DESCRIPCION", "NUMERO PARTE", "U.M.", "CANTIDAD", "PRECIO", "TOTAL", "PROVEEDOR", "TE"};
+        miModelo = (new DefaultTableModel(null, titulos) {
+            boolean[] canEdit = new boolean[]{
+                false, true, true, true, true, true, true, true, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
+            }
         });
-        
+
         Tabla2.setModel(miModelo);
-        try{
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from requisiciones where Proyecto like '"+lblRequi.getText()+"' and Aux like 'APROBADO' and OC is null";
+            String sql = "select * from requisiciones where Proyecto like '" + lblRequi.getText() + "' and Aux like 'APROBADO' and OC is null";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[15];
-            while(rs.next()){
+            while (rs.next()) {
                 datos[0] = rs.getString("Id");
                 datos[1] = rs.getString("Descripcion");
                 datos[2] = rs.getString("Codigo");
@@ -281,97 +280,101 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 miModelo.addRow(datos);
             }
             DecimalFormatSymbols separador = new DecimalFormatSymbols();
-                separador.setDecimalSeparator('.');
-                DecimalFormat formato = new DecimalFormat("#.##",separador);
-                
+            separador.setDecimalSeparator('.');
+            DecimalFormat formato = new DecimalFormat("#.##", separador);
+
             for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                
-                if(Tabla2.getValueAt(i, 5) != null ){
-                    if(Tabla2.getValueAt(i, 5).toString().equals("")){
-                        
-                    }else{
-                    double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
-                    double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
-                    double total = precio * cantidad;
-                    
-                    Tabla2.setValueAt(formato.format(total), i, 6);
+
+                if (Tabla2.getValueAt(i, 5) != null) {
+                    if (Tabla2.getValueAt(i, 5).toString().equals("")) {
+
+                    } else {
+                        double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
+                        double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                        double total = precio * cantidad;
+
+                        Tabla2.setValueAt(formato.format(total), i, 6);
                     }
                 }
             }
-       }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void limpiarTablaImportada(){
-        DefaultTableModel miModelo;
-        String titulos[] = {"ID","DESCRIPCION","NUMERO PARTE","U.M.","CANTIDAD","PRECIO","TOTAL","PROVEEDOR","TE","NO. ITEM","CANTIDAD ENCONTRADA"};
-        miModelo = (new DefaultTableModel(null,titulos){
-        boolean[] canEdit = new boolean [] {
-            false, true, true, true, true, true, true, true, true, false,false
-        };
 
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return canEdit [columnIndex];
-        }
+    public void limpiarTablaImportada() {
+        DefaultTableModel miModelo;
+        String titulos[] = {"ID", "DESCRIPCION", "NUMERO PARTE", "U.M.", "CANTIDAD", "PRECIO", "TOTAL", "PROVEEDOR", "TE", "NO. ITEM", "CANTIDAD ENCONTRADA"};
+        miModelo = (new DefaultTableModel(null, titulos) {
+            boolean[] canEdit = new boolean[]{
+                false, true, true, true, true, true, true, true, true, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit[columnIndex];
+            }
         });
-        
+
         Tabla2.setModel(miModelo);
     }
-    
-    public void reducirCantidad(){
-        try{
+
+    public void reducirCantidad() {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             for (int i = 0; i < Tabla2.getRowCount(); i++) {
                 String id = Tabla2.getValueAt(i, 0).toString();
-                String sql = "select cantidadStock, Cantidad, Id from requisiciones where Id like '"+id+"'";
+                String sql = "select cantidadStock, Cantidad, Id from requisiciones where Id like '" + id + "'";
                 ResultSet rs = st.executeQuery(sql);
                 String c = null;
                 double cantidadStock = 0;
-                while(rs.next()){
+                while (rs.next()) {
                     c = rs.getString("Cantidad");
                     cantidadStock = rs.getDouble("cantidadStock");
                 }
                 double cantidad;
-                try{cantidad = Double.parseDouble(c);}catch(Exception e){cantidad = 0;}
-                if(cantidadStock != 0 && c != null){
+                try {
+                    cantidad = Double.parseDouble(c);
+                } catch (Exception e) {
+                    cantidad = 0;
+                }
+                if (cantidadStock != 0 && c != null) {
                     double total = cantidad - cantidadStock;
                     Tabla2.setValueAt(total, i, 4);
                 }
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void importarLista(String requi){
+
+    public void importarLista(String requi) {
         DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            if(lblTitulo.getText().equals("PROYECTO:")){
-                verPorProyecto(con, miModelo,false);
-            }else{
+            if (lblTitulo.getText().equals("PROYECTO:")) {
+                verPorProyecto(con, miModelo, false);
+            } else {
                 int tab = Tabla1.getRowCount() - cont;
-                if(cont > 0){
-                    tab = Tabla1.getRowCount() - cont -1;
+                if (cont > 0) {
+                    tab = Tabla1.getRowCount() - cont - 1;
                 }
-                if(Tabla1.getSelectedRow() > tab){
+                if (Tabla1.getSelectedRow() > tab) {
                     //PARTE DE ORDENES EDITADA
                     Statement st = con.createStatement();
                     Statement st2 = con.createStatement();
-                    String sql = "select * from requisiciones where OC like '"+requi+"'";
+                    String sql = "select * from requisiciones where OC like '" + requi + "'";
                     ResultSet rs = st.executeQuery(sql);
                     String sql2 = "select * from registroprov_compras order by Nombre";
                     ResultSet rs2 = st2.executeQuery(sql2);
                     String proveedor;
 
                     JComboBox jcb = new JComboBox();
-                    while(rs2.next()){
+                    while (rs2.next()) {
                         proveedor = rs2.getString("Nombre");
                         jcb.addItem(proveedor);
                     }
@@ -382,13 +385,13 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     String datos[] = new String[15];
                     int n = 0;
 
-                    if(search == true){
+                    if (search == true) {
                         Statement st1 = con.createStatement();
-                        String sql1 = "select * from requisicionesmuestra where PO like '"+requi+"'";
+                        String sql1 = "select * from requisicionesmuestra where PO like '" + requi + "'";
                         ResultSet rs1 = st1.executeQuery(sql1);
                         String datos1[] = new String[15];
 
-                        while(rs1.next()){
+                        while (rs1.next()) {
                             datos1[0] = ("");
                             datos1[1] = rs1.getString("Descripcion");
                             datos1[2] = rs1.getString("Codigo");
@@ -400,21 +403,21 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             datos1[9] = rs1.getString("TE");
                             datos1[10] = rs1.getString("cantidadStock");
                             datos1[13] = rs1.getString("Estado");
-                            if((datos1[13]) != null){
+                            if ((datos1[13]) != null) {
                                 miModelo.addRow(datos1);
                             }
                         }
                         Statement st20 = con.createStatement();
-                        String sql20 = "select * from inventario where NumeroDeParte like '"+datos1[2]+"'";
+                        String sql20 = "select * from inventario where NumeroDeParte like '" + datos1[2] + "'";
                         ResultSet rs20 = st20.executeQuery(sql20);
                         String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
                         PreparedStatement pst21 = con.prepareStatement(sql21);
 
                         String d[] = new String[10];
-                        while(rs20.next()){
+                        while (rs20.next()) {
                             d[0] = rs20.getString("NumeroDeParte");
                         }
-                        if(d[0] == null){
+                        if (d[0] == null) {
                             pst21.setString(1, datos1[2]);
                             pst21.setString(2, datos1[1]);
                             pst21.setString(3, datos1[4]);
@@ -424,82 +427,82 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             n = pst21.executeUpdate();
 
                         }
-                    }else{
-                    int cont = 1;
-                    while(rs.next()){
-                        datos[0] = rs.getString("Id");
-                        datos[1] = rs.getString("Descripcion");
-                        datos[2] = rs.getString("Codigo");
-                        datos[3] = rs.getString("UM");
-                        datos[4] = rs.getString("Cantidad");
-                        datos[5] = rs.getString("Precio");
-                        datos[7] = rs.getString("Proveedor");
-                        datos[8] = rs.getString("TE");
-                        datos[9] = rs.getString("TE");
-                        datos[10] = rs.getString("Estado");
-                        datos[9] = String.valueOf(cont);
-                        cont++;
-                        if((datos[10]) != null){
-                            if((datos[10]).equals("EDITADO")){
-                                miModelo.addRow(datos);
+                    } else {
+                        int cont = 1;
+                        while (rs.next()) {
+                            datos[0] = rs.getString("Id");
+                            datos[1] = rs.getString("Descripcion");
+                            datos[2] = rs.getString("Codigo");
+                            datos[3] = rs.getString("UM");
+                            datos[4] = rs.getString("Cantidad");
+                            datos[5] = rs.getString("Precio");
+                            datos[7] = rs.getString("Proveedor");
+                            datos[8] = rs.getString("TE");
+                            datos[9] = rs.getString("TE");
+                            datos[10] = rs.getString("Estado");
+                            datos[9] = String.valueOf(cont);
+                            cont++;
+                            if ((datos[10]) != null) {
+                                if ((datos[10]).equals("EDITADO")) {
+                                    miModelo.addRow(datos);
+                                }
+                            }
+                            Statement st20 = con.createStatement();
+                            String sql20 = "select * from inventario where NumeroDeParte like '" + datos[2] + "'";
+                            ResultSet rs20 = st20.executeQuery(sql20);
+                            String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst21 = con.prepareStatement(sql21);
+
+                            String d[] = new String[10];
+                            while (rs20.next()) {
+                                d[0] = rs20.getString("NumeroDeParte");
+                            }
+                            if (d[0] == null) {
+                                pst21.setString(1, datos[2]);
+                                pst21.setString(2, datos[1]);
+                                pst21.setString(3, datos[4]);
+                                pst21.setString(4, datos[3]);
+                                pst21.setString(5, datos[7]);
+
+                                n = pst21.executeUpdate();
+
                             }
                         }
-                        Statement st20 = con.createStatement();
-                        String sql20 = "select * from inventario where NumeroDeParte like '"+datos[2]+"'";
-                        ResultSet rs20 = st20.executeQuery(sql20);
-                        String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst21 = con.prepareStatement(sql21);
-
-                        String d[] = new String[10];
-                        while(rs20.next()){
-                            d[0] = rs20.getString("NumeroDeParte");
-                        }
-                        if(d[0] == null){
-                            pst21.setString(1, datos[2]);
-                            pst21.setString(2, datos[1]);
-                            pst21.setString(3, datos[4]);
-                            pst21.setString(4, datos[3]);
-                            pst21.setString(5, datos[7]);
-
-                            n = pst21.executeUpdate();
-
-                        }
                     }
-                    }
-                    if(n > 0){
+                    if (n > 0) {
                         JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
                     }
 
-                        DecimalFormatSymbols separador = new DecimalFormatSymbols();
-                        separador.setDecimalSeparator('.');
-                        DecimalFormat formato = new DecimalFormat("#.##",separador);
-                        reducirCantidad();
+                    DecimalFormatSymbols separador = new DecimalFormatSymbols();
+                    separador.setDecimalSeparator('.');
+                    DecimalFormat formato = new DecimalFormat("#.##", separador);
+                    reducirCantidad();
                     for (int i = 0; i < Tabla2.getRowCount(); i++) {
 
-                        if(Tabla2.getValueAt(i, 5) != null ){
-                            if(Tabla2.getValueAt(i, 5).toString().equals("")){
+                        if (Tabla2.getValueAt(i, 5) != null) {
+                            if (Tabla2.getValueAt(i, 5).toString().equals("")) {
 
-                            }else{
-                            double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
-                            double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
-                            double total = precio * cantidad;
+                            } else {
+                                double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
+                                double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                                double total = precio * cantidad;
 
-                            Tabla2.setValueAt(formato.format(total), i, 6);
+                                Tabla2.setValueAt(formato.format(total), i, 6);
                             }
                         }
                     }
-                    if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("APROBADO") 
-                            || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("COMPRADO")){
+                    if (Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("APROBADO")
+                            || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("COMPRADO")) {
                         CrearOrden.setEnabled(true);
                     }
-                    
-                }else if(tab == 0){
-                }else{
-                //REQUISICIONES PARTE DE ARRIBA
+
+                } else if (tab == 0) {
+                } else {
+                    //REQUISICIONES PARTE DE ARRIBA
                     Statement st = con.createStatement();
                     Statement st2 = con.createStatement();
                     int fila = Tabla1.getSelectedRow();
-                    String sql = "select * from requisiciones where NumRequisicion like '"+requi+"'";
+                    String sql = "select * from requisiciones where NumRequisicion like '" + requi + "'";
                     ResultSet rs = st.executeQuery(sql);
                     String sql2 = "select * from registroprov_compras order by Nombre";
                     ResultSet rs2 = st2.executeQuery(sql2);
@@ -507,8 +510,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                     JComboBox jcb = new JComboBox();
 
-
-                    while(rs2.next()){
+                    while (rs2.next()) {
                         proveedor = rs2.getString("Nombre");
                         jcb.addItem(proveedor);
 
@@ -518,204 +520,204 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     tc.setCellEditor(tce);
 
                     int n = 0;
-                    if(search == true){
+                    if (search == true) {
                         Statement st1 = con.createStatement();
-                        String sql1 = "select * from requisicionesmuestra where NumRequisicion like '"+requi+"'";
+                        String sql1 = "select * from requisicionesmuestra where NumRequisicion like '" + requi + "'";
                         ResultSet rs1 = st1.executeQuery(sql1);
                         String datos1[] = new String[15];
 
-                        while(rs1.next()){
-                        datos1[0] = rs1.getString("Id");
-                        datos1[1] = rs1.getString("Descripcion");
-                        datos1[2] = rs1.getString("Codigo");
-                        datos1[3] = rs1.getString("UM");
-                        datos1[4] = rs1.getString("Cantidad");
-                        datos1[5] = rs1.getString("Precio");
-                        datos1[7] = rs1.getString("Proveedor");
-                        datos1[8] = rs1.getString("TE");
-                        datos1[9] = rs1.getString("TE");
-                        datos1[10] = rs1.getString("cantidadStock");
-                        datos1[13] = rs1.getString("OC");
-                        if((datos1[13]) == null){
-                        miModelo.addRow(datos1);
+                        while (rs1.next()) {
+                            datos1[0] = rs1.getString("Id");
+                            datos1[1] = rs1.getString("Descripcion");
+                            datos1[2] = rs1.getString("Codigo");
+                            datos1[3] = rs1.getString("UM");
+                            datos1[4] = rs1.getString("Cantidad");
+                            datos1[5] = rs1.getString("Precio");
+                            datos1[7] = rs1.getString("Proveedor");
+                            datos1[8] = rs1.getString("TE");
+                            datos1[9] = rs1.getString("TE");
+                            datos1[10] = rs1.getString("cantidadStock");
+                            datos1[13] = rs1.getString("OC");
+                            if ((datos1[13]) == null) {
+                                miModelo.addRow(datos1);
+                            }
+
+                            Statement st20 = con.createStatement();
+                            String sql20 = "select * from inventario where NumeroDeParte like '" + datos1[2] + "'";
+                            ResultSet rs20 = st20.executeQuery(sql20);
+                            String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst21 = con.prepareStatement(sql21);
+
+                            String d[] = new String[10];
+                            while (rs20.next()) {
+                                d[0] = rs20.getString("NumeroDeParte");
+                            }
+                            if (d[0] == null) {
+                                pst21.setString(1, datos1[2]);
+                                pst21.setString(2, datos1[1]);
+                                pst21.setString(3, datos1[4]);
+                                pst21.setString(4, datos1[3]);
+                                pst21.setString(5, datos1[7]);
+
+                                n = pst21.executeUpdate();
+                            }
                         }
+                    } else {
+                        String datos[] = new String[15];
+                        int cont = 1;
+                        while (rs.next()) {
+                            datos[0] = rs.getString("Id");
+                            datos[1] = rs.getString("Descripcion");
+                            datos[2] = rs.getString("Codigo");
+                            datos[3] = rs.getString("UM");
+                            datos[4] = rs.getString("Cantidad");
+                            datos[5] = rs.getString("Precio");
+                            datos[7] = rs.getString("Proveedor");
+                            datos[8] = rs.getString("TE");
+                            datos[10] = rs.getString("cantidadStock");
+                            datos[9] = String.valueOf(cont);
+                            cont++;
+                            datos[13] = rs.getString("OC");
+                            if ((datos[13]) == null) {
+                                miModelo.addRow(datos);
+                            }
+                            Statement st20 = con.createStatement();
+                            String sql20 = "select * from inventario where NumeroDeParte like '" + datos[2] + "'";
+                            ResultSet rs20 = st20.executeQuery(sql20);
+                            String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst21 = con.prepareStatement(sql21);
 
-                        Statement st20 = con.createStatement();
-                        String sql20 = "select * from inventario where NumeroDeParte like '"+datos1[2]+"'";
-                        ResultSet rs20 = st20.executeQuery(sql20);
-                        String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst21 = con.prepareStatement(sql21);
+                            String d[] = new String[10];
+                            while (rs20.next()) {
+                                d[0] = rs20.getString("NumeroDeParte");
+                            }
+                            if (d[0] == null) {
+                                pst21.setString(1, datos[2]);
+                                pst21.setString(2, datos[1]);
+                                pst21.setString(3, datos[4]);
+                                pst21.setString(4, datos[3]);
+                                pst21.setString(5, datos[7]);
 
-                        String d[] = new String[10];
-                        while(rs20.next()){
-                            d[0] = rs20.getString("NumeroDeParte");
-                        }
-                        if(d[0] == null){
-                            pst21.setString(1, datos1[2]);
-                            pst21.setString(2, datos1[1]);
-                            pst21.setString(3, datos1[4]);
-                            pst21.setString(4, datos1[3]);
-                            pst21.setString(5, datos1[7]);
+                                n = pst21.executeUpdate();
 
-                            n = pst21.executeUpdate();
-                        }
-                    }
-                }else{
-                    String datos[] = new String[15];
-                    int cont = 1;
-                    while(rs.next()){
-                        datos[0] = rs.getString("Id");
-                        datos[1] = rs.getString("Descripcion");
-                        datos[2] = rs.getString("Codigo");
-                        datos[3] = rs.getString("UM");
-                        datos[4] = rs.getString("Cantidad");
-                        datos[5] = rs.getString("Precio");
-                        datos[7] = rs.getString("Proveedor");
-                        datos[8] = rs.getString("TE");
-                        datos[10] = rs.getString("cantidadStock");
-                        datos[9] = String.valueOf(cont);
-                        cont++;
-                        datos[13] = rs.getString("OC");
-                        if((datos[13]) == null){
-                            miModelo.addRow(datos);
-                        }
-                        Statement st20 = con.createStatement();
-                        String sql20 = "select * from inventario where NumeroDeParte like '"+datos[2]+"'";
-                        ResultSet rs20 = st20.executeQuery(sql20);
-                        String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst21 = con.prepareStatement(sql21);
-
-                        String d[] = new String[10];
-                        while(rs20.next()){
-                            d[0] = rs20.getString("NumeroDeParte");
-                        }
-                        if(d[0] == null){
-                            pst21.setString(1, datos[2]);
-                            pst21.setString(2, datos[1]);
-                            pst21.setString(3, datos[4]);
-                            pst21.setString(4, datos[3]);
-                            pst21.setString(5, datos[7]);
-
-                            n = pst21.executeUpdate();
-
-                            if(n > 0){
-                                JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
+                                if (n > 0) {
+                                    JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
+                                }
                             }
                         }
                     }
-                }
-                if(n > 0){
-                    JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
-                }
+                    if (n > 0) {
+                        JOptionPane.showMessageDialog(this, "SE AGREGARON ARTICULOS A LA BASE DE DATOS");
+                    }
 
                     DecimalFormatSymbols separador = new DecimalFormatSymbols();
                     separador.setDecimalSeparator('.');
-                    DecimalFormat formato = new DecimalFormat("#.##",separador);
+                    DecimalFormat formato = new DecimalFormat("#.##", separador);
                     reducirCantidad();
-                for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                    for (int i = 0; i < Tabla2.getRowCount(); i++) {
 
-                    if(Tabla2.getValueAt(i, 5) != null ){
-                        if(Tabla2.getValueAt(i, 5).toString().equals("")){
-                        }else{
-                            double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
-                            double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
-                            double total = precio * cantidad;
-                            Tabla2.setValueAt(formato.format(total), i, 6);
+                        if (Tabla2.getValueAt(i, 5) != null) {
+                            if (Tabla2.getValueAt(i, 5).toString().equals("")) {
+                            } else {
+                                double precio = Double.parseDouble(Tabla2.getValueAt(i, 5).toString());
+                                double cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                                double total = precio * cantidad;
+                                Tabla2.setValueAt(formato.format(total), i, 6);
+                            }
                         }
                     }
-                }
-                if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("APROBADO") || 
-                        Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("COMPRADO")
-                         || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("LLEGO, INCOMPETO")){
-                    CrearOrden.setEnabled(true);
-                }
+                    if (Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("APROBADO")
+                            || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("COMPRADO")
+                            || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("LLEGO, INCOMPETO")) {
+                        CrearOrden.setEnabled(true);
+                    }
                 }
             }
-            
+
             verGastos();
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void guardarListaImportada(){
-        try{
+
+    public void guardarListaImportada() {
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            int tab = Tabla1.getRowCount () - cont;
-            if(cont > 0){
-                tab = Tabla1.getRowCount() - cont -1;
+            int tab = Tabla1.getRowCount() - cont;
+            if (cont > 0) {
+                tab = Tabla1.getRowCount() - cont - 1;
             }
-            if(Tabla1.getSelectedRow() > tab){
+            if (Tabla1.getSelectedRow() > tab) {
                 //PARTES EDITADAS PARTE DE ABAJO
                 for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                if(Tabla2.getValueAt(i, 0) == null || Tabla2.getValueAt(i, 0).toString().equals("")){
-                    String sql3 = "select * from Inventario where NumeroDeParte like '"+Tabla2.getValueAt(i, 2).toString()+"'";
-                    Statement st = con.createStatement();
-                    ResultSet rs = st.executeQuery(sql3);
-                    String np = "";
-                    int n = 0;
-                    while(rs.next()){
-                        np = rs.getString("NumeroDeParte");
-                    }
-                    if(np == null){
-                        String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst = con.prepareStatement(inse);
-                        pst.setString(1, Tabla2.getValueAt(i, 2).toString());
-                        pst.setString(2, Tabla2.getValueAt(i, 1).toString());
-                        pst.setString(3, Tabla2.getValueAt(i, 4).toString());
-                        pst.setString(4, Tabla2.getValueAt(i, 3).toString());
-                        pst.setString(5, Tabla2.getValueAt(i, 7).toString());
-                        
-                        n = pst.executeUpdate();
-                        if(n > 0){
-                            JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
+                    if (Tabla2.getValueAt(i, 0) == null || Tabla2.getValueAt(i, 0).toString().equals("")) {
+                        String sql3 = "select * from Inventario where NumeroDeParte like '" + Tabla2.getValueAt(i, 2).toString() + "'";
+                        Statement st = con.createStatement();
+                        ResultSet rs = st.executeQuery(sql3);
+                        String np = "";
+                        int n = 0;
+                        while (rs.next()) {
+                            np = rs.getString("NumeroDeParte");
                         }
-                        
-                    } else if(np.equals("")){
-                        String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst = con.prepareStatement(inse);
-                        pst.setString(1, Tabla2.getValueAt(i, 2).toString());
-                        pst.setString(2, Tabla2.getValueAt(i, 1).toString());
-                        pst.setString(3, Tabla2.getValueAt(i, 4).toString());
-                        pst.setString(4, Tabla2.getValueAt(i, 3).toString());
-                        pst.setString(5, Tabla2.getValueAt(i, 7).toString());
-                        
-                        n = pst.executeUpdate();
-                        
-                        if(n > 0){
-                            JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
+                        if (np == null) {
+                            String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst = con.prepareStatement(inse);
+                            pst.setString(1, Tabla2.getValueAt(i, 2).toString());
+                            pst.setString(2, Tabla2.getValueAt(i, 1).toString());
+                            pst.setString(3, Tabla2.getValueAt(i, 4).toString());
+                            pst.setString(4, Tabla2.getValueAt(i, 3).toString());
+                            pst.setString(5, Tabla2.getValueAt(i, 7).toString());
+
+                            n = pst.executeUpdate();
+                            if (n > 0) {
+                                JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
+                            }
+
+                        } else if (np.equals("")) {
+                            String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst = con.prepareStatement(inse);
+                            pst.setString(1, Tabla2.getValueAt(i, 2).toString());
+                            pst.setString(2, Tabla2.getValueAt(i, 1).toString());
+                            pst.setString(3, Tabla2.getValueAt(i, 4).toString());
+                            pst.setString(4, Tabla2.getValueAt(i, 3).toString());
+                            pst.setString(5, Tabla2.getValueAt(i, 7).toString());
+
+                            n = pst.executeUpdate();
+
+                            if (n > 0) {
+                                JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
+                            }
                         }
-                    }
-                
-                    String bus = "select * from requisiciones where Id like '"+Tabla2.getValueAt(0, 0).toString()+"'";
-                    Statement st2 = con.createStatement();
-                    ResultSet rs2 = st2.executeQuery(bus);
-                    String dat[] = new String[10];
-                    while(rs2.next()){
-                        dat[0] = rs2.getString("NumRequisicion");
-                        dat[1] = rs2.getString("Proyecto");
-                        dat[2] = rs2.getString("Requisitor");
-                        dat[3] = rs2.getString("OC");
-                    }
-                    String req = "insert into requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,Requisitor,UM,Proveedor,TE,Estado,OC) values (?,?,?,?,?,?,?,?,?,?,?)";
-                    PreparedStatement pst2 = con.prepareStatement(req);
-                    pst2.setString(1, dat[0]);
-                    pst2.setString(2, Tabla2.getValueAt(i, 2).toString());
-                    pst2.setString(3, Tabla2.getValueAt(i, 1).toString());
-                    pst2.setString(4, dat[1]);
-                    pst2.setString(5, Tabla2.getValueAt(i, 4).toString());
-                    pst2.setString(6, dat[2]);
-                    pst2.setString(7, Tabla2.getValueAt(i, 3).toString());
-                    pst2.setString(8, Tabla2.getValueAt(i, 7).toString());
-                    
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+                        String bus = "select * from requisiciones where Id like '" + Tabla2.getValueAt(0, 0).toString() + "'";
+                        Statement st2 = con.createStatement();
+                        ResultSet rs2 = st2.executeQuery(bus);
+                        String dat[] = new String[10];
+                        while (rs2.next()) {
+                            dat[0] = rs2.getString("NumRequisicion");
+                            dat[1] = rs2.getString("Proyecto");
+                            dat[2] = rs2.getString("Requisitor");
+                            dat[3] = rs2.getString("OC");
+                        }
+                        String req = "insert into requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,Requisitor,UM,Proveedor,TE,Estado,OC) values (?,?,?,?,?,?,?,?,?,?,?)";
+                        PreparedStatement pst2 = con.prepareStatement(req);
+                        pst2.setString(1, dat[0]);
+                        pst2.setString(2, Tabla2.getValueAt(i, 2).toString());
+                        pst2.setString(3, Tabla2.getValueAt(i, 1).toString());
+                        pst2.setString(4, dat[1]);
+                        pst2.setString(5, Tabla2.getValueAt(i, 4).toString());
+                        pst2.setString(6, dat[2]);
+                        pst2.setString(7, Tabla2.getValueAt(i, 3).toString());
+                        pst2.setString(8, Tabla2.getValueAt(i, 7).toString());
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         Date fec = null;
                         String TE;
-                        if(Tabla2.getValueAt(i, 8) == null){
+                        if (Tabla2.getValueAt(i, 8) == null) {
                             TE = "";
-                        }else{
+                        } else {
                             TE = Tabla2.getValueAt(i, 8).toString();
                         }
                         try {
@@ -723,189 +725,195 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         } catch (ParseException ex) {
                             Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        if(fec == null){
+                        if (fec == null) {
                             pst2.setDate(9, null);
-                        }else{
-                        java.sql.Date data = new java.sql.Date(fec.getTime());
+                        } else {
+                            java.sql.Date data = new java.sql.Date(fec.getTime());
                             pst2.setDate(9, data);
                         }
                         pst2.setString(10, "EDITADO");
                         pst2.setString(11, dat[3]);
-                    int n1 = pst2.executeUpdate();
+                        int n1 = pst2.executeUpdate();
 
-                    if(n > 0 && n1 > 0){
-                        JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
+                        if (n > 0 && n1 > 0) {
+                            JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
+                        }
                     }
                 }
-            }
-            String sql = "update requisiciones set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            String sql2 = "update inventario set Descripcion = ?, UM = ?,Proveedor = ? where NumeroDeParte = ?";
-            PreparedStatement pst2 = con.prepareStatement(sql2);
-            int n = 0, n2 = 0;
-            for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                String UM,Precio,Proveedor,TE;
-                double cantStock,cantidad;
-                try{cantStock = Double.parseDouble(Tabla2.getValueAt(i, 10).toString());}catch(Exception e){cantStock = 0;}
-                try{cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());}catch(Exception e){cantidad = 0;}
-                
-                if(Tabla2.getValueAt(i, 3) == null){
-                    UM = "";
-                }else{
-                    UM = Tabla2.getValueAt(i, 3).toString();
+                String sql = "update requisiciones set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
+                PreparedStatement pst = con.prepareStatement(sql);
+                String sql2 = "update inventario set Descripcion = ?, UM = ?,Proveedor = ? where NumeroDeParte = ?";
+                PreparedStatement pst2 = con.prepareStatement(sql2);
+                int n = 0, n2 = 0;
+                for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                    String UM, Precio, Proveedor, TE;
+                    double cantStock, cantidad;
+                    try {
+                        cantStock = Double.parseDouble(Tabla2.getValueAt(i, 10).toString());
+                    } catch (Exception e) {
+                        cantStock = 0;
+                    }
+                    try {
+                        cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                    } catch (Exception e) {
+                        cantidad = 0;
+                    }
+
+                    if (Tabla2.getValueAt(i, 3) == null) {
+                        UM = "";
+                    } else {
+                        UM = Tabla2.getValueAt(i, 3).toString();
+                    }
+
+                    if (Tabla2.getValueAt(i, 5) == null) {
+                        Precio = "";
+                    } else {
+                        Precio = Tabla2.getValueAt(i, 5).toString();
+                    }
+
+                    if (Tabla2.getValueAt(i, 7) == null) {
+                        Proveedor = "";
+                    } else {
+                        Proveedor = Tabla2.getValueAt(i, 7).toString();
+                    }
+
+                    if (Tabla2.getValueAt(i, 8) == null) {
+                        TE = "";
+                    } else {
+                        TE = Tabla2.getValueAt(i, 8).toString();
+                    }
+
+                    if (search == true) {
+
+                        String sql4 = "select * from requisiciones where OC like '" + lblRequi.getText() + "'";
+                        Statement st4 = con.createStatement();
+                        ResultSet rs4 = st4.executeQuery(sql4);
+
+                        String sql5 = "update requisicionesmuestra set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
+                        PreparedStatement pst5 = con.prepareStatement(sql5);
+
+                        pst5.setString(1, Tabla2.getValueAt(i, 1).toString());
+                        pst5.setString(2, Tabla2.getValueAt(i, 2).toString());
+                        pst5.setString(3, UM);
+                        pst5.setString(4, String.valueOf(cantidad + cantStock));
+                        pst5.setString(5, Precio);
+                        pst5.setString(6, Proveedor);
+                        pst5.setString(7, TE);
+                        pst5.setString(8, Tabla2.getValueAt(i, 0).toString());
+
+                        pst5.executeUpdate();
+                        String idd = "";
+                        String num = "";
+                        int cont = 0;
+                        while (rs4.next()) {
+                            idd = rs4.getString("Id");
+                            num = rs4.getString("Codigo");
+
+                            if (num.equals(Tabla2.getValueAt(i, 2).toString())) {
+                                pst.setString(1, Tabla2.getValueAt(i, 1).toString());
+                                pst.setString(2, Tabla2.getValueAt(i, 2).toString());
+                                pst.setString(3, UM);
+                                pst.setString(4, String.valueOf(cantidad + cantStock));
+                                pst.setString(5, Precio);
+                                pst.setString(6, Proveedor);
+                                pst.setString(7, TE);
+                                pst.setString(8, idd);
+
+                                n = pst.executeUpdate();
+
+                                pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
+                                pst2.setString(2, UM);
+                                pst2.setString(3, Proveedor);
+                                pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
+
+                                n2 = pst2.executeUpdate();
+                            }
+
+                        }
+                    } else {
+                        pst.setString(1, Tabla2.getValueAt(i, 1).toString());
+                        pst.setString(2, Tabla2.getValueAt(i, 2).toString());
+                        pst.setString(3, UM);
+                        pst.setString(4, String.valueOf(cantidad + cantStock));
+                        pst.setString(5, Precio);
+                        pst.setString(6, Proveedor);
+                        pst.setString(7, TE);
+                        pst.setString(8, Tabla2.getValueAt(i, 0).toString());
+
+                        n = pst.executeUpdate();
+
+                        pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
+                        pst2.setString(2, UM);
+                        pst2.setString(3, Proveedor);
+                        pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
+
+                        n2 = pst2.executeUpdate();
+                    }
+
+                    if (n == 0) {
+                        JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN REQUISICIONES EN LA FILA NO. " + i);
+                    }
+                    if (n2 == 0) {
+                        JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN INVENTARIO EN LA FILA NO. " + i);
+                    }
                 }
-                
-                if(Tabla2.getValueAt(i, 5) == null){
-                    Precio = "";
-                }else{
-                    Precio = Tabla2.getValueAt(i, 5).toString();
+                if (lblRequi.getText().contains("-")) {
+                    Stack<String> pila = getLista();
+                    for (int i = 0; i < pila.size(); i++) {
+                        importarLista(pila.get(i));
+                    }
+                } else {
+                    importarLista(lblRequi.getText());
                 }
-                
-                if(Tabla2.getValueAt(i, 7) == null){
-                    Proveedor = "";
-                }else{
-                    Proveedor = Tabla2.getValueAt(i, 7).toString();
-                }
-                
-                if(Tabla2.getValueAt(i, 8) == null){
-                    TE = "";
-                }else{
-                    TE = Tabla2.getValueAt(i, 8).toString();
-                }
-                
-                
-                if(search == true){
-                    
-                    String sql4 = "select * from requisiciones where OC like '"+lblRequi.getText()+"'";
-                    Statement st4 = con.createStatement();
-                    ResultSet rs4 = st4.executeQuery(sql4);
-                    
-                    String sql5 = "update requisicionesmuestra set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
-                    PreparedStatement pst5 = con.prepareStatement(sql5);
-                    
-                            pst5.setString(1, Tabla2.getValueAt(i, 1).toString());
-                            pst5.setString(2, Tabla2.getValueAt(i, 2).toString());
-                            pst5.setString(3, UM);
-                            pst5.setString(4, String.valueOf(cantidad + cantStock));
-                            pst5.setString(5, Precio);
-                            pst5.setString(6, Proveedor);
-                            pst5.setString(7, TE);
-                            pst5.setString(8, Tabla2.getValueAt(i, 0).toString());
-                    
-                            pst5.executeUpdate();
-                    String idd = "";
-                    String num = "";
-                    int cont = 0;
-                    while(rs4.next()){ 
-                        idd = rs4.getString("Id");
-                        num = rs4.getString("Codigo");
-                        
-                        if(num.equals(Tabla2.getValueAt(i, 2).toString())){
-                            pst.setString(1, Tabla2.getValueAt(i, 1).toString());
-                            pst.setString(2, Tabla2.getValueAt(i, 2).toString());
-                            pst.setString(3, UM);
-                            pst.setString(4, String.valueOf(cantidad + cantStock));
-                            pst.setString(5, Precio);
-                            pst.setString(6, Proveedor);
-                            pst.setString(7, TE);
-                            pst.setString(8, idd);
+            } else if (tab == 0) {
+                //PARTE DEL MEDIO
+            } else {
+                //-------------------------
+                //-------------------------
+                for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                    //PARTE DE LAS REQUISICIONES PARTE DE ARRIBA
+                    if (Tabla2.getValueAt(i, 0).equals("")) {
+                        String sql3 = "select * from Inventario where NumeroDeParte like '" + Tabla2.getValueAt(i, 2).toString() + "'";
+                        Statement st = con.createStatement();
+                        ResultSet rs = st.executeQuery(sql3);
+                        String np = "";
+                        int n = 0;
+                        while (rs.next()) {
+                            np = rs.getString("NumeroDeParte");
+                        }
+                        if (np == null) {
+                            String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst = con.prepareStatement(inse);
+                            pst.setString(1, Tabla2.getValueAt(i, 2).toString());
+                            pst.setString(2, Tabla2.getValueAt(i, 1).toString());
+                            pst.setString(3, "0");
+                            pst.setString(4, Tabla2.getValueAt(i, 3).toString());
+                            pst.setString(5, Tabla2.getValueAt(i, 7).toString());
 
                             n = pst.executeUpdate();
 
-                            pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
-                            pst2.setString(2, UM);
-                            pst2.setString(3, Proveedor);
-                            pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
+                        } else if (np.equals("")) {
+                            String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
+                            PreparedStatement pst = con.prepareStatement(inse);
+                            pst.setString(1, Tabla2.getValueAt(i, 2).toString());
+                            pst.setString(2, Tabla2.getValueAt(i, 1).toString());
+                            pst.setString(3, "0");
+                            pst.setString(4, Tabla2.getValueAt(i, 3).toString());
+                            pst.setString(5, Tabla2.getValueAt(i, 7).toString());
 
-                            n2 = pst2.executeUpdate();
+                            n = pst.executeUpdate();
+
                         }
-                        
-                        
-                    }
-                }else{
-                pst.setString(1, Tabla2.getValueAt(i, 1).toString());
-                pst.setString(2, Tabla2.getValueAt(i, 2).toString());
-                pst.setString(3, UM);
-                pst.setString(4, String.valueOf(cantidad + cantStock));
-                pst.setString(5, Precio);
-                pst.setString(6, Proveedor);
-                pst.setString(7, TE);
-                pst.setString(8, Tabla2.getValueAt(i, 0).toString());
-                
-                n = pst.executeUpdate();
-                
-                pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
-                pst2.setString(2, UM);
-                pst2.setString(3, Proveedor);
-                pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
-                
-                n2 = pst2.executeUpdate();
-                }
-                
-                if(n == 0){
-                    JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN REQUISICIONES EN LA FILA NO. "+i);
-                }
-                if(n2 == 0){
-                    JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN INVENTARIO EN LA FILA NO. "+i);
-                }
-            }
-            if(lblRequi.getText().contains("-")){
-                Stack<String> pila = getLista();
-                for (int i = 0; i < pila.size(); i++) {
-                    importarLista(pila.get(i));
-                }
-            }else{
-                importarLista(lblRequi.getText());
-            }
-            }else if(tab == 0){
-                //PARTE DEL MEDIO
-            }else{
-                //-------------------------
-                //-------------------------
-            for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                //PARTE DE LAS REQUISICIONES PARTE DE ARRIBA
-                if(Tabla2.getValueAt(i, 0).equals("")){
-                    String sql3 = "select * from Inventario where NumeroDeParte like '"+Tabla2.getValueAt(i, 2).toString()+"'";
-                    Statement st = con.createStatement();
-                    ResultSet rs = st.executeQuery(sql3);
-                    String np = "";
-                    int n = 0;
-                    while(rs.next()){
-                        np = rs.getString("NumeroDeParte");
-                    }
-                    if(np == null){
-                        String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst = con.prepareStatement(inse);
-                        pst.setString(1, Tabla2.getValueAt(i, 2).toString());
-                        pst.setString(2, Tabla2.getValueAt(i, 1).toString());
-                        pst.setString(3, "0");
-                        pst.setString(4, Tabla2.getValueAt(i, 3).toString());
-                        pst.setString(5, Tabla2.getValueAt(i, 7).toString());
-                        
-                        n = pst.executeUpdate();
-                        
-                    } else if(np.equals("")){
-                        String inse = "insert into inventario (NumeroDeParte,Descripcion,Cantidad,UM,Proveedor) values(?,?,?,?,?)";
-                        PreparedStatement pst = con.prepareStatement(inse);
-                        pst.setString(1, Tabla2.getValueAt(i, 2).toString());
-                        pst.setString(2, Tabla2.getValueAt(i, 1).toString());
-                        pst.setString(3, "0");
-                        pst.setString(4, Tabla2.getValueAt(i, 3).toString());
-                        pst.setString(5, Tabla2.getValueAt(i, 7).toString());
-                        
-                        n = pst.executeUpdate();
-                        
-                    }
-                
-                    String bus = "select * from requisiciones where Id like '"+Tabla2.getValueAt(0, 0)+"'";
+
+                        String bus = "select * from requisiciones where Id like '" + Tabla2.getValueAt(0, 0) + "'";
                         Statement st2 = con.createStatement();
                         ResultSet rs2 = st2.executeQuery(bus);
                         String dat[] = new String[10];
-                        while(rs2.next()){
+                        while (rs2.next()) {
                             dat[0] = rs2.getString("NumRequisicion");
                             dat[1] = rs2.getString("Proyecto");
                             dat[2] = rs2.getString("Requisitor");
-                    }
+                        }
                         String req = "insert into requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,Requisitor,UM,Proveedor,TE) values (?,?,?,?,?,?,?,?,?)";
                         PreparedStatement pst2 = con.prepareStatement(req);
                         pst2.setString(1, dat[0]);
@@ -917,221 +925,227 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         pst2.setString(7, Tabla2.getValueAt(i, 3).toString());
                         pst2.setString(8, Tabla2.getValueAt(i, 7).toString());
                         String TE = "";
-                        if(Tabla2.getValueAt(i, 8) != null){
+                        if (Tabla2.getValueAt(i, 8) != null) {
                             TE = Tabla2.getValueAt(i, 8).toString();
                         }
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                         Date fec = null;
-                            if(TE.equals("")){
-                        pst2.setDate(9, null);
-                        }else{
-                        try {
-                        fec = sdf.parse(TE);
-                        } catch (ParseException ex) {
-                        fec = null;
-                        }
-                        if(fec == null){
-                        pst2.setDate(9, null);
-                        }else{
-                        java.sql.Date data = new java.sql.Date(fec.getTime());
-                        pst2.setDate(9, data);
-                        }
+                        if (TE.equals("")) {
+                            pst2.setDate(9, null);
+                        } else {
+                            try {
+                                fec = sdf.parse(TE);
+                            } catch (ParseException ex) {
+                                fec = null;
+                            }
+                            if (fec == null) {
+                                pst2.setDate(9, null);
+                            } else {
+                                java.sql.Date data = new java.sql.Date(fec.getTime());
+                                pst2.setDate(9, data);
+                            }
                         }
                         int n1 = pst2.executeUpdate();
-                        
-                        if(n > 0 && n1 > 0){
+
+                        if (n > 0 && n1 > 0) {
                             JOptionPane.showMessageDialog(this, "SE AGREGARON NUEVAS PARTIDAS");
                         }
+                    }
                 }
-                }
-            String sql = "update requisiciones set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
-            PreparedStatement pst = con.prepareStatement(sql);
-            String sql2 = "update inventario set Descripcion = ?, UM = ?,Proveedor = ? where NumeroDeParte = ?";
-            PreparedStatement pst2 = con.prepareStatement(sql2);
-            int n = 0, n2 = 0;
-            
-            for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                String UM,Precio,Proveedor, TE;
-                double cantidad, canSt;
-                try{canSt = Double.parseDouble(Tabla2.getValueAt(i, 10).toString());}catch(Exception e){canSt = 0;}
-                try{cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());}catch(Exception e){cantidad = 0;}
-                
-                if(Tabla2.getValueAt(i, 3) == null){
-                    UM = "";
-                }else{
-                    UM = Tabla2.getValueAt(i, 3).toString();
-                }
-                
-                if(Tabla2.getValueAt(i, 5) == null){
-                    Precio = "";
-                }else{
-                    Precio = Tabla2.getValueAt(i, 5).toString();
-                }
-                
-                if(Tabla2.getValueAt(i, 7) == null){
-                    Proveedor = "";
-                }else{
-                    Proveedor = Tabla2.getValueAt(i, 7).toString();
-                }
-                
-                if(Tabla2.getValueAt(i, 8) == null){
-                    TE = "";
-                }else{
-                    TE = Tabla2.getValueAt(i, 8).toString();
-                }
-                //--------------------------------MUESTRA--------------------------------
-                if(search == true){
-                    
-                    String sql4 = "select Id,Codigo from requisicionesmuestra where Id like '"+Tabla2.getValueAt(i, 0).toString()+"'";
-                    Statement st4 = con.createStatement();
-                    ResultSet rs4 = st4.executeQuery(sql4);
-                    
-                    String sql5 = "update requisicionesmuestra set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
-                    PreparedStatement pst5 = con.prepareStatement(sql5);
-                    
-                            pst5.setString(1, Tabla2.getValueAt(i, 1).toString());
-                            pst5.setString(2, Tabla2.getValueAt(i, 2).toString());
-                            pst5.setString(3, UM);
-                            pst5.setString(4, String.valueOf(cantidad + canSt));
-                            pst5.setString(5, Precio);
-                            pst5.setString(6, Proveedor);
-                            
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            if(TE.equals("")){
+                String sql = "update requisiciones set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
+                PreparedStatement pst = con.prepareStatement(sql);
+                String sql2 = "update inventario set Descripcion = ?, UM = ?,Proveedor = ? where NumeroDeParte = ?";
+                PreparedStatement pst2 = con.prepareStatement(sql2);
+                int n = 0, n2 = 0;
+
+                for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                    String UM, Precio, Proveedor, TE;
+                    double cantidad, canSt;
+                    try {
+                        canSt = Double.parseDouble(Tabla2.getValueAt(i, 10).toString());
+                    } catch (Exception e) {
+                        canSt = 0;
+                    }
+                    try {
+                        cantidad = Double.parseDouble(Tabla2.getValueAt(i, 4).toString());
+                    } catch (Exception e) {
+                        cantidad = 0;
+                    }
+
+                    if (Tabla2.getValueAt(i, 3) == null) {
+                        UM = "";
+                    } else {
+                        UM = Tabla2.getValueAt(i, 3).toString();
+                    }
+
+                    if (Tabla2.getValueAt(i, 5) == null) {
+                        Precio = "";
+                    } else {
+                        Precio = Tabla2.getValueAt(i, 5).toString();
+                    }
+
+                    if (Tabla2.getValueAt(i, 7) == null) {
+                        Proveedor = "";
+                    } else {
+                        Proveedor = Tabla2.getValueAt(i, 7).toString();
+                    }
+
+                    if (Tabla2.getValueAt(i, 8) == null) {
+                        TE = "";
+                    } else {
+                        TE = Tabla2.getValueAt(i, 8).toString();
+                    }
+                    //--------------------------------MUESTRA--------------------------------
+                    if (search == true) {
+
+                        String sql4 = "select Id,Codigo from requisicionesmuestra where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
+                        Statement st4 = con.createStatement();
+                        ResultSet rs4 = st4.executeQuery(sql4);
+
+                        String sql5 = "update requisicionesmuestra set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Id = ?";
+                        PreparedStatement pst5 = con.prepareStatement(sql5);
+
+                        pst5.setString(1, Tabla2.getValueAt(i, 1).toString());
+                        pst5.setString(2, Tabla2.getValueAt(i, 2).toString());
+                        pst5.setString(3, UM);
+                        pst5.setString(4, String.valueOf(cantidad + canSt));
+                        pst5.setString(5, Precio);
+                        pst5.setString(6, Proveedor);
+
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        if (TE.equals("")) {
                             pst5.setDate(7, null);
-                            }else{
+                        } else {
                             Date fec = null;
                             try {
-                            fec = sdf.parse(TE);
+                                fec = sdf.parse(TE);
                             } catch (ParseException ex) {
-                            fec = null;
+                                fec = null;
                             }
-                            if(fec == null){
-                            pst5.setDate(7, null);
-                            }else{
-                            java.sql.Date data = new java.sql.Date(fec.getTime());
-                            pst5.setDate(7, data);
+                            if (fec == null) {
+                                pst5.setDate(7, null);
+                            } else {
+                                java.sql.Date data = new java.sql.Date(fec.getTime());
+                                pst5.setDate(7, data);
                             }
-                            }
-                            
-                            pst5.setString(8, Tabla2.getValueAt(i, 0).toString());
-                    
-                            pst5.executeUpdate();
-                    String idd = "";
-                    String num = "";
-                    int cont = 0;
-                    sql = "update requisiciones set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Codigo = ?";
-                    pst = con.prepareStatement(sql);
-                    while(rs4.next()){ 
-//                        idd = rs4.getString("IdArticulo");
-                        num = rs4.getString("Codigo");
-                        if(num.equals(Tabla2.getValueAt(i, 2).toString())){
-                            pst.setString(1, Tabla2.getValueAt(i, 1).toString());
-                            pst.setString(2, Tabla2.getValueAt(i, 2).toString());
-                            pst.setString(3, UM);
-                            pst.setString(4, String.valueOf(cantidad + canSt));
-                            pst.setString(5, Precio);
-                            pst.setString(6, Proveedor);
-                            
-                            SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-                            Date fec1 = null;
-                            try {
-                                fec1 = sdf.parse(TE);
-                            } catch (ParseException ex) {
-                                fec1 = null;
-                            }
-                            if(fec1 == null){
-                                pst.setDate(7, null);
-                            }else{
-                            java.sql.Date data1 = new java.sql.Date(fec1.getTime());
-                                pst.setDate(7, data1);
-                            }
-                            pst.setString(8, num);
-
-                            n = pst.executeUpdate();
-
-                            pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
-                            pst2.setString(2, UM);
-                            pst2.setString(3, Proveedor);
-                            pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
-
-                            n2 = pst2.executeUpdate();
                         }
+
+                        pst5.setString(8, Tabla2.getValueAt(i, 0).toString());
+
+                        pst5.executeUpdate();
+                        String idd = "";
+                        String num = "";
+                        int cont = 0;
+                        sql = "update requisiciones set Descripcion = ?, Codigo = ?, UM = ?, Cantidad = ?, Precio = ?,Proveedor = ?, TE = ? where Codigo = ?";
+                        pst = con.prepareStatement(sql);
+                        while (rs4.next()) {
+//                        idd = rs4.getString("IdArticulo");
+                            num = rs4.getString("Codigo");
+                            if (num.equals(Tabla2.getValueAt(i, 2).toString())) {
+                                pst.setString(1, Tabla2.getValueAt(i, 1).toString());
+                                pst.setString(2, Tabla2.getValueAt(i, 2).toString());
+                                pst.setString(3, UM);
+                                pst.setString(4, String.valueOf(cantidad + canSt));
+                                pst.setString(5, Precio);
+                                pst.setString(6, Proveedor);
+
+                                SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
+                                Date fec1 = null;
+                                try {
+                                    fec1 = sdf.parse(TE);
+                                } catch (ParseException ex) {
+                                    fec1 = null;
+                                }
+                                if (fec1 == null) {
+                                    pst.setDate(7, null);
+                                } else {
+                                    java.sql.Date data1 = new java.sql.Date(fec1.getTime());
+                                    pst.setDate(7, data1);
+                                }
+                                pst.setString(8, num);
+
+                                n = pst.executeUpdate();
+
+                                pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
+                                pst2.setString(2, UM);
+                                pst2.setString(3, Proveedor);
+                                pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
+
+                                n2 = pst2.executeUpdate();
+                            }
+                        }
+                    } else //-------------------------------------------------------------------------------------
+                    {
+                        pst.setString(1, Tabla2.getValueAt(i, 1).toString());
+                        pst.setString(2, Tabla2.getValueAt(i, 2).toString());
+                        pst.setString(3, UM);
+                        pst.setString(4, String.valueOf(cantidad + canSt));
+                        pst.setString(5, Precio);
+                        pst.setString(6, Proveedor);
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+                        if (TE.equals("")) {
+                            pst.setDate(7, null);
+                        } else {
+                            Date fec = null;
+                            try {
+                                fec = sdf.parse(TE);
+                            } catch (ParseException ex) {
+                                fec = null;
+                            }
+                            if (fec == null) {
+                                pst.setDate(7, null);
+                            } else {
+                                java.sql.Date data = new java.sql.Date(fec.getTime());
+                                pst.setDate(7, data);
+                            }
+
+                        }
+                        pst.setString(8, Tabla2.getValueAt(i, 0).toString());
+                        n = pst.executeUpdate();
+
+                        pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
+                        pst2.setString(2, UM);
+                        pst2.setString(3, Proveedor);
+                        pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
+
+                        n2 = pst2.executeUpdate();
                     }
-                }else
-                //-------------------------------------------------------------------------------------
-                {
-                pst.setString(1, Tabla2.getValueAt(i, 1).toString());
-                pst.setString(2, Tabla2.getValueAt(i, 2).toString());
-                pst.setString(3, UM);
-                pst.setString(4, String.valueOf(cantidad + canSt));
-                pst.setString(5, Precio);
-                pst.setString(6, Proveedor);
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                
-                if(TE.equals("")){
-                pst.setDate(7, null);
-                }else{
-                Date fec = null;
-                try {
-                fec = sdf.parse(TE);
-                } catch (ParseException ex) {
-                fec = null;
+
+                    if (n == 0) {
+                        JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN REQUISICIONES EN LA FILA NO. " + (i + 1));
+                    }
+                    if (n2 == 0) {
+                        JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN INVENTARIO EN LA FILA NO. " + (i + 1));
+                    }
                 }
-                if(fec == null){
-                pst.setDate(7, null);
-                }else{
-                java.sql.Date data = new java.sql.Date(fec.getTime());
-                pst.setDate(7, data);
-                }
-                
-                }
-                pst.setString(8, Tabla2.getValueAt(i, 0).toString());
-                n = pst.executeUpdate();
-                
-                pst2.setString(1, Tabla2.getValueAt(i, 1).toString());
-                pst2.setString(2, UM);
-                pst2.setString(3, Proveedor);
-                pst2.setString(4, Tabla2.getValueAt(i, 2).toString());
-                
-                n2 = pst2.executeUpdate();
-                }
-                
-                if(n == 0){
-                    JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN REQUISICIONES EN LA FILA NO. "+(i+1));
-                }
-                if(n2 == 0){
-                    JOptionPane.showMessageDialog(this, "NO SE PUDO GUARDAR EN INVENTARIO EN LA FILA NO. "+(i+1));
+
+                if (lblRequi.getText().contains("-")) {
+                    Stack<String> pila = getLista();
+                    for (int i = 0; i < pila.size(); i++) {
+                        importarLista(pila.get(i));
+                    }
+                } else {
+                    importarLista(lblRequi.getText());
                 }
             }
-            
-            
-            if(lblRequi.getText().contains("-")){
-                Stack<String> pila = getLista();
-                for (int i = 0; i < pila.size(); i++) {
-                    importarLista(pila.get(i));
-                }
-            }else{
-                importarLista(lblRequi.getText());
-            }
-        }
-        }catch(SQLException e){
-         JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-         Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
-    public void Exportar(){
+
+    public void Exportar() {
         Workbook book;
-        String mensaje="Error en la Exportacion";
-        String nombreArchivo = "\\\\192.168.100.40\\bd\\OC\\Requisicion_de_Compra\\Requisicion_de_Compra_"+id+".xlsx";
-        int NumeroFila=Tabla2.getRowCount(),NumeroColumna=Tabla2.getColumnCount();
-        if(nombreArchivo.endsWith("xls")){
-            book=new HSSFWorkbook();
-        }else{
-            book=new XSSFWorkbook();
+        String mensaje = "Error en la Exportacion";
+        String nombreArchivo = "\\\\192.168.100.40\\bd\\OC\\Requisicion_de_Compra\\Requisicion_de_Compra_" + id + ".xlsx";
+        int NumeroFila = Tabla2.getRowCount(), NumeroColumna = Tabla2.getColumnCount();
+        if (nombreArchivo.endsWith("xls")) {
+            book = new HSSFWorkbook();
+        } else {
+            book = new XSSFWorkbook();
         }
-        
+
         Sheet hoja = book.createSheet("Requisicion de compra");
         Row row = hoja.createRow(4);
         Cell cell = row.createCell(1);
@@ -1139,240 +1153,236 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         Cell columna = shuma.createCell(1);
         CellStyle estilo = book.createCellStyle();
         CellStyle style = book.createCellStyle();
-        
+
         hoja.setColumnWidth(1, 6200);
         hoja.setColumnWidth(2, 4200);
-        hoja.setColumnWidth(3, 3200); 
-        hoja.setColumnWidth(4, 8200); 
-        hoja.setColumnWidth(5, 6200); 
+        hoja.setColumnWidth(3, 3200);
+        hoja.setColumnWidth(4, 8200);
+        hoja.setColumnWidth(5, 6200);
         hoja.setColumnWidth(6, 6200);
         hoja.setColumnWidth(7, 5200);
-        
+
         Font font = book.createFont();
         font.setBold(true);
         font.setColor(IndexedColors.WHITE.getIndex());
-        font.setFontHeightInPoints((short)12);
+        font.setFontHeightInPoints((short) 12);
         estilo.setFont(font);
-        
+
         Font font1 = book.createFont();
         font1.setBold(true);
         font1.setColor(IndexedColors.BLACK.getIndex());
-        font1.setFontHeightInPoints((short)14);
+        font1.setFontHeightInPoints((short) 14);
         style.setFont(font1);
-        
+
         style.setFillBackgroundColor(IndexedColors.WHITE.getIndex());
         style.setFillForegroundColor(IndexedColors.WHITE.getIndex());
         style.setFillPattern(SOLID_FOREGROUND);
         style.setVerticalAlignment(VerticalAlignment.BOTTOM);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setWrapText(true);
-        
+
         estilo.setFillBackgroundColor(IndexedColors.WHITE.getIndex());
         estilo.setFillForegroundColor(IndexedColors.GREY_80_PERCENT.getIndex());
         estilo.setFillPattern(SOLID_FOREGROUND);
         estilo.setVerticalAlignment(VerticalAlignment.CENTER);
         estilo.setAlignment(HorizontalAlignment.CENTER);
-        
+
         columna.setCellValue("SERVICIOS INDUSTRIALES 3I S DE RL MI");
         cell.setCellValue("REQUISICION DE COMPRA");
         cell.setCellStyle(estilo);
         columna.setCellStyle(style);
-        
-        hoja.addMergedRegion(new CellRangeAddress (
-        0,
-        3,
-        1,
-        7
+
+        hoja.addMergedRegion(new CellRangeAddress(
+                0,
+                3,
+                1,
+                7
         ));
         hoja.addMergedRegion(new CellRangeAddress(
-        4,
-        4,
-        1,
-        7
+                4,
+                4,
+                1,
+                7
         ));
-        
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
         properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
         properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
         properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-        
+
         properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
         properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
         properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());  
-        
-        try{
-        InputStream is = new FileInputStream("C:/Pruebas/BD/3i.png");
-        byte[] bytes = IOUtils.toByteArray(is);
-        int pictureIdx = book.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
-        is.close();
-        CreationHelper helper = book.getCreationHelper();
-        Drawing drawing = hoja.createDrawingPatriarch();
-        ClientAnchor anchor = helper.createClientAnchor();
-        anchor.setCol1(1);
-        anchor.setCol2(3);
-        anchor.setRow1(0);
-        anchor.setRow2(3);
-        Picture pict = drawing.createPicture(anchor, pictureIdx);
-        pict.resize();
-        }catch(FileNotFoundException e){
-        JOptionPane.showMessageDialog(this, e);
+        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+
+        try {
+            InputStream is = new FileInputStream("C:/Pruebas/BD/3i.png");
+            byte[] bytes = IOUtils.toByteArray(is);
+            int pictureIdx = book.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
+            is.close();
+            CreationHelper helper = book.getCreationHelper();
+            Drawing drawing = hoja.createDrawingPatriarch();
+            ClientAnchor anchor = helper.createClientAnchor();
+            anchor.setCol1(1);
+            anchor.setCol2(3);
+            anchor.setRow1(0);
+            anchor.setRow2(3);
+            Picture pict = drawing.createPicture(anchor, pictureIdx);
+            pict.resize();
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, e);
         } catch (IOException ex) {
             Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, ex);
         }
         try {
             for (int i = -1; i < NumeroFila; i++) {
-                Row fila=hoja.createRow(i+6);
-                for (int j = 0; j <NumeroColumna; j++) {
-                    Cell celda=fila.createCell(j+1);
-                    if(i == -1 && (j >= 0 && j <=6)){
+                Row fila = hoja.createRow(i + 6);
+                for (int j = 0; j < NumeroColumna; j++) {
+                    Cell celda = fila.createCell(j + 1);
+                    if (i == -1 && (j >= 0 && j <= 6)) {
                         CellStyle s = book.createCellStyle();
                         Font f = book.createFont();
                         f.setBold(true);
                         s.setFont(f);
                         celda.setCellStyle(s);
                     }
-                    if(i > -1 && (j > -1 && j <= 6) && (i%2 == 0)){
+                    if (i > -1 && (j > -1 && j <= 6) && (i % 2 == 0)) {
                         CellStyle s = book.createCellStyle();
                         s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
                         s.setFillPattern(SOLID_FOREGROUND);
                         celda.setCellStyle(s);
                     }
-                    
-                    if(i==-1){
+
+                    if (i == -1) {
                         celda.setCellValue(String.valueOf(Tabla2.getColumnName(j)));
                         CellUtil.setCellStyleProperties(celda, properties);
-                    }else{
-                        if(j == 3){
-                        CellStyle ss = book.createCellStyle();
-                        ss.setWrapText(true);
-                        
-                            if(i%2 == 0){
-                            ss.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                            ss.setFillPattern(SOLID_FOREGROUND);
+                    } else {
+                        if (j == 3) {
+                            CellStyle ss = book.createCellStyle();
+                            ss.setWrapText(true);
+
+                            if (i % 2 == 0) {
+                                ss.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                                ss.setFillPattern(SOLID_FOREGROUND);
 
                             }
                             celda.setCellStyle(ss);
                         }
                         celda.setCellValue(String.valueOf(Tabla2.getValueAt(i, j)));
                         CellUtil.setCellStyleProperties(celda, properties);
-                        
-                        
-                       
+
                     }
-                    
+
                     book.write(new FileOutputStream("C:\\Users\\AlmacenPC\\OneDrive\\Documents\\pdf\\PDF 475\\"));
                 }
             }
             book.close();
-            mensaje="Exportacion Exitosa";
+            mensaje = "Exportacion Exitosa";
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e);
         }
         JOptionPane.showMessageDialog(this, mensaje);
     }
-    
-    public void ExportarCoti(){
+
+    public void ExportarCoti() {
         Workbook book;
-        String mensaje="Error en la Exportacion";
-        String nombreArchivo = "\\\\192.168.100.40\\bd\\OC\\Solicitud_de_cotizacion\\Solicitud_de_cotizacion_"+id+".xlsx";
-        int NumeroFila=Tabla2.getRowCount(),NumeroColumna=Tabla2.getColumnCount();
-        if(nombreArchivo.endsWith("xls")){
-            book=new HSSFWorkbook();
-        }else{
-            book=new XSSFWorkbook();
+        String mensaje = "Error en la Exportacion";
+        String nombreArchivo = "\\\\192.168.100.40\\bd\\OC\\Solicitud_de_cotizacion\\Solicitud_de_cotizacion_" + id + ".xlsx";
+        int NumeroFila = Tabla2.getRowCount(), NumeroColumna = Tabla2.getColumnCount();
+        if (nombreArchivo.endsWith("xls")) {
+            book = new HSSFWorkbook();
+        } else {
+            book = new XSSFWorkbook();
         }
-        
+
         Sheet hoja = book.createSheet("Solicitud de cotizacion");
         Row shuma = hoja.createRow(0);
         Cell columna = shuma.createCell(1);
         CellStyle style = book.createCellStyle();
-        
+
         hoja.setColumnWidth(1, 3200);
         hoja.setColumnWidth(2, 10200);
-        hoja.setColumnWidth(3, 6200); 
-        hoja.setColumnWidth(4, 4200); 
-        hoja.setColumnWidth(5, 4200); 
+        hoja.setColumnWidth(3, 6200);
+        hoja.setColumnWidth(4, 4200);
+        hoja.setColumnWidth(5, 4200);
         hoja.setColumnWidth(6, 6200);
-        
-        
-        
+
         Font font1 = book.createFont();
         font1.setColor(IndexedColors.BLACK.getIndex());
-        font1.setFontHeightInPoints((short)12);
+        font1.setFontHeightInPoints((short) 12);
         font1.setFontName("Arial Nova");
         style.setFont(font1);
-        
+
         style.setFillBackgroundColor(IndexedColors.WHITE.getIndex());
         style.setFillForegroundColor(IndexedColors.WHITE.getIndex());
         style.setFillPattern(SOLID_FOREGROUND);
         style.setVerticalAlignment(VerticalAlignment.BOTTOM);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setWrapText(true);
-        
+
         columna.setCellValue("SOLICITUD DE COTIZACION");
         columna.setCellStyle(style);
-        
-        hoja.addMergedRegion(new CellRangeAddress (
-        0,
-        3,
-        1,
-        6
+
+        hoja.addMergedRegion(new CellRangeAddress(
+                0,
+                3,
+                1,
+                6
         ));
-        
-                    Row fi = hoja.createRow(NumeroFila+1+4);
-                    Cell ce = fi.createCell(1);
-                    ce.setCellValue("NOTA: No es una orden de compra");
-                    CellStyle ss = book.createCellStyle();
-                    ss.setVerticalAlignment(VerticalAlignment.BOTTOM);
-                    ss.setAlignment(HorizontalAlignment.RIGHT);
-                    Font ff = book.createFont();
-                    ff.setBold(true);
-                    ff.setFontHeightInPoints((short) 14);
-                    ss.setFont(ff);
-                    ce.setCellStyle(ss);
-                    hoja.addMergedRegion(new CellRangeAddress(
-                    NumeroFila+1+4,
-                    NumeroFila+2+4,
-                    1,
-                    6
-                    ));
-        
+
+        Row fi = hoja.createRow(NumeroFila + 1 + 4);
+        Cell ce = fi.createCell(1);
+        ce.setCellValue("NOTA: No es una orden de compra");
+        CellStyle ss = book.createCellStyle();
+        ss.setVerticalAlignment(VerticalAlignment.BOTTOM);
+        ss.setAlignment(HorizontalAlignment.RIGHT);
+        Font ff = book.createFont();
+        ff.setBold(true);
+        ff.setFontHeightInPoints((short) 14);
+        ss.setFont(ff);
+        ce.setCellStyle(ss);
+        hoja.addMergedRegion(new CellRangeAddress(
+                NumeroFila + 1 + 4,
+                NumeroFila + 2 + 4,
+                1,
+                6
+        ));
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
         properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-        
+
         properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());  
-        
-        try{
-        InputStream is = new FileInputStream("C:/Pruebas/BD/3i.png");
-        byte[] bytes = IOUtils.toByteArray(is);
-        int pictureIdx = book.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
-        is.close();
-        CreationHelper helper = book.getCreationHelper();
-        Drawing drawing = hoja.createDrawingPatriarch();
-        ClientAnchor anchor = helper.createClientAnchor();
-        anchor.setCol1(1);
-        anchor.setCol2(3);
-        anchor.setRow1(0);
-        anchor.setRow2(3);
-        Picture pict = drawing.createPicture(anchor, pictureIdx);
-        pict.resize();
-        }catch(FileNotFoundException e){
-        JOptionPane.showMessageDialog(this, e);
+        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+
+        try {
+            InputStream is = new FileInputStream("C:/Pruebas/BD/3i.png");
+            byte[] bytes = IOUtils.toByteArray(is);
+            int pictureIdx = book.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
+            is.close();
+            CreationHelper helper = book.getCreationHelper();
+            Drawing drawing = hoja.createDrawingPatriarch();
+            ClientAnchor anchor = helper.createClientAnchor();
+            anchor.setCol1(1);
+            anchor.setCol2(3);
+            anchor.setRow1(0);
+            anchor.setRow2(3);
+            Picture pict = drawing.createPicture(anchor, pictureIdx);
+            pict.resize();
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(this, e);
         } catch (IOException ex) {
             Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, ex);
             JOptionPane.showMessageDialog(this, ex);
         }
         try {
             for (int i = -1; i < NumeroFila; i++) {
-                Row fila=hoja.createRow(i+5);
-                for (int j = 0; j <NumeroColumna; j++) {
-                    Cell celda=fila.createCell(j+1);
-                    if(i == -1 && (j >= 0 && j <=5)){
+                Row fila = hoja.createRow(i + 5);
+                for (int j = 0; j < NumeroColumna; j++) {
+                    Cell celda = fila.createCell(j + 1);
+                    if (i == -1 && (j >= 0 && j <= 5)) {
                         CellStyle s = book.createCellStyle();
                         Font f = book.createFont();
                         s.setFillBackgroundColor(IndexedColors.WHITE.getIndex());
@@ -1386,22 +1396,22 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         s.setFont(f);
                         celda.setCellStyle(s);
                     }
-                    if(i > -1 && (j > -1 && j <= 5) && (i%2 == 0)){
+                    if (i > -1 && (j > -1 && j <= 5) && (i % 2 == 0)) {
                         CellStyle s = book.createCellStyle();
                         s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
                         s.setFillPattern(SOLID_FOREGROUND);
                         celda.setCellStyle(s);
-                    }else{
+                    } else {
                         CellStyle s = book.createCellStyle();
                         s.setFillForegroundColor(IndexedColors.WHITE.getIndex());
                         s.setFillPattern(SOLID_FOREGROUND);
                         celda.setCellStyle(s);
                     }
-                    
-                    if(i==-1){
+
+                    if (i == -1) {
                         celda.setCellValue(String.valueOf(Tabla2.getColumnName(j)));
                         CellUtil.setCellStyleProperties(celda, properties);
-                    }else{
+                    } else {
                         celda.setCellValue(String.valueOf(Tabla2.getValueAt(i, j)));
                         CellUtil.setCellStyleProperties(celda, properties);
                     }
@@ -1409,97 +1419,97 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 }
             }
             book.close();
-            mensaje="Exportacion Exitosa";
+            mensaje = "Exportacion Exitosa";
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e);
         }
         JOptionPane.showMessageDialog(this, mensaje);
-        
+
     }
-        
-    public void cambiarTabla(){
+
+    public void cambiarTabla() {
         DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        Statement st1 = con.createStatement();
-        String sql = "select * from Requisiciones where NumRequisicion like '"+(Tabla1.getValueAt(ta, 2).toString())+"'";
-        String sql1 = "select * from Requisicion where Id like '"+(Tabla1.getValueAt(ta, 2).toString())+"'";
-        ResultSet rs = st.executeQuery(sql);
-        ResultSet rs1 = st1.executeQuery(sql1);
-        String datos[] = new String[10];
-        int cont = 1;
-        while(rs.next()){
-        
-        datos[0] = ""+cont;
-        datos[1] = rs.getString("Descripcion");
-        datos[2] = rs.getString("Codigo");
-        datos[3] = rs.getString("UM");
-        datos[4] = rs.getString("Cantidad");
-        datos[5] = rs.getString("Precio");
-        miModelo.addRow(datos);
-        cont = cont+1;
+        try {
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            Statement st1 = con.createStatement();
+            String sql = "select * from Requisiciones where NumRequisicion like '" + (Tabla1.getValueAt(ta, 2).toString()) + "'";
+            String sql1 = "select * from Requisicion where Id like '" + (Tabla1.getValueAt(ta, 2).toString()) + "'";
+            ResultSet rs = st.executeQuery(sql);
+            ResultSet rs1 = st1.executeQuery(sql1);
+            String datos[] = new String[10];
+            int cont = 1;
+            while (rs.next()) {
+
+                datos[0] = "" + cont;
+                datos[1] = rs.getString("Descripcion");
+                datos[2] = rs.getString("Codigo");
+                datos[3] = rs.getString("UM");
+                datos[4] = rs.getString("Cantidad");
+                datos[5] = rs.getString("Precio");
+                miModelo.addRow(datos);
+                cont = cont + 1;
+            }
+            while (rs1.next()) {
+                datos[0] = rs1.getString("Id");
+                datos[1] = rs1.getString("Progreso");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
-        while(rs1.next()){
-        datos[0] = rs1.getString("Id");
-        datos[1] = rs1.getString("Progreso");
-        }
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
-        }
-    
-    public void verificarOrdenes(String requisicion){
-        try{
+    }
+
+    public void verificarOrdenes(String requisicion) {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select Progreso, Id from requisicion where Id like '"+requisicion+"'";
+            String sql = "select Progreso, Id from requisicion where Id like '" + requisicion + "'";
             ResultSet rs = st.executeQuery(sql);
             String estado = "";
-            while(rs.next()){
+            while (rs.next()) {
                 estado = rs.getString("Progreso");
             }
-            if(estado.equals("NUEVO") || estado.equals("COTIZANDO") || estado.equals("APROBADO")){
-                String sql2 = "select * from requisiciones where NumRequisicion like '"+requisicion+"'";
+            if (estado.equals("NUEVO") || estado.equals("COTIZANDO") || estado.equals("APROBADO")) {
+                String sql2 = "select * from requisiciones where NumRequisicion like '" + requisicion + "'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql2);
                 int contR = 0;
                 int contE = 0;
-                while(rs2.next()){
+                while (rs2.next()) {
                     String oc = rs2.getString("OC");
                     contR++;
-                    if(oc != null){
+                    if (oc != null) {
                         contE++;
                     }
                 }
-                if(contR == contE){
+                if (contR == contE) {
                     String sql3 = "update requisicion set Progreso = ? where Id = ?";
                     PreparedStatement pst = con.prepareStatement(sql3);
-                    
+
                     pst.setString(1, "COMPRADO");
                     pst.setString(2, requisicion);
-                    
+
                     int n = pst.executeUpdate();
-                    
-                    if(n > 0){
+
+                    if (n > 0) {
                         JOptionPane.showMessageDialog(this, "Esta Requisicion esta completa, su estado paso a 'COMPRADO'");
                         limpiarTabla1();
                         verDatos();
-                    }else{
-                        JOptionPane.showMessageDialog(this, "ERROR: No se mando a comprar, favor de avisar","ERROR",JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "ERROR: No se mando a comprar, favor de avisar", "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-                    
+
                 }
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public String mostrarDialogoEmergente() {
         ImageIcon icono = new ImageIcon(getClass().getResource("/Img/archivo.png"));
         String opcion = (String) JOptionPane.showInputDialog(
@@ -1517,1419 +1527,1403 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             return null;
         }
     }
-    
-    public void OrdenDeCompraNormal(){
+
+    public void OrdenDeCompraNormal() {
         String cadena = "";
         String cadena2 = "";
-        try{
+        try {
             int tam = elegir.botones.length;
             for (int i = 0; i < tam; i++) {
-            if(elegir.panel[i].getBackground().equals(java.awt.Color.green)){
-            String provedor = elegir.botones[i].getText();
-            String cotizacion = "";
-            boolean banda = false;
-            do{
-                cotizacion = JOptionPane.showInputDialog(this, "INGRESA NUMERO DE COTIZACION DEL PROVEEDOR "+provedor);
-                if(cotizacion.equals("")){
-                    banda = false;
-                }else{
-                    banda = true;
-                }
-            }while(banda == false);
+                if (elegir.panel[i].getBackground().equals(java.awt.Color.green)) {
+                    String provedor = elegir.botones[i].getText();
+                    String cotizacion = "";
+                    boolean banda = false;
+                    do {
+                        cotizacion = JOptionPane.showInputDialog(this, "INGRESA NUMERO DE COTIZACION DEL PROVEEDOR " + provedor);
+                        if (cotizacion.equals("")) {
+                            banda = false;
+                        } else {
+                            banda = true;
+                        }
+                    } while (banda == false);
 //         ---------------------------------BD--------------------------------
-           try{
-           Connection con = null;
-           Conexion con1 = new Conexion();
-           con = con1.getConnection();
-           Statement st = con.createStatement();
-           String sql = "select OrdenNo from OrdenCompra";
-           String datos = "";
-           ResultSet rs = st.executeQuery(sql);
-           while(rs.next()){
-           datos = rs.getString("OrdenNo");
-           }
-           
-           //---------------------------PROVEEDOR------------------------------
-           Statement st2 = con.createStatement();
-           String sql2 = "select * from registroprov_compras where Nombre like '"+provedor+"'";
-           ResultSet rs2 = st2.executeQuery(sql2);
-           String Proveedor = "",Condicion = "",Iva = "",Moneda = "";
-           while(rs2.next()){
-               Proveedor = rs2.getString("Nombre");
-               Condicion = rs2.getString("Condiciones");
-               Iva = rs2.getString("Iva");
-               Moneda = rs2.getString("Moneda");
-           }
-           
-           if(Proveedor == null){
-               Proveedor = "";
-           }
-           if(Condicion == null){
-               Condicion = "";
-           }
-           if(Iva == null){
-               Iva = "0";
-           }
-           if(Moneda == null){
-               Moneda = "";
-           }
-           
-           //------------------------------------------------------------------
-           
-           cadena = datos.substring(3,7);
-           int suma = Integer.parseInt(cadena);
-           cadena = "OCM"+(suma+1);
-           cadena2 = "OCM"+(suma+1)+"-"+provedor;
-           
-           String prov = "select * from registroProv_Compras where Nombre like '"+Proveedor+"'";
-           ResultSet rs1 = st.executeQuery(prov);
-           String datos1[] = new String[15];
-           String isr = null;
-           while(rs1.next()){
-           datos1[0] = rs1.getString("Nombre");
-           datos1[1] = rs1.getString("Contacto");
-           datos1[2] = rs1.getString("Direccion");
-           datos1[3] = rs1.getString("Telefono");
-           datos1[4] = rs1.getString("Condiciones");
-           datos1[5] = rs1.getString("Iva");
-           isr = rs1.getString("Isr");
-           
-           String add = "insert into OrdenCompra (OrdenNo,RequisicionNo,Fecha) values (?,?,?)";
-           PreparedStatement pst = con.prepareStatement(add);
-           
-           Date d = new Date();
-           SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-           String fec = sdf.format(d);
-           
-           pst.setString(1, cadena);
-           pst.setString(2, lblRequi.getText());
-           pst.setString(3, fec);
-           
-           
-           int n = pst.executeUpdate();
-           }
-           //-------------------------------------------------------------------
-           
-        String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\"+cadena2+".pdf";
+                    try {
+                        Connection con = null;
+                        Conexion con1 = new Conexion();
+                        con = con1.getConnection();
+                        Statement st = con.createStatement();
+                        String sql = "select OrdenNo from OrdenCompra";
+                        String datos = "";
+                        ResultSet rs = st.executeQuery(sql);
+                        while (rs.next()) {
+                            datos = rs.getString("OrdenNo");
+                        }
+
+                        //---------------------------PROVEEDOR------------------------------
+                        Statement st2 = con.createStatement();
+                        String sql2 = "select * from registroprov_compras where Nombre like '" + provedor + "'";
+                        ResultSet rs2 = st2.executeQuery(sql2);
+                        String Proveedor = "", Condicion = "", Iva = "", Moneda = "";
+                        while (rs2.next()) {
+                            Proveedor = rs2.getString("Nombre");
+                            Condicion = rs2.getString("Condiciones");
+                            Iva = rs2.getString("Iva");
+                            Moneda = rs2.getString("Moneda");
+                        }
+
+                        if (Proveedor == null) {
+                            Proveedor = "";
+                        }
+                        if (Condicion == null) {
+                            Condicion = "";
+                        }
+                        if (Iva == null) {
+                            Iva = "0";
+                        }
+                        if (Moneda == null) {
+                            Moneda = "";
+                        }
+
+                        //------------------------------------------------------------------
+                        cadena = datos.substring(3, 7);
+                        int suma = Integer.parseInt(cadena);
+                        cadena = "OCM" + (suma + 1);
+                        cadena2 = "OCM" + (suma + 1) + "-" + provedor;
+
+                        String prov = "select * from registroProv_Compras where Nombre like '" + Proveedor + "'";
+                        ResultSet rs1 = st.executeQuery(prov);
+                        String datos1[] = new String[15];
+                        String isr = null;
+                        while (rs1.next()) {
+                            datos1[0] = rs1.getString("Nombre");
+                            datos1[1] = rs1.getString("Contacto");
+                            datos1[2] = rs1.getString("Direccion");
+                            datos1[3] = rs1.getString("Telefono");
+                            datos1[4] = rs1.getString("Condiciones");
+                            datos1[5] = rs1.getString("Iva");
+                            isr = rs1.getString("Isr");
+
+                            String add = "insert into OrdenCompra (OrdenNo,RequisicionNo,Fecha) values (?,?,?)";
+                            PreparedStatement pst = con.prepareStatement(add);
+
+                            Date d = new Date();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            String fec = sdf.format(d);
+
+                            pst.setString(1, cadena);
+                            pst.setString(2, lblRequi.getText());
+                            pst.setString(3, fec);
+
+                            int n = pst.executeUpdate();
+                        }
+                        //-------------------------------------------------------------------
+
+                        String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + cadena2 + ".pdf";
 //        String ruta = "C:\\Users\\AlmacenPC\\Documents\\Prueba Crear multiple\\"+cadena2+".pdf";
-        Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
-        document.open();
-        //------------------------------FUENTES---------------------------------
-        com.itextpdf.text.Font fuente = new com.itextpdf.text.Font();
-        com.itextpdf.text.Font fuente1 = new com.itextpdf.text.Font();
-        com.itextpdf.text.Font fuente2 = new com.itextpdf.text.Font();
-        com.itextpdf.text.Font fuente3 = new com.itextpdf.text.Font();
-        //-----------------------------RELLENO----------------------------------
-        PdfContentByte under1 = writer.getDirectContentUnder();
-        under1.saveState();
-        under1.setRGBColorFill(87, 89, 87);
-        under1.rectangle(30, 755,300, 15);
-        under1.fill();
-        under1.restoreState();
-        
-        PdfContentByte under2 = writer.getDirectContentUnder();
-        under2.saveState();
-        under2.setRGBColorFill(87, 89, 87);
-        under2.rectangle(30, 672,300, 15);
-        under2.fill();
-        under2.restoreState();
-        
-        PdfContentByte under3 = writer.getDirectContentUnder();
-        under3.saveState();
-        under3.setRGBColorFill(87, 89, 87);
-        under3.rectangle(400, 672,150, 15);
-        under3.fill();
-        under3.restoreState();
-        //----------------------------------------------------------------------
-        //--------------------------------FUENTES-------------------------------
-        fuente.setSize(8);
-        fuente.setFamily("Arial");
-        fuente.setColor(BaseColor.BLACK);
-        fuente.setStyle(com.itextpdf.text.Font.BOLD);
-        
-        fuente1.setSize(8);
-        fuente1.setFamily("Arial");
-        fuente1.setColor(BaseColor.WHITE);
-        fuente1.setStyle(com.itextpdf.text.Font.BOLD);
-        
-        fuente2.setSize(8);
-        fuente2.setFamily("Arial");
-        fuente2.setColor(BaseColor.BLACK);
-        
-        fuente3.setSize(8);
-        fuente3.setFamily("Arial");
-        fuente3.setColor(BaseColor.BLACK);
-        //----------------------------------------------------------------------
-        //--------------------------------TEXTO---------------------------------
-        Paragraph p = new Paragraph("                  SERVICIOS INDUSTRIALES 3i S de RL MI                                                                                           ORDEN DE COMPRA",fuente);
-        p.setAlignment(Element.ALIGN_CENTER);
-        
-        Paragraph p1 = new Paragraph("Nuevo Dimicilio Fiscal Para Facturacion",fuente1);
-        p.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p2 = new Paragraph("CAMINO VIEJO A LA ROSITA 305 COLONIA SALVARCAR",fuente);
-        p2.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p3 = new Paragraph("Cd Juárez, Chihuahua, CP 32580",fuente);
-        p3.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p4 = new Paragraph("Telefono: 656-791-1365",fuente);
-        p4.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p5 = new Paragraph("RFC: SII150213KR7",fuente);
-        p5.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p6 = new Paragraph("E-mail: leonardo.soto.salcido@gmail.com",fuente);
-        p6.setAlignment(Element.ALIGN_LEFT);
-        
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        String fecha = sdf.format(d);
-        
-        Paragraph p7 = new Paragraph("                                                                                                                                                                                     FECHA:   "+fecha,fuente);
-        p7.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p8 = new Paragraph("                                                                                                                                                                                          OC#:   "+cadena,fuente);
-        p8.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p9 = new Paragraph("VENDEDOR                                                                                                                                                  ENVIAR A",fuente1);
-        p9.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p10 = new Paragraph("Si usted tiene alguna pregunta sobre esta orden de compra, por favor, pongase en contacto con",fuente2);
-        p10.setAlignment(Element.ALIGN_CENTER);
-        
-        Paragraph p11 = new Paragraph("Kenia Rueda: Tel: 656-791-1365 E-mail: compras01@si3i.com",fuente2);
-        p11.setAlignment(Element.ALIGN_CENTER);
-        
-        Paragraph p12 = new Paragraph("NR: "+lblRequi.getText(),fuente);
-        p12.setAlignment(Element.ALIGN_CENTER);
-        
-        PdfPTable tbl = new PdfPTable(3);
-        tbl.setWidthPercentage(100);
-        PdfPCell col1 = new PdfPCell(new Phrase("Proveedor:   "+datos1[0],fuente2));
-        PdfPCell col2 = new PdfPCell(new Phrase("Nombre:  ",fuente2));
-        PdfPCell col3 = new PdfPCell(new Phrase("Servicios Industriales 3i",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        float[] medidaCeldas = {110, 50, 50}; 
-        tbl.setWidths(medidaCeldas);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        col1 = new PdfPCell(new Phrase("Contacto:     "+datos1[1],fuente2));
-        col2 = new PdfPCell(new Phrase("Direccion: ",fuente2));
-        col3 = new PdfPCell(new Phrase("Camino Viejo a la Rosita #305",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        col1 = new PdfPCell(new Phrase("Direccion:     "+datos1[2],fuente2));
-        col2 = new PdfPCell(new Phrase("",fuente2));
-        col3 = new PdfPCell(new Phrase("Col Salvarcar CP: 32580",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        col1 = new PdfPCell(new Phrase("Telefono:      "+datos1[3],fuente2));
-        col2 = new PdfPCell(new Phrase("Horario: ",fuente2));
-        col3 = new PdfPCell(new Phrase("8:00 am - 5:00 pm",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        
-        PdfPTable tbl1 = new PdfPTable(5);
-        float[] medidaCeldas1 = {35, 90, 100,50,60}; 
-        tbl1.setWidths(medidaCeldas1);
-        tbl1.setWidthPercentage(100);
-        PdfPCell c12 = new PdfPCell(new Phrase("COTIZACION",fuente1));
-        PdfPCell c13 = new PdfPCell(new Phrase("FORMA DE PAGO",fuente1));
-        PdfPCell c14 = new PdfPCell(new Phrase("REQUISITOR",fuente1));
-        PdfPCell c15 = new PdfPCell(new Phrase("PROYECTO",fuente1));
-        PdfPCell c16 = new PdfPCell(new Phrase("CONDICION DE PAGO",fuente1));
-        c12.setBackgroundColor(BaseColor.DARK_GRAY);
-        c13.setBackgroundColor(BaseColor.DARK_GRAY);
-        c14.setBackgroundColor(BaseColor.DARK_GRAY);
-        c15.setBackgroundColor(BaseColor.DARK_GRAY);
-        c16.setBackgroundColor(BaseColor.DARK_GRAY);
-        c12.setBorder(0);
-        c13.setBorder(0);
-        c14.setBorder(0);
-        c15.setBorder(0);
-        c16.setBorder(0);
-        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
-        tbl1.addCell(c12);
-        tbl1.addCell(c13);
-        tbl1.addCell(c14);
-        tbl1.addCell(c15);
-        tbl1.addCell(c16);
-        
-        c12 = new PdfPCell(new Phrase(""+cotizacion,fuente2));
-        c13 = new PdfPCell(new Phrase("TRANSFERENCIA ELECTRONICA",fuente2));
-        c14 = new PdfPCell(new Phrase(num,fuente2));
-        c15 = new PdfPCell(new Phrase(proy,fuente2));
-        c16 = new PdfPCell(new Phrase(Condicion,fuente2));
-        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
-        tbl1.addCell(c12);
-        tbl1.addCell(c13);
-        tbl1.addCell(c14);
-        tbl1.addCell(c15);
-        tbl1.addCell(c16);
-        
-        PdfPTable tbl2 = new PdfPTable(7);
-        float[] medidaCeldas2 = {35, 130, 60,20,35,30,40}; 
-        tbl2.setWidths(medidaCeldas2);
-        tbl2.setWidthPercentage(100);
-        PdfPCell c17;
-        PdfPCell c18;
-        c12 = new PdfPCell(new Phrase("ARTICULO",fuente1));
-        c13 = new PdfPCell(new Phrase("DESCRIPCION",fuente1));
-        c14 = new PdfPCell(new Phrase("CODIGO",fuente1));
-        c15 = new PdfPCell(new Phrase("U.M.",fuente1));
-        c16 = new PdfPCell(new Phrase("CANTIDAD",fuente1));
-        c17 = new PdfPCell(new Phrase("PRECIO",fuente1));
-        c18 = new PdfPCell(new Phrase("TOTAL",fuente1));
-        c12.setBackgroundColor(BaseColor.DARK_GRAY);
-        c13.setBackgroundColor(BaseColor.DARK_GRAY);
-        c14.setBackgroundColor(BaseColor.DARK_GRAY);
-        c15.setBackgroundColor(BaseColor.DARK_GRAY);
-        c16.setBackgroundColor(BaseColor.DARK_GRAY);
-        c17.setBackgroundColor(BaseColor.DARK_GRAY);
-        c18.setBackgroundColor(BaseColor.DARK_GRAY);
-        c12.setBorder(0);
-        c13.setBorder(0);
-        c14.setBorder(0);
-        c15.setBorder(0);
-        c16.setBorder(0);
-        c17.setBorder(0);
-        c18.setBorder(0);
-        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c17.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c18.setHorizontalAlignment(Element.ALIGN_CENTER);
-        tbl2.addCell(c12);
-        tbl2.addCell(c13);
-        tbl2.addCell(c14);
-        tbl2.addCell(c15);
-        tbl2.addCell(c16);
-        tbl2.addCell(c17);
-        tbl2.addCell(c18);
-            
-                int con12 = Tabla2.getRowCount();
-                int con11 = con12;
-                int articulo = 0;
-                
-                Stack<String> id = new Stack<>();
-                JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                enviarCorreo enviar = new enviarCorreo(f,true);
-                Stack<String> pila = new Stack<>();
-                Stack<String> pilaProv = new Stack<>();
-                
-                
-                double total = 0, total2 = 0;
-                if(con12 == 0){
-                    con12++;
-                }
-                
-                Statement st3 = con.createStatement();
-                for (int k = 0; k < con12; k++) {
-                    String sql3 = "";
-                    ResultSet rs3 = null;
-                    
-                   if(search == true){
-                       sql3 = "select * from requisicionesmuestra where Id like '"+Tabla2.getValueAt(k,0).toString()+"'";
-                   rs3 = st3.executeQuery(sql3);
-                   }else{
-                   sql3 = "select * from requisiciones where Id like '"+Tabla2.getValueAt(k,0).toString()+"'";
-                   rs3 = st3.executeQuery(sql3);
-                   }
-                   
-                   
-                   String dap = "";
-                   while(rs3.next()){
-                       dap = rs3.getString("Proveedor");
-                   }
-                   
-                   boolean ban = true;
-                   
-                   if(Tabla2.getValueAt(k, 5) == null){
-                       ban = false;
-                   }else if(Tabla2.getValueAt(k, 5).toString().equals("")){
-                       ban = false;
-                   }
-                   
-                   if(provedor.equals(dap) && ban == true){
-                        
-                       if(search == true){
-                            String sql4 = "select * from requisiciones where NumRequisicion like '"+lblRequi.getText()+"'";
-                            Statement st4 = con.createStatement();
-                            ResultSet rs4 = st4.executeQuery(sql4);
+                        Document document = new Document();
+                        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
+                        document.open();
+                        //------------------------------FUENTES---------------------------------
+                        com.itextpdf.text.Font fuente = new com.itextpdf.text.Font();
+                        com.itextpdf.text.Font fuente1 = new com.itextpdf.text.Font();
+                        com.itextpdf.text.Font fuente2 = new com.itextpdf.text.Font();
+                        com.itextpdf.text.Font fuente3 = new com.itextpdf.text.Font();
+                        //-----------------------------RELLENO----------------------------------
+                        PdfContentByte under1 = writer.getDirectContentUnder();
+                        under1.saveState();
+                        under1.setRGBColorFill(87, 89, 87);
+                        under1.rectangle(30, 755, 300, 15);
+                        under1.fill();
+                        under1.restoreState();
 
-                            String sql30 = "update requisiciones set OC = ? where Codigo = ?";
-                            PreparedStatement pst30 = con.prepareStatement(sql30);
+                        PdfContentByte under2 = writer.getDirectContentUnder();
+                        under2.saveState();
+                        under2.setRGBColorFill(87, 89, 87);
+                        under2.rectangle(30, 672, 300, 15);
+                        under2.fill();
+                        under2.restoreState();
 
-                            String sql31 = "update requisicionesmuestra set OC = ? where Id = ?";
-                            PreparedStatement pst31 = con.prepareStatement(sql31);
+                        PdfContentByte under3 = writer.getDirectContentUnder();
+                        under3.saveState();
+                        under3.setRGBColorFill(87, 89, 87);
+                        under3.rectangle(400, 672, 150, 15);
+                        under3.fill();
+                        under3.restoreState();
+                        //----------------------------------------------------------------------
+                        //--------------------------------FUENTES-------------------------------
+                        fuente.setSize(8);
+                        fuente.setFamily("Arial");
+                        fuente.setColor(BaseColor.BLACK);
+                        fuente.setStyle(com.itextpdf.text.Font.BOLD);
 
-                            pst31.setString(1, cadena);
-                            pst31.setString(2, Tabla2.getValueAt(k,0).toString());
+                        fuente1.setSize(8);
+                        fuente1.setFamily("Arial");
+                        fuente1.setColor(BaseColor.WHITE);
+                        fuente1.setStyle(com.itextpdf.text.Font.BOLD);
 
-                            pst31.executeUpdate();
+                        fuente2.setSize(8);
+                        fuente2.setFamily("Arial");
+                        fuente2.setColor(BaseColor.BLACK);
 
-                            String idd = "";
-                            String num = "";
-                            int cont = 0;
-                            while(rs4.next()){ 
-                                idd = rs4.getString("Id");
-                                num = rs4.getString("Codigo");
-                                if(num.equals(Tabla2.getValueAt(i, 2).toString())){
+                        fuente3.setSize(8);
+                        fuente3.setFamily("Arial");
+                        fuente3.setColor(BaseColor.BLACK);
+                        //----------------------------------------------------------------------
+                        //--------------------------------TEXTO---------------------------------
+                        Paragraph p = new Paragraph("                  SERVICIOS INDUSTRIALES 3i S de RL MI                                                                                           ORDEN DE COMPRA", fuente);
+                        p.setAlignment(Element.ALIGN_CENTER);
+
+                        Paragraph p1 = new Paragraph("Nuevo Dimicilio Fiscal Para Facturacion", fuente1);
+                        p.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p2 = new Paragraph("CAMINO VIEJO A LA ROSITA 305 COLONIA SALVARCAR", fuente);
+                        p2.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p3 = new Paragraph("Cd Juárez, Chihuahua, CP 32580", fuente);
+                        p3.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p4 = new Paragraph("Telefono: 656-791-1365", fuente);
+                        p4.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p5 = new Paragraph("RFC: SII150213KR7", fuente);
+                        p5.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p6 = new Paragraph("E-mail: leonardo.soto.salcido@gmail.com", fuente);
+                        p6.setAlignment(Element.ALIGN_LEFT);
+
+                        Date d = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        String fecha = sdf.format(d);
+
+                        Paragraph p7 = new Paragraph("                                                                                                                                                                                     FECHA:   " + fecha, fuente);
+                        p7.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p8 = new Paragraph("                                                                                                                                                                                          OC#:   " + cadena, fuente);
+                        p8.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p9 = new Paragraph("VENDEDOR                                                                                                                                                  ENVIAR A", fuente1);
+                        p9.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p10 = new Paragraph("Si usted tiene alguna pregunta sobre esta orden de compra, por favor, pongase en contacto con", fuente2);
+                        p10.setAlignment(Element.ALIGN_CENTER);
+
+                        Paragraph p11 = new Paragraph("Kenia Rueda: Tel: 656-791-1365 E-mail: compras01@si3i.com", fuente2);
+                        p11.setAlignment(Element.ALIGN_CENTER);
+
+                        Paragraph p12 = new Paragraph("NR: " + lblRequi.getText(), fuente);
+                        p12.setAlignment(Element.ALIGN_CENTER);
+
+                        PdfPTable tbl = new PdfPTable(3);
+                        tbl.setWidthPercentage(100);
+                        PdfPCell col1 = new PdfPCell(new Phrase("Proveedor:   " + datos1[0], fuente2));
+                        PdfPCell col2 = new PdfPCell(new Phrase("Nombre:  ", fuente2));
+                        PdfPCell col3 = new PdfPCell(new Phrase("Servicios Industriales 3i", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        float[] medidaCeldas = {110, 50, 50};
+                        tbl.setWidths(medidaCeldas);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+                        col1 = new PdfPCell(new Phrase("Contacto:     " + datos1[1], fuente2));
+                        col2 = new PdfPCell(new Phrase("Direccion: ", fuente2));
+                        col3 = new PdfPCell(new Phrase("Camino Viejo a la Rosita #305", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+                        col1 = new PdfPCell(new Phrase("Direccion:     " + datos1[2], fuente2));
+                        col2 = new PdfPCell(new Phrase("", fuente2));
+                        col3 = new PdfPCell(new Phrase("Col Salvarcar CP: 32580", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+                        col1 = new PdfPCell(new Phrase("Telefono:      " + datos1[3], fuente2));
+                        col2 = new PdfPCell(new Phrase("Horario: ", fuente2));
+                        col3 = new PdfPCell(new Phrase("8:00 am - 5:00 pm", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+
+                        PdfPTable tbl1 = new PdfPTable(5);
+                        float[] medidaCeldas1 = {35, 90, 100, 50, 60};
+                        tbl1.setWidths(medidaCeldas1);
+                        tbl1.setWidthPercentage(100);
+                        PdfPCell c12 = new PdfPCell(new Phrase("COTIZACION", fuente1));
+                        PdfPCell c13 = new PdfPCell(new Phrase("FORMA DE PAGO", fuente1));
+                        PdfPCell c14 = new PdfPCell(new Phrase("REQUISITOR", fuente1));
+                        PdfPCell c15 = new PdfPCell(new Phrase("PROYECTO", fuente1));
+                        PdfPCell c16 = new PdfPCell(new Phrase("CONDICION DE PAGO", fuente1));
+                        c12.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c13.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c14.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c15.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c16.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c12.setBorder(0);
+                        c13.setBorder(0);
+                        c14.setBorder(0);
+                        c15.setBorder(0);
+                        c16.setBorder(0);
+                        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        tbl1.addCell(c12);
+                        tbl1.addCell(c13);
+                        tbl1.addCell(c14);
+                        tbl1.addCell(c15);
+                        tbl1.addCell(c16);
+
+                        c12 = new PdfPCell(new Phrase("" + cotizacion, fuente2));
+                        c13 = new PdfPCell(new Phrase("TRANSFERENCIA ELECTRONICA", fuente2));
+                        c14 = new PdfPCell(new Phrase(num, fuente2));
+                        c15 = new PdfPCell(new Phrase(proy, fuente2));
+                        c16 = new PdfPCell(new Phrase(Condicion, fuente2));
+                        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        tbl1.addCell(c12);
+                        tbl1.addCell(c13);
+                        tbl1.addCell(c14);
+                        tbl1.addCell(c15);
+                        tbl1.addCell(c16);
+
+                        PdfPTable tbl2 = new PdfPTable(7);
+                        float[] medidaCeldas2 = {35, 130, 60, 20, 35, 30, 40};
+                        tbl2.setWidths(medidaCeldas2);
+                        tbl2.setWidthPercentage(100);
+                        PdfPCell c17;
+                        PdfPCell c18;
+                        c12 = new PdfPCell(new Phrase("ARTICULO", fuente1));
+                        c13 = new PdfPCell(new Phrase("DESCRIPCION", fuente1));
+                        c14 = new PdfPCell(new Phrase("CODIGO", fuente1));
+                        c15 = new PdfPCell(new Phrase("U.M.", fuente1));
+                        c16 = new PdfPCell(new Phrase("CANTIDAD", fuente1));
+                        c17 = new PdfPCell(new Phrase("PRECIO", fuente1));
+                        c18 = new PdfPCell(new Phrase("TOTAL", fuente1));
+                        c12.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c13.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c14.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c15.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c16.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c17.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c18.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c12.setBorder(0);
+                        c13.setBorder(0);
+                        c14.setBorder(0);
+                        c15.setBorder(0);
+                        c16.setBorder(0);
+                        c17.setBorder(0);
+                        c18.setBorder(0);
+                        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c17.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c18.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        tbl2.addCell(c12);
+                        tbl2.addCell(c13);
+                        tbl2.addCell(c14);
+                        tbl2.addCell(c15);
+                        tbl2.addCell(c16);
+                        tbl2.addCell(c17);
+                        tbl2.addCell(c18);
+
+                        int con12 = Tabla2.getRowCount();
+                        int con11 = con12;
+                        int articulo = 0;
+
+                        Stack<String> id = new Stack<>();
+                        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+                        enviarCorreo enviar = new enviarCorreo(f, true);
+                        Stack<String> pila = new Stack<>();
+                        Stack<String> pilaProv = new Stack<>();
+
+                        double total = 0, total2 = 0;
+                        if (con12 == 0) {
+                            con12++;
+                        }
+
+                        Statement st3 = con.createStatement();
+                        for (int k = 0; k < con12; k++) {
+                            String sql3 = "";
+                            ResultSet rs3 = null;
+
+                            if (search == true) {
+                                sql3 = "select * from requisicionesmuestra where Id like '" + Tabla2.getValueAt(k, 0).toString() + "'";
+                                rs3 = st3.executeQuery(sql3);
+                            } else {
+                                sql3 = "select * from requisiciones where Id like '" + Tabla2.getValueAt(k, 0).toString() + "'";
+                                rs3 = st3.executeQuery(sql3);
+                            }
+
+                            String dap = "";
+                            while (rs3.next()) {
+                                dap = rs3.getString("Proveedor");
+                            }
+
+                            boolean ban = true;
+
+                            if (Tabla2.getValueAt(k, 5) == null) {
+                                ban = false;
+                            } else if (Tabla2.getValueAt(k, 5).toString().equals("")) {
+                                ban = false;
+                            }
+
+                            if (provedor.equals(dap) && ban == true) {
+
+                                if (search == true) {
+                                    String sql4 = "select * from requisiciones where NumRequisicion like '" + lblRequi.getText() + "'";
+                                    Statement st4 = con.createStatement();
+                                    ResultSet rs4 = st4.executeQuery(sql4);
+
+                                    String sql30 = "update requisiciones set OC = ? where Codigo = ?";
+                                    PreparedStatement pst30 = con.prepareStatement(sql30);
+
+                                    String sql31 = "update requisicionesmuestra set OC = ? where Id = ?";
+                                    PreparedStatement pst31 = con.prepareStatement(sql31);
+
+                                    pst31.setString(1, cadena);
+                                    pst31.setString(2, Tabla2.getValueAt(k, 0).toString());
+
+                                    pst31.executeUpdate();
+
+                                    String idd = "";
+                                    String num = "";
+                                    int cont = 0;
+                                    while (rs4.next()) {
+                                        idd = rs4.getString("Id");
+                                        num = rs4.getString("Codigo");
+                                        if (num.equals(Tabla2.getValueAt(i, 2).toString())) {
+                                            pst30.setString(1, cadena);
+                                            pst30.setString(2, Tabla2.getValueAt(k, 2).toString());
+
+                                            pst30.executeUpdate();
+                                        }
+                                    }
+                                } else {
+                                    String sql30 = "update requisiciones set OC = ? where Id = ?";
+                                    PreparedStatement pst30 = con.prepareStatement(sql30);
+
                                     pst30.setString(1, cadena);
-                                    pst30.setString(2, Tabla2.getValueAt(k,2).toString());
+                                    pst30.setString(2, Tabla2.getValueAt(k, 0).toString());
 
                                     pst30.executeUpdate();
                                 }
-                            }      
-                       }else{
-                        String sql30 = "update requisiciones set OC = ? where Id = ?";
-                        PreparedStatement pst30 = con.prepareStatement(sql30);
 
-                        pst30.setString(1, cadena);
-                        pst30.setString(2, Tabla2.getValueAt(k,0).toString());
+                                double ad1 = Double.parseDouble(Tabla2.getValueAt(k, 6).toString());
+                                total = total + (ad1);
+                                for (int j = 0; j < 7; j++) {
+                                    PdfPCell c1 = new PdfPCell(new Phrase(Tabla2.getValueAt(k, j).toString(), fuente3));
+                                    if (j == 0) {
+                                        articulo++;
+                                        c1 = new PdfPCell(new Phrase("" + articulo, fuente3));
+                                    }
+                                    if (articulo % 2 == 0) {
+                                        c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                                    }
 
-                        pst30.executeUpdate();
-                       }
-                       
-                       double ad1 = Double.parseDouble(Tabla2.getValueAt(k, 6).toString());
-                        total = total + (ad1);
-                   for (int j = 0; j < 7; j++) {
-                       PdfPCell c1 = new PdfPCell(new Phrase(Tabla2.getValueAt(k, j).toString(),fuente3));
-                       if(j == 0){
-                           articulo++;
-                           c1 = new PdfPCell(new Phrase(""+articulo,fuente3));
-                       }
-                       if(articulo%2 == 0){
-                       c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                                    tbl2.addCell(c1);
+
+                                }
+                            }
                         }
-                       
-                       tbl2.addCell(c1);
-                       
-                    }
-                   }
-               }
-                for (int k = articulo; k < 20; k++) {
-                   con11++;
-                   for (int j = 0; j < 7; j++) {
-                       PdfPCell c1;
-                       if(j == 0){
-                        articulo++;
-                        c1 = new PdfPCell(new Phrase(""+articulo,fuente3));
-                       }else{
-                       c1 = new PdfPCell(new Phrase(" ",fuente3));
-                       }
-                       
-                       if(articulo%2 == 0){
-                       c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        for (int k = articulo; k < 20; k++) {
+                            con11++;
+                            for (int j = 0; j < 7; j++) {
+                                PdfPCell c1;
+                                if (j == 0) {
+                                    articulo++;
+                                    c1 = new PdfPCell(new Phrase("" + articulo, fuente3));
+                                } else {
+                                    c1 = new PdfPCell(new Phrase(" ", fuente3));
+                                }
+
+                                if (articulo % 2 == 0) {
+                                    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                                }
+                                tbl2.addCell(c1);
+
+                            }
                         }
-                       tbl2.addCell(c1);
-                       
+
+                        DecimalFormatSymbols separador = new DecimalFormatSymbols();
+                        separador.setDecimalSeparator('.');
+                        DecimalFormat formato = new DecimalFormat("#,###.##", separador);
+
+                        double iva = Double.parseDouble(Iva);
+                        total2 = (total * iva) / 100;
+                        PdfPTable tbl3 = new PdfPTable(2);
+                        tbl3.setWidthPercentage(20);
+                        tbl3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        PdfPCell c1 = new PdfPCell(new Phrase("SUBTOTAL", fuente));
+                        PdfPCell c2 = new PdfPCell(new Phrase("$  " + formato.format(total), fuente2));
+                        c1.setBorder(0);
+                        c2.setBorder(0);
+                        c2.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        tbl3.addCell(c1);
+                        tbl3.addCell(c2);
+
+                        PdfPTable tbl4 = new PdfPTable(3);
+                        tbl4.setWidthPercentage(100);
+                        float[] medidas = {50, 50, 11};
+                        tbl4.setWidths(medidas);
+
+                        PdfPCell c11 = new PdfPCell(new Phrase("Comentarios o instrucciones especiales", fuente1));
+                        PdfPCell c22 = new PdfPCell(new Phrase("IVA ", fuente));
+                        double t = (total * iva) / 100;
+                        PdfPCell c33 = new PdfPCell(new Phrase("  " + (formato.format(t)), fuente));
+                        c11.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c11.setBorder(0);
+                        c22.setBorder(0);
+                        c33.setBorder(0);
+                        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        tbl4.addCell(c11);
+                        tbl4.addCell(c22);
+                        tbl4.addCell(c33);
+
+                        //-----------------------------------------------------------------------
+                        //----------------------------ISR*---------------------------------------
+                        double isrT = 0;
+                        if (isr != null) {
+                            if (!isr.equals("")) {
+                                PdfPCell c23 = new PdfPCell(new Phrase("ISR ", fuente));
+                                isrT = ((total) * Double.parseDouble(isr)) / 100;
+                                PdfPCell c24 = new PdfPCell(new Phrase("$ " + formato.format(isrT), fuente2));
+                                c23.setBorder(0);
+                                c23.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                                c24.setBorder(0);
+                                tbl3.addCell(c23);
+                                tbl3.addCell(c24);
+                            }
+                        }
+                        //-----------------------------------------------------------------------
+
+                        c11 = new PdfPCell(new Phrase("" + Moneda, fuente));
+                        c22 = new PdfPCell(new Phrase("TOTAL ", fuente));
+                        total2 = total2 + total - isrT;
+                        c33 = new PdfPCell(new Phrase("$  " + (formato.format(total2)), fuente2));
+                        c11.setBorder(0);
+                        c22.setBorder(0);
+                        c33.setBorder(0);
+                        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        c33.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        c33.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        tbl4.addCell(c11);
+                        tbl4.addCell(c22);
+                        tbl4.addCell(c33);
+
+                        //----------------------------------------------------------------------
+                        Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
+                        img.setAbsolutePosition((20), (775));
+                        document.add(img);
+                        document.add(p);
+                        document.add(p7);
+                        document.add(p8);
+                        document.add(p1);
+                        document.add(p2);
+                        document.add(p3);
+                        document.add(p4);
+                        document.add(p5);
+                        document.add(p6);
+                        document.add(Chunk.NEWLINE);
+                        document.add(p9);
+                        document.add(tbl);
+                        document.add(Chunk.NEWLINE);
+                        document.add(tbl1);
+                        document.add(Chunk.NEWLINE);
+                        document.add(tbl2);
+                        document.add(tbl3);
+                        document.add(tbl4);
+                        document.add(p10);
+                        document.add(p11);
+                        document.add(p12);
+                        document.close();
+                        document.open();
+
+                        pila.push(cadena2);
+                        pilaProv.push(provedor);
+                        id.push(Tabla2.getValueAt(i, 0).toString());
+
+                        enviar.llenarBotones(pila, pilaProv, id);
+                        enviar.btnAgregar.setVisible(false);
+                        enviar.tabla = Tabla2;
+                        enviar.numRequi = cadena2;
+                        enviar.correo = correo;
+                        enviar.contra = pass;
+                        enviar.transaccion = "orden";
+                        enviar.ordenReal = cadena;
+                        for (int j = 0; j < enviar.panel.length; j++) {
+                            enviar.partes[j].setEnabled(false);
+                            enviar.label[j].setEnabled(false);
+                        }
+                        enviar.setVisible(true);
+
+                    } catch (SQLException ee) {
+                        JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ee, "ERROR", JOptionPane.ERROR_MESSAGE);
+                    } catch (FileNotFoundException ex) {
+                        JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ex, "ERROR", JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ex, "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-               }
-                
-                DecimalFormatSymbols separador = new DecimalFormatSymbols();
-                separador.setDecimalSeparator('.');
-                DecimalFormat formato = new DecimalFormat("#,###.##",separador);
-                
-                double iva = Double.parseDouble(Iva);
-                total2 = (total * iva)/100;
-                PdfPTable tbl3 = new PdfPTable(2);
-                tbl3.setWidthPercentage(20);
-                tbl3.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                PdfPCell c1 = new PdfPCell(new Phrase("SUBTOTAL",fuente));
-                PdfPCell c2 = new PdfPCell(new Phrase("$  "+formato.format(total),fuente2));
-                c1.setBorder(0);
-                c2.setBorder(0);
-                c2.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                tbl3.addCell(c1);
-                tbl3.addCell(c2);
-                
-        PdfPTable tbl4 = new PdfPTable(3);
-        tbl4.setWidthPercentage(100);
-        float[] medidas = {50, 50,11};
-        tbl4.setWidths(medidas);
-            
-        PdfPCell c11 = new PdfPCell(new Phrase("Comentarios o instrucciones especiales",fuente1));
-        PdfPCell c22 = new PdfPCell(new Phrase("IVA ",fuente));
-        double t = (total*iva)/100;
-        PdfPCell c33 = new PdfPCell(new Phrase("  "+(formato.format(t)),fuente));
-        c11.setBackgroundColor(BaseColor.DARK_GRAY);
-        c11.setBorder(0);
-        c22.setBorder(0);
-        c33.setBorder(0);
-        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
-        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        tbl4.addCell(c11);
-        tbl4.addCell(c22);
-        tbl4.addCell(c33);
-        
-        //-----------------------------------------------------------------------
-        //----------------------------ISR*---------------------------------------
-        double isrT = 0;
-        if(isr != null){
-            if(!isr.equals("")){
-                PdfPCell c23 = new PdfPCell(new Phrase("ISR ",fuente));
-                isrT = ((total) * Double.parseDouble(isr)) / 100;
-                PdfPCell c24 = new PdfPCell(new Phrase("$ " + formato.format(isrT),fuente2));
-                c23.setBorder(0);
-                c23.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                c24.setBorder(0);
-                tbl3.addCell(c23);
-                tbl3.addCell(c24);
-            }
-        }
-        //-----------------------------------------------------------------------
-        
-        c11 = new PdfPCell(new Phrase(""+Moneda,fuente));
-        c22 = new PdfPCell(new Phrase("TOTAL ",fuente));
-            total2 = total2 + total - isrT;
-        c33 = new PdfPCell(new Phrase("$  "+(formato.format(total2)),fuente2));
-        c11.setBorder(0);
-        c22.setBorder(0);
-        c33.setBorder(0);
-        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
-        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        c33.setHorizontalAlignment(Element.ALIGN_LEFT);
-        c33.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        tbl4.addCell(c11);
-        tbl4.addCell(c22);
-        tbl4.addCell(c33);
-        
-        
-        //----------------------------------------------------------------------
-        Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
-        img.setAbsolutePosition((20),(775) );
-        document.add(img);
-        document.add(p);
-        document.add(p7);
-        document.add(p8);
-        document.add(p1);
-        document.add(p2);
-        document.add(p3);
-        document.add(p4);
-        document.add(p5);
-        document.add(p6);
-        document.add(Chunk.NEWLINE);
-        document.add(p9);
-        document.add(tbl);
-        document.add(Chunk.NEWLINE);
-        document.add(tbl1);
-        document.add(Chunk.NEWLINE);
-        document.add(tbl2);
-        document.add(tbl3);
-        document.add(tbl4);
-        document.add(p10);
-        document.add(p11);
-        document.add(p12);
-        document.close();
-        document.open();
-        
-        pila.push(cadena2);
-        pilaProv.push(provedor);
-        id.push(Tabla2.getValueAt(i, 0).toString());
-        
-        enviar.llenarBotones(pila,pilaProv,id);
-        enviar.btnAgregar.setVisible(false);
-        enviar.tabla = Tabla2;
-        enviar.numRequi = cadena2;
-        enviar.correo = correo;
-        enviar.contra = pass;
-        enviar.transaccion = "orden";
-        enviar.ordenReal = cadena;
-        for (int j = 0; j < enviar.panel.length; j++) {
-            enviar.partes[j].setEnabled(false);
-            enviar.label[j].setEnabled(false);
-        }
-        enviar.setVisible(true);
-        
-           }catch(SQLException ee){
-           JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS"+ee,"ERROR",JOptionPane.ERROR_MESSAGE);
-           } catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS"+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS"+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
-            }
-       try{
-           char comillas = '"';
-          Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\"+comillas+cadena2+comillas+".pdf");
-          Runtime.getRuntime().exec("cmd /c close");
-       }catch(IOException  ee){
-              JOptionPane.showMessageDialog(this, ee);
-          }
-           }
-                
+                    try {
+                        char comillas = '"';
+                        Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + comillas + cadena2 + comillas + ".pdf");
+                        Runtime.getRuntime().exec("cmd /c close");
+                    } catch (IOException ee) {
+                        JOptionPane.showMessageDialog(this, ee);
+                    }
                 }
-            
-        limpiarTabla1();
-        verDatos();
-        verificarOrdenes(lblRequi.getText());
-        
-        }catch(Exception a){
-        JOptionPane.showMessageDialog(this, "ERROR enterio: "+a);
-        Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,a);
+
+            }
+
+            limpiarTabla1();
+            verDatos();
+            verificarOrdenes(lblRequi.getText());
+
+        } catch (Exception a) {
+            JOptionPane.showMessageDialog(this, "ERROR enterio: " + a);
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, a);
         }
-        
+
     }
-    
-    public void OrdenDeCompraEditada(){
+
+    public void OrdenDeCompraEditada() {
         String cadena = "";
         String cadena2 = "";
-        try{
+        try {
             int tam = elegir.botones.length;
             for (int i = 0; i < tam; i++) {
-            if(elegir.panel[i].getBackground().equals(java.awt.Color.green)){
-            String provedor = elegir.botones[i].getText();
-            String cotizacion = "";
-            boolean banda = false;
-            do{
-                cotizacion = JOptionPane.showInputDialog(this, "INGRESA NUMERO DE COTIZACION DEL PROVEEDOR "+provedor);
-                if(cotizacion.equals("")){
-                    banda = false;
-                }else{
-                    banda = true;
-                }
-            }while(banda == false);
+                if (elegir.panel[i].getBackground().equals(java.awt.Color.green)) {
+                    String provedor = elegir.botones[i].getText();
+                    String cotizacion = "";
+                    boolean banda = false;
+                    do {
+                        cotizacion = JOptionPane.showInputDialog(this, "INGRESA NUMERO DE COTIZACION DEL PROVEEDOR " + provedor);
+                        if (cotizacion.equals("")) {
+                            banda = false;
+                        } else {
+                            banda = true;
+                        }
+                    } while (banda == false);
 //         ---------------------------------BD--------------------------------
-           try{
-           Connection con = null;
-           Conexion con1 = new Conexion();
-           con = con1.getConnection();
-           Statement st = con.createStatement();
-           
-           String po4 = "select * from detallesedicionpo where IdArticulo like '"+Tabla2.getValueAt(0, 0).toString()+"'";
-           Statement st4 = con.createStatement();
-           ResultSet rs4 = st4.executeQuery(po4);
-           String arti = "";
-           String arti5 = "";
-           String o = "";
-           while(rs4.next()){
-               arti = rs4.getString("IdArticulo");
-               arti5 = rs4.getString("Proveedor");
-               o = rs4.getString("PO");
-           }
-           
-           if(arti5.equals(provedor)){
-               cadena = o;
-               cadena2 = o+"-"+provedor;
-               
-           }else{
-               
-           String sql = "select * from OrdenCompra";
-           String datos = "";
-           ResultSet rs = st.executeQuery(sql);
-           while(rs.next()){
-           datos = rs.getString("OrdenNo");
-           }
-           
-           cadena = datos.substring(3,7);
-           int suma = Integer.parseInt(cadena);
-           cadena = "OCM"+(suma+1);
-           cadena2 = "OCM"+(suma+1)+"-"+provedor;
-           
-           String add = "insert into OrdenCompra (OrdenNo,RequisicionNo) values (?,?)";
-           PreparedStatement pst = con.prepareStatement(add);
-           
-           
-           pst.setString(1, cadena);
-           pst.setString(2, id);
-           
-           
-           pst.executeUpdate();
-           
-               for (int j = 0; j < Tabla2.getRowCount(); j++) {
-                   String prov = "";
-                   if(Tabla2.getValueAt(j, 7) != null){
-                       prov = Tabla2.getValueAt(j, 7).toString();
-                       if(prov.equals(proveedor)){
-                        String act = "update requisiciones set OC = ? where Id = ?";
-                        PreparedStatement pst1 = con.prepareStatement(act);
-                        pst1.setString(1, cadena);
-                        pst1.setString(2, Tabla2.getValueAt(j, 0).toString());
-                        pst1.executeUpdate();
-                   }
-                   }
-               }
-           }
-           
-           //---------------------------PROVEEDOR------------------------------
-           Statement st2 = con.createStatement();
-           String sql2 = "select * from registroprov_compras where Nombre like '"+provedor+"'";
-           ResultSet rs2 = st2.executeQuery(sql2);
-           String Proveedor = "",Condicion = "",Iva = "",Moneda = "";
-           while(rs2.next()){
-               Proveedor = rs2.getString("Nombre");
-               Condicion = rs2.getString("Condiciones");
-               Iva = rs2.getString("Iva");
-               Moneda = rs2.getString("Moneda");
-           }
-           
-           if(Proveedor == null){
-               Proveedor = "";
-           }
-           if(Condicion == null){
-               Condicion = "";
-           }
-           if(Iva == null){
-               Iva = "0";
-           }
-           if(Moneda == null){
-               Moneda = "";
-           }
-           
-           //------------------------------------------------------------------
-           
-           
-           
-           String prov = "select * from registroProv_Compras where Nombre like '"+Proveedor+"'";
-           ResultSet rs1 = st.executeQuery(prov);
-           String datos1[] = new String[15];
-           String isr = null;
-           while(rs1.next()){
-           datos1[0] = rs1.getString("Nombre");
-           datos1[1] = rs1.getString("Contacto");
-           datos1[2] = rs1.getString("Direccion");
-           datos1[3] = rs1.getString("Telefono");
-           datos1[4] = rs1.getString("Condiciones");
-           datos1[5] = rs1.getString("Iva");
-           isr = rs1.getString("Isr");
-           
-           
-           }
-           //-------------------------------------------------------------------
-           
-        String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\"+cadena2+".pdf";
+                    try {
+                        Connection con = null;
+                        Conexion con1 = new Conexion();
+                        con = con1.getConnection();
+                        Statement st = con.createStatement();
+
+                        String po4 = "select * from detallesedicionpo where IdArticulo like '" + Tabla2.getValueAt(0, 0).toString() + "'";
+                        Statement st4 = con.createStatement();
+                        ResultSet rs4 = st4.executeQuery(po4);
+                        String arti = "";
+                        String arti5 = "";
+                        String o = "";
+                        while (rs4.next()) {
+                            arti = rs4.getString("IdArticulo");
+                            arti5 = rs4.getString("Proveedor");
+                            o = rs4.getString("PO");
+                        }
+
+                        if (arti5.equals(provedor)) {
+                            cadena = o;
+                            cadena2 = o + "-" + provedor;
+
+                        } else {
+
+                            String sql = "select * from OrdenCompra";
+                            String datos = "";
+                            ResultSet rs = st.executeQuery(sql);
+                            while (rs.next()) {
+                                datos = rs.getString("OrdenNo");
+                            }
+
+                            cadena = datos.substring(3, 7);
+                            int suma = Integer.parseInt(cadena);
+                            cadena = "OCM" + (suma + 1);
+                            cadena2 = "OCM" + (suma + 1) + "-" + provedor;
+
+                            String add = "insert into OrdenCompra (OrdenNo,RequisicionNo) values (?,?)";
+                            PreparedStatement pst = con.prepareStatement(add);
+
+                            pst.setString(1, cadena);
+                            pst.setString(2, id);
+
+                            pst.executeUpdate();
+
+                            for (int j = 0; j < Tabla2.getRowCount(); j++) {
+                                String prov = "";
+                                if (Tabla2.getValueAt(j, 7) != null) {
+                                    prov = Tabla2.getValueAt(j, 7).toString();
+                                    if (prov.equals(proveedor)) {
+                                        String act = "update requisiciones set OC = ? where Id = ?";
+                                        PreparedStatement pst1 = con.prepareStatement(act);
+                                        pst1.setString(1, cadena);
+                                        pst1.setString(2, Tabla2.getValueAt(j, 0).toString());
+                                        pst1.executeUpdate();
+                                    }
+                                }
+                            }
+                        }
+
+                        //---------------------------PROVEEDOR------------------------------
+                        Statement st2 = con.createStatement();
+                        String sql2 = "select * from registroprov_compras where Nombre like '" + provedor + "'";
+                        ResultSet rs2 = st2.executeQuery(sql2);
+                        String Proveedor = "", Condicion = "", Iva = "", Moneda = "";
+                        while (rs2.next()) {
+                            Proveedor = rs2.getString("Nombre");
+                            Condicion = rs2.getString("Condiciones");
+                            Iva = rs2.getString("Iva");
+                            Moneda = rs2.getString("Moneda");
+                        }
+
+                        if (Proveedor == null) {
+                            Proveedor = "";
+                        }
+                        if (Condicion == null) {
+                            Condicion = "";
+                        }
+                        if (Iva == null) {
+                            Iva = "0";
+                        }
+                        if (Moneda == null) {
+                            Moneda = "";
+                        }
+
+                        //------------------------------------------------------------------
+                        String prov = "select * from registroProv_Compras where Nombre like '" + Proveedor + "'";
+                        ResultSet rs1 = st.executeQuery(prov);
+                        String datos1[] = new String[15];
+                        String isr = null;
+                        while (rs1.next()) {
+                            datos1[0] = rs1.getString("Nombre");
+                            datos1[1] = rs1.getString("Contacto");
+                            datos1[2] = rs1.getString("Direccion");
+                            datos1[3] = rs1.getString("Telefono");
+                            datos1[4] = rs1.getString("Condiciones");
+                            datos1[5] = rs1.getString("Iva");
+                            isr = rs1.getString("Isr");
+
+                        }
+                        //-------------------------------------------------------------------
+
+                        String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + cadena2 + ".pdf";
 //        String ruta = "C:\\Users\\AlmacenPC\\Documents\\Prueba Crear multiple\\"+cadena2+".pdf";
-        Document document = new Document();
-        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
-        document.open();
-        //------------------------------FUENTES---------------------------------
-        com.itextpdf.text.Font fuente = new com.itextpdf.text.Font();
-        com.itextpdf.text.Font fuente1 = new com.itextpdf.text.Font();
-        com.itextpdf.text.Font fuente2 = new com.itextpdf.text.Font();
-        com.itextpdf.text.Font fuente3 = new com.itextpdf.text.Font();
-        //-----------------------------RELLENO----------------------------------
-        PdfContentByte under1 = writer.getDirectContentUnder();
-        under1.saveState();
-        under1.setRGBColorFill(87, 89, 87);
-        under1.rectangle(30, 755,300, 15);
-        under1.fill();
-        under1.restoreState();
-        
-        PdfContentByte under2 = writer.getDirectContentUnder();
-        under2.saveState();
-        under2.setRGBColorFill(87, 89, 87);
-        under2.rectangle(30, 672,300, 15);
-        under2.fill();
-        under2.restoreState();
-        
-        PdfContentByte under3 = writer.getDirectContentUnder();
-        under3.saveState();
-        under3.setRGBColorFill(87, 89, 87);
-        under3.rectangle(400, 672,150, 15);
-        under3.fill();
-        under3.restoreState();
-        //----------------------------------------------------------------------
-        //--------------------------------FUENTES-------------------------------
-        fuente.setSize(8);
-        fuente.setFamily("Arial");
-        fuente.setColor(BaseColor.BLACK);
-        fuente.setStyle(com.itextpdf.text.Font.BOLD);
-        
-        fuente1.setSize(8);
-        fuente1.setFamily("Arial");
-        fuente1.setColor(BaseColor.WHITE);
-        fuente1.setStyle(com.itextpdf.text.Font.BOLD);
-        
-        fuente2.setSize(8);
-        fuente2.setFamily("Arial");
-        fuente2.setColor(BaseColor.BLACK);
-        
-        fuente3.setSize(8);
-        fuente3.setFamily("Arial");
-        fuente3.setColor(BaseColor.BLACK);
-        //----------------------------------------------------------------------
-        //--------------------------------TEXTO---------------------------------
-        Paragraph p = new Paragraph("                  SERVICIOS INDUSTRIALES 3i S de RL MI                                                                                           ORDEN DE COMPRA",fuente);
-        p.setAlignment(Element.ALIGN_CENTER);
-        
-        Paragraph p1 = new Paragraph("Nuevo Dimicilio Fiscal Para Facturacion",fuente1);
-        p.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p2 = new Paragraph("CAMINO VIEJO A LA ROSITA 305 COLONIA SALVARCAR",fuente);
-        p2.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p3 = new Paragraph("Cd Juárez, Chihuahua, CP 32580",fuente);
-        p3.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p4 = new Paragraph("Telefono: 656-791-1365",fuente);
-        p4.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p5 = new Paragraph("RFC: SII150213KR7",fuente);
-        p5.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p6 = new Paragraph("E-mail: leonardo.soto.salcido@gmail.com",fuente);
-        p6.setAlignment(Element.ALIGN_LEFT);
-        
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        String fec = sdf.format(d);
-               System.out.println(fec);
-        Paragraph p7 = new Paragraph("                                                                                                                                                                                     FECHA:   "+fec,fuente);
-        p7.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p8 = new Paragraph("                                                                                                                                                                                          OC#:   "+cadena,fuente);
-        p8.setAlignment(Element.ALIGN_LEFT);
-        //------------------------
-        Paragraph p9 = new Paragraph("VENDEDOR                                                                                                                                                  ENVIAR A",fuente1);
-        p9.setAlignment(Element.ALIGN_LEFT);
-        
-        Paragraph p10 = new Paragraph("Si usted tiene alguna pregunta sobre esta orden de compra, por favor, pongase en contacto con",fuente2);
-        p10.setAlignment(Element.ALIGN_CENTER);
-        
-        Paragraph p11 = new Paragraph("Kenia Rueda: Tel: 656-791-1365 E-mail: compras01@si3i.com",fuente2);
-        p11.setAlignment(Element.ALIGN_CENTER);
-        
-        String sql1 = "select * from ordencompra where OrdenNo like '"+lblRequi.getText()+"'";
-        Statement st1 = con.createStatement();
-        ResultSet rs = st1.executeQuery(sql1);
-        String requisicion = "";
-        while(rs.next()){
-            requisicion = rs.getString("RequisicionNo");
-        }
-        if(requisicion == null){
-            requisicion = "";
-        }
-               System.out.println(requisicion);
-        Paragraph p12 = new Paragraph("NR: "+requisicion,fuente);
-        p12.setAlignment(Element.ALIGN_CENTER);
-        
-        PdfPTable tbl = new PdfPTable(3);
-        tbl.setWidthPercentage(100);
-        PdfPCell col1 = new PdfPCell(new Phrase("Proveedor:   "+datos1[0],fuente2));
-        PdfPCell col2 = new PdfPCell(new Phrase("Nombre:  ",fuente2));
-        PdfPCell col3 = new PdfPCell(new Phrase("Servicios Industriales 3i",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        float[] medidaCeldas = {110, 50, 50}; 
-        tbl.setWidths(medidaCeldas);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        col1 = new PdfPCell(new Phrase("Contacto:     "+datos1[1],fuente2));
-        col2 = new PdfPCell(new Phrase("Direccion: ",fuente2));
-        col3 = new PdfPCell(new Phrase("Camino Viejo a la Rosita #305",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        col1 = new PdfPCell(new Phrase("Direccion:     "+datos1[2],fuente2));
-        col2 = new PdfPCell(new Phrase("",fuente2));
-        col3 = new PdfPCell(new Phrase("Col Salvarcar CP: 32580",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        col1 = new PdfPCell(new Phrase("Telefono:      "+datos1[3],fuente2));
-        col2 = new PdfPCell(new Phrase("Horario: ",fuente2));
-        col3 = new PdfPCell(new Phrase("8:00 am - 5:00 pm",fuente2));
-        col1.setBorder(0);
-        col2.setBorder(0);
-        col3.setBorder(0);
-        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
-        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
-        tbl.addCell(col1);
-        tbl.addCell(col2);
-        tbl.addCell(col3);
-        
-        PdfPTable tbl1 = new PdfPTable(5);
-        float[] medidaCeldas1 = {35, 90, 100,50,60}; 
-        tbl1.setWidths(medidaCeldas1);
-        tbl1.setWidthPercentage(100);
-        PdfPCell c12 = new PdfPCell(new Phrase("COTIZACION",fuente1));
-        PdfPCell c13 = new PdfPCell(new Phrase("FORMA DE PAGO",fuente1));
-        PdfPCell c14 = new PdfPCell(new Phrase("REQUISITOR",fuente1));
-        PdfPCell c15 = new PdfPCell(new Phrase("PROYECTO",fuente1));
-        PdfPCell c16 = new PdfPCell(new Phrase("CONDICION DE PAGO",fuente1));
-        c12.setBackgroundColor(BaseColor.DARK_GRAY);
-        c13.setBackgroundColor(BaseColor.DARK_GRAY);
-        c14.setBackgroundColor(BaseColor.DARK_GRAY);
-        c15.setBackgroundColor(BaseColor.DARK_GRAY);
-        c16.setBackgroundColor(BaseColor.DARK_GRAY);
-        c12.setBorder(0);
-        c13.setBorder(0);
-        c14.setBorder(0);
-        c15.setBorder(0);
-        c16.setBorder(0);
-        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
-        tbl1.addCell(c12);
-        tbl1.addCell(c13);
-        tbl1.addCell(c14);
-        tbl1.addCell(c15);
-        tbl1.addCell(c16);
-        
-        c12 = new PdfPCell(new Phrase(""+cotizacion,fuente2));
-        c13 = new PdfPCell(new Phrase("TRANSFERENCIA ELECTRONICA",fuente2));
-        c14 = new PdfPCell(new Phrase(num,fuente2));
-        c15 = new PdfPCell(new Phrase(proy,fuente2));
-        c16 = new PdfPCell(new Phrase(Condicion,fuente2));
-        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
-        tbl1.addCell(c12);
-        tbl1.addCell(c13);
-        tbl1.addCell(c14);
-        tbl1.addCell(c15);
-        tbl1.addCell(c16);
-        
-        PdfPTable tbl2 = new PdfPTable(7);
-        float[] medidaCeldas2 = {35, 130, 60,20,35,30,40}; 
-        tbl2.setWidths(medidaCeldas2);
-        tbl2.setWidthPercentage(100);
-        PdfPCell c17;
-        PdfPCell c18;
-        c12 = new PdfPCell(new Phrase("ARTICULO",fuente1));
-        c13 = new PdfPCell(new Phrase("DESCRIPCION",fuente1));
-        c14 = new PdfPCell(new Phrase("CODIGO",fuente1));
-        c15 = new PdfPCell(new Phrase("U.M.",fuente1));
-        c16 = new PdfPCell(new Phrase("CANTIDAD",fuente1));
-        c17 = new PdfPCell(new Phrase("PRECIO",fuente1));
-        c18 = new PdfPCell(new Phrase("TOTAL",fuente1));
-        c12.setBackgroundColor(BaseColor.DARK_GRAY);
-        c13.setBackgroundColor(BaseColor.DARK_GRAY);
-        c14.setBackgroundColor(BaseColor.DARK_GRAY);
-        c15.setBackgroundColor(BaseColor.DARK_GRAY);
-        c16.setBackgroundColor(BaseColor.DARK_GRAY);
-        c17.setBackgroundColor(BaseColor.DARK_GRAY);
-        c18.setBackgroundColor(BaseColor.DARK_GRAY);
-        c12.setBorder(0);
-        c13.setBorder(0);
-        c14.setBorder(0);
-        c15.setBorder(0);
-        c16.setBorder(0);
-        c17.setBorder(0);
-        c18.setBorder(0);
-        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c17.setHorizontalAlignment(Element.ALIGN_CENTER);
-        c18.setHorizontalAlignment(Element.ALIGN_CENTER);
-        tbl2.addCell(c12);
-        tbl2.addCell(c13);
-        tbl2.addCell(c14);
-        tbl2.addCell(c15);
-        tbl2.addCell(c16);
-        tbl2.addCell(c17);
-        tbl2.addCell(c18);
-            
-                int con12 = Tabla2.getRowCount();
-                int con11 = con12;
-                int articulo = 0;
-                
-                double total = 0, total2 = 0;
-                if(con12 == 0){
-                    con12++;
-                }
-                
-                Statement st3 = con.createStatement();
-                for (int k = 0; k < con12; k++) {
-                   String sql3 = "select * from requisiciones where Id like '"+Tabla2.getValueAt(k,0).toString()+"'";
-                   ResultSet rs3 = st3.executeQuery(sql3);
-                   String dap = "";
-                   while(rs3.next()){
-                       dap = rs3.getString("Proveedor");
-                   }
-                   
-                   boolean ban = true;
-                   
-                   if(Tabla2.getValueAt(k, 5) == null){
-                       ban = false;
-                   }else if(Tabla2.getValueAt(k, 5).toString().equals("")){
-                       ban = false;
-                   }
-                   
-                   if(provedor.equals(dap) && ban == true){
-                       String sql30 = "update requisiciones set Estado = ? where Id = ?";
-                       PreparedStatement pst30 = con.prepareStatement(sql30);
-                       
-                       pst30.setString(1, "TERMINADO");
-                       pst30.setString(2, Tabla2.getValueAt(k,0).toString());
-                       
-                       pst30.executeUpdate();
-                       
-                       double ad1 = Double.parseDouble(Tabla2.getValueAt(k, 6).toString());
-                        total = total + (ad1);
-                   for (int j = 0; j < 7; j++) {
-                       PdfPCell c1 = new PdfPCell(new Phrase(Tabla2.getValueAt(k, j).toString(),fuente3));
-                       if(j == 0){
-                           articulo++;
-                           c1 = new PdfPCell(new Phrase(""+articulo,fuente3));
-                       }
-                       if(articulo%2 == 0){
-                       c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        Document document = new Document();
+                        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
+                        document.open();
+                        //------------------------------FUENTES---------------------------------
+                        com.itextpdf.text.Font fuente = new com.itextpdf.text.Font();
+                        com.itextpdf.text.Font fuente1 = new com.itextpdf.text.Font();
+                        com.itextpdf.text.Font fuente2 = new com.itextpdf.text.Font();
+                        com.itextpdf.text.Font fuente3 = new com.itextpdf.text.Font();
+                        //-----------------------------RELLENO----------------------------------
+                        PdfContentByte under1 = writer.getDirectContentUnder();
+                        under1.saveState();
+                        under1.setRGBColorFill(87, 89, 87);
+                        under1.rectangle(30, 755, 300, 15);
+                        under1.fill();
+                        under1.restoreState();
+
+                        PdfContentByte under2 = writer.getDirectContentUnder();
+                        under2.saveState();
+                        under2.setRGBColorFill(87, 89, 87);
+                        under2.rectangle(30, 672, 300, 15);
+                        under2.fill();
+                        under2.restoreState();
+
+                        PdfContentByte under3 = writer.getDirectContentUnder();
+                        under3.saveState();
+                        under3.setRGBColorFill(87, 89, 87);
+                        under3.rectangle(400, 672, 150, 15);
+                        under3.fill();
+                        under3.restoreState();
+                        //----------------------------------------------------------------------
+                        //--------------------------------FUENTES-------------------------------
+                        fuente.setSize(8);
+                        fuente.setFamily("Arial");
+                        fuente.setColor(BaseColor.BLACK);
+                        fuente.setStyle(com.itextpdf.text.Font.BOLD);
+
+                        fuente1.setSize(8);
+                        fuente1.setFamily("Arial");
+                        fuente1.setColor(BaseColor.WHITE);
+                        fuente1.setStyle(com.itextpdf.text.Font.BOLD);
+
+                        fuente2.setSize(8);
+                        fuente2.setFamily("Arial");
+                        fuente2.setColor(BaseColor.BLACK);
+
+                        fuente3.setSize(8);
+                        fuente3.setFamily("Arial");
+                        fuente3.setColor(BaseColor.BLACK);
+                        //----------------------------------------------------------------------
+                        //--------------------------------TEXTO---------------------------------
+                        Paragraph p = new Paragraph("                  SERVICIOS INDUSTRIALES 3i S de RL MI                                                                                           ORDEN DE COMPRA", fuente);
+                        p.setAlignment(Element.ALIGN_CENTER);
+
+                        Paragraph p1 = new Paragraph("Nuevo Dimicilio Fiscal Para Facturacion", fuente1);
+                        p.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p2 = new Paragraph("CAMINO VIEJO A LA ROSITA 305 COLONIA SALVARCAR", fuente);
+                        p2.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p3 = new Paragraph("Cd Juárez, Chihuahua, CP 32580", fuente);
+                        p3.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p4 = new Paragraph("Telefono: 656-791-1365", fuente);
+                        p4.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p5 = new Paragraph("RFC: SII150213KR7", fuente);
+                        p5.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p6 = new Paragraph("E-mail: leonardo.soto.salcido@gmail.com", fuente);
+                        p6.setAlignment(Element.ALIGN_LEFT);
+
+                        Date d = new Date();
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                        String fec = sdf.format(d);
+
+                        Paragraph p7 = new Paragraph("                                                                                                                                                                                     FECHA:   " + fec, fuente);
+                        p7.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p8 = new Paragraph("                                                                                                                                                                                          OC#:   " + cadena, fuente);
+                        p8.setAlignment(Element.ALIGN_LEFT);
+                        //------------------------
+                        Paragraph p9 = new Paragraph("VENDEDOR                                                                                                                                                  ENVIAR A", fuente1);
+                        p9.setAlignment(Element.ALIGN_LEFT);
+
+                        Paragraph p10 = new Paragraph("Si usted tiene alguna pregunta sobre esta orden de compra, por favor, pongase en contacto con", fuente2);
+                        p10.setAlignment(Element.ALIGN_CENTER);
+
+                        Paragraph p11 = new Paragraph("Kenia Rueda: Tel: 656-791-1365 E-mail: compras01@si3i.com", fuente2);
+                        p11.setAlignment(Element.ALIGN_CENTER);
+
+                        String sql1 = "select * from ordencompra where OrdenNo like '" + lblRequi.getText() + "'";
+                        Statement st1 = con.createStatement();
+                        ResultSet rs = st1.executeQuery(sql1);
+                        String requisicion = "";
+                        while (rs.next()) {
+                            requisicion = rs.getString("RequisicionNo");
                         }
-                       
-                       tbl2.addCell(c1);
-                       
-                    }
-                   }
-               }
-                for (int k = articulo; k < 20; k++) {
-                   con11++;
-                   for (int j = 0; j < 7; j++) {
-                       PdfPCell c1;
-                       if(j == 0){
-                        articulo++;
-                        c1 = new PdfPCell(new Phrase(""+articulo,fuente3));
-                       }else{
-                       c1 = new PdfPCell(new Phrase(" ",fuente3));
-                       }
-                       
-                       if(articulo%2 == 0){
-                       c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        if (requisicion == null) {
+                            requisicion = "";
                         }
-                       tbl2.addCell(c1);
-                       
+
+                        Paragraph p12 = new Paragraph("NR: " + requisicion, fuente);
+                        p12.setAlignment(Element.ALIGN_CENTER);
+
+                        PdfPTable tbl = new PdfPTable(3);
+                        tbl.setWidthPercentage(100);
+                        PdfPCell col1 = new PdfPCell(new Phrase("Proveedor:   " + datos1[0], fuente2));
+                        PdfPCell col2 = new PdfPCell(new Phrase("Nombre:  ", fuente2));
+                        PdfPCell col3 = new PdfPCell(new Phrase("Servicios Industriales 3i", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        float[] medidaCeldas = {110, 50, 50};
+                        tbl.setWidths(medidaCeldas);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+                        col1 = new PdfPCell(new Phrase("Contacto:     " + datos1[1], fuente2));
+                        col2 = new PdfPCell(new Phrase("Direccion: ", fuente2));
+                        col3 = new PdfPCell(new Phrase("Camino Viejo a la Rosita #305", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+                        col1 = new PdfPCell(new Phrase("Direccion:     " + datos1[2], fuente2));
+                        col2 = new PdfPCell(new Phrase("", fuente2));
+                        col3 = new PdfPCell(new Phrase("Col Salvarcar CP: 32580", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+                        col1 = new PdfPCell(new Phrase("Telefono:      " + datos1[3], fuente2));
+                        col2 = new PdfPCell(new Phrase("Horario: ", fuente2));
+                        col3 = new PdfPCell(new Phrase("8:00 am - 5:00 pm", fuente2));
+                        col1.setBorder(0);
+                        col2.setBorder(0);
+                        col3.setBorder(0);
+                        col1.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        col2.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        col3.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        tbl.addCell(col1);
+                        tbl.addCell(col2);
+                        tbl.addCell(col3);
+
+                        PdfPTable tbl1 = new PdfPTable(5);
+                        float[] medidaCeldas1 = {35, 90, 100, 50, 60};
+                        tbl1.setWidths(medidaCeldas1);
+                        tbl1.setWidthPercentage(100);
+                        PdfPCell c12 = new PdfPCell(new Phrase("COTIZACION", fuente1));
+                        PdfPCell c13 = new PdfPCell(new Phrase("FORMA DE PAGO", fuente1));
+                        PdfPCell c14 = new PdfPCell(new Phrase("REQUISITOR", fuente1));
+                        PdfPCell c15 = new PdfPCell(new Phrase("PROYECTO", fuente1));
+                        PdfPCell c16 = new PdfPCell(new Phrase("CONDICION DE PAGO", fuente1));
+                        c12.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c13.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c14.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c15.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c16.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c12.setBorder(0);
+                        c13.setBorder(0);
+                        c14.setBorder(0);
+                        c15.setBorder(0);
+                        c16.setBorder(0);
+                        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        tbl1.addCell(c12);
+                        tbl1.addCell(c13);
+                        tbl1.addCell(c14);
+                        tbl1.addCell(c15);
+                        tbl1.addCell(c16);
+
+                        c12 = new PdfPCell(new Phrase("" + cotizacion, fuente2));
+                        c13 = new PdfPCell(new Phrase("TRANSFERENCIA ELECTRONICA", fuente2));
+                        c14 = new PdfPCell(new Phrase(num, fuente2));
+                        c15 = new PdfPCell(new Phrase(proy, fuente2));
+                        c16 = new PdfPCell(new Phrase(Condicion, fuente2));
+                        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        tbl1.addCell(c12);
+                        tbl1.addCell(c13);
+                        tbl1.addCell(c14);
+                        tbl1.addCell(c15);
+                        tbl1.addCell(c16);
+
+                        PdfPTable tbl2 = new PdfPTable(7);
+                        float[] medidaCeldas2 = {35, 130, 60, 20, 35, 30, 40};
+                        tbl2.setWidths(medidaCeldas2);
+                        tbl2.setWidthPercentage(100);
+                        PdfPCell c17;
+                        PdfPCell c18;
+                        c12 = new PdfPCell(new Phrase("ARTICULO", fuente1));
+                        c13 = new PdfPCell(new Phrase("DESCRIPCION", fuente1));
+                        c14 = new PdfPCell(new Phrase("CODIGO", fuente1));
+                        c15 = new PdfPCell(new Phrase("U.M.", fuente1));
+                        c16 = new PdfPCell(new Phrase("CANTIDAD", fuente1));
+                        c17 = new PdfPCell(new Phrase("PRECIO", fuente1));
+                        c18 = new PdfPCell(new Phrase("TOTAL", fuente1));
+                        c12.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c13.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c14.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c15.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c16.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c17.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c18.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c12.setBorder(0);
+                        c13.setBorder(0);
+                        c14.setBorder(0);
+                        c15.setBorder(0);
+                        c16.setBorder(0);
+                        c17.setBorder(0);
+                        c18.setBorder(0);
+                        c12.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c13.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c14.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c15.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c16.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c17.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        c18.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        tbl2.addCell(c12);
+                        tbl2.addCell(c13);
+                        tbl2.addCell(c14);
+                        tbl2.addCell(c15);
+                        tbl2.addCell(c16);
+                        tbl2.addCell(c17);
+                        tbl2.addCell(c18);
+
+                        int con12 = Tabla2.getRowCount();
+                        int con11 = con12;
+                        int articulo = 0;
+
+                        double total = 0, total2 = 0;
+                        if (con12 == 0) {
+                            con12++;
+                        }
+
+                        Statement st3 = con.createStatement();
+                        for (int k = 0; k < con12; k++) {
+                            String sql3 = "select * from requisiciones where Id like '" + Tabla2.getValueAt(k, 0).toString() + "'";
+                            ResultSet rs3 = st3.executeQuery(sql3);
+                            String dap = "";
+                            while (rs3.next()) {
+                                dap = rs3.getString("Proveedor");
+                            }
+
+                            boolean ban = true;
+
+                            if (Tabla2.getValueAt(k, 5) == null) {
+                                ban = false;
+                            } else if (Tabla2.getValueAt(k, 5).toString().equals("")) {
+                                ban = false;
+                            }
+
+                            if (provedor.equals(dap) && ban == true) {
+                                String sql30 = "update requisiciones set Estado = ? where Id = ?";
+                                PreparedStatement pst30 = con.prepareStatement(sql30);
+
+                                pst30.setString(1, "TERMINADO");
+                                pst30.setString(2, Tabla2.getValueAt(k, 0).toString());
+
+                                pst30.executeUpdate();
+
+                                double ad1 = Double.parseDouble(Tabla2.getValueAt(k, 6).toString());
+                                total = total + (ad1);
+                                for (int j = 0; j < 7; j++) {
+                                    PdfPCell c1 = new PdfPCell(new Phrase(Tabla2.getValueAt(k, j).toString(), fuente3));
+                                    if (j == 0) {
+                                        articulo++;
+                                        c1 = new PdfPCell(new Phrase("" + articulo, fuente3));
+                                    }
+                                    if (articulo % 2 == 0) {
+                                        c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                                    }
+
+                                    tbl2.addCell(c1);
+
+                                }
+                            }
+                        }
+                        for (int k = articulo; k < 20; k++) {
+                            con11++;
+                            for (int j = 0; j < 7; j++) {
+                                PdfPCell c1;
+                                if (j == 0) {
+                                    articulo++;
+                                    c1 = new PdfPCell(new Phrase("" + articulo, fuente3));
+                                } else {
+                                    c1 = new PdfPCell(new Phrase(" ", fuente3));
+                                }
+
+                                if (articulo % 2 == 0) {
+                                    c1.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                                }
+                                tbl2.addCell(c1);
+
+                            }
+                        }
+
+                        DecimalFormatSymbols separador = new DecimalFormatSymbols();
+                        separador.setDecimalSeparator('.');
+                        DecimalFormat formato = new DecimalFormat("#,###.##", separador);
+
+                        double iva = Integer.parseInt(Iva);
+                        total2 = (total * iva) / 100;
+                        PdfPTable tbl3 = new PdfPTable(2);
+                        tbl3.setWidthPercentage(20);
+                        tbl3.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        PdfPCell c1 = new PdfPCell(new Phrase("SUBTOTAL", fuente));
+                        PdfPCell c2 = new PdfPCell(new Phrase("$  " + formato.format(total), fuente2));
+                        c1.setBorder(0);
+                        c2.setBorder(0);
+                        c2.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        tbl3.addCell(c1);
+                        tbl3.addCell(c2);
+
+                        PdfPTable tbl4 = new PdfPTable(3);
+                        tbl4.setWidthPercentage(100);
+                        float[] medidas = {50, 50, 11};
+                        tbl4.setWidths(medidas);
+
+                        PdfPCell c11 = new PdfPCell(new Phrase("Comentarios o instrucciones especiales", fuente1));
+                        PdfPCell c22 = new PdfPCell(new Phrase("IVA ", fuente));
+                        double t = (total * iva) / 100;
+                        PdfPCell c33 = new PdfPCell(new Phrase("  " + (formato.format(t)), fuente));
+                        c11.setBackgroundColor(BaseColor.DARK_GRAY);
+                        c11.setBorder(0);
+                        c22.setBorder(0);
+                        c33.setBorder(0);
+                        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        tbl4.addCell(c11);
+                        tbl4.addCell(c22);
+                        tbl4.addCell(c33);
+
+                        //-----------------------------------------------------------------------
+                        //----------------------------ISR*---------------------------------------
+                        double isrT = 0;
+                        if (isr != null) {
+                            if (!isr.equals("")) {
+                                PdfPCell c23 = new PdfPCell(new Phrase("ISR ", fuente));
+                                isrT = ((total) * Double.parseDouble(isr)) / 100;
+                                PdfPCell c24 = new PdfPCell(new Phrase("$ " + formato.format(isrT), fuente2));
+                                c23.setBorder(0);
+                                c24.setBorder(0);
+                                tbl3.addCell(c23);
+                                tbl3.addCell(c24);
+                            }
+                        }
+                        //-----------------------------------------------------------------------
+
+                        c11 = new PdfPCell(new Phrase("" + Moneda, fuente));
+                        c22 = new PdfPCell(new Phrase("TOTAL ", fuente));
+                        total2 = total2 + total - isrT;
+                        c33 = new PdfPCell(new Phrase("$  " + (formato.format(total2)), fuente2));
+                        c11.setBorder(0);
+                        c22.setBorder(0);
+                        c33.setBorder(0);
+                        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                        c33.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        c33.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        tbl4.addCell(c11);
+                        tbl4.addCell(c22);
+                        tbl4.addCell(c33);
+                        //----------------------------------------------------------------------
+                        Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
+                        img.setAbsolutePosition((20), (775));
+                        document.add(img);
+                        document.add(p);
+                        document.add(p7);
+                        document.add(p8);
+                        document.add(p1);
+                        document.add(p2);
+                        document.add(p3);
+                        document.add(p4);
+                        document.add(p5);
+                        document.add(p6);
+                        document.add(Chunk.NEWLINE);
+                        document.add(p9);
+                        document.add(tbl);
+                        document.add(Chunk.NEWLINE);
+                        document.add(tbl1);
+                        document.add(Chunk.NEWLINE);
+                        document.add(tbl2);
+                        document.add(tbl3);
+                        document.add(tbl4);
+                        document.add(p10);
+                        document.add(p11);
+                        document.add(p12);
+                        document.close();
+
+                    } catch (SQLException ee) {
+                        JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ee, "ERROR", JOptionPane.ERROR_MESSAGE);
+                    } catch (FileNotFoundException ex) {
+                        JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ex, "ERROR", JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ex, "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-               }
-                
-                
-                DecimalFormatSymbols separador = new DecimalFormatSymbols();
-                separador.setDecimalSeparator('.');
-                DecimalFormat formato = new DecimalFormat("#,###.##",separador);
-                
-                double iva = Integer.parseInt(Iva);
-                total2 = (total * iva)/100;
-                PdfPTable tbl3 = new PdfPTable(2);
-                tbl3.setWidthPercentage(20);
-                tbl3.setHorizontalAlignment(Element.ALIGN_RIGHT);
-                PdfPCell c1 = new PdfPCell(new Phrase("SUBTOTAL",fuente));
-                PdfPCell c2 = new PdfPCell(new Phrase("$  "+formato.format(total),fuente2));
-                c1.setBorder(0);
-                c2.setBorder(0);
-                c2.setBackgroundColor(BaseColor.LIGHT_GRAY);
-                tbl3.addCell(c1);
-                tbl3.addCell(c2);
-        
-        PdfPTable tbl4 = new PdfPTable(3);
-        tbl4.setWidthPercentage(100);
-        float[] medidas = {50, 50,11};
-        tbl4.setWidths(medidas);
-            
-        PdfPCell c11 = new PdfPCell(new Phrase("Comentarios o instrucciones especiales",fuente1));
-        PdfPCell c22 = new PdfPCell(new Phrase("IVA ",fuente));
-        double t = (total*iva)/100;
-        PdfPCell c33 = new PdfPCell(new Phrase("  "+(formato.format(t)),fuente));
-        c11.setBackgroundColor(BaseColor.DARK_GRAY);
-        c11.setBorder(0);
-        c22.setBorder(0);
-        c33.setBorder(0);
-        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
-        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        tbl4.addCell(c11);
-        tbl4.addCell(c22);
-        tbl4.addCell(c33);
-        
-        //-----------------------------------------------------------------------
-        //----------------------------ISR*---------------------------------------
-        double isrT = 0;
-        if(isr != null){
-            if(!isr.equals("")){
-                PdfPCell c23 = new PdfPCell(new Phrase("ISR ",fuente));
-                isrT = ((total) * Double.parseDouble(isr)) / 100;
-                PdfPCell c24 = new PdfPCell(new Phrase("$ " + formato.format(isrT),fuente2));
-                c23.setBorder(0);
-                c24.setBorder(0);
-                tbl3.addCell(c23);
-                tbl3.addCell(c24);
-            }
-        }
-        //-----------------------------------------------------------------------
-        
-        c11 = new PdfPCell(new Phrase(""+Moneda,fuente));
-        c22 = new PdfPCell(new Phrase("TOTAL ",fuente));
-            total2 = total2 + total - isrT;
-        c33 = new PdfPCell(new Phrase("$  "+(formato.format(total2)),fuente2));
-        c11.setBorder(0);
-        c22.setBorder(0);
-        c33.setBorder(0);
-        c11.setHorizontalAlignment(Element.ALIGN_LEFT);
-        c22.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        c33.setHorizontalAlignment(Element.ALIGN_LEFT);
-        c33.setBackgroundColor(BaseColor.LIGHT_GRAY);
-        tbl4.addCell(c11);
-        tbl4.addCell(c22);
-        tbl4.addCell(c33);
-        //----------------------------------------------------------------------
-        Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
-        img.setAbsolutePosition((20),(775) );
-        document.add(img);
-        document.add(p);
-        document.add(p7);
-        document.add(p8);
-        document.add(p1);
-        document.add(p2);
-        document.add(p3);
-        document.add(p4);
-        document.add(p5);
-        document.add(p6);
-        document.add(Chunk.NEWLINE);
-        document.add(p9);
-        document.add(tbl);
-        document.add(Chunk.NEWLINE);
-        document.add(tbl1);
-        document.add(Chunk.NEWLINE);
-        document.add(tbl2);
-        document.add(tbl3);
-        document.add(tbl4);
-        document.add(p10);
-        document.add(p11);
-        document.add(p12);
-        document.close();
-        
-        
-           }catch(SQLException ee){
-           JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS"+ee,"ERROR",JOptionPane.ERROR_MESSAGE);
-           } catch (FileNotFoundException ex) {
-                JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS"+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS"+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
-            }
-       try{
-           char comillas = '"';
-          Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\"+comillas+cadena2+comillas+".pdf");
-          Runtime.getRuntime().exec("cmd /c close");
-       }catch(IOException  ee){
-              JOptionPane.showMessageDialog(this, ee);
-          }
-           }
-                
+                    try {
+                        char comillas = '"';
+                        Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + comillas + cadena2 + comillas + ".pdf");
+                        Runtime.getRuntime().exec("cmd /c close");
+                    } catch (IOException ee) {
+                        JOptionPane.showMessageDialog(this, ee);
+                    }
                 }
-            
-            
-        limpiarTabla1();
-        verDatos();
-        
-        
-        }catch(Exception a){
+
+            }
+
+            limpiarTabla1();
+            verDatos();
+
+        } catch (Exception a) {
 //        JOptionPane.showMessageDialog(this, "ERROR enterio: "+a);
         }
     }
-    
-    public void limpiarTabla1(){
-    DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-        String titulos[] = {"ESTADO","REQUISITOR","NUMERO DE REQUISICION","PO"};
-        miModelo = new DefaultTableModel(null,titulos);
+
+    public void limpiarTabla1() {
+        DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+        String titulos[] = {"ESTADO", "REQUISITOR", "NUMERO DE REQUISICION", "PO"};
+        miModelo = new DefaultTableModel(null, titulos);
         Tabla1.setModel(miModelo);
     }
-    
-    public void limpiarTabla2(){
-    DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        String titulos[] = {"ARTICULO","DESCRIPCION","NUMERO PARTE","U.M.","CANTIDAD","PRECIO","TE"};
-        miModelo = new DefaultTableModel(null,titulos);
+
+    public void limpiarTabla2() {
+        DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
+        String titulos[] = {"ARTICULO", "DESCRIPCION", "NUMERO PARTE", "U.M.", "CANTIDAD", "PRECIO", "TE"};
+        miModelo = new DefaultTableModel(null, titulos);
         Tabla2.setModel(miModelo);
     }
-    
-    public void limpiarTabla3(){
-    DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        String titulos[] = {"ARTICULO #","DESCRIPCION","CODIGO","U.M.","CANTIDAD","PRECIO","TOTAL","TE"};
-        miModelo = new DefaultTableModel(null,titulos);
+
+    public void limpiarTabla3() {
+        DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
+        String titulos[] = {"ARTICULO #", "DESCRIPCION", "CODIGO", "U.M.", "CANTIDAD", "PRECIO", "TOTAL", "TE"};
+        miModelo = new DefaultTableModel(null, titulos);
         Tabla2.setModel(miModelo);
     }
-    
-    public void limpiarTabla(){
-    DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        String titulos[] = {"Requisitor","Cantidad","U.M.","Descripcion/ Articulo","No. Parte","Proveedor","No. Proyefto","ID","TE","PO","Fecha Proyecto","Notas","Llego","Fecha Esperada"};
-        miModelo = new DefaultTableModel(null,titulos);
-        
+
+    public void limpiarTabla() {
+        DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
+        String titulos[] = {"Requisitor", "Cantidad", "U.M.", "Descripcion/ Articulo", "No. Parte", "Proveedor", "No. Proyefto", "ID", "TE", "PO", "Fecha Proyecto", "Notas", "Llego", "Fecha Esperada"};
+        miModelo = new DefaultTableModel(null, titulos);
+
         Tabla2.setModel(miModelo);
     }
-    
-    public void agregarPO(){
+
+    public void agregarPO() {
         int lleno = Tabla1.getRowCount();
         for (int i = 0; i < lleno; i++) {
             Tabla1.setValueAt("", i, 3);
         }
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             int fila = Tabla1.getSelectedRow();
-            String sql = "select OrdenNo from ordencompra where RequisicionNo like '"+Tabla1.getValueAt(fila, 2).toString()+"'";
+            String sql = "select OrdenNo from ordencompra where RequisicionNo like '" + Tabla1.getValueAt(fila, 2).toString() + "'";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[10];
             int cont = fila;
-            while(rs.next()){
+            while (rs.next()) {
                 datos[0] = rs.getString("OrdenNo");
                 Tabla1.setValueAt(datos[0], cont, 3);
                 cont++;
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public String format(String proyecto, String priori){
+
+    public String format(String proyecto, String priori) {
         String text;
-        text = "<html>" +
-        "<div style='padding: 2px 14px; text-align:center;'>" +
-        "<p style='font-size:12px; font-weight: 700;'>"+proyecto+"</p>" +
-        "<p style='font-size:10px; font-weight: 700;'>"+priori+"</p>" +
-        "</div>" +
-        "</html>";
+        text = "<html>"
+                + "<div style='padding: 2px 14px; text-align:center;'>"
+                + "<p style='font-size:12px; font-weight: 700;'>" + proyecto + "</p>"
+                + "<p style='font-size:10px; font-weight: 700;'>" + priori + "</p>"
+                + "</div>"
+                + "</html>";
         return text;
     }
-    
-    public void verPrioridad(){
-        try{
+
+    public void verPrioridad() {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             for (int i = 1; i <= 10; i++) {
                 Statement st = con.createStatement();
-                String sql = "select * from prioridadcompras where Estado like 'ACTIVO' and Prioridad like '"+i+"'";
+                String sql = "select * from prioridadcompras where Estado like 'ACTIVO' and Prioridad like '" + i + "'";
                 ResultSet rs = st.executeQuery(sql);
                 String priori = null;
-                while(rs.next()){
+                while (rs.next()) {
                     priori = rs.getString("Proyecto");
                 }
-                if(priori != null){
-                    switch(i){
-                    case 1:
-                        btn1.setText(format(priori,String.valueOf(i)));
-                        proyecto[1] = priori;
-                        break;
-                    case 2:
-                        btn2.setText(format(priori,String.valueOf(i)));
-                        proyecto[2] = priori;
-                        break;
-                    case 3:
-                        btn3.setText(format(priori,String.valueOf(i)));
-                        proyecto[3] = priori;
-                        break;
-                    case 4:
-                        btn4.setText(format(priori,String.valueOf(i)));
-                        proyecto[4] = priori;
-                        break;
-                    case 5:
-                        btn5.setText(format(priori,String.valueOf(i)));
-                        proyecto[5] = priori;
-                        break;
-                    case 6:
-                        btn6.setText(format(priori,String.valueOf(i)));
-                        proyecto[6] = priori;
-                        break;
-                    case 7:
-                        btn7.setText(format(priori,String.valueOf(i)));
-                        proyecto[7] = priori;
-                        break;
-                    case 8:
-                        btn8.setText(format(priori,String.valueOf(i)));
-                        proyecto[8] = priori;
-                        break;
-                    case 9:
-                        btn9.setText(format(priori,String.valueOf(i)));
-                        proyecto[9] = priori;
-                        break;
-                    case 10:
-                        btn10.setText(format(priori,String.valueOf(i)));
-                        proyecto[10] = priori;
-                        break;
-                }
-                }else{
-                    switch(i){
-                    case 1:
-                        panel1.setVisible(false);
-                        break;
-                    case 2:
-                        panel2.setVisible(false);
-                        break;
-                    case 3:
-                        panel3.setVisible(false);
-                        break;
-                    case 4:
-                        panel4.setVisible(false);
-                        break;
-                    case 5:
-                        panel5.setVisible(false);
-                        break;
-                    case 6:
-                        panel6.setVisible(false);
-                        break;
-                    case 7:
-                        panel7.setVisible(false);
-                        break;
-                    case 8:
-                        panel8.setVisible(false);
-                        break;
-                    case 9:
-                        panel9.setVisible(false);
-                        break;
-                    case 10:
-                        panel10.setVisible(false);
-                        break;
-                }
+                if (priori != null) {
+                    switch (i) {
+                        case 1:
+                            btn1.setText(format(priori, String.valueOf(i)));
+                            proyecto[1] = priori;
+                            break;
+                        case 2:
+                            btn2.setText(format(priori, String.valueOf(i)));
+                            proyecto[2] = priori;
+                            break;
+                        case 3:
+                            btn3.setText(format(priori, String.valueOf(i)));
+                            proyecto[3] = priori;
+                            break;
+                        case 4:
+                            btn4.setText(format(priori, String.valueOf(i)));
+                            proyecto[4] = priori;
+                            break;
+                        case 5:
+                            btn5.setText(format(priori, String.valueOf(i)));
+                            proyecto[5] = priori;
+                            break;
+                        case 6:
+                            btn6.setText(format(priori, String.valueOf(i)));
+                            proyecto[6] = priori;
+                            break;
+                        case 7:
+                            btn7.setText(format(priori, String.valueOf(i)));
+                            proyecto[7] = priori;
+                            break;
+                        case 8:
+                            btn8.setText(format(priori, String.valueOf(i)));
+                            proyecto[8] = priori;
+                            break;
+                        case 9:
+                            btn9.setText(format(priori, String.valueOf(i)));
+                            proyecto[9] = priori;
+                            break;
+                        case 10:
+                            btn10.setText(format(priori, String.valueOf(i)));
+                            proyecto[10] = priori;
+                            break;
+                    }
+                } else {
+                    switch (i) {
+                        case 1:
+                            panel1.setVisible(false);
+                            break;
+                        case 2:
+                            panel2.setVisible(false);
+                            break;
+                        case 3:
+                            panel3.setVisible(false);
+                            break;
+                        case 4:
+                            panel4.setVisible(false);
+                            break;
+                        case 5:
+                            panel5.setVisible(false);
+                            break;
+                        case 6:
+                            panel6.setVisible(false);
+                            break;
+                        case 7:
+                            panel7.setVisible(false);
+                            break;
+                        case 8:
+                            panel8.setVisible(false);
+                            break;
+                        case 9:
+                            panel9.setVisible(false);
+                            break;
+                        case 10:
+                            panel10.setVisible(false);
+                            break;
+                    }
                 }
             }
-            
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    public void verDatos(){
-        try{
-        DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        
-        verPrioridad();
-        
-        Statement st2 = con.createStatement();
-        String sql2 = "select PO from edicionpo where Estado like 'APROBADO' or Estado like 'COMPRADO'";
-        ResultSet rs2 = st2.executeQuery(sql2);
-        String datos2;
 
-        Statement st3 = con.createStatement();
-        String sql3 = "select Estado,NumEmpleado,PO from edicionpo where Estado like 'APROBADO' or Estado like 'COMPRADO'";
-        ResultSet rs3 = st3.executeQuery(sql3);
-        String datos3[] = new String[10];
-        cont = 0;
-        while(rs2.next()){
-            datos2 = rs2.getString("PO");
-            cont++;
-        }
-        
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        // and Progreso != 'APROBACION'
-        String sql = "select Progreso,NumeroEmpleado,Id,Fecha from Requisicion where Completado like 'NO' and Progreso != 'RECIBIDO'  and Progreso != 'EVALUACION' and Progreso != 'RECHAZADO' and Progreso != 'COTIZADO' order by Id desc" ;
-        ResultSet rs = st.executeQuery(sql);
-        String datos[] = new String[7];
-        while(rs.next()){
-        datos[0] = rs.getString("Progreso");
-        datos[1] = rs.getString("NumeroEmpleado");
-        datos[2] = rs.getString("Id");
-        datos[4] = rs.getString("Fecha");
-        miModelo.addRow(datos);
-        }
-        
-        if(cont > 0){
-        String d[] = new String[10];
-        d[0] = "ORDENES";
-        d[1] = "EDITADAS";
-        miModelo.addRow(d);
-        while(rs3.next()){
-        datos3[0] = rs3.getString("Estado");
-        datos3[1] = rs3.getString("NumEmpleado");
-        datos3[2] = rs3.getString("PO");
-        miModelo.addRow(datos3);
-    }
-    }
-        
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS"+ e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void verDatos2(){
-    try{
-    DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-    int fila = Tabla1.getSelectedRow();
-    Connection con = null;
-    Conexion con1 = new Conexion();
-    con = con1.getConnection();
-    Statement st = con.createStatement();
-    String datos[] = new String[8];
-    String datos1[] = new String[8];
-    String sql = "select * from Requisiciones where Requisicion like '"+(Tabla1.getValueAt(fila, 2).toString())+"'";
-    ResultSet rs = st.executeQuery(sql);
-    while(rs.next()){
-    datos[1] = rs.getString("NumParte");
-    datos[2] = rs.getString("Cantidad");
-    datos[3] = rs.getString("Codigo");
-    datos[4] = rs.getString("Descripcion");
-    datos[5] = rs.getString("Proyecto");
-    datos[6] = rs.getString("NumRequisicion");
-    miModelo.addRow(datos);
+
+    public void verDatos() {
+        try {
+            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+
+            verPrioridad();
+
+            Statement st2 = con.createStatement();
+            String sql2 = "select PO from edicionpo where Estado like 'APROBADO' or Estado like 'COMPRADO'";
+            ResultSet rs2 = st2.executeQuery(sql2);
+            String datos2;
+
+            Statement st3 = con.createStatement();
+            String sql3 = "select Estado,NumEmpleado,PO from edicionpo where Estado like 'APROBADO' or Estado like 'COMPRADO'";
+            ResultSet rs3 = st3.executeQuery(sql3);
+            String datos3[] = new String[10];
+            cont = 0;
+            while (rs2.next()) {
+                datos2 = rs2.getString("PO");
+                cont++;
+            }
+
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            // and Progreso != 'APROBACION'
+            String sql = "select Progreso,NumeroEmpleado,Id,Fecha from Requisicion where Completado like 'NO' and Progreso != 'RECIBIDO'  and Progreso != 'EVALUACION' and Progreso != 'RECHAZADO' and Progreso != 'COTIZADO' order by Id desc";
+            ResultSet rs = st.executeQuery(sql);
+            String datos[] = new String[7];
+            while (rs.next()) {
+                datos[0] = rs.getString("Progreso");
+                datos[1] = rs.getString("NumeroEmpleado");
+                datos[2] = rs.getString("Id");
+                datos[4] = rs.getString("Fecha");
+                miModelo.addRow(datos);
+            }
+
+            if (cont > 0) {
+                String d[] = new String[10];
+                d[0] = "ORDENES";
+                d[1] = "EDITADAS";
+                miModelo.addRow(d);
+                while (rs3.next()) {
+                    datos3[0] = rs3.getString("Estado");
+                    datos3[1] = rs3.getString("NumEmpleado");
+                    datos3[2] = rs3.getString("PO");
+                    miModelo.addRow(datos3);
+                }
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
-    
-    }catch(SQLException e){
-    JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+    public void verDatos2() {
+        try {
+            DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
+            int fila = Tabla1.getSelectedRow();
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String datos[] = new String[8];
+            String datos1[] = new String[8];
+            String sql = "select * from Requisiciones where Requisicion like '" + (Tabla1.getValueAt(fila, 2).toString()) + "'";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                datos[1] = rs.getString("NumParte");
+                datos[2] = rs.getString("Cantidad");
+                datos[3] = rs.getString("Codigo");
+                datos[4] = rs.getString("Descripcion");
+                datos[5] = rs.getString("Proyecto");
+                datos[6] = rs.getString("NumRequisicion");
+                miModelo.addRow(datos);
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
+
+    public void ocultarOrden() {
+        CrearOrden.setEnabled(true);
+        AbrirOrden.setEnabled(true);
+        ImportarOrden.setEnabled(true);
     }
-    
-    public void ocultarOrden(){
-    CrearOrden.setEnabled(true);
-    AbrirOrden.setEnabled(true);
-    ImportarOrden.setEnabled(true);
-    }
-    
-    public Stack<String> getLista(){
+
+    public Stack<String> getLista() {
         String text = lblRequi.getText();
         String buscar = "-";
         int aux = 0;
@@ -2940,38 +2934,38 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             String letra = String.valueOf(arreglo[j]);
             if (buscar.equalsIgnoreCase(letra)) {
                 aux2 = j;
-                String ad = (text.substring(aux,aux2));
-                aux = j+1;
+                String ad = (text.substring(aux, aux2));
+                aux = j + 1;
                 lista.push(ad);
             }
         }
         return lista;
     }
-    
-    public void clic(String numRequi){
+
+    public void clic(String numRequi) {
         txtCambio.setText("ARTICULOS DE REQUISICIONES");
-        try{
+        try {
             DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
             ta = Tabla1.getSelectedRow();
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             int tab = Tabla1.getRowCount() - cont;
-            if(cont > 0){
-                tab = Tabla1.getRowCount() - cont -1;
+            if (cont > 0) {
+                tab = Tabla1.getRowCount() - cont - 1;
             }
-            if(Tabla1.getSelectedRow() > tab){
-                    //TABLA PARTE DE ABAJO ORDENES EDITADAS
-                    Statement st = con.createStatement();
-                    Statement st1 = con.createStatement();
-                    String datos[] = new String[20];
-                    String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor,Proyecto,Id,OC,Notas,FechaEsperada from requisiciones where OC like '"+numRequi+"'";
-                    String sql1 = "select PO, Estado from edicionpo where PO like '"+numRequi+"'";
-                    ResultSet rs = st.executeQuery(sql);
-                    ResultSet rs1 = st1.executeQuery(sql1);
-                    
-                    if(search != true){
-                    while(rs.next()){
+            if (Tabla1.getSelectedRow() > tab) {
+                //TABLA PARTE DE ABAJO ORDENES EDITADAS
+                Statement st = con.createStatement();
+                Statement st1 = con.createStatement();
+                String datos[] = new String[20];
+                String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor,Proyecto,Id,OC,Notas,FechaEsperada from requisiciones where OC like '" + numRequi + "'";
+                String sql1 = "select PO, Estado from edicionpo where PO like '" + numRequi + "'";
+                ResultSet rs = st.executeQuery(sql);
+                ResultSet rs1 = st1.executeQuery(sql1);
+
+                if (search != true) {
+                    while (rs.next()) {
                         datos[0] = rs.getString("Requisitor");
                         datos[1] = rs.getString("Cantidad");
                         datos[2] = rs.getString("UM");
@@ -2985,187 +2979,185 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         datos[13] = rs.getString("FechaEsperada");
                         miModelo.addRow(datos);
                     }
-                    }
-                    
-                    num = datos[0];
-                    proy = datos[6];
-                    while(rs1.next()){
+                }
+
+                num = datos[0];
+                proy = datos[6];
+                while (rs1.next()) {
                     datos[0] = rs1.getString("PO");
                     datos[1] = rs1.getString("Estado");
-                    }
-                    verCotizacion.setEnabled(false);
-                    jMenu3.setIcon(null);
-                    if(datos[1].equals("APROBADO")){
-                        CrearOrden.setEnabled(true);
-                        AbrirOrden.setEnabled(true);
-                        ImportarOrden.setEnabled(true);
-                    }
-                    if(datos[1].equals("COMPRADO") || datos[1].equals("LLEGO, INCOMPETO")){
-                        CrearOrden.setEnabled(true);
-                        AbrirOrden.setEnabled(true);
-                        ImportarOrden.setEnabled(true);
-                    }
-                    if(datos[1].equals("NUEVO") || datos[1].equals("COTIZANDO")){
-                        CrearOrden.setEnabled(false);
-                        AbrirOrden.setEnabled(false);
-                        ImportarOrden.setEnabled(true);
-                    }
-                    if(datos[1].equals("NUEVO")){
-                        Aprobacion.setEnabled(false);
-                        String sql3 = "update requisicion set Progreso = ? where Id like '"+numRequi+"'";
-                        PreparedStatement pst = con.prepareStatement(sql3);
+                }
+                verCotizacion.setEnabled(false);
+                jMenu3.setIcon(null);
+                if (datos[1].equals("APROBADO")) {
+                    CrearOrden.setEnabled(true);
+                    AbrirOrden.setEnabled(true);
+                    ImportarOrden.setEnabled(true);
+                }
+                if (datos[1].equals("COMPRADO") || datos[1].equals("LLEGO, INCOMPETO")) {
+                    CrearOrden.setEnabled(true);
+                    AbrirOrden.setEnabled(true);
+                    ImportarOrden.setEnabled(true);
+                }
+                if (datos[1].equals("NUEVO") || datos[1].equals("COTIZANDO")) {
+                    CrearOrden.setEnabled(false);
+                    AbrirOrden.setEnabled(false);
+                    ImportarOrden.setEnabled(true);
+                }
+                if (datos[1].equals("NUEVO")) {
+                    Aprobacion.setEnabled(false);
+                    String sql3 = "update requisicion set Progreso = ? where Id like '" + numRequi + "'";
+                    PreparedStatement pst = con.prepareStatement(sql3);
 
-                        pst.setString(1, "VISTO");
+                    pst.setString(1, "VISTO");
 
-                        pst.executeUpdate();
-                        CrearOrden.setEnabled(false);
-                        AbrirOrden.setEnabled(false);
-                        ImportarOrden.setEnabled(true);
-                    }
-                    if(datos[1].equals("VISTO")){
-                        CrearOrden.setEnabled(false);
-                        AbrirOrden.setEnabled(false);
-                        ImportarOrden.setEnabled(true);
-                    }
-                    if(datos[1].equals("RECHAZADO")){
-                        ocultarOrden();
-                        CrearRequi.setEnabled(false);
-                        AbrirRequi.setEnabled(false);
-                        Aprobacion.setEnabled(false);
-                    }
-                    id = datos[0];
-                    if(datos[1].equals("NUEVO")){
+                    pst.executeUpdate();
+                    CrearOrden.setEnabled(false);
+                    AbrirOrden.setEnabled(false);
+                    ImportarOrden.setEnabled(true);
+                }
+                if (datos[1].equals("VISTO")) {
+                    CrearOrden.setEnabled(false);
+                    AbrirOrden.setEnabled(false);
+                    ImportarOrden.setEnabled(true);
+                }
+                if (datos[1].equals("RECHAZADO")) {
+                    ocultarOrden();
+                    CrearRequi.setEnabled(false);
+                    AbrirRequi.setEnabled(false);
+                    Aprobacion.setEnabled(false);
+                }
+                id = datos[0];
+                if (datos[1].equals("NUEVO")) {
 
-                    }else if(datos[1].equals("APROBADO")){
-                    }
-                    
-                    
-            }else if(Tabla1.getSelectedRow() == tab){
+                } else if (datos[1].equals("APROBADO")) {
+                }
+
+            } else if (Tabla1.getSelectedRow() == tab) {
                 limpiarTabla2();
                 verCotizacion.setEnabled(false);
                 jMenu3.setIcon(null);
-            }else{
-                    agregarPO();
-                    Statement st = con.createStatement();
-                    Statement st1 = con.createStatement();
-                    String datos[] = new String[20];
-                    String datos1[] = new String[20]; 
-                    String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor, Proyecto, Id, TE,OC,Notas, Llego, FechaEsperada from Requisiciones where NumRequisicion like '"+numRequi+"' and Estado is null";
-                    String sql1 = "select Id,Progreso, Cotizacion, Estado, Comentarios, Comprar from Requisicion where Id like '"+numRequi+"'";
-                    ResultSet rs = st.executeQuery(sql);
-                    ResultSet rs1 = st1.executeQuery(sql1);
-                    
-                    if(search != true){
-                        while(rs.next()){
-                            datos[0] = rs.getString("Requisitor");
-                            datos[1] = rs.getString("Cantidad");
-                            datos[2] = rs.getString("UM");
-                            datos[3] = rs.getString("Descripcion");
-                            datos[4] = rs.getString("Codigo");
-                            datos[5] = rs.getString("Proveedor");
-                            datos[6] = rs.getString("Proyecto");
-                            datos[7] = rs.getString("Id");
-                            datos[8] = rs.getString("TE");
-                            datos[9] = rs.getString("OC");
-                            datos[11] = rs.getString("Notas");
-                            datos[12] = rs.getString("Llego");
-                            datos[13] = rs.getString("FechaEsperada");
-                            miModelo.addRow(datos);
-                        }
+            } else {
+                agregarPO();
+                Statement st = con.createStatement();
+                Statement st1 = con.createStatement();
+                String datos[] = new String[20];
+                String datos1[] = new String[20];
+                String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor, Proyecto, Id, TE,OC,Notas, Llego, FechaEsperada from Requisiciones where NumRequisicion like '" + numRequi + "' and Estado is null";
+                String sql1 = "select Id,Progreso, Cotizacion, Estado, Comentarios, Comprar from Requisicion where Id like '" + numRequi + "'";
+                ResultSet rs = st.executeQuery(sql);
+                ResultSet rs1 = st1.executeQuery(sql1);
+
+                if (search != true) {
+                    while (rs.next()) {
+                        datos[0] = rs.getString("Requisitor");
+                        datos[1] = rs.getString("Cantidad");
+                        datos[2] = rs.getString("UM");
+                        datos[3] = rs.getString("Descripcion");
+                        datos[4] = rs.getString("Codigo");
+                        datos[5] = rs.getString("Proveedor");
+                        datos[6] = rs.getString("Proyecto");
+                        datos[7] = rs.getString("Id");
+                        datos[8] = rs.getString("TE");
+                        datos[9] = rs.getString("OC");
+                        datos[11] = rs.getString("Notas");
+                        datos[12] = rs.getString("Llego");
+                        datos[13] = rs.getString("FechaEsperada");
+                        miModelo.addRow(datos);
                     }
-                    num = datos[0];
-                    proy = datos[6];
-                    while(rs1.next()){
+                }
+                num = datos[0];
+                proy = datos[6];
+                while (rs1.next()) {
                     datos[0] = rs1.getString("Id");
                     datos[1] = rs1.getString("Progreso");
                     datos[8] = rs1.getString("Cotizacion");
                     datos[9] = rs1.getString("Estado");
                     datos[7] = rs1.getString("Comentarios");
                     datos[12] = rs1.getString("Comprar");
+                }
+                if (datos[12] != null) {
+                    if (datos[12].equals("SI")) {
+                        btnCompra.setSelected(true);
+                    } else {
+                        btnCompra.setSelected(false);
                     }
-                    if(datos[12] != null){
-                        if(datos[12].equals("SI")){
-                            btnCompra.setSelected(true);
-                        }else{
-                            btnCompra.setSelected(false);
-                        }
-                    }
-                    txtComentarios.setText(datos[7]);
-                    if(datos[8] != null){
-                        verCotizacion.setEnabled(true);
-                        jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circulo verde.png")));
-                        Noti n = new Noti();
-                        n.setVisible(true);
-                    }else{
-                        verCotizacion.setEnabled(false);
-                        jMenu3.setIcon(null);
-                    }
-                    
-                    if(datos[9].equals("NORMAL")){
-                        urgencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/CV.png")));
-                    }else if(datos[9].equals("URGENTE")){
-                        urgencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/CR.png")));
-                    }else{
-                        urgencia.setIcon(null);
-                    }
-                    
-                    if(datos[1].equals("APROBADO")){
-                        CrearOrden.setEnabled(true);
-                        AbrirOrden.setEnabled(true);
-                        ImportarOrden.setEnabled(true);
-                    }else if(datos[1].equals("COMPRADO")){
-                        CrearOrden.setEnabled(true);
-                        AbrirOrden.setEnabled(true);
-                        ImportarOrden.setEnabled(true);
-                        
-                    }else if(datos[1].equals("NUEVO") || datos[1].equals("COTIZANDO")){
-                        CrearOrden.setEnabled(false);
-                        AbrirOrden.setEnabled(false);
-                        ImportarOrden.setEnabled(true);
-                    }else if(datos[1].equals("NUEVO")){
-                        Aprobacion.setEnabled(false);
-                        String sql3 = "update requisicion set Progreso = ? where Id like '"+numRequi+"'";
-                        PreparedStatement pst = con.prepareStatement(sql3);
+                }
+                txtComentarios.setText(datos[7]);
+                if (datos[8] != null) {
+                    verCotizacion.setEnabled(true);
+                    jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circulo verde.png")));
+                    Noti n = new Noti();
+                    n.setVisible(true);
+                } else {
+                    verCotizacion.setEnabled(false);
+                    jMenu3.setIcon(null);
+                }
 
-                        pst.setString(1, "VISTO");
+                if (datos[9].equals("NORMAL")) {
+                    urgencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/CV.png")));
+                } else if (datos[9].equals("URGENTE")) {
+                    urgencia.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/CR.png")));
+                } else {
+                    urgencia.setIcon(null);
+                }
 
-                        pst.executeUpdate();
-                        CrearOrden.setEnabled(false);
-                        AbrirOrden.setEnabled(false);
-                        ImportarOrden.setEnabled(true);
-                    } else if(datos[1].equals("VISTO")){
-                        CrearOrden.setEnabled(false);
-                        AbrirOrden.setEnabled(false);
-                        ImportarOrden.setEnabled(true);
+                if (datos[1].equals("APROBADO")) {
+                    CrearOrden.setEnabled(true);
+                    AbrirOrden.setEnabled(true);
+                    ImportarOrden.setEnabled(true);
+                } else if (datos[1].equals("COMPRADO")) {
+                    CrearOrden.setEnabled(true);
+                    AbrirOrden.setEnabled(true);
+                    ImportarOrden.setEnabled(true);
 
+                } else if (datos[1].equals("NUEVO") || datos[1].equals("COTIZANDO")) {
+                    CrearOrden.setEnabled(false);
+                    AbrirOrden.setEnabled(false);
+                    ImportarOrden.setEnabled(true);
+                } else if (datos[1].equals("NUEVO")) {
+                    Aprobacion.setEnabled(false);
+                    String sql3 = "update requisicion set Progreso = ? where Id like '" + numRequi + "'";
+                    PreparedStatement pst = con.prepareStatement(sql3);
 
-                    }else if(datos[1].equals("RECHAZADO")){
-                        ocultarOrden();
-                        CrearRequi.setEnabled(false);
-                        AbrirRequi.setEnabled(false);
-                        Aprobacion.setEnabled(false);
-                    }
-                    if(datos[1].equals("COMPRADO") || datos[1].equals("LLEGO, INCOMPETO")){
-                        CrearOrden.setEnabled(true);
-                        AbrirOrden.setEnabled(true);
-                        ImportarOrden.setEnabled(true);
-                    }
-                    id = datos[0];
-                    if(datos[1].equals("NUEVO")){
+                    pst.setString(1, "VISTO");
 
-                    }else if(datos[1].equals("APROBACION")){
-                        CrearOrden.setEnabled(false);
-                    }
+                    pst.executeUpdate();
+                    CrearOrden.setEnabled(false);
+                    AbrirOrden.setEnabled(false);
+                    ImportarOrden.setEnabled(true);
+                } else if (datos[1].equals("VISTO")) {
+                    CrearOrden.setEnabled(false);
+                    AbrirOrden.setEnabled(false);
+                    ImportarOrden.setEnabled(true);
+
+                } else if (datos[1].equals("RECHAZADO")) {
+                    ocultarOrden();
+                    CrearRequi.setEnabled(false);
+                    AbrirRequi.setEnabled(false);
+                    Aprobacion.setEnabled(false);
+                }
+                if (datos[1].equals("COMPRADO") || datos[1].equals("LLEGO, INCOMPETO")) {
+                    CrearOrden.setEnabled(true);
+                    AbrirOrden.setEnabled(true);
+                    ImportarOrden.setEnabled(true);
+                }
+                id = datos[0];
+                if (datos[1].equals("NUEVO")) {
+
+                } else if (datos[1].equals("APROBACION")) {
+                    CrearOrden.setEnabled(false);
+                }
             }
-            
-            if(search == true){
+
+            if (search == true) {
 //                limpiarTabla();
                 Statement st1 = con.createStatement();
-                String sql1 = "select Requisitor, Cantidad, UM, Descripcion, Codigo, Proveedor, Proyecto, Id from requisicionesmuestra where NumRequisicion like '"+numRequi+"'";
+                String sql1 = "select Requisitor, Cantidad, UM, Descripcion, Codigo, Proveedor, Proyecto, Id from requisicionesmuestra where NumRequisicion like '" + numRequi + "'";
                 ResultSet rs = st1.executeQuery(sql1);
                 String datos[] = new String[15];
-                
-                while(rs.next()){
+
+                while (rs.next()) {
                     datos[0] = rs.getString("Requisitor");
                     datos[1] = rs.getString("Cantidad");
                     datos[2] = rs.getString("UM");
@@ -3175,30 +3167,34 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     datos[6] = rs.getString("Proyecto");
                     datos[7] = rs.getString("Id");
                     miModelo.addRow(datos);
-                    }
-                    num = datos[0];
-                    proy = datos[6];
+                }
+                num = datos[0];
+                proy = datos[6];
             }
-            if(Tabla2.getRowCount() > 0){
+            if (Tabla2.getRowCount() > 0) {
                 for (int i = 0; i < Tabla2.getRowCount(); i++) {
                     String valor;
-                    try{valor = Tabla2.getValueAt(i, 6).toString();}catch(Exception e){valor = "";}
-                    String sql2 = "select Proyecto, FechaEntrega from proyectos where Proyecto like '"+valor+"'";
+                    try {
+                        valor = Tabla2.getValueAt(i, 6).toString();
+                    } catch (Exception e) {
+                        valor = "";
+                    }
+                    String sql2 = "select Proyecto, FechaEntrega from proyectos where Proyecto like '" + valor + "'";
                     Statement st = con.createStatement();
                     ResultSet rs = st.executeQuery(sql2);
-                    while(rs.next()){
+                    while (rs.next()) {
                         Tabla2.setValueAt(rs.getString("FechaEntrega"), i, 10);
                     }
                 }
             }
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR AL VER DATOS" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
-    public void buscarProyecto(String proyecto){
-        try{
+
+    public void buscarProyecto(String proyecto) {
+        try {
             limpiarTabla();
             search = false;
             CrearOrden.setEnabled(false);
@@ -3209,83 +3205,83 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from requisiciones where Proyecto like '"+proyecto+"' and Llego is null";
+            String sql = "select * from requisiciones where Proyecto like '" + proyecto + "' and Llego is null";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[15];
             DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-            while(rs.next()){
+            while (rs.next()) {
                 datos[0] = rs.getString("Requisitor");
-                    datos[1] = rs.getString("Cantidad");
-                    datos[2] = rs.getString("UM");
-                    datos[3] = rs.getString("Descripcion");
-                    datos[4] = rs.getString("Codigo");
-                    datos[5] = rs.getString("Proveedor");
-                    datos[6] = rs.getString("Proyecto");
-                    datos[7] = rs.getString("Id");
-                    datos[8] = rs.getString("TE");
-                    datos[9] = rs.getString("OC");
-                    datos[10] = rs.getString("NumRequisicion");
-                    String sql2 = "select * from requisicion where id like '" + datos[10] + "'";
-                    Statement st2 = con.createStatement();
-                    ResultSet rs2 = st2.executeQuery(sql2);
-                    while(rs2.next()){
-                        datos[11] = rs2.getString("Progreso");
-                    }
-                    if(!datos[11].equals("CANCELADO")){
-                        datos[11] = "";
-                    }
-                    miModelo.addRow(datos);
+                datos[1] = rs.getString("Cantidad");
+                datos[2] = rs.getString("UM");
+                datos[3] = rs.getString("Descripcion");
+                datos[4] = rs.getString("Codigo");
+                datos[5] = rs.getString("Proveedor");
+                datos[6] = rs.getString("Proyecto");
+                datos[7] = rs.getString("Id");
+                datos[8] = rs.getString("TE");
+                datos[9] = rs.getString("OC");
+                datos[10] = rs.getString("NumRequisicion");
+                String sql2 = "select * from requisicion where id like '" + datos[10] + "'";
+                Statement st2 = con.createStatement();
+                ResultSet rs2 = st2.executeQuery(sql2);
+                while (rs2.next()) {
+                    datos[11] = rs2.getString("Progreso");
+                }
+                if (!datos[11].equals("CANCELADO")) {
+                    datos[11] = "";
+                }
+                miModelo.addRow(datos);
             }
             proy = proyecto;
             num = "N/A";
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void getCorreo(){
-        try{
+
+    public void getCorreo() {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select AES_DECRYPT(pass,'mi_llave'),correo,NumEmpleado from registroempleados where NumEmpleado like '"+numEmpleado+"'";
+            String sql = "select AES_DECRYPT(pass,'mi_llave'),correo,NumEmpleado from registroempleados where NumEmpleado like '" + numEmpleado + "'";
             ResultSet rs = st.executeQuery(sql);
-            while(rs.next()){
+            while (rs.next()) {
                 pass = rs.getString("AES_DECRYPT(Pass,'mi_llave')");
                 correo = rs.getString("Correo");
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public boolean verificarPrecios(){
+
+    public boolean verificarPrecios() {
         boolean band = true;
         for (int i = 0; i < Tabla2.getRowCount(); i++) {
-            try{
-                if(Tabla2.getValueAt(i, 5) != null){
-                    if(!Tabla2.getValueAt(i, 5).toString().equals("")){
+            try {
+                if (Tabla2.getValueAt(i, 5) != null) {
+                    if (!Tabla2.getValueAt(i, 5).toString().equals("")) {
                         String precio = Tabla2.getValueAt(i, 5).toString();
                         double pre = Double.parseDouble(precio);
                     }
                 }
-                if(Tabla2.getValueAt(i, 4) != null){
-                    if(!Tabla2.getValueAt(i, 4).toString().equals("")){
+                if (Tabla2.getValueAt(i, 4) != null) {
+                    if (!Tabla2.getValueAt(i, 4).toString().equals("")) {
                         String precio = Tabla2.getValueAt(i, 4).toString();
                         double pre = Double.parseDouble(precio);
                     }
                 }
-            }catch(NumberFormatException e){
+            } catch (NumberFormatException e) {
                 band = false;
             }
         }
         return band;
     }
-    
-    public boolean verificarProveedor(){
+
+    public boolean verificarProveedor() {
         boolean band = true;
-        try{
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
@@ -3293,56 +3289,56 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
             Stack<String> pilaProv = new Stack<>();
-            while(rs.next()){
+            while (rs.next()) {
                 pilaProv.push(rs.getString("Nombre"));
             }
             for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                if(Tabla2.getValueAt(i, 7) != null){
-                    if(Tabla2.getValueAt(i, 7).toString().equals("")){
+                if (Tabla2.getValueAt(i, 7) != null) {
+                    if (Tabla2.getValueAt(i, 7).toString().equals("")) {
                         String prov = Tabla2.getValueAt(i, 7).toString();
-                        if(pilaProv.search(prov) < 0){
+                        if (pilaProv.search(prov) < 0) {
                             band = false;
                         }
                     }
                 }
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
         return band;
     }
-    
-    public Stack<String> extraerProveedores(){
+
+    public Stack<String> extraerProveedores() {
         Stack<String> pila = new Stack<>();
         for (int i = 0; i < Tabla2.getRowCount(); i++) {
             boolean band = true;
-            if(Tabla2.getValueAt(i, 7) != null){
-                if(pila.isEmpty()){
+            if (Tabla2.getValueAt(i, 7) != null) {
+                if (pila.isEmpty()) {
                     pila.push(Tabla2.getValueAt(i, 7).toString());
                 }
                 for (int j = 0; j < pila.size(); j++) {
-                    if(pila.get(j).equals(Tabla2.getValueAt(i, 7).toString())){
+                    if (pila.get(j).equals(Tabla2.getValueAt(i, 7).toString())) {
                         band = false;
                     }
                 }
-                if(band){
+                if (band) {
                     pila.push(Tabla2.getValueAt(i, 7).toString());
                 }
             }
         }
         return pila;
     }
-    
-    public void crearBotones(String proveedor, String costo){
+
+    public void crearBotones(String proveedor, String costo) {
         JPanel panel = new javax.swing.JPanel();
         panel.setBackground(new java.awt.Color(255, 255, 255));
         panel.setLayout(new java.awt.BorderLayout(10, 0));
-        
+
         JLabel label = new javax.swing.JLabel();
         label.setFont(new java.awt.Font("Lexend", 1, 12));
         label.setText(proveedor + ": ");
         panel.add(label, java.awt.BorderLayout.WEST);
-        
+
         JTextField field = new javax.swing.JTextField();
         field.setBackground(new java.awt.Color(255, 255, 255));
         field.setEditable(false);
@@ -3352,28 +3348,36 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         field.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(153, 153, 153)));
         field.setPreferredSize(new java.awt.Dimension(100, 17));
         panel.add(field, java.awt.BorderLayout.CENTER);
-        
+
         panelGastos.add(panel);
     }
-    
-    public String getTotal(Connection con, String proveedor) throws SQLException{
+
+    public String getTotal(Connection con, String proveedor) throws SQLException {
         String costo = "";
         Statement st = con.createStatement();
-        String sql = "select Cantidad, Precio,Proveedor from requisiciones where Proveedor like '"+proveedor+"' and precio is not null and Precio != ''";
+        String sql = "select Cantidad, Precio,Proveedor from requisiciones where Proveedor like '" + proveedor + "' and precio is not null and Precio != ''";
         ResultSet rs = st.executeQuery(sql);
         double total = 0;
-        while(rs.next()){
-            double cantidad,precio;
-            try{cantidad = Double.parseDouble(rs.getString("Cantidad"));}catch(Exception e){cantidad = 0;}
-            try{precio = Double.parseDouble(rs.getString("Precio"));}catch(Exception e){precio = 0;}
+        while (rs.next()) {
+            double cantidad, precio;
+            try {
+                cantidad = Double.parseDouble(rs.getString("Cantidad"));
+            } catch (Exception e) {
+                cantidad = 0;
+            }
+            try {
+                precio = Double.parseDouble(rs.getString("Precio"));
+            } catch (Exception e) {
+                precio = 0;
+            }
             total += cantidad * precio;
         }
         DecimalFormat d = new DecimalFormat("#,###.##");
         costo = d.format(total);
         return costo;
     }
-    
-    public void verGastos(){
+
+    public void verGastos() {
         panelGastos.removeAll();
         revalidate();
         repaint();
@@ -3383,53 +3387,52 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         String fecha = sdf.format(d).toUpperCase();
         lblGastos.setText(fecha);
         Stack<String> proveedores = extraerProveedores();
-        try{
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             for (int i = 0; i < proveedores.size(); i++) {
-                crearBotones(proveedores.get(i),getTotal(con,proveedores.get(i)));
+                crearBotones(proveedores.get(i), getTotal(con, proveedores.get(i)));
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public OrdenDeCompra(String numEmpleado) {
         initComponents();
         verDatos();
         this.numEmpleado = numEmpleado;
-        
+
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-        
+
         Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
         Tabla1.getTableHeader().setOpaque(false);
-        Tabla1.getTableHeader().setBackground(new java.awt.Color(0,0,0,0));
+        Tabla1.getTableHeader().setBackground(new java.awt.Color(0, 0, 0, 0));
         Tabla1.getTableHeader().setForeground(java.awt.Color.black);
         Tabla1.setRowHeight(25);
         Tabla1.setShowGrid(false);
-        
+
         Tabla2.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
         Tabla2.getTableHeader().setOpaque(false);
-        Tabla2.getTableHeader().setBackground(new java.awt.Color(0,0,0,0));
+        Tabla2.getTableHeader().setBackground(new java.awt.Color(0, 0, 0, 0));
         Tabla2.getTableHeader().setForeground(java.awt.Color.black);
         Tabla2.setRowHeight(25);
-        
-        jScrollPane1.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
-        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
-        jScrollPane3.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
-        jScrollPane4.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
-        
+
+        jScrollPane1.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0, 165, 255)));
+        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0, 165, 255)));
+        jScrollPane3.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0, 165, 255)));
+        jScrollPane4.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0, 165, 255)));
+
         panelEditar.setVisible(false);
-        
+
         getCorreo();
-        
+
         Tabla2.setDefaultRenderer(Object.class, new CustomCellRenderer());
         Tabla1.setDefaultRenderer(Object.class, new CustomCellRenderer());
     }
 
-   
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -4481,80 +4484,79 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
-    
+
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-            if(agr == null || !agr.isVisible()){
+        if (agr == null || !agr.isVisible()) {
             search = false;
             importar = false;
-            String requis ="";
-            try{
+            String requis = "";
+            try {
                 Connection con = null;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
-                String sql = "select NumRequisicion from requisicionesmuestra where NumRequisicion like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString()+"'";
+                String sql = "select NumRequisicion from requisicionesmuestra where NumRequisicion like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery(sql);
                 String f = "";
-                while(rs.next()){
+                while (rs.next()) {
                     f = rs.getString("NumRequisicion");
-                    if(f != null){
-                        if(!"".equals(f)){
+                    if (f != null) {
+                        if (!"".equals(f)) {
                             search = true;
                         }
                     }
                 }
 
-                String sql2 = "select Id,Modificar from requisicion where Id like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString()+"'";
+                String sql2 = "select Id,Modificar from requisicion where Id like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql2);
                 String a = null;
-                while(rs2.next()){
+                while (rs2.next()) {
                     a = rs2.getString("Modificar");
                 }
-                if(a == null){
+                if (a == null) {
                     editar = false;
                     panelEditar.setVisible(false);
-                }else{
-                    if(a.equals("0")){
+                } else {
+                    if (a.equals("0")) {
                         editar = true;
                         panelEditar.setVisible(true);
-                    }else{
-                    panelEditar.setVisible(false);
-                    editar = false;
+                    } else {
+                        panelEditar.setVisible(false);
+                        editar = false;
                     }
                 }
 
-                String sql3 = "select IdAgrupar from agrupacion where NumRequisicion like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString()+"'";
+                String sql3 = "select IdAgrupar from agrupacion where NumRequisicion like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
                 Statement st3 = con.createStatement();
                 ResultSet rs3 = st3.executeQuery(sql3);
                 String ar = null;
-                while(rs3.next()){
+                while (rs3.next()) {
                     ar = rs3.getString("IdAgrupar");
                 }
-                
-                if(ar != null){
-                    String sql4 = "select * from agrupacion where IdAgrupar like '"+ar+"'";
+
+                if (ar != null) {
+                    String sql4 = "select * from agrupacion where IdAgrupar like '" + ar + "'";
                     Statement st4 = con.createStatement();
                     ResultSet rs4 = st4.executeQuery(sql4);
-                    while(rs4.next()){
-                        requis += rs4.getString("NumRequisicion")+"-";
-                    } 
+                    while (rs4.next()) {
+                        requis += rs4.getString("NumRequisicion") + "-";
+                    }
                 }
-                
-            }catch(SQLException e){
-                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
             limpiarTabla();
-            
-            if(!requis.equals("")){
+
+            if (!requis.equals("")) {
                 lblTitulo.setText("REQUISICIONES AGRUPADAS:");
                 lblRequi.setText(requis);
                 Stack<String> pila = getLista();
                 for (int i = 0; i < pila.size(); i++) {
                     clic(pila.get(i));
                 }
-            }else{
+            } else {
                 lblTitulo.setText("REQUISICION NO:");
                 lblRequi.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
                 clic(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
@@ -4562,20 +4564,20 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             btnGuardar.setEnabled(false);
             CrearOrden.setEnabled(false);
             CancelarRequisicion.setEnabled(true);
-        }else{
+        } else {
             boolean ex = true;
             for (int i = 0; i < agr.Tabla1.getRowCount(); i++) {
-                if(agr.Tabla1.getValueAt(i, 0).toString().equals(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString())){
+                if (agr.Tabla1.getValueAt(i, 0).toString().equals(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString())) {
                     ex = false;
                 }
             }
-            if(ex){
+            if (ex) {
                 String datos[] = new String[2];
                 datos[0] = Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString();
                 DefaultTableModel miModelo = (DefaultTableModel) agr.Tabla1.getModel();
                 miModelo.addRow(datos);
-            }else{
-                JOptionPane.showMessageDialog(this, "Esta requisicion ya esta seleccionada","Advertencia",JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Esta requisicion ya esta seleccionada", "Advertencia", JOptionPane.WARNING_MESSAGE);
             }
         }
         CrearCoti.setEnabled(true);
@@ -4597,20 +4599,20 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_CrearRequiActionPerformed
 
     private void AbrirRequiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AbrirRequiActionPerformed
-         try{
-          Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Requisicion_de_compra_"+id+".xlsx");
-          Runtime.getRuntime().exec("cmd /c close");
-          }catch(IOException  e){
-              JOptionPane.showMessageDialog(this, e);
-          }
+        try {
+            Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Requisicion_de_compra_" + id + ".xlsx");
+            Runtime.getRuntime().exec("cmd /c close");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, e);
+        }
     }//GEN-LAST:event_AbrirRequiActionPerformed
 
     private void CrearCotiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearCotiActionPerformed
-        if(pass == null){
-            JOptionPane.showMessageDialog(this, "Debes cambiar la configuracion de tu correo","Error",JOptionPane.ERROR_MESSAGE);
-        }else{
+        if (pass == null) {
+            JOptionPane.showMessageDialog(this, "Debes cambiar la configuracion de tu correo", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
             JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-            enviarCorreo enviar = new enviarCorreo(f,true);
+            enviarCorreo enviar = new enviarCorreo(f, true);
             Stack<String> pila = new Stack<>();
             Stack<String> pilaProv = new Stack<>();
             Stack<String> id = new Stack<>();
@@ -4620,7 +4622,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 pilaProv.push(Tabla2.getValueAt(i, 5).toString());
                 id.push(Tabla2.getValueAt(i, 7).toString());
             }
-            enviar.llenarBotones(pila,pilaProv,id);
+            enviar.llenarBotones(pila, pilaProv, id);
             enviar.tabla = Tabla2;
             enviar.proyecto = Tabla2.getValueAt(0, 6).toString();
             enviar.numRequi = lblRequi.getText();
@@ -4631,32 +4633,31 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             enviar.setVisible(true);
             int n = 1;
 
-            if(n > 0){
+            if (n > 0) {
 
-            try{
-                Connection con = null;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                Statement st = con.createStatement();
-                
-                
-                if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("NUEVO") || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("VISTO")){
-                    String sql = "update requisicion set Progreso = ? where Id = ?";
-                    PreparedStatement pst = con.prepareStatement(sql);
-                    
-                    pst.setString(1, "COTIZANDO");
-                    pst.setString(2, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+                try {
+                    Connection con = null;
+                    Conexion con1 = new Conexion();
+                    con = con1.getConnection();
+                    Statement st = con.createStatement();
 
-                    pst.executeUpdate();
-                }else{
-                    
+                    if (Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("NUEVO") || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("VISTO")) {
+                        String sql = "update requisicion set Progreso = ? where Id = ?";
+                        PreparedStatement pst = con.prepareStatement(sql);
+
+                        pst.setString(1, "COTIZANDO");
+                        pst.setString(2, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+
+                        pst.executeUpdate();
+                    } else {
+
+                    }
+
+                    limpiarTabla1();
+                    verDatos();
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
-                
-                limpiarTabla1();
-                verDatos();
-            }catch(SQLException e){
-                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-            }
             }
         }
     }//GEN-LAST:event_CrearCotiActionPerformed
@@ -4666,217 +4667,213 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     private void CrearOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CrearOrdenActionPerformed
-        if(verificarPrecios()){
-            if(verificarProveedor()){
+        if (verificarPrecios()) {
+            if (verificarProveedor()) {
                 guardarListaImportada();
                 limpiarTablaImportada();
                 importarLista(lblRequi.getText());
                 JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                verificarTotales ver = new verificarTotales(f,true);
+                verificarTotales ver = new verificarTotales(f, true);
                 boolean band5 = ver.getOption(lblRequi.getText());
-                if(band5){
-                    if(lblTitulo.getText().equals("PROYECTO:")){
+                if (band5) {
+                    if (lblTitulo.getText().equals("PROYECTO:")) {
 
                         verOrdenProyecto();
                     }
 
                     int tab = Tabla1.getRowCount() - cont;
-                    if(cont > 0){
-                        tab = Tabla1.getRowCount() - cont -1;
+                    if (cont > 0) {
+                        tab = Tabla1.getRowCount() - cont - 1;
                     }
-                    if(Tabla1.getSelectedRow() > tab){
+                    if (Tabla1.getSelectedRow() > tab) {
                         //TABLA DE EDICION DE PO PARTE DE ABAJO
-                    boolean in = false;
+                        boolean in = false;
                         for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                            if(Tabla2.getValueAt(i, 5) != null){
+                            if (Tabla2.getValueAt(i, 5) != null) {
                                 in = true;
                             }
                         }
 
-                        if(in == false){
-                            JOptionPane.showMessageDialog(this, "DEBES LLENAR POR LO MENOS UN PRECIO O UN PROVEEDOR DE LA REQUISICION","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-                        }else{
+                        if (in == false) {
+                            JOptionPane.showMessageDialog(this, "DEBES LLENAR POR LO MENOS UN PRECIO O UN PROVEEDOR DE LA REQUISICION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                        } else {
 
-                        ArrayList lista = new ArrayList<String>();
+                            ArrayList lista = new ArrayList<String>();
 
-                            try{
+                            try {
                                 for (int i = 0; i < Tabla2.getRowCount(); i++) {
 
-                                    if(Tabla2.getValueAt(i, 5) == null){
+                                    if (Tabla2.getValueAt(i, 5) == null) {
 
-                                        }else{
+                                    } else {
                                         Connection con = null;
                                         Conexion con1 = new Conexion();
                                         con = con1.getConnection();
                                         Statement st = con.createStatement();
                                         Statement st2 = con.createStatement();
-                                        String sql = "select * from Inventario where NumeroDeParte like '"+Tabla2.getValueAt(i, 2).toString()+"'";
+                                        String sql = "select * from Inventario where NumeroDeParte like '" + Tabla2.getValueAt(i, 2).toString() + "'";
                                         ResultSet rs = st.executeQuery(sql);
-                                        String sql2 = "select * from requisiciones where Id like '"+Tabla2.getValueAt(i, 0).toString()+"'";
+                                        String sql2 = "select * from requisiciones where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
                                         ResultSet rs2 = st2.executeQuery(sql2);
                                         String oc = "";
-                                        while(rs2.next()){
+                                        while (rs2.next()) {
                                             oc = rs2.getString("OC");
                                         }
 
-                                        if(oc != null){
-                                        String datos[] = new String[10];
-                                        while(rs.next()){
-                                        datos[0] = rs.getString("Proveedor");
-                                        datos[1] = rs.getString("Codigo");
-                                        }
-                                        int cont = 0;
-                                        int cont1 = 0;
-                                        boolean band = true;
-                                        boolean band1 = true;
-                                        if((lista.isEmpty())){
-                                        lista.add(datos[0]);
-                                        }else if(lista.size() >= 1){
-                                        do{
-                                        if((lista.get(cont).toString()).equals(datos[0])){
-                                        band = false;
-                                        break;
-                                        }
-                                        cont = cont+1;
-                                        }
-                                        while(cont < (lista.size()));
-                                                    if(band == true){
-                                                    lista.add(datos[0]);
+                                        if (oc != null) {
+                                            String datos[] = new String[10];
+                                            while (rs.next()) {
+                                                datos[0] = rs.getString("Proveedor");
+                                                datos[1] = rs.getString("Codigo");
+                                            }
+                                            int cont = 0;
+                                            int cont1 = 0;
+                                            boolean band = true;
+                                            boolean band1 = true;
+                                            if ((lista.isEmpty())) {
+                                                lista.add(datos[0]);
+                                            } else if (lista.size() >= 1) {
+                                                do {
+                                                    if ((lista.get(cont).toString()).equals(datos[0])) {
+                                                        band = false;
+                                                        break;
                                                     }
+                                                    cont = cont + 1;
+                                                } while (cont < (lista.size()));
+                                                if (band == true) {
+                                                    lista.add(datos[0]);
                                                 }
+                                            }
                                         }
                                     }
                                 }
-                            }catch(SQLException e){
-                                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-                                } 
-
-                            da = new String[lista.size()]; 
-                            for (int i = 0; i < lista.size(); i++) {
-                               da[i] = lista.get(i).toString();
+                            } catch (SQLException e) {
+                                JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                             }
-                //            
-                //            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-                //            elegir = new ProveedoresCompras(lista.size(),da,j,true);
+
+                            da = new String[lista.size()];
+                            for (int i = 0; i < lista.size(); i++) {
+                                da[i] = lista.get(i).toString();
+                            }
+                            //            
+                            //            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
+                            //            elegir = new ProveedoresCompras(lista.size(),da,j,true);
                             JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-                            elegir = new ElegirProveedor(j, false,lista.size(),da,lblRequi.getText());
+                            elegir = new ElegirProveedor(j, false, lista.size(), da, lblRequi.getText());
                             elegir.setVisible(true);
                             elegir.btnCrear.addActionListener(this);
                             elegir.btnCancelar.addActionListener(this);
                         }
-                    }else if(tab == 0){
+                    } else if (tab == 0) {
                         //NOTHING
-                    }else{
+                    } else {
                         //TABLA DE REQUISICIONES PARTE DE ARRRIBA
                         boolean in = false;
                         for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                            if(Tabla2.getValueAt(i, 5) != null){
+                            if (Tabla2.getValueAt(i, 5) != null) {
                                 in = true;
                             }
                         }
 
-                        if(in == false){
-                            JOptionPane.showMessageDialog(this, "DEBES LLENAR POR LO MENOS UN PRECIO O UN PROVEEDOR DE LA REQUISICION","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-                        }else{
+                        if (in == false) {
+                            JOptionPane.showMessageDialog(this, "DEBES LLENAR POR LO MENOS UN PRECIO O UN PROVEEDOR DE LA REQUISICION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                        } else {
 
-                        ArrayList lista = new ArrayList<String>();
+                            ArrayList lista = new ArrayList<String>();
 
-                            try{
-                                for (int i = 0; i < Tabla2.getRowCount(); i++) { 
+                            try {
+                                for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                                    if (Tabla2.getValueAt(i, 5) == null) {
+                                    } else if ("".equals(Tabla2.getValueAt(i, 5).toString())) {
+                                    } else if (Tabla2.getValueAt(i, 7) != null) {
+                                        if (!"".equals(Tabla2.getValueAt(i, 7).toString())) {
+                                            Connection con;
+                                            Conexion con1 = new Conexion();
+                                            con = con1.getConnection();
+                                            Statement st = con.createStatement();
+                                            Statement st2 = con.createStatement();
+                                            String sql = "select Proveedor, NumeroDeParte from Inventario where NumeroDeParte like '" + Tabla2.getValueAt(i, 2).toString() + "'";
+                                            ResultSet rs = st.executeQuery(sql);
+                                            String sql2;
+                                            ResultSet rs2;
+                                            if (search != true) {
+                                                sql2 = "select OC from requisiciones where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
+                                                rs2 = st2.executeQuery(sql2);
+                                            } else {
+                                                sql2 = "select OC from requisicionesmuestra where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
+                                                rs2 = st2.executeQuery(sql2);
+                                            }
+                                            String oc = "";
+                                            while (rs2.next()) {
+                                                oc = rs2.getString("OC");
+                                            }
 
-                                    if(Tabla2.getValueAt(i, 5) == null){
-
-                                        }else if ("".equals(Tabla2.getValueAt(i, 5).toString())){
-
-                                        }else if(Tabla2.getValueAt(i, 7) != null){
-                                        if(!"".equals(Tabla2.getValueAt(i, 7).toString())){
-                                        Connection con = null;
-                                        Conexion con1 = new Conexion();
-                                        con = con1.getConnection();
-                                        Statement st = con.createStatement();
-                                        Statement st2 = con.createStatement();
-                                        String sql = "select Proveedor, NumeroDeParte from Inventario where NumeroDeParte like '"+Tabla2.getValueAt(i, 2).toString()+"'";
-                                        ResultSet rs = st.executeQuery(sql);
-                                        String sql2 = "";
-                                        ResultSet rs2 = null;
-                                        if(search != true){
-                                        sql2 = "select OC from requisiciones where Id like '"+Tabla2.getValueAt(i, 0).toString()+"'";
-                                        rs2 = st2.executeQuery(sql2);
-                                        }else{
-                                            sql2 = "select OC from requisicionesmuestra where Id like '"+Tabla2.getValueAt(i, 0).toString()+"'";
-                                        rs2 = st2.executeQuery(sql2);
-                                        }
-                                        String oc = "";
-                                        while(rs2.next()){
-                                            oc = rs2.getString("OC");
-                                        }
-
-                                        if(oc == null){
-                                        String datos[] = new String[10];
-                                        while(rs.next()){
-                                        datos[0] = rs.getString("Proveedor");
-                                        datos[1] = rs.getString("NumeroDeParte");
-                                        }
-                                        int cont = 0;
-                                        boolean band = true;
-                                        if((lista.isEmpty())){
-                                        lista.add(datos[0]);
-                                        }else if(lista.size() >= 1){
-                                        do{
-                                            System.out.println(datos[0]);
-                                        if((lista.get(cont).toString()).equals(datos[0])){
-                                        band = false;
-                                        break;
-                                        }
-                                        cont = cont+1;
-                                        }
-                                        while(cont < (lista.size()));
-                                                    if(band == true){
+                                            if (oc == null) {
+                                                String datos[] = new String[10];
+                                                while (rs.next()) {
+                                                    datos[0] = rs.getString("Proveedor");
+                                                    datos[1] = rs.getString("NumeroDeParte");
+                                                }
+                                                int cont = 0;
+                                                boolean band = true;
+                                                if ((lista.isEmpty())) {
                                                     lista.add(datos[0]);
+                                                } else {
+                                                    do {
+                                                        if ((lista.get(cont).toString()).equals(datos[0])) {
+                                                            band = false;
+                                                            break;
+                                                        }
+                                                        cont = cont + 1;
+                                                    } while (cont < (lista.size()));
+                                                    if (band == true) {
+                                                        lista.add(datos[0]);
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }catch(SQLException e){
-                                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-                                } 
 
-                            if(!lista.isEmpty()){
-                            da = new String[lista.size()]; 
-                            for (int i = 0; i < lista.size(); i++) {
-                               da[i] = lista.get(i).toString();
+                            } catch (SQLException e) {
+                                JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                             }
-                //            
-                //            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-                //            elegir = new ProveedoresCompras(lista.size(),da,j,true);
-                            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-                            elegir = new ElegirProveedor(j, false,lista.size(),da,lblRequi.getText());
-                            elegir.setVisible(true);
-                            elegir.btnCrear.addActionListener(this);
-                            elegir.btnCancelar.addActionListener(this);
-                            }else{
-                                    JOptionPane.showMessageDialog(this, "DEBES LLENAR PRECIO Y PROVEEDOR DE ALGUNA PARTIDA");
+
+                            if (!lista.isEmpty()) {
+                                da = new String[lista.size()];
+                                for (int i = 0; i < lista.size(); i++) {
+                                    da[i] = lista.get(i).toString();
+                                }
+                                //            
+                                //            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
+                                //            elegir = new ProveedoresCompras(lista.size(),da,j,true);
+                                JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
+                                System.out.println(Arrays.toString(da));
+                                elegir = new ElegirProveedor(j, false, lista.size(), da, lblRequi.getText());
+                                elegir.setVisible(true);
+                                elegir.btnCrear.addActionListener(this);
+                                elegir.btnCancelar.addActionListener(this);
+                            } else {
+                                JOptionPane.showMessageDialog(this, "DEBES LLENAR PRECIO Y PROVEEDOR DE ALGUNA PARTIDA");
                             }
                         }
                     }
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "EL PROVEEDOR NO SE ENCONTRO EN LA LISTA DE LA BASE DE DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-            }else{
-                JOptionPane.showMessageDialog(this, "EL PROVEEDOR NO SE ENCONTRO EN LA LISTA DE LA BASE DE DATOS","ERROR",JOptionPane.ERROR_MESSAGE);
-            }
-        }else{
-            JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR UN PRECIO/CANTIDAD","ERROR",JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR UN PRECIO/CANTIDAD", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_CrearOrdenActionPerformed
 
     private void AbrirOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AbrirOrdenActionPerformed
-       try{
-          Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\Orden_de_compra_"+id+".xlsx");
-          Runtime.getRuntime().exec("cmd /c close");
-       }catch(IOException  e){
-              JOptionPane.showMessageDialog(this, e);
-          }
+        try {
+            Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\Orden_de_compra_" + id + ".xlsx");
+            Runtime.getRuntime().exec("cmd /c close");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, e);
+        }
     }//GEN-LAST:event_AbrirOrdenActionPerformed
 
     private void ImportarOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportarOrdenActionPerformed
@@ -4889,219 +4886,211 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         }
         limpiarTablaImportada();
         btnGuardar.setEnabled(true);
-        if(lblRequi.getText().contains("-")){
-                Stack<String> pila = getLista();
-                for (int i = 0; i < pila.size(); i++) {
-                    importarLista(pila.get(i));
-                }
-            }else{
-                importarLista(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+        if (lblRequi.getText().contains("-")) {
+            Stack<String> pila = getLista();
+            for (int i = 0; i < pila.size(); i++) {
+                importarLista(pila.get(i));
             }
+        } else {
+            importarLista(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+        }
     }//GEN-LAST:event_ImportarOrdenActionPerformed
 
     private void Tabla2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla2MouseClicked
         x = evt.getXOnScreen();
         y = evt.getYOnScreen();
-        if(Tabla2.getColumnName(Tabla2.getSelectedColumn()).equals("TE")){
-            JFrame f = (JFrame)JOptionPane.getFrameForComponent(this);
-           fecha = new Fecha(f, true);
-           filaFecha = Tabla2.getSelectedRow();
-           fecha.btnGuardar.addActionListener(this);
-           fecha.setVisible(true);
+        if (Tabla2.getColumnName(Tabla2.getSelectedColumn()).equals("TE")) {
+            JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+            fecha = new Fecha(f, true);
+            filaFecha = Tabla2.getSelectedRow();
+            fecha.btnGuardar.addActionListener(this);
+            fecha.setVisible(true);
         }
     }//GEN-LAST:event_Tabla2MouseClicked
 
     private void AprobacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AprobacionActionPerformed
         String t;
-        if(lblTitulo.getText().equals("PROYECTO:")){
+        if (lblTitulo.getText().equals("PROYECTO:")) {
             t = "el proyecto";
-        }else{
+        } else {
             t = "la requisicion";
         }
-        int opc = JOptionPane.showConfirmDialog(this, "¿Deseas mandar a aprobacion "+t+" "+lblRequi.getText()+"?");
-        if(opc == 0){
-        try{
-        Connection con;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        if(lblTitulo.getText().equals("PROYECTO:")){
-         boolean band = true;
-            for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                if(Tabla2.getValueAt(i, 5) != null && Tabla2.getValueAt(i, 7) != null){
-                    band = false;
-                    break;
-                }
-            }
-            
-            if(band == false){
-            for (int i = 0; i < Tabla2.getRowCount(); i++) {
-                if(Tabla2.getValueAt(i, 5) != null && Tabla2.getValueAt(i, 7) != null)
-                {
-                    if(!"".equals(Tabla2.getValueAt(i, 5).toString()) && !"".equals(Tabla2.getValueAt(i, 7).toString()))
-                    {
-                        Statement st = con.createStatement();
-                        String sql1 = "select * from requisiciones where Id like '"+Tabla2.getValueAt(i, 0).toString()+"'";
-                        ResultSet rs1 = st.executeQuery(sql1);
-                        String numRequi = "";
-                        while(rs1.next()){
-                            numRequi = rs1.getString("NumRequisicion");
+        int opc = JOptionPane.showConfirmDialog(this, "¿Deseas mandar a aprobacion " + t + " " + lblRequi.getText() + "?");
+        if (opc == 0) {
+            try {
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                if (lblTitulo.getText().equals("PROYECTO:")) {
+                    boolean band = true;
+                    for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                        if (Tabla2.getValueAt(i, 5) != null && Tabla2.getValueAt(i, 7) != null) {
+                            band = false;
+                            break;
                         }
-                        String sql2 = "select * from requisicion where Id like '"+numRequi+"'";
-                        Statement st2 = con.createStatement();
-                        ResultSet rs2 = st2.executeQuery(sql2);
-                        String com = null;
+                    }
 
-                        String sql = "update requisiciones set Aux = ? where Id = ?";
-                        PreparedStatement pst = con.prepareStatement(sql);
+                    if (band == false) {
+                        for (int i = 0; i < Tabla2.getRowCount(); i++) {
+                            if (Tabla2.getValueAt(i, 5) != null && Tabla2.getValueAt(i, 7) != null) {
+                                if (!"".equals(Tabla2.getValueAt(i, 5).toString()) && !"".equals(Tabla2.getValueAt(i, 7).toString())) {
+                                    Statement st = con.createStatement();
+                                    String sql1 = "select * from requisiciones where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
+                                    ResultSet rs1 = st.executeQuery(sql1);
+                                    String numRequi = "";
+                                    while (rs1.next()) {
+                                        numRequi = rs1.getString("NumRequisicion");
+                                    }
+                                    String sql2 = "select * from requisicion where Id like '" + numRequi + "'";
+                                    Statement st2 = con.createStatement();
+                                    ResultSet rs2 = st2.executeQuery(sql2);
+                                    String com = null;
 
-                        while(rs2.next()){
-                            com = rs2.getString("Comprar");
-                        }
+                                    String sql = "update requisiciones set Aux = ? where Id = ?";
+                                    PreparedStatement pst = con.prepareStatement(sql);
 
-                        String d;
-                        if(com == null)
-                        {
-                            d = "SI";
-                        }else
-                        {
-                            d = com;
-                        }
-                        if(d.equals("NO"))
-                        {
-                            pst.setString(1, "COTIZADO");
-                            pst.setString(2, Tabla2.getValueAt(i, 0).toString());
-                        }else
-                        {
-                            pst.setString(1, "APROBACION");
-                            pst.setString(2, Tabla2.getValueAt(i, 0).toString());
-                        }
+                                    while (rs2.next()) {
+                                        com = rs2.getString("Comprar");
+                                    }
 
-                        int n = pst.executeUpdate();
+                                    String d;
+                                    if (com == null) {
+                                        d = "SI";
+                                    } else {
+                                        d = com;
+                                    }
+                                    if (d.equals("NO")) {
+                                        pst.setString(1, "COTIZADO");
+                                        pst.setString(2, Tabla2.getValueAt(i, 0).toString());
+                                    } else {
+                                        pst.setString(1, "APROBACION");
+                                        pst.setString(2, Tabla2.getValueAt(i, 0).toString());
+                                    }
 
-                        if(n > 0)
-                        {
-                            limpiarTabla1();
-                            verDatos();
-                            crearNotificacion();
-                            if(lblRequi.getText().contains("-")){
-                                Stack<String> pila = getLista();
-                                for (int ar = 0; ar< pila.size(); ar++) {
-                                    importarLista(pila.get(ar));
+                                    int n = pst.executeUpdate();
+
+                                    if (n > 0) {
+                                        limpiarTabla1();
+                                        verDatos();
+                                        crearNotificacion();
+                                        if (lblRequi.getText().contains("-")) {
+                                            Stack<String> pila = getLista();
+                                            for (int ar = 0; ar < pila.size(); ar++) {
+                                                importarLista(pila.get(ar));
+                                            }
+                                        } else {
+                                            importarLista(lblRequi.getText());
+                                        }
+                                        JOptionPane.showMessageDialog(this, "ARTICULOS ENVIADOS A APROBACION");
+                                    }
                                 }
-                            }else{
-                                importarLista(lblRequi.getText());
                             }
-                            JOptionPane.showMessageDialog(this, "ARTICULOS ENVIADOS A APROBACION");
+                        }
+
+                    }
+                } else {
+                    JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+                    verificarTotales ver = new verificarTotales(f, true);
+                    boolean band = ver.getOption(lblRequi.getText());
+                    if (band) {
+                        Statement st = con.createStatement();
+                        int fila = Tabla1.getSelectedRow();
+
+                        String sql = "update Requisicion set Progreso = ? where Id = ?";
+                        PreparedStatement pst = con.prepareStatement(sql);
+                        String sql2 = "select * from Requisicion where Id like '" + lblRequi.getText() + "'";
+                        ResultSet rs = st.executeQuery(sql2);
+                        String datos[] = new String[10];
+                        boolean liberacion = false;
+                        while (rs.next()) {
+                            datos[1] = rs.getString("Comprar");
+                            liberacion = rs.getBoolean("LiberacionAlmacen");
+                        }
+                        String d;
+                        if (!liberacion) {
+                            JOptionPane.showMessageDialog(this, "La requisicion no esta liberada por almacen", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                        } else {
+                            if (datos[1] == null) {
+                                d = "SI";
+                            } else {
+                                d = datos[1];
+                            }
+                            if (d.equals("NO")) {
+                                pst.setString(1, "COTIZADO");
+                                pst.setString(2, lblRequi.getText());
+                            } else {
+                                pst.setString(1, "APROBACION");
+                                pst.setString(2, lblRequi.getText());
+                            }
+
+                            int n = pst.executeUpdate();
+
+                            if (n > 0) {
+                                limpiarTabla1();
+                                verDatos();
+                                crearNotificacion();
+                                JOptionPane.showMessageDialog(this, "DATOS ENVIADOS");
+                            }
                         }
                     }
                 }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "ERROR AL ACTUALIZAR" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-            
-        }
-        }else{
-            JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-            verificarTotales ver = new verificarTotales(f,true);
-            boolean band = ver.getOption(lblRequi.getText());
-            if(band){
-                Statement st = con.createStatement();
-                int fila = Tabla1.getSelectedRow();
-
-                String sql = "update Requisicion set Progreso = ? where Id = ?";
-                PreparedStatement pst = con.prepareStatement(sql);
-                String sql2 = "select * from Requisicion where Id like '"+lblRequi.getText()+"'";
-                ResultSet rs = st.executeQuery(sql2);
-                String datos[] = new String[10];
-                boolean liberacion = false;
-                while(rs.next())
-                {
-                    datos[1] = rs.getString("Comprar");
-                    liberacion = rs.getBoolean("LiberacionAlmacen");
-                }
-                String d;
-                if(!liberacion){
-                    JOptionPane.showMessageDialog(this, "La requisicion no esta liberada por almacen","Advertencia",JOptionPane.WARNING_MESSAGE);
-                }else{
-                    if(datos[1] == null){
-                        d = "SI";
-                    }else{
-                        d = datos[1];
-                    }
-                    if(d.equals("NO")){
-                        pst.setString(1, "COTIZADO");
-                        pst.setString(2, lblRequi.getText());
-                    }else{
-                        pst.setString(1, "APROBACION");
-                        pst.setString(2, lblRequi.getText());
-                    }
-
-                    int n = pst.executeUpdate();
-
-                    if(n > 0){
-                        limpiarTabla1();
-                        verDatos();
-                        crearNotificacion();
-                        JOptionPane.showMessageDialog(this, "DATOS ENVIADOS");
-                    }
-                }
-            }
-        }
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL ACTUALIZAR" + e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
         }
     }//GEN-LAST:event_AprobacionActionPerformed
 
     private void CancelarRequisicionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CancelarRequisicionActionPerformed
         int opc = JOptionPane.showConfirmDialog(this, "¿ESTAS SEGURO(A) QUE DESEAS CANCELAR ESTA REQUISICION?");
-        if(opc == 0){
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        
-        int tab = Tabla1.getRowCount() - cont;
-            if(cont > 0){
-                tab = Tabla1.getRowCount() - cont -1;
+        if (opc == 0) {
+            try {
+                Connection con = null;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+
+                int tab = Tabla1.getRowCount() - cont;
+                if (cont > 0) {
+                    tab = Tabla1.getRowCount() - cont - 1;
+                }
+                if (Tabla1.getSelectedRow() > tab) {
+                    String act = "update edicionpo set Estado = ? where PO = ?";
+                    PreparedStatement pst1 = con.prepareCall(act);
+
+                    pst1.setString(1, "CANCELADO");
+                    pst1.setString(2, id);
+                    int n1 = pst1.executeUpdate();
+
+                    if (n1 > 0) {
+                        limpiarTabla1();
+                        limpiarTabla();
+                        verDatos();
+                    }
+                } else if (Tabla1.getSelectedRow() == tab) {
+
+                } else {
+                    String act = "update Requisicion set Progreso = ?, Completado = ? where Id = ?";
+                    PreparedStatement pst1 = con.prepareCall(act);
+
+                    pst1.setString(1, "CANCELADO");
+                    pst1.setString(2, "SI");
+                    pst1.setString(3, id);
+                    int n1 = pst1.executeUpdate();
+
+                    if (n1 > 0) {
+                        limpiarTabla1();
+                        limpiarTabla();
+                        verDatos();
+                    }
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "ERROR AL CANCELAR REQUISICION" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-        if(Tabla1.getSelectedRow() > tab){
-            String act = "update edicionpo set Estado = ? where PO = ?";
-        PreparedStatement pst1 = con.prepareCall(act);
-        
-        pst1.setString(1, "CANCELADO");
-        pst1.setString(2, id);
-        int n1 = pst1.executeUpdate();
-        
-        if (n1 > 0){
-        limpiarTabla1();
-        limpiarTabla();
-        verDatos();
-        }
-        }else if(Tabla1.getSelectedRow() == tab){
-            
-        }else{
-        String act = "update Requisicion set Progreso = ?, Completado = ? where Id = ?";
-        PreparedStatement pst1 = con.prepareCall(act);
-        
-        pst1.setString(1, "CANCELADO");
-        pst1.setString(2, "SI");
-        pst1.setString(3, id);
-        int n1 = pst1.executeUpdate();
-        
-        if (n1 > 0){
-        limpiarTabla1();
-        limpiarTabla();
-        verDatos();
-        }
-        }
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL CANCELAR REQUISICION"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
         }
     }//GEN-LAST:event_CancelarRequisicionActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
         JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-        EstadoCuentas s = new EstadoCuentas(j,true);
+        EstadoCuentas s = new EstadoCuentas(j, true);
         s.setVisible(true);
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
@@ -5111,7 +5100,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     private void jMenuItem8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem8ActionPerformed
         JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-        VentanaEmergente.Compras.addProveedor a = new VentanaEmergente.Compras.addProveedor(j,true);
+        VentanaEmergente.Compras.addProveedor a = new VentanaEmergente.Compras.addProveedor(j, true);
         a.setVisible(true);
     }//GEN-LAST:event_jMenuItem8ActionPerformed
 
@@ -5120,36 +5109,35 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_jMenu3ActionPerformed
 
     private void verCotizacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verCotizacionActionPerformed
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             int fila = Tabla1.getSelectedRow();
-            String sql = "select * from requisicion where Id like '"+Tabla1.getValueAt(fila, 2).toString()+"'";
+            String sql = "select * from requisicion where Id like '" + Tabla1.getValueAt(fila, 2).toString() + "'";
             ResultSet rs = st.executeQuery(sql);
             byte[] b = null;
-            while(rs.next()){
+            while (rs.next()) {
                 b = rs.getBytes("Cotizacion");
             }
-            
+
             InputStream bos = new ByteArrayInputStream(b);
-            
+
             int tamInput = bos.available();
             byte[] datosPdf = new byte[tamInput];
             bos.read(datosPdf, 0, tamInput);
-            
+
             OutputStream out = new FileOutputStream("new.pdf");
             out.write(datosPdf);
-            
+
             out.close();
             bos.close();
-            
-             Desktop.getDesktop().open(new File("new.pdf"));
-                    
-            
-        }catch(SQLException | NumberFormatException  |IOException e){
-            JOptionPane.showMessageDialog(this,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+            Desktop.getDesktop().open(new File("new.pdf"));
+
+        } catch (SQLException | NumberFormatException | IOException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_verCotizacionActionPerformed
 
@@ -5166,49 +5154,49 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_jLabel1MouseExited
 
     private void comprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comprarActionPerformed
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            
+
             int tab = Tabla1.getRowCount() - cont;
-            if(cont > 0){
-                tab = Tabla1.getRowCount() - cont -1;
+            if (cont > 0) {
+                tab = Tabla1.getRowCount() - cont - 1;
             }
-            if(Tabla1.getSelectedRow() > tab){
-            String sql = "update edicionpo set Estado = 'COMPRADO' where PO like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString()+"'";
-            PreparedStatement pst = con.prepareStatement(sql);
-            
-            int n = pst.executeUpdate();
-            
-            if(n > 0){
-                JOptionPane.showMessageDialog(this, "COMPRADO");
-                limpiarTabla1();
-                verDatos();
+            if (Tabla1.getSelectedRow() > tab) {
+                String sql = "update edicionpo set Estado = 'COMPRADO' where PO like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
+                PreparedStatement pst = con.prepareStatement(sql);
+
+                int n = pst.executeUpdate();
+
+                if (n > 0) {
+                    JOptionPane.showMessageDialog(this, "COMPRADO");
+                    limpiarTabla1();
+                    verDatos();
+                }
+            } else if (Tabla1.getSelectedRow() == tab) {
+
+            } else {
+                String sql = "update requisicion set Progreso = 'COMPRADO' where Id like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
+                PreparedStatement pst = con.prepareStatement(sql);
+
+                int n = pst.executeUpdate();
+
+                if (n > 0) {
+                    JOptionPane.showMessageDialog(this, "COMPRADO");
+                    limpiarTabla1();
+                    verDatos();
+                }
             }
-            }else if(Tabla1.getSelectedRow() == tab){
-                
-            }else{
-            String sql = "update requisicion set Progreso = 'COMPRADO' where Id like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString()+"'";
-            PreparedStatement pst = con.prepareStatement(sql);
-            
-            int n = pst.executeUpdate();
-            
-            if(n > 0){
-                JOptionPane.showMessageDialog(this, "COMPRADO");
-                limpiarTabla1();
-                verDatos();
-            }
-            }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_comprarActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        EditarPO e = new EditarPO(f,true,numEmpleado);
+        EditarPO e = new EditarPO(f, true, numEmpleado);
         e.setLocationRelativeTo(e);
         e.setVisible(true);
     }//GEN-LAST:event_jMenuItem3ActionPerformed
@@ -5219,34 +5207,34 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
-        String f[] = {"","","","","","","",""};
+        String f[] = {"", "", "", "", "", "", "", ""};
         miModelo.addRow(f);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
     private void BorrarArticuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BorrarArticuloActionPerformed
-        if(!Tabla2.getColumnName(7).equals("ID")){
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR LA TABLA CORRECTA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else if(Tabla2.getSelectedRow() < 0){
+        if (!Tabla2.getColumnName(7).equals("ID")) {
+            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR LA TABLA CORRECTA", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else if (Tabla2.getSelectedRow() < 0) {
             JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN ELEMENTO DE LA TABLA");
-        }else{
+        } else {
             int opc = JOptionPane.showConfirmDialog(this, "¿Estas seguro de eliminar el articulo de esta requisicion?");
-            if(opc == 0){
+            if (opc == 0) {
                 int tab = Tabla1.getRowCount() - cont;
-                    if(cont > 0){
-                        tab = Tabla1.getRowCount() - cont -1;
-                    }
-                    if(Tabla1.getSelectedRow() > tab){
-                        try{
+                if (cont > 0) {
+                    tab = Tabla1.getRowCount() - cont - 1;
+                }
+                if (Tabla1.getSelectedRow() > tab) {
+                    try {
                         Connection con;
                         Conexion con1 = new Conexion();
                         con = con1.getConnection();
                         int n = 0;
-                        if(search){
-                            String sql3 = "select * from requisicionesmuestra where Id like '"+Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString()+"'";
+                        if (search) {
+                            String sql3 = "select * from requisicionesmuestra where Id like '" + Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString() + "'";
                             Statement st = con.createStatement();
                             ResultSet rs = st.executeQuery(sql3);
                             String parte = "";
-                            while(rs.next()){
+                            while (rs.next()) {
                                 parte = rs.getString("Codigo");
                             }
 
@@ -5261,34 +5249,34 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                             pst4.setString(1, parte);
                             n += pst4.executeUpdate();
-                            
-                        }else{
+
+                        } else {
                             String sql2 = "delete from requisiciones where Id = ?";
                             PreparedStatement pst = con.prepareStatement(sql2);
 
                             pst.setString(1, Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString());
                             n += pst.executeUpdate();
                         }
-                        if(n > 0){
+                        if (n > 0) {
                             JOptionPane.showMessageDialog(this, "DATOS BORRADOS");
                         }
-                    }catch(SQLException e){
-                        JOptionPane.showMessageDialog(this,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-                    }else if(Tabla1.getSelectedRow() == tab){
+                } else if (Tabla1.getSelectedRow() == tab) {
 
-                    }else{
-                        try{
+                } else {
+                    try {
                         Connection con;
                         Conexion con1 = new Conexion();
                         con = con1.getConnection();
                         int n = 0;
-                        if(search){
-                            String sql3 = "select * from requisicionesmuestra where Id like '"+Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString()+"'";
+                        if (search) {
+                            String sql3 = "select * from requisicionesmuestra where Id like '" + Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString() + "'";
                             Statement st = con.createStatement();
                             ResultSet rs = st.executeQuery(sql3);
                             String parte = "";
-                            while(rs.next()){
+                            while (rs.next()) {
                                 parte = rs.getString("Codigo");
                             }
 
@@ -5304,19 +5292,19 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             pst4.setString(1, parte);
                             n += pst4.executeUpdate();
 
-                        }else{
+                        } else {
                             String sql2 = "delete from requisiciones where Id = ?";
                             PreparedStatement pst = con.prepareStatement(sql2);
 
                             pst.setString(1, Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString());
                             n += pst.executeUpdate();
                         }
-                        if(n > 0){
+                        if (n > 0) {
                             JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
                             clic(lblRequi.getText());
                         }
-                    }catch(SQLException e){
-                        JOptionPane.showMessageDialog(this,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -5324,7 +5312,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_BorrarArticuloActionPerformed
 
     private void Tabla2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla2MousePressed
-        
+
     }//GEN-LAST:event_Tabla2MousePressed
 
     private void Tabla2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla2MouseReleased
@@ -5332,11 +5320,11 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_Tabla2MouseReleased
 
     private void Tabla2MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla2MouseDragged
-       
-        if(Tabla2.getSelectedColumn() == 8){
+
+        if (Tabla2.getSelectedColumn() == 8) {
             for (int i = 0; i < Tabla2.getSelectedRows().length; i++) {
-            Tabla2.setValueAt(Tabla2.getValueAt(fil, 8), Tabla2.getSelectedRows()[i], 8);
-        }
+                Tabla2.setValueAt(Tabla2.getValueAt(fil, 8), Tabla2.getSelectedRows()[i], 8);
+            }
         }
     }//GEN-LAST:event_Tabla2MouseDragged
 
@@ -5345,7 +5333,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_copiarActionPerformed
 
     private void pegarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pegarActionPerformed
-        
+
         for (int i = 0; i < Tabla2.getSelectedRows().length; i++) {
             Tabla2.setValueAt(copy, Tabla2.getSelectedRows()[i], 8);
         }
@@ -5353,68 +5341,68 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        Reclamos r = new Reclamos(f,true);
+        Reclamos r = new Reclamos(f, true);
         r.setVisible(true);
     }//GEN-LAST:event_jMenuItem9ActionPerformed
 
     private void AgregarNotaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AgregarNotaActionPerformed
-        if(Tabla2.getSelectedRow() < 0){
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA FILA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else{
+        if (Tabla2.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA FILA", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else {
             JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
             AgregarNota a = new AgregarNota(f, false, Tabla2.getValueAt(Tabla2.getSelectedRow(), 7).toString());
-            a.parte.setText("PARTE: "+Tabla2.getValueAt(Tabla2.getSelectedRow(), 4).toString());
+            a.parte.setText("PARTE: " + Tabla2.getValueAt(Tabla2.getSelectedRow(), 4).toString());
             a.setLocation(x, y);
-            
+
             a.setVisible(true);
         }
     }//GEN-LAST:event_AgregarNotaActionPerformed
 
     private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
-        if(Tabla2.getSelectedRow() < 0){
+        if (Tabla2.getSelectedRow() < 0) {
             AgregarNota.setEnabled(false);
             copiar.setEnabled(false);
-        }else{
+        } else {
             AgregarNota.setEnabled(true);
             copiar.setEnabled(true);
         }
-        if(Tabla2.getColumnName(7).equals("ID")){
+        if (Tabla2.getColumnName(7).equals("ID")) {
             AgregarNota.setEnabled(true);
-        }else{
+        } else {
             AgregarNota.setEnabled(false);
         }
     }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
 
     private void jMenuItem10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem10ActionPerformed
-        try{
+        try {
             Connection con;
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            for (int i = Tabla1.getRowCount()-1; i > 0; i--) {
-                
+            for (int i = Tabla1.getRowCount() - 1; i > 0; i--) {
+
                 Statement st = con.createStatement();
                 String s = "";
-                if(Tabla1.getValueAt(i, 2) != null){
+                if (Tabla1.getValueAt(i, 2) != null) {
                     s = Tabla1.getValueAt(i, 2).toString();
                 }
-                String sql = "select OC from requisiciones where NumRequisicion like '"+s+"'";
+                String sql = "select OC from requisiciones where NumRequisicion like '" + s + "'";
                 ResultSet rs = st.executeQuery(sql);
                 String datos[] = new String[10];
-                while(rs.next()){
+                while (rs.next()) {
                     datos[0] = rs.getString("OC");
-                    if(datos[0] == null){
+                    if (datos[0] == null) {
                         break;
                     }
                 }
-                if(datos[0] != null){
-                    
+                if (datos[0] != null) {
+
                     miModelo.removeRow(i);
                 }
             }
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jMenuItem10ActionPerformed
 
@@ -5464,12 +5452,12 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_btn10ActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        if(verificarPrecios()){
+        if (verificarPrecios()) {
             guardarListaImportada();
             limpiarTablaImportada();
             importarLista(lblRequi.getText());
-        }else{
-            JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR PRECIO/CANTIDAD","ERROR",JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR PRECIO/CANTIDAD", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
@@ -5478,50 +5466,50 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_urgenciaMouseClicked
 
     private void cxpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cxpActionPerformed
-        if(!Tabla2.getColumnName(4).equals("NO PARTE")){
-            JOptionPane.showMessageDialog(this, "Debes seleccionar la tabla sin importar","Advertencia",JOptionPane.WARNING_MESSAGE);
-        }else{
+        if (!Tabla2.getColumnName(4).equals("NO PARTE")) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar la tabla sin importar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else {
             String articulos = "";
             String po;
             for (int i = 0; i < Tabla2.getSelectedRows().length; i++) {
-                if(Tabla2.getValueAt(Tabla2.getSelectedRows()[i], 9) != null){
+                if (Tabla2.getValueAt(Tabla2.getSelectedRows()[i], 9) != null) {
                     po = Tabla2.getValueAt(Tabla2.getSelectedRows()[i], 9).toString();
-                }else{
+                } else {
                     po = "";
                 }
-                if(po.equals("")){
-                    articulos = articulos + Tabla2.getValueAt(Tabla2.getSelectedRows()[i], 4).toString()+"\n";
+                if (po.equals("")) {
+                    articulos = articulos + Tabla2.getValueAt(Tabla2.getSelectedRows()[i], 4).toString() + "\n";
                 }
             }
-            if(articulos.equals("")){
-                JOptionPane.showMessageDialog(this, "Los elementos seleccionados ya tienen PO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-            }else{
+            if (articulos.equals("")) {
+                JOptionPane.showMessageDialog(this, "Los elementos seleccionados ya tienen PO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+            } else {
                 int opc = JOptionPane.showConfirmDialog(this, "¿Estas segur@ de enviar estos articulos:\n"
                         + "\n "
                         + articulos
                         + "\n a CXP?");
-                if(opc == 0){
-                    try{
+                if (opc == 0) {
+                    try {
                         Connection con;
                         Conexion con1 = new Conexion();
-                        con= con1.getConnection();
+                        con = con1.getConnection();
                         String sql = "update requisiciones set Notas = ? where Id = ?";
                         PreparedStatement pst = con.prepareStatement(sql);
                         int n = 0;
-                        
+
                         for (int i = 0; i < Tabla2.getSelectedRows().length; i++) {
                             pst.setString(1, "ESTE ARTICULO SE ENVIO A CUENTAS POR PAGAR");
                             pst.setString(2, Tabla2.getValueAt(Tabla2.getSelectedRows()[i], 7).toString());
 
-                            n = pst.executeUpdate(); 
+                            n = pst.executeUpdate();
                         }
-                        
-                        if(n > 0){
+
+                        if (n > 0) {
                             JOptionPane.showMessageDialog(this, "Articulos enviados a CXP");
                         }
-                        
-                    }catch(SQLException e){
-                        JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
@@ -5530,19 +5518,19 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     private void agruparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agruparActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        agr = new Agrupar(f,false,numEmpleado);
+        agr = new Agrupar(f, false, numEmpleado);
         agr.existe(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
-        agr.setLocation(this.getWidth()/4,this.getHeight()/4);
+        agr.setLocation(this.getWidth() / 4, this.getHeight() / 4);
         agr.setVisible(true);
     }//GEN-LAST:event_agruparActionPerformed
 
     private void historialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historialActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        Historial his = new Historial(f,true);
+        Historial his = new Historial(f, true);
         int col;
-        if(Tabla2.getColumnName(2).equals("NUMERO PARTE")){
+        if (Tabla2.getColumnName(2).equals("NUMERO PARTE")) {
             col = 2;
-        }else{
+        } else {
             col = 4;
         }
         his.verHistorial(Tabla2.getValueAt(Tabla2.getSelectedRow(), col).toString());
@@ -5551,39 +5539,39 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     private void buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarActionPerformed
         String requi = mostrarDialogoEmergente();
-        if(requi != null){
-            if(requi.equals("")){
-            }else{
-                try{
+        if (requi != null) {
+            if (requi.equals("")) {
+            } else {
+                try {
                     Connection con;
                     Conexion con1 = new Conexion();
                     con = con1.getConnection();
                     Statement st = con.createStatement();
-                    String sql = "select * from requisicion where Id like '"+requi+"'";
+                    String sql = "select * from requisicion where Id like '" + requi + "'";
                     ResultSet rs = st.executeQuery(sql);
                     String empleado = "";
                     String estado = "";
                     String completado = "";
                     String fecha = "";
                     String comprar = "";
-                    while(rs.next()){
+                    while (rs.next()) {
                         empleado = rs.getString("NumeroEmpleado");
                         estado = rs.getString("Progreso");
                         completado = rs.getString("Completado");
                         fecha = rs.getString("Fecha");
                         comprar = rs.getString("Comprar");
                     }
-                    if(empleado == null || empleado.equals("")){
-                        JOptionPane.showMessageDialog(this, "NO EXISTE ESTA REQUISICION","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-                    }else{
-                        String sql2 = "select * from registroempleados where NumEmpleado like '"+empleado+"'";
+                    if (empleado == null || empleado.equals("")) {
+                        JOptionPane.showMessageDialog(this, "NO EXISTE ESTA REQUISICION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                    } else {
+                        String sql2 = "select * from registroempleados where NumEmpleado like '" + empleado + "'";
                         Statement st2 = con.createStatement();
                         ResultSet rs2 = st2.executeQuery(sql2);
-                        while(rs2.next()){
+                        while (rs2.next()) {
                             empleado = rs2.getString("Nombre") + " " + rs2.getString("Apellido");
                         }
                         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                        Estado es = new Estado(f,true);
+                        Estado es = new Estado(f, true);
                         es.lblEmpleado.setText(empleado);
                         es.lblEstado.setText(estado);
                         es.lblCompletado.setText(completado);
@@ -5592,20 +5580,20 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         es.verRequisicion(requi);
                         es.setVisible(true);
                     }
-                }catch(SQLException e){
-                    JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
             }
         }
     }//GEN-LAST:event_buscarActionPerformed
 
     private void buscar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscar1ActionPerformed
-        
+
     }//GEN-LAST:event_buscar1ActionPerformed
 
     private void jMenuItem12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem12ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        ReporteMes reporte = new ReporteMes(f,true);
+        ReporteMes reporte = new ReporteMes(f, true);
         reporte.setLocationRelativeTo(f);
         reporte.setVisible(true);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
@@ -5725,39 +5713,37 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try{
-        if(e.getSource() == elegir.btnCrear){
-            int tab = Tabla1.getRowCount() - cont;
-            if(cont > 0){
-                tab = Tabla1.getRowCount() - cont -1;
-            }
-                if(Tabla1.getSelectedRow() > tab){
-                    OrdenDeCompraEditada();
-                    System.out.println("orden editada");
-                }else if(tab == 0){
-                    
-                }else{
-                    OrdenDeCompraNormal();
-                    System.out.println("orden normal");
+        try {
+            if (e.getSource() == elegir.btnCrear) {
+                int tab = Tabla1.getRowCount() - cont;
+                if (cont > 0) {
+                    tab = Tabla1.getRowCount() - cont - 1;
                 }
+                if (Tabla1.getSelectedRow() > tab) {
+                    OrdenDeCompraEditada();
+                } else if (tab == 0) {
+
+                } else {
+                    OrdenDeCompraNormal();
+                }
+            }
+        } catch (Exception ex) {
+
         }
-        }catch(Exception ex){
-            
-        }
-        try{
-        if(e.getSource() == elegir.btnCancelar){
-        elegir.dispose();
-        }
-        }catch(Exception a){
+        try {
+            if (e.getSource() == elegir.btnCancelar) {
+                elegir.dispose();
+            }
+        } catch (Exception a) {
 //            JOptionPane.showMessageDialog(this, "ERROR: "+a);
         }
-        
-        try{
-            if(fecha != null){
-                if(e.getSource() == fecha.btnGuardar){
+
+        try {
+            if (fecha != null) {
+                if (e.getSource() == fecha.btnGuardar) {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    if(Tabla2.getColumnName(0).equals("REQUISITOR")){
-                        try{
+                    if (Tabla2.getColumnName(0).equals("REQUISITOR")) {
+                        try {
                             Connection con;
                             Conexion con1 = new Conexion();
                             con = con1.getConnection();
@@ -5771,12 +5757,12 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                             int n = pst.executeUpdate();
 
-                            if(n > 0){
+                            if (n > 0) {
                                 JOptionPane.showMessageDialog(this, "Fecha guardada");
                             }
 
-                        }catch(SQLException ex){
-                            JOptionPane.showMessageDialog(this, "ERROR: "+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
+                        } catch (SQLException ex) {
+                            JOptionPane.showMessageDialog(this, "ERROR: " + ex, "ERROR", JOptionPane.ERROR_MESSAGE);
                         }
                     }
                     String fechaa = sdf.format(this.fecha.calendario.getDate());
@@ -5784,9 +5770,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     fecha.dispose();
                 }
             }
-        }catch(Exception a){
-            
+        } catch (Exception a) {
+
         }
-        
+
     }
 }

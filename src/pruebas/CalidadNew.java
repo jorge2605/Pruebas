@@ -7,6 +7,7 @@ import VentanaEmergente.CalidadNew.Enviar;
 import VentanaEmergente.CalidadNew.Errores;
 import VentanaEmergente.CalidadNew.Numeros;
 import VentanaEmergente.CalidadNew.Seleccionar;
+import VentanaEmergente.Costos.verPdf;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Font;
@@ -62,9 +63,9 @@ public class CalidadNew extends javax.swing.JInternalFrame implements MouseListe
     private int numImg;
     int x , y;  
     JLabel l[] = new JLabel[300];
-    Lectura lectura;    
-    public String plan; 
-    String nombre,numero;  
+    Lectura lectura;
+    public String plan;
+    String nombre,numero;
     String[][] propiedades;
     Enviar e;
     JButton[] botones;
@@ -689,19 +690,28 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
     }
     
     public void abrir_pdf(String url)  {
-        this.numImg = 0;
-        ruta_archivo = url;
-        this.ListaComponente = pn.leerPDF(url);
-        for (int i = 0; i < ListaComponente.size(); i++) {
-            pl = ListaComponente.get(i);;
-            this.img.setImagen(pl.getArchivos());
+//        this.numImg = 0;
+//        ruta_archivo = url;
+//        this.ListaComponente = pn.leerPDF(url);
+//        for (int i = 0; i < ListaComponente.size(); i++) {
+//            pl = ListaComponente.get(i);;
+//            this.img.setImagen(pl.getArchivos());
+//        }
+//        paginas = 1;
+//        p.setText(String.valueOf("Pag. " + paginas));
+//        totalp = ListaComponente.size();
+//        ArchivosVO pi = new ArchivosVO();
+//        pi = ListaComponente.get(0);
+//        this.img.setImagen(pi.getArchivos());
+        
+        verPdf ver = new verPdf();
+        try {
+            ver.setPdf(url);
+            ver.setLocationRelativeTo(this);
+            ver.setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(CalidadNew.class.getName()).log(Level.SEVERE, null, ex);
         }
-        paginas = 1;
-        p.setText(String.valueOf("Pag. " + paginas));
-        totalp = ListaComponente.size();
-        ArchivosVO pi = new ArchivosVO();
-        pi = ListaComponente.get(0);
-        this.img.setImagen(pi.getArchivos());
     }
     
     public void limpiarPantalla2(){
@@ -838,7 +848,6 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         img = new mivisorpdf.CuadroImagen();
         jScrollPane2 = new javax.swing.JScrollPane();
         Tabla1 = new javax.swing.JTable();
-        txtPlano = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
         btnSalir = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -863,6 +872,8 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         btnEliminar = new javax.swing.JButton();
         panelEditar1 = new javax.swing.JPanel();
         btnEditar1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        txtPlano = new javax.swing.JTextField();
 
         setBorder(null);
 
@@ -877,7 +888,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setContentAreaFilled(false);
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton3.setFocusPainted(false);
         jButton3.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton3.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/left-arrow_24.png"))); // NOI18N
@@ -895,7 +906,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         jButton4.setBorder(null);
         jButton4.setBorderPainted(false);
         jButton4.setContentAreaFilled(false);
-        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton4.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton4.setFocusPainted(false);
         jButton4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jButton4.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/right-arrow_24.png"))); // NOI18N
@@ -912,7 +923,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         p.setText("Pag.");
         jPanel2.add(p, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 580, 50, -1));
 
-        Panel3.setCursor(new java.awt.Cursor(java.awt.Cursor.CROSSHAIR_CURSOR));
+        Panel3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Panel3.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 Panel3MouseClicked(evt);
@@ -998,16 +1009,6 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         }
 
         jPanel2.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 100, 710, 500));
-
-        txtPlano.setBackground(new java.awt.Color(255, 255, 255));
-        txtPlano.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtPlano.setBorder(null);
-        txtPlano.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPlanoActionPerformed(evt);
-            }
-        });
-        jPanel2.add(txtPlano, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 620, 270, 20));
         jPanel2.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 640, 270, 10));
 
         btnSalir.setBackground(new java.awt.Color(255, 255, 255));
@@ -1015,7 +1016,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         jLabel1.setFont(new java.awt.Font("Roboto", 0, 36)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("X");
-        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel1MouseClicked(evt);
@@ -1054,7 +1055,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         btnRechazo.setBorder(null);
         btnRechazo.setBorderPainted(false);
         btnRechazo.setContentAreaFilled(false);
-        btnRechazo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnRechazo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnRechazo.setFocusPainted(false);
         btnRechazo.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnRechazo.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/izquierda_32.png"))); // NOI18N
@@ -1072,7 +1073,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         btnAprobado.setBorder(null);
         btnAprobado.setBorderPainted(false);
         btnAprobado.setContentAreaFilled(false);
-        btnAprobado.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAprobado.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnAprobado.setFocusPainted(false);
         btnAprobado.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         btnAprobado.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/derecha_32.png"))); // NOI18N
@@ -1147,7 +1148,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("TERMINAR");
-        jLabel2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel2.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jLabel2MouseClicked(evt);
@@ -1185,7 +1186,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setContentAreaFilled(false);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         jButton1.setFocusPainted(false);
         jButton1.setPreferredSize(new java.awt.Dimension(20, 20));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -1213,7 +1214,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         btnEliminar.setBorder(null);
         btnEliminar.setBorderPainted(false);
         btnEliminar.setContentAreaFilled(false);
-        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnEliminar.setEnabled(false);
         btnEliminar.setFocusPainted(false);
         btnEliminar.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -1232,7 +1233,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         btnEditar1.setBorder(null);
         btnEditar1.setBorderPainted(false);
         btnEditar1.setContentAreaFilled(false);
-        btnEditar1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditar1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnEditar1.setEnabled(false);
         btnEditar1.setFocusPainted(false);
         btnEditar1.setPreferredSize(new java.awt.Dimension(20, 20));
@@ -1258,6 +1259,24 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
         );
 
         jPanel2.add(panelEditar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(950, 620, 20, 20));
+
+        jButton2.setText("jButton2");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel2.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1020, 660, -1, -1));
+
+        txtPlano.setBackground(new java.awt.Color(255, 255, 255));
+        txtPlano.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtPlano.setBorder(null);
+        txtPlano.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtPlanoActionPerformed(evt);
+            }
+        });
+        jPanel2.add(txtPlano, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 620, 270, -1));
 
         jPanel1.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(-4, -3, 1400, 700));
 
@@ -1350,7 +1369,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from pdfplanos where Plano like '"+plan+"'";
+            String sql = "select Pdf,Plano from pdfplanos where Plano like '"+plan+"'";
             ResultSet rs = st.executeQuery(sql);
             String cant = "1";
             while(rs.next()){
@@ -1374,7 +1393,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             
             
             Statement st1 = con.createStatement();
-            String sql1 = "select Id from calidadpdf where Plano like '"+plan+"'";
+            String sql1 = "select Id,Plano from calidadpdf where Plano like '"+plan+"'";
             ResultSet rs1 = st1.executeQuery(sql1);
             int cont = 0;
             
@@ -1382,34 +1401,30 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
                 JOptionPane.showMessageDialog(this, "NO EXISTE ESTE PLANO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
             }else{
             File n = new File("C:\\Pruebas\\BD\\img\\new.pdf");
-            try {
-                BufferedOutputStream bs = null;
-                FileOutputStream fs = new FileOutputStream(n);
-                bs = new BufferedOutputStream(fs);
-                bs.write(ruta);
-                
-                bs.close();
-                bs = null;
-                
-            } catch (IOException e) {
-                n = new File("C:\\Pruebas\\BD\\img\\new2.pdf");
-            try {
-                BufferedOutputStream bs = null;
-                FileOutputStream fs = new FileOutputStream(n);
-                bs = new BufferedOutputStream(fs);
-                bs.write(ruta);
-                
-                bs.close();
-                bs = null;
-                
-            } catch (IOException e2) {
-                JOptionPane.showMessageDialog(this, "ERROR: "+e2,"ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-            }
-            }
-            
-            abrir_pdf(n.toString());
-            
-            limpiarPantalla();
+                try {
+                    BufferedOutputStream bs;
+                    FileOutputStream fs = new FileOutputStream(n);
+                    bs = new BufferedOutputStream(fs);
+                    bs.write(ruta);
+
+                    bs.close();
+                } catch (IOException e) {
+                    n = new File("C:\\Pruebas\\BD\\img\\new2.pdf");
+                try {
+                    BufferedOutputStream bs;
+                    FileOutputStream fs = new FileOutputStream(n);
+                    bs = new BufferedOutputStream(fs);
+                    bs.write(ruta);
+
+                    bs.close();
+                } catch (IOException e2) {
+                    JOptionPane.showMessageDialog(this, "ERROR: "+e2,"ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+                }
+                }
+
+                abrir_pdf(n.toString());
+
+                limpiarPantalla();
             
               acomodar();
             }
@@ -1422,36 +1437,36 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             
             if(cont > 0){
                 limpiarPantalla();
-            Statement st2 = con.createStatement();
-            String sql2 = "select Plano, Fecha, Id from calidadpdf where Plano like '"+plan+"'";
-            ResultSet rs2 = st2.executeQuery(sql2);
-            String datos2[] = new String[10];
-            botones = new JButton[cont];
-            bot = new String[cont];
-            
-            int c = 0;
-            while(rs2.next()){
-                datos2[0] = rs2.getString("Plano");
-                datos2[1] = rs2.getString("Fecha");
-                datos2[3] = rs2.getString("Id");
-                botones[c] = new JButton("<html>"
-                        + "<font size = 4><b><p>"+datos2[0]+"</p></b></font>"
-                        + "<font size = 2><p>"+datos2[3]+"</p></font>"
-                        + "<font size = 1><p>"+datos2[1]+"</p></font>"
-                        + "</html>");
-                botones[c].setContentAreaFilled(false);
-                botones[c].setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-                botones[c].setBorder(null);
-                botones[c].addActionListener(this);
-                bot[c] = datos2[3];
-            c++;
-            }
-            JFrame d = (JFrame) JOptionPane.getFrameForComponent(this);
-            a = new Seleccionar(d,true,botones);
-            a.setSize(300,500);
-            a.setResizable(false);
-            a.setLocationRelativeTo(null);
-            a.setVisible(true);
+                Statement st2 = con.createStatement();
+                String sql2 = "select Plano, Fecha, Id from calidadpdf where Plano like '"+plan+"'";
+                ResultSet rs2 = st2.executeQuery(sql2);
+                String datos2[] = new String[10];
+                botones = new JButton[cont];
+                bot = new String[cont];
+
+                int c = 0;
+                while(rs2.next()){
+                    datos2[0] = rs2.getString("Plano");
+                    datos2[1] = rs2.getString("Fecha");
+                    datos2[3] = rs2.getString("Id");
+                    botones[c] = new JButton("<html>"
+                            + "<font size = 4><b><p>"+datos2[0]+"</p></b></font>"
+                            + "<font size = 2><p>"+datos2[3]+"</p></font>"
+                            + "<font size = 1><p>"+datos2[1]+"</p></font>"
+                            + "</html>");
+                    botones[c].setContentAreaFilled(false);
+                    botones[c].setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                    botones[c].setBorder(null);
+                    botones[c].addActionListener(this);
+                    bot[c] = datos2[3];
+                c++;
+                }
+                JFrame d = (JFrame) JOptionPane.getFrameForComponent(this);
+                a = new Seleccionar(d,true,botones);
+                a.setSize(300,500);
+                a.setResizable(false);
+                a.setLocationRelativeTo(null);
+                a.setVisible(true);
             
             }
             
@@ -1486,45 +1501,44 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
             }else if(txtAlto.getText().equals("")){
                 JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE LIMITE ALTO");
             }else{
-        DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-        String datos[] = new String[10];
-        
-        int ultimo = Tabla1.getRowCount();
-        if(ultimo == 0){
-        ultimo++;
-        }else{
-            ultimo = Integer.parseInt(Tabla1.getValueAt(ultimo-1, 0).toString())+1;
-        }
-        datos[0] = ultimo+"";
-        
-        l[ultimo] = new JLabel(""+ultimo);
-        int tam = 10,ty = 10;
-        if(ultimo < 10){
-        tam = 7;
-        ty = 10;
-        }else if(ultimo >= 10 && ultimo < 100){
-            tam = 14;
-            ty = 10;
-        }else if (ultimo >= 100){
-            tam = 23;
-            ty = 10;
-        }
-        l[ultimo].addMouseListener(this);
-        l[ultimo].setFont(new java.awt.Font("Roboto",Font.BOLD,12));
-        l[ultimo].setForeground(Color.BLUE);
-        l[ultimo].setEnabled(true);
-        Panel3.add(l[ultimo], new org.netbeans.lib.awtextra.AbsoluteConstraints(evt.getX(), evt.getY(), 20, 10));
-        l[ultimo].setBounds(evt.getX(), evt.getY(), tam, ty);
-        x = evt.getX();
-        y = evt.getY();
-        acomodar();
-        JFrame k = (JFrame) JOptionPane.getFrameForComponent(this);
-        lectura = new Lectura(k,true,"");
-        lectura.lblPunto.setText(""+datos[0]);
-        lectura.addWindowListener(this);
-        lectura.btnEnviar.addActionListener(this);
-        lectura.btnBorrar.addActionListener(this);
-        lectura.setVisible(true);
+                String datos[] = new String[10];
+
+                int ultimo = Tabla1.getRowCount();
+                if(ultimo == 0){
+                ultimo++;
+                }else{
+                    ultimo = Integer.parseInt(Tabla1.getValueAt(ultimo-1, 0).toString())+1;
+                }
+                datos[0] = ultimo+"";
+
+                l[ultimo] = new JLabel(""+ultimo);
+                int tam = 10,ty = 10;
+                if(ultimo < 10){
+                tam = 7;
+                ty = 10;
+                }else if(ultimo >= 10 && ultimo < 100){
+                    tam = 14;
+                    ty = 10;
+                }else if (ultimo >= 100){
+                    tam = 23;
+                    ty = 10;
+                }
+                l[ultimo].addMouseListener(this);
+                l[ultimo].setFont(new java.awt.Font("Roboto",Font.BOLD,12));
+                l[ultimo].setForeground(Color.BLUE);
+                l[ultimo].setEnabled(true);
+                Panel3.add(l[ultimo], new org.netbeans.lib.awtextra.AbsoluteConstraints(evt.getX(), evt.getY(), 20, 10));
+                l[ultimo].setBounds(evt.getX(), evt.getY(), tam, ty);
+                x = evt.getX();
+                y = evt.getY();
+                acomodar();
+                JFrame k = (JFrame) JOptionPane.getFrameForComponent(this);
+                lectura = new Lectura(k,true,"");
+                lectura.lblPunto.setText(""+datos[0]);
+                lectura.addWindowListener(this);
+                lectura.btnEnviar.addActionListener(this);
+                lectura.btnBorrar.addActionListener(this);
+                lectura.setVisible(true);
             }
         }else{
             JOptionPane.showMessageDialog(this, "PRIMERO DEBES SELECCIONAR UN PLANO");
@@ -2105,6 +2119,12 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
        btnEditar1.setEnabled(false);
     }//GEN-LAST:event_btnEditar1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        verPdf v = new verPdf();
+        v.setLocationRelativeTo(this);
+        v.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel A;
@@ -2119,6 +2139,7 @@ if (Tabla1.getColumnModel().getColumnCount() > 0) {
     private javax.swing.JPanel btnTerminar;
     private mivisorpdf.CuadroImagen img;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
