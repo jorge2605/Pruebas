@@ -12,8 +12,10 @@ public class confEmpleado {
     String salidaSabado;
     String totalHoras;
     boolean redondeo;
+    boolean automatico;
 
-    public confEmpleado(String entrada, String salida, String horaDiaria, String turno, String horaSabado, String numEmpleado, String nombre, String entradaSabado, String salidaSabado, boolean redondeo, String totalHoras) {
+    public confEmpleado(String entrada, String salida, String horaDiaria, String turno, String horaSabado, String numEmpleado, 
+            String nombre, String entradaSabado, String salidaSabado, boolean redondeo, String totalHoras, boolean automatico) {
         this.entrada = entrada;
         this.salida = salida;
         this.horaDiaria = horaDiaria;
@@ -25,6 +27,7 @@ public class confEmpleado {
         this.salidaSabado = salidaSabado;
         this.redondeo = redondeo;
         this.totalHoras = totalHoras;
+        this.automatico = automatico;
     }
 
     public String getTotalHoras() {
@@ -114,4 +117,13 @@ public class confEmpleado {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    public boolean isAutomatico() {
+        return automatico;
+    }
+
+    public void setAutomatico(boolean automatico) {
+        this.automatico = automatico;
+    }
+    
 }

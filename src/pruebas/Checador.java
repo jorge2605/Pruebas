@@ -717,7 +717,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             Statement st = con.createStatement();
             String sql = "select * from empleadoscheck where NumSupervisor like '"+numEmpleado+"'";
             if(numEmpleado.equals("61") || getSupervisor().equals("GERENCIA")){
-                sql = "select * from empleadoscheck WHERE Activo like 'true'";
+                sql = "select * from empleadoscheck WHERE NumSupervisor like '"+numEmpleado+"' and Activo like 'true'";
             }
             ResultSet rs = st.executeQuery(sql);
             int cont = 0;
@@ -729,7 +729,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             String sql2 = "select * from empleadoscheck where NumSupervisor like '"+numEmpleado+"'";
             boolean redondeo = false;
             if(numEmpleado.equals("61") || getSupervisor().equals("GERENCIA")){
-                sql2 = "select * from empleadoscheck WHERE Activo like 'true'";
+                sql2 = "select * from empleadoscheck WHERE NumSupervisor like '"+numEmpleado+"' and Activo like 'true'";
                 redondeo = true;
             }
             ResultSet rs2 = st2.executeQuery(sql2);
@@ -745,8 +745,9 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                 String entradasabado = rs2.getString("EntradaSabado");
                 String salidasabado = rs2.getString("SalidaSabado");
                 String totalHoras = rs2.getString("totalHoras");
+                boolean automatico = rs2.getBoolean("Automatico");
                 config[i] = new confEmpleado(entrada, salida, horadiaria,turno,horasabado,numero, nombre, 
-                        entradasabado, salidasabado, redondeo,totalHoras);
+                        entradasabado, salidasabado, redondeo,totalHoras, automatico);
                 i++;
             }
         }catch(SQLException e){
@@ -867,7 +868,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             JOptionPane.showMessageDialog(this, "No tienes acceso para ingresar a este modulo", "Error", JOptionPane.ERROR_MESSAGE);
             this.dispose();
         }
-        addKeyPressed();
+//        addKeyPressed();
     }
 
     @SuppressWarnings("unchecked")
@@ -1668,7 +1669,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                         band = false;
                     }
                 }
-                if(band == true){
+                if(band == true && config[i].isAutomatico()){
                     datos[0] = config[i].getNumEmpleado();
                     datos[1] = config[i].getNombre();
                     datos[2] = config[i].getEntrada();
@@ -1734,18 +1735,18 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             }
             agregarDias(inicio);
             if(estado == null){
-            btnSubir.setEnabled(true);
-            lblEstado.setText("EDITANDO");
-            lblEstado.setForeground(Color.ORANGE);
+                btnSubir.setEnabled(true);
+                lblEstado.setText("EDITANDO");
+                lblEstado.setForeground(Color.ORANGE);
             }else{
                 btnSubir.setEnabled(false);
                 lblEstado.setText("EDITADO");
                 lblEstado.setForeground(Color.RED);
             }
             if(cmbSemana.getSelectedIndex() == 0){
-            lblSemana.setText("SIN SELECCIONAR");
+                lblSemana.setText("SIN SELECCIONAR");
             }else{
-            lblSemana.setText(cmbSemana.getSelectedItem().toString());
+                lblSemana.setText(cmbSemana.getSelectedItem().toString());
             }
             crearMatriz();
         }catch(SQLException e){
