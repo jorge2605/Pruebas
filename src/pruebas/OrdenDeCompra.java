@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import Conexiones.ConexionChat;
+import Modelo.javamail;
 import VentanaEmergente.Compras.AgregarNota;
 import VentanaEmergente.Compras.Agrupar;
 import VentanaEmergente.Compras.CustomCellRenderer;
@@ -3546,6 +3547,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem13 = new javax.swing.JMenuItem();
 
         jMenuItem2.setText("jMenuItem2");
 
@@ -4476,6 +4478,15 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             }
         });
         jMenu4.add(jMenuItem12);
+
+        jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/reporte_compras_16.png"))); // NOI18N
+        jMenuItem13.setText("Enviar correo de prueba");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem13);
 
         jMenuBar1.add(jMenu4);
 
@@ -5598,6 +5609,11 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         reporte.setVisible(true);
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
+    private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
+        javamail ja = new javamail();
+        ja.sendOC("", Tabla2, "Prueba", "jorge.santacruz@si3i.com", correo, pass, "OCMJ1", null, "CJ45");
+    }//GEN-LAST:event_jMenuItem13ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem AbrirOrden;
@@ -5648,6 +5664,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
+    private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
