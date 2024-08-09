@@ -440,6 +440,8 @@ public class javamail {
 
         } catch (MessagingException e) {
             JOptionPane.showMessageDialog(null, "ERROR: "+e);
+        } catch (Exception e){
+            JOptionPane.showMessageDialog(null, "Error: " + e);
         }
     }
     
