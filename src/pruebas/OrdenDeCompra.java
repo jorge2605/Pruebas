@@ -12,6 +12,7 @@ import VentanaEmergente.Compras.Historial;
 import VentanaEmergente.Compras.Noti;
 import VentanaEmergente.Compras.Reclamos;
 import VentanaEmergente.Compras.ReporteMes;
+import VentanaEmergente.Compras.TransferirRequisicion;
 import VentanaEmergente.Compras.enviarCorreo;
 import VentanaEmergente.Compras.verificarTotales;
 import com.app.sockets.chat.Cliente;
@@ -73,6 +74,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
+import jdk.internal.loader.AbstractClassLoaderValue;
 import scrollPane.ScrollBarCustom;
 
 public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionListener {
@@ -98,6 +100,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     Agrupar agr;
     String correo;
     String pass;
+    String inicial;
 
     String proyecto[] = new String[11];
 
@@ -105,6 +108,22 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
     public String[] dat;
 
+    public final void extraerInicial(String empleado){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            String sql = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "'";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                inicial = rs.getString("Nombre").substring(0,1).toUpperCase();
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public void crearNotificacion() {
 
         try {
@@ -1588,8 +1607,9 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         //------------------------------------------------------------------
                         cadena = datos.substring(3, 7);
                         int suma = Integer.parseInt(cadena);
-                        cadena = "OCM" + (suma + 1);
-                        cadena2 = "OCM" + (suma + 1) + "-" + provedor;
+                        
+                        cadena = "OC" + inicial + (suma + 1);
+                        cadena2 = "OC" + inicial + (suma + 1) + "-" + provedor;
 
                         String prov = "select * from registroProv_Compras where Nombre like '" + Proveedor + "'";
                         ResultSet rs1 = st.executeQuery(prov);
@@ -2168,8 +2188,8 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                             cadena = datos.substring(3, 7);
                             int suma = Integer.parseInt(cadena);
-                            cadena = "OCM" + (suma + 1);
-                            cadena2 = "OCM" + (suma + 1) + "-" + provedor;
+                            cadena = "OC" + inicial + (suma + 1);
+                            cadena2 = "OC" + inicial + (suma + 1) + "-" + provedor;
 
                             String add = "insert into OrdenCompra (OrdenNo,RequisicionNo) values (?,?)";
                             PreparedStatement pst = con.prepareStatement(add);
@@ -3043,7 +3063,6 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 Statement st = con.createStatement();
                 Statement st1 = con.createStatement();
                 String datos[] = new String[20];
-                String datos1[] = new String[20];
                 String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor, Proyecto, Id, TE,OC,Notas, Llego, FechaEsperada from Requisiciones where NumRequisicion like '" + numRequi + "' and Estado is null";
                 String sql1 = "select Id,Progreso, Cotizacion, Estado, Comentarios, Comprar from Requisicion where Id like '" + numRequi + "'";
                 ResultSet rs = st.executeQuery(sql);
@@ -3401,6 +3420,29 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         }
     }
 
+    public boolean getComprador(String requi){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select Id, Comprador from requisicion where Id like '" + requi +"'";
+            ResultSet rs = st.executeQuery(sql);
+            String comp = null;
+            while(rs.next()){
+                comp = rs.getString("Comprador");
+            }
+            if(comp == null){
+                return true;
+            } else {
+                return comp.equals(numEmpleado);
+            }
+        } catch (SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+        return false;
+    }
+    
     public OrdenDeCompra(String numEmpleado) {
         initComponents();
         verDatos();
@@ -3432,6 +3474,8 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
         Tabla2.setDefaultRenderer(Object.class, new CustomCellRenderer());
         Tabla1.setDefaultRenderer(Object.class, new CustomCellRenderer());
+        
+        extraerInicial(numEmpleado);
     }
 
     @SuppressWarnings("unchecked")
@@ -3534,6 +3578,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         comprar = new javax.swing.JMenuItem();
         jSeparator4 = new javax.swing.JPopupMenu.Separator();
         jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem13 = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMenuItem6 = new javax.swing.JMenuItem();
         jSeparator8 = new javax.swing.JPopupMenu.Separator();
@@ -3547,7 +3592,6 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem12 = new javax.swing.JMenuItem();
-        jMenuItem13 = new javax.swing.JMenuItem();
 
         jMenuItem2.setText("jMenuItem2");
 
@@ -4382,6 +4426,16 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             }
         });
         jMenu2.add(jMenuItem3);
+
+        jMenuItem13.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/editarEmpleado_16.png"))); // NOI18N
+        jMenuItem13.setText("Transferir Requisicion");
+        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem13ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMenuItem13);
         jMenu2.add(jSeparator5);
 
         jMenuItem6.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
@@ -4479,15 +4533,6 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         });
         jMenu4.add(jMenuItem12);
 
-        jMenuItem13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/reporte_compras_16.png"))); // NOI18N
-        jMenuItem13.setText("Enviar correo de prueba");
-        jMenuItem13.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem13ActionPerformed(evt);
-            }
-        });
-        jMenu4.add(jMenuItem13);
-
         jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
@@ -4497,102 +4542,114 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
+        String requi = Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString();
         if (agr == null || !agr.isVisible()) {
-            search = false;
-            importar = false;
-            String requis = "";
-            try {
-                Connection con = null;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                String sql = "select NumRequisicion from requisicionesmuestra where NumRequisicion like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
-                Statement st = con.createStatement();
-                ResultSet rs = st.executeQuery(sql);
-                String f = "";
-                while (rs.next()) {
-                    f = rs.getString("NumRequisicion");
-                    if (f != null) {
-                        if (!"".equals(f)) {
-                            search = true;
-                        }
+        search = false;
+        importar = false;
+        String requis = "";
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+
+            String sql = "select NumRequisicion from requisicionesmuestra where NumRequisicion like '" + requi + "'";
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            String f = "";
+            while (rs.next()) {
+                f = rs.getString("NumRequisicion");
+                if (f != null) {
+                    if (!"".equals(f)) {
+                        search = true;
                     }
                 }
+            }
 
-                String sql2 = "select Id,Modificar from requisicion where Id like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
-                Statement st2 = con.createStatement();
-                ResultSet rs2 = st2.executeQuery(sql2);
-                String a = null;
-                while (rs2.next()) {
-                    a = rs2.getString("Modificar");
-                }
-                if (a == null) {
-                    editar = false;
-                    panelEditar.setVisible(false);
+            String sql2 = "select Id,Modificar from requisicion where Id like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery(sql2);
+            String a = null;
+            while (rs2.next()) {
+                a = rs2.getString("Modificar");
+            }
+            if (a == null) {
+                editar = false;
+                panelEditar.setVisible(false);
+            } else {
+                if (a.equals("0")) {
+                    editar = true;
+                    panelEditar.setVisible(true);
                 } else {
-                    if (a.equals("0")) {
-                        editar = true;
-                        panelEditar.setVisible(true);
-                    } else {
-                        panelEditar.setVisible(false);
-                        editar = false;
-                    }
+                    panelEditar.setVisible(false);
+                    editar = false;
                 }
-
-                String sql3 = "select IdAgrupar from agrupacion where NumRequisicion like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
-                Statement st3 = con.createStatement();
-                ResultSet rs3 = st3.executeQuery(sql3);
-                String ar = null;
-                while (rs3.next()) {
-                    ar = rs3.getString("IdAgrupar");
-                }
-
-                if (ar != null) {
-                    String sql4 = "select * from agrupacion where IdAgrupar like '" + ar + "'";
-                    Statement st4 = con.createStatement();
-                    ResultSet rs4 = st4.executeQuery(sql4);
-                    while (rs4.next()) {
-                        requis += rs4.getString("NumRequisicion") + "-";
-                    }
-                }
-
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-            limpiarTabla();
 
-            if (!requis.equals("")) {
-                lblTitulo.setText("REQUISICIONES AGRUPADAS:");
-                lblRequi.setText(requis);
-                Stack<String> pila = getLista();
-                for (int i = 0; i < pila.size(); i++) {
-                    clic(pila.get(i));
-                }
-            } else {
-                lblTitulo.setText("REQUISICION NO:");
-                lblRequi.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
-                clic(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+            String sql3 = "select IdAgrupar from agrupacion where NumRequisicion like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "'";
+            Statement st3 = con.createStatement();
+            ResultSet rs3 = st3.executeQuery(sql3);
+            String ar = null;
+            while (rs3.next()) {
+                ar = rs3.getString("IdAgrupar");
             }
-            btnGuardar.setEnabled(false);
-            CrearOrden.setEnabled(false);
-            CancelarRequisicion.setEnabled(true);
+
+            if (ar != null) {
+                String sql4 = "select * from agrupacion where IdAgrupar like '" + ar + "'";
+                Statement st4 = con.createStatement();
+                ResultSet rs4 = st4.executeQuery(sql4);
+                while (rs4.next()) {
+                    requis += rs4.getString("NumRequisicion") + "-";
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        limpiarTabla();
+
+        if (!requis.equals("")) {
+            lblTitulo.setText("REQUISICIONES AGRUPADAS:");
+            lblRequi.setText(requis);
+            Stack<String> pila = getLista();
+            for (int i = 0; i < pila.size(); i++) {
+                clic(pila.get(i));
+            }
         } else {
-            boolean ex = true;
-            for (int i = 0; i < agr.Tabla1.getRowCount(); i++) {
-                if (agr.Tabla1.getValueAt(i, 0).toString().equals(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString())) {
-                    ex = false;
-                }
-            }
-            if (ex) {
-                String datos[] = new String[2];
-                datos[0] = Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString();
-                DefaultTableModel miModelo = (DefaultTableModel) agr.Tabla1.getModel();
-                miModelo.addRow(datos);
-            } else {
-                JOptionPane.showMessageDialog(this, "Esta requisicion ya esta seleccionada", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            lblTitulo.setText("REQUISICION NO:");
+            lblRequi.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+            clic(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+        }
+        btnGuardar.setEnabled(false);
+        CrearOrden.setEnabled(false);
+        CancelarRequisicion.setEnabled(true);
+    } else {
+        boolean ex = true;
+        for (int i = 0; i < agr.Tabla1.getRowCount(); i++) {
+            if (agr.Tabla1.getValueAt(i, 0).toString().equals(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString())) {
+                ex = false;
             }
         }
-        CrearCoti.setEnabled(true);
-        extraerProveedores();
+        if (ex) {
+            String datos[] = new String[2];
+            datos[0] = Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString();
+            DefaultTableModel miModelo = (DefaultTableModel) agr.Tabla1.getModel();
+            miModelo.addRow(datos);
+        } else {
+            JOptionPane.showMessageDialog(this, "Esta requisicion ya esta seleccionada", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+    CrearCoti.setEnabled(true);
+    extraerProveedores();
+    boolean comprador = getComprador(requi);
+    if(!comprador){
+        CrearRequi.setEnabled(false);
+        AbrirRequi.setEnabled(false);
+        CrearCoti.setEnabled(false);
+        CrearOrden.setEnabled(false);
+        AbrirOrden.setEnabled(false);
+        ImportarOrden.setEnabled(false);
+        panelEditar.setVisible(true);
+        txtCambio1.setText("Esta requisicion le pertenece a otro comprador");
+    }
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -4647,17 +4704,17 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             if (n > 0) {
 
                 try {
-                    Connection con = null;
+                    Connection con;
                     Conexion con1 = new Conexion();
                     con = con1.getConnection();
-                    Statement st = con.createStatement();
 
                     if (Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("NUEVO") || Tabla1.getValueAt(Tabla1.getSelectedRow(), 0).toString().equals("VISTO")) {
-                        String sql = "update requisicion set Progreso = ? where Id = ?";
+                        String sql = "update requisicion set Progreso = ?, Comprador = ? where Id = ?";
                         PreparedStatement pst = con.prepareStatement(sql);
 
                         pst.setString(1, "COTIZANDO");
-                        pst.setString(2, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+                        pst.setString(2, numEmpleado);
+                        pst.setString(3, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
 
                         pst.executeUpdate();
                     } else {
@@ -5610,8 +5667,10 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }//GEN-LAST:event_jMenuItem12ActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
-        javamail ja = new javamail();
-        ja.sendOC("", Tabla2, "Prueba", "jorge.santacruz@si3i.com", correo, pass, "OCMJ1", null, "CJ45");
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        TransferirRequisicion transferir = new TransferirRequisicion(f, true);
+        transferir.setLocationRelativeTo(f);
+        transferir.setVisible(true);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
 
