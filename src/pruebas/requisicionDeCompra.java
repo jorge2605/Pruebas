@@ -1,4 +1,3 @@
-
 package pruebas;
 
 import Conexiones.Conexion;
@@ -48,19 +47,19 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     public String um = "";
     public String proveedor = "";
     public String requisitor = "";
-    JFileChooser seleccionar,archivoExcel;
-    File archivo = null,archivoEx;
+    JFileChooser seleccionar, archivoExcel;
+    File archivo = null, archivoEx;
     Escoger esc;
     Material mat;
     Espera espera = new Espera();
     String numEmpleado;
     JTable TablaReal = new JTable();
-    
-    public void agregarMaterial(String requi){
-        try{
+
+    public void agregarMaterial(String requi) {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
-            con =  con1.getConnection();
+            con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "insert into materialrequisiciones (Codigo,Planos,Fecha, NumRequisicion, NumEmpleado) values(?,?,?,?,?)";
             PreparedStatement pst = con.prepareStatement(sql);
@@ -70,88 +69,88 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             for (int i = 0; i < Tabla1.getRowCount(); i++) {
                 String planos = Tabla1.getValueAt(i, 7).toString();
                 String codigo = Tabla1.getValueAt(i, 2).toString();
-                if(!"".equals(planos)){
+                if (!"".equals(planos)) {
                     pst.setString(1, codigo);
                     pst.setString(2, planos);
                     pst.setString(3, fecha);
                     pst.setString(4, requi);
                     pst.setString(5, numEmpleado);
-                    
+
                     pst.executeUpdate();
                 }
             }
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public boolean comprobar(){
+
+    public boolean comprobar() {
         boolean comprobar = true;
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
-            if(Tabla1.getValueAt(i, 1) == null){
+            if (Tabla1.getValueAt(i, 1) == null) {
                 comprobar = false;
-            }else if(Tabla1.getValueAt(i, 2) == null){
+            } else if (Tabla1.getValueAt(i, 2) == null) {
                 comprobar = false;
-                }else if(Tabla1.getValueAt(i, 3) == null){
+            } else if (Tabla1.getValueAt(i, 3) == null) {
                 comprobar = false;
             }
         }
-        
+
         return comprobar;
     }
-    
-    public boolean buscarTornillos(){
+
+    public boolean buscarTornillos() {
         boolean ban = false;
         String cadenaDondeBuscar = "";
         String pal = "";
-        try{
-            
+        try {
+
             Connection con;
             ConexionChat con1 = new ConexionChat();
             con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "select * from palabras";
             ResultSet rs = st.executeQuery(sql);
-            while(rs.next()){
+            while (rs.next()) {
                 cadenaDondeBuscar = rs.getString("palabra");
                 String loQueQuieroBuscar = txtDescripcion.getText().toUpperCase();
                 String[] palabras = loQueQuieroBuscar.split("\\W+");
-                for (String palabra : palabras) 
-                {
-                    if (cadenaDondeBuscar.equals(palabra)) 
-                    {
+                for (String palabra : palabras) {
+                    if (cadenaDondeBuscar.equals(palabra)) {
                         ban = true;
                         System.out.println(palabra);
                         System.out.println(cadenaDondeBuscar);
                         pal = cadenaDondeBuscar;
-                        
+
                     }
                 }
             }
             Conexion c = new Conexion();
             Connection con2 = c.getConnection();
-            String sql2 = "select * from registroempleados where NumEmpleado like '"+numEmpleado+"'";
+            String sql2 = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "'";
             Statement st2 = con2.createStatement();
             ResultSet rs2 = st2.executeQuery(sql2);
             String numero = "";
-            while(rs2.next()){
+            while (rs2.next()) {
                 numero = rs2.getString("Almacen");
             }
-            if(numero.equals("SI")) ban = false;
-            if(ban == true){
-                JOptionPane.showMessageDialog(this,"EL ARTICULO '"+pal + "' ESTA BLOQUEADO","ADVERTENCIA",JOptionPane.ERROR_MESSAGE);
+            if (numero.equals("SI")) {
+                ban = false;
             }
-        }catch(SQLException e){
-            System.out.println("ERROR: "+e);
+            if (ban == true) {
+                JOptionPane.showMessageDialog(this, "EL ARTICULO '" + pal + "' ESTA BLOQUEADO", "ADVERTENCIA", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException e) {
+            System.out.println("ERROR: " + e);
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(requisicionDeCompra.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return ban;
     }
-    
-    public void empleado(String numEmpleado){
+
+    public void empleado(String numEmpleado) {
         try {
             Connection con = null;
             Conexion con1 = new Conexion();
@@ -170,15 +169,15 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 txtNumeroEmpleado.setText(datos[1] + " " + datos[2]);
                 txtNumeroEmpleado.setForeground(java.awt.Color.BLUE);
                 txtNumeroEmpleado.setEditable(false);
-                requisitor = datos[1] +" " + datos[2];
+                requisitor = datos[1] + " " + datos[2];
             } else {
                 JOptionPane.showMessageDialog(this, "NO SE ENCONTRO EMPLEADO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
             }
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "ERROR AL ENCONTRAR DATOS"+e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "ERROR AL ENCONTRAR DATOS" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void autoCompletarProyecto() {
         ac1 = new TextAutoCompleter(txtProyecto);
         try {
@@ -203,10 +202,10 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             JOptionPane.showMessageDialog(this, "ERROR AL AUTOCOMPLETAR" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void autoCompletar() {
         ac = new TextAutoCompleter(txtCodigo);
-        
+
         try {
             Connection con = null;
             Conexion con1 = new Conexion();
@@ -217,15 +216,15 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             ResultSet rs = st.executeQuery(sql);
             while (rs.next()) {
                 datos[0] = rs.getString("NumeroDeParte");
-                
+
                 ac.addItem(datos[0]);
             }
-        
+
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "ERROR AL AUTOCOMPLETAR" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     public void extraer() {
         try {
             Connection con = null;
@@ -245,29 +244,29 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             JOptionPane.showMessageDialog(this, "ERROR AL INICIAR REQUISICIONES" + e);
         }
     }
-    
-    public double getInventario(String parte){
+
+    public double getInventario(String parte) {
         double cantidad;
-        try{
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select NumeroDeParte, Cantidad, Id from inventario where NumeroDeParte like '"+parte+"' order by Id desc";
+            String sql = "select NumeroDeParte, Cantidad, Id from inventario where NumeroDeParte like '" + parte + "' order by Id desc";
             ResultSet rs = st.executeQuery(sql);
             int cont = 0;
 //            String codigo
-            while(rs.next()){
-                if(cont == 0){
-                    
+            while (rs.next()) {
+                if (cont == 0) {
+
                 }
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR);
         }
         return 0;
     }
-    
+
     public requisicionDeCompra(String numero, String nombre) {
         initComponents();
         Date fechaIn = new Date();
@@ -281,11 +280,11 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         txtDescripcion.setLineWrap(true);
         txtDescripcion.setWrapStyleWord(true);
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-        
+
         empleado(numero);
         autoCompletarProyecto();
         autoCompletar();
-        
+
         limpiarTabla2();
         Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14));
         Tabla1.getTableHeader().setOpaque(false);
@@ -293,23 +292,24 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         Tabla1.getTableHeader().setForeground(Color.white);
         Tabla1.setRowHeight(25);
         Tabla1.setShowGrid(false);
-        
-        jScrollPane2.getViewport().setBackground(new Color(255,255,255));
-        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new Color(0,165,255)));
+
+        jScrollPane2.getViewport().setBackground(new Color(255, 255, 255));
+        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new Color(0, 165, 255)));
     }
 
     public void limpiarTabla() {
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] { },
-            new String [] {
-                "Parte", "Cantidad", "Codigo", "Descripcion", "Proyecto", "UM", "Proveedor", "Material", "Fecha Esperada"
-            }
+                new Object[][]{},
+                new String[]{
+                    "Parte", "Cantidad", "Codigo", "Descripcion", "Proyecto", "UM", "Proveedor", "Material", "Fecha Esperada"
+                }
         ) {
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean[]{
                 false, false, false, false, false, true, true, false, false
             };
+
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
         Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -333,22 +333,20 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
         txtSubir.setText("");
     }
-    
+
     public void limpiarTabla2() {
         TablaReal.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "PARTE", "CANTIDAD", "CODIGO", "DESCRIPCION", "PROYECTO", "UM", "PROVEEDOR", "MATERIAL"
-            }
+                new Object[][]{},
+                new String[]{
+                    "PARTE", "CANTIDAD", "CODIGO", "DESCRIPCION", "PROYECTO", "UM", "PROVEEDOR", "MATERIAL"
+                }
         ) {
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean[]{
                 false, false, false, false, false, true, true, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
     }
@@ -1039,40 +1037,40 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     private void txtNumeroEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumeroEmpleadoActionPerformed
 
-        
+
     }//GEN-LAST:event_txtNumeroEmpleadoActionPerformed
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         boolean band = false;
         String mensaje = "";
-        if(buscarTornillos() == false){
+        if (buscarTornillos() == false) {
             for (int i = 0; i < TablaReal.getRowCount(); i++) {
-                if(txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())){
+                if (txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())) {
                     band = true;
                     mensaje = "ESTE NUMERO DE PARTE YA ESTA INCLUIDO";
                 }
             }
             for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                if(txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())){
+                if (txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())) {
                     band = true;
                     mensaje = "ESTE NUMERO DE PARTE YA ESTA INCLUIDO";
                 }
             }
-            if(!fecha.isVisible()){
+            if (!fecha.isVisible()) {
                 band = false;
-            }else{
-                if(fecha.getDatoFecha() == null){
+            } else {
+                if (fecha.getDatoFecha() == null) {
                     band = true;
                     mensaje = "Debes seleccionar la fecha esperada";
                 }
             }
-            
-            if(band == true){
+
+            if (band == true) {
                 JOptionPane.showMessageDialog(this, mensaje, "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
                 txtCodigo.setText("");
                 txtDescripcion.setText("");
                 txtCantidad.setText("");
-            }else if (txtCodigo.getText().isEmpty()) {
+            } else if (txtCodigo.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CODIGO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
             } else if (txtDescripcion.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE DESCRIPCION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
@@ -1082,7 +1080,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CANTIDAD", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
             } else if (txtUM.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE UM", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            } else{
+            } else {
                 String datos[] = new String[20];
                 DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
                 DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
@@ -1096,39 +1094,39 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 datos[5] = txtUM.getText();
                 datos[6] = proveedor;
                 datos[7] = "";
-                if(fecha.isVisible()){
+                if (fecha.isVisible()) {
                     datos[8] = sdf.format(fecha.getDatoFecha());
-                }else{
+                } else {
                     datos[8] = null;
                 }
-                try{
+                try {
                     Connection con;
                     Conexion con1 = new Conexion();
                     con = con1.getConnection();
                     Statement st = con.createStatement();
-                    String sql = "select * from inventario where NumeroDeParte like '"+txtCodigo.getText()+"'";
+                    String sql = "select * from inventario where NumeroDeParte like '" + txtCodigo.getText() + "'";
                     ResultSet rs = st.executeQuery(sql);
                     String datos1[] = new String[10];
-                    while(rs.next()){
+                    while (rs.next()) {
                         datos1[1] = rs.getString("NumeroDeParte");
                     }
-                    if(!txtCodigo.getText().equals(datos1[1])){
+                    if (!txtCodigo.getText().equals(datos1[1])) {
 
-                            String sql1 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad) values (?,?,?)";
-                            PreparedStatement pst = con.prepareStatement(sql1);
+                        String sql1 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad) values (?,?,?)";
+                        PreparedStatement pst = con.prepareStatement(sql1);
 
-                            pst.setString(1, txtCodigo.getText());
-                            pst.setString(2, txtDescripcion.getText());
-                            pst.setString(3, "0");
+                        pst.setString(1, txtCodigo.getText());
+                        pst.setString(2, txtDescripcion.getText());
+                        pst.setString(3, "0");
 
-                            int n = pst.executeUpdate();
+                        int n = pst.executeUpdate();
 
-                            if(n > 0){
-                                JOptionPane.showMessageDialog(this, "ESTE NUMERO DE PARTE SE GUARDO EN LA BASE DE DATOS");
-                            }
+                        if (n > 0) {
+                            JOptionPane.showMessageDialog(this, "ESTE NUMERO DE PARTE SE GUARDO EN LA BASE DE DATOS");
+                        }
                     }
-                }catch(SQLException e){
-                    JOptionPane.showMessageDialog(this, "ERROR: "+e);
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "ERROR: " + e);
                 }
                 miModelo.addRow(datos);
                 Modelo.addRow(datos);
@@ -1153,257 +1151,267 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         String compra = "";
         boolean band = false;
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
-            if(Tabla1.getValueAt(i, 4).toString().equals("DIFERENTES")){
+            if (Tabla1.getValueAt(i, 4).toString().equals("DIFERENTES")) {
                 band = true;
             }
         }
-        
-        if(Tabla1.getRowCount() <= 0){
-            JOptionPane.showMessageDialog(this, "DEBES AGREGAR POR LO MENOS 1 ARTICULO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-            espera.dispose();
-        }else if (comprobar() == false){
-            JOptionPane.showMessageDialog(this, "ELEMENTOS DE LA TABLA NO ESTAN LLENOS, FAVOR DE LLENARLOS CORRECTAMENTE","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-            espera.dispose();
-        }else{
-            if (rbtCompra.isSelected()) {
-            compra = "SI";
-        } else if (rbtCotizar.isSelected()) {
-            compra = "NO";
-        }
-        
-        if (jRadioButton1.isSelected()) {
-            estado = "URGENTE";
-        } else if (jRadioButton2.isSelected()) {
-            estado = "NORMAL";
-        }
-        if (jRadioButton1.isSelected() || jRadioButton2.isSelected()) {
-            if(rbtCotizar.isSelected() || rbtCompra.isSelected()){
-            try {
-                Connection con = null;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                Statement st = con.createStatement();
-                String sql = "insert into Requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,NumParte,Requisitor,UM,Proveedor, FechaEsperada) values(?,?,?,?,?,?,?,?,?,?)";
-                String sql1 = "insert into Requisicion (NumeroEmpleado,Estatus,Estado,Progreso,Completado,Costo,NumeroCotizacion,Fecha,Comprar,Cotizacion,Modificar) values(?,?,?,?,?,?,?,?,?,?,?)";
-                PreparedStatement pst = con.prepareStatement(sql);
-                PreparedStatement pst1 = con.prepareStatement(sql1);
-                
-                String slq3 = "insert into RequisicionesMuestra (Cantidad, Codigo, Descripcion, Proyecto, UM, Proveedor, NumRequisicion, Requisitor) values(?,?,?,?,?,?,?,?)";
-                PreparedStatement pst3 = con.prepareStatement(slq3);
-                
-                byte[] pe = null;
-                if(archivo == null){
-                }else{
-                pe = new byte[(int) archivo.length()];
-                try{
-                InputStream input = new FileInputStream(archivo);
-                input.read(pe);
-                }catch(IOException e){
-                    
-                }
-                }
-                
-                boolean editar = false;
-                if(rbtEditar.isSelected()){
-                    editar = true;
-                }
-                
-                pst1.setString(1, numeroEmpleado);
-                pst1.setString(2, "PEDIDO");
-                pst1.setString(3, estado);
-                pst1.setString(4, "EVALUACION");
-                pst1.setString(5, "NO");
-                pst1.setString(6, "");
-                pst1.setString(7, "");
-                pst1.setString(8, txtFecha.getText());
-                pst1.setString(9, compra);
-                pst1.setBytes(10, pe);
-                pst1.setBoolean(11, editar);
 
-                int n1 = pst1.executeUpdate();
-
-                if (n1 > 0) {
-                    extraer();
-                    
-                    String sql2 = "select * from Requisicion";
-                    ResultSet rs = st.executeQuery(sql2);
-                    String datos[] = new String[3];
-                    while (rs.next()) {
-                        datos[1] = rs.getString("Id");
-                    }
-                    String id = datos[1];
-                    int n = 0;
-                    int n2 = 0;
-                    
-                    if(band){
-                        //REQUISICIONES MUESTRA
-                        for (int i = 0; i < TablaReal.getRowCount(); i++) {
-                        String proveedor = "";
-                        String um = "";
-                        String codigo = "";
-                        if((TablaReal.getValueAt(i, 6)) == null){
-                            proveedor = "";
-                        }else{
-                            proveedor = (TablaReal.getValueAt(i, 6).toString());
-                        }
-                        if((TablaReal.getValueAt(i, 5)) == null){
-                            um = "";
-                        }else{
-                            um = (TablaReal.getValueAt(i, 5).toString());
-                        }
-                        
-                        if((TablaReal.getValueAt(i, 0)) == null){
-                            codigo = "";
-                        }else{
-                            codigo = (TablaReal.getValueAt(i, 0).toString());
-                        }
-                        pst3.setString(1, id);
-                        pst3.setString(2, (TablaReal.getValueAt(i, 2).toString()));
-                        pst3.setString(3, (TablaReal.getValueAt(i, 3).toString()));
-                        pst3.setString(4, (TablaReal.getValueAt(i, 4).toString()));
-                        pst3.setString(5, (TablaReal.getValueAt(i, 1).toString()));
-                        pst3.setString(6, codigo);
-                        pst3.setString(7,  requisitor);
-                        pst3.setString(8, um);
-                        pst3.setString(9, proveedor);
-                        
-                        n = pst3.executeUpdate();
-                        
-                    }
-                    
-                    for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                        String proveedor = "";
-                        String um = "";
-                        String codigo = "";
-                        String fech;
-                        if((Tabla1.getValueAt(i, 6)) == null){
-                            proveedor = "";
-                        }else{
-                            proveedor = (Tabla1.getValueAt(i, 6).toString());
-                        }
-                        if((Tabla1.getValueAt(i, 5)) == null){
-                            um = "";
-                        }else{
-                            um = (Tabla1.getValueAt(i, 5).toString());
-                        }
-                        
-                        if((Tabla1.getValueAt(i, 0)) == null){
-                            codigo = "";
-                        }else{
-                            codigo = (Tabla1.getValueAt(i, 0).toString());
-                        }
-                        
-                        if((Tabla1.getValueAt(i, 8)) == null){
-                            fech = null;
-                        }else{
-                            fech = (Tabla1.getValueAt(i, 8).toString());
-                        }
-                        
-                        pst.setString(1, (Tabla1.getValueAt(i, 1).toString()));
-                        pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
-                        pst.setString(3, (Tabla1.getValueAt(i, 3).toString()));
-                        pst.setString(4, (Tabla1.getValueAt(i, 4).toString()));
-                        pst.setString(5, um);
-                        pst.setString(6, proveedor);
-                        pst.setString(7,  id);
-                        pst.setString(8, requisitor);
-                        pst.setString(9, fech);
-                        n2 = pst.executeUpdate();
-                        
-                    }
-                    }else{
-                        for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                        String proveedor = "";
-                        String um = "";
-                        String codigo = "";
-                        String fech;
-                        if((Tabla1.getValueAt(i, 6)) == null){
-                            proveedor = "";
-                        }else{
-                            proveedor = (Tabla1.getValueAt(i, 6).toString());
-                        }
-                        if((Tabla1.getValueAt(i, 5)) == null){
-                            um = "";
-                        }else{
-                            um = (Tabla1.getValueAt(i, 5).toString());
-                        }
-                        
-                        if((Tabla1.getValueAt(i, 0)) == null){
-                            codigo = "";
-                        }else{
-                            codigo = (Tabla1.getValueAt(i, 0).toString());
-                        }
-                        
-                        if((Tabla1.getValueAt(i, 8)) == null){
-                            fech = null;
-                        }else{
-                            fech = (Tabla1.getValueAt(i, 8).toString());
-                        }
-                        pst.setString(1, id);
-                        pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
-                        pst.setString(3, (Tabla1.getValueAt(i, 3).toString()));
-                        pst.setString(4, (Tabla1.getValueAt(i, 4).toString()));
-                        pst.setString(5, (Tabla1.getValueAt(i, 1).toString()));
-                        pst.setString(6, codigo);
-                        pst.setString(7,  requisitor);
-                        pst.setString(8, um);
-                        pst.setString(9, proveedor);
-                        pst.setString(10, fech);
-                        
-                        n = pst.executeUpdate();
-                    }
-                    }
-                    
-                    agregarMaterial(id);
-                    
-                    
-                    if (n > 0) {
-                        espera.band = false;
-                        espera.dispose();
-                            JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE", "GUARDADO", JOptionPane.INFORMATION_MESSAGE);
-                        } else {
-                            JOptionPane.showMessageDialog(null, "ERROR AL INSERTAR DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
-                        }
-                    limpiarTabla();
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "ERROR AL MOSTRAR INFORMACION" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
-                espera.dispose();
-            }
-        }else{
-                JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR COMPRA O SOLO COTIZAR", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-                espera.dispose();
-            }
+        if (Tabla1.getRowCount() <= 0) {
+            JOptionPane.showMessageDialog(this, "DEBES AGREGAR POR LO MENOS 1 ARTICULO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+            espera.dispose();
+        } else if (comprobar() == false) {
+            JOptionPane.showMessageDialog(this, "ELEMENTOS DE LA TABLA NO ESTAN LLENOS, FAVOR DE LLENARLOS CORRECTAMENTE", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+            espera.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR ESTADO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            espera.dispose();
+            if (rbtCompra.isSelected()) {
+                compra = "SI";
+            } else if (rbtCotizar.isSelected()) {
+                compra = "NO";
+            }
+
+            if (jRadioButton1.isSelected()) {
+                estado = "URGENTE";
+            } else if (jRadioButton2.isSelected()) {
+                estado = "NORMAL";
+            }
+            if (jRadioButton1.isSelected() || jRadioButton2.isSelected()) {
+                if (rbtCotizar.isSelected() || rbtCompra.isSelected()) {
+                    try {
+                        Connection con;
+                        Conexion con1 = new Conexion();
+                        con = con1.getConnection();
+                        Statement st = con.createStatement();
+                        String sql = "insert into Requisiciones (NumRequisicion,Codigo,Descripcion,Proyecto,Cantidad,NumParte,Requisitor,UM,Proveedor, FechaEsperada) values(?,?,?,?,?,?,?,?,?,?)";
+                        String sql1 = "insert into Requisicion (NumeroEmpleado,Estatus,Estado,Progreso,Completado,Costo,NumeroCotizacion,Fecha,Comprar,Modificar) values(?,?,?,?,?,?,?,?,?,?)";
+                        String sql4 = "insert into requisicionpdf (NumRequisicion, Pdf, Fecha, Nombre) values(?,?,?,?)";
+                        PreparedStatement pst = con.prepareStatement(sql);
+                        PreparedStatement pst1 = con.prepareStatement(sql1);
+                        PreparedStatement pst4 = con.prepareStatement(sql4);
+
+                        String slq3 = "insert into RequisicionesMuestra (Cantidad, Codigo, Descripcion, Proyecto, UM, Proveedor, NumRequisicion, Requisitor) values(?,?,?,?,?,?,?,?)";
+                        PreparedStatement pst3 = con.prepareStatement(slq3);
+
+                        byte[] pe = null;
+                        if (archivo == null) {
+                        } else {
+                            pe = new byte[(int) archivo.length()];
+                            try {
+                                InputStream input = new FileInputStream(archivo);
+                                input.read(pe);
+                            } catch (IOException e) {
+
+                            }
+                        }
+
+                        boolean editar = false;
+                        if (rbtEditar.isSelected()) {
+                            editar = true;
+                        }
+
+                        pst1.setString(1, numeroEmpleado);
+                        pst1.setString(2, "PEDIDO");
+                        pst1.setString(3, estado);
+                        pst1.setString(4, "EVALUACION");
+                        pst1.setString(5, "NO");
+                        pst1.setString(6, "");
+                        pst1.setString(7, "");
+                        pst1.setString(8, txtFecha.getText());
+                        pst1.setString(9, compra);
+                        pst1.setBytes(10, pe);
+                        pst1.setBoolean(11, editar);
+
+                        int n1 = pst1.executeUpdate();
+
+                        if (n1 > 0) {
+                            extraer();
+
+                            String sql2 = "select Id from Requisicion";
+                            ResultSet rs = st.executeQuery(sql2);
+                            String datos[] = new String[3];
+                            while (rs.next()) {
+                                datos[1] = rs.getString("Id");
+                            }
+                            String id = datos[1];
+                            
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                            Date d = new Date();
+                            pst4.setString(1, id);
+                            pst4.setBytes(2, pe);
+                            pst4.setString(3, sdf.format(d));
+                            pst4.setString(4, archivo.getName());
+                            
+                            pst4.executeUpdate();
+                            
+                            int n = 0;
+
+                            if (band) {
+                                //REQUISICIONES MUESTRA
+                                for (int i = 0; i < TablaReal.getRowCount(); i++) {
+                                    String proveedor = "";
+                                    String um = "";
+                                    String codigo = "";
+                                    if ((TablaReal.getValueAt(i, 6)) == null) {
+                                        proveedor = "";
+                                    } else {
+                                        proveedor = (TablaReal.getValueAt(i, 6).toString());
+                                    }
+                                    if ((TablaReal.getValueAt(i, 5)) == null) {
+                                        um = "";
+                                    } else {
+                                        um = (TablaReal.getValueAt(i, 5).toString());
+                                    }
+
+                                    if ((TablaReal.getValueAt(i, 0)) == null) {
+                                        codigo = "";
+                                    } else {
+                                        codigo = (TablaReal.getValueAt(i, 0).toString());
+                                    }
+                                    pst3.setString(1, id);
+                                    pst3.setString(2, (TablaReal.getValueAt(i, 2).toString()));
+                                    pst3.setString(3, (TablaReal.getValueAt(i, 3).toString()));
+                                    pst3.setString(4, (TablaReal.getValueAt(i, 4).toString()));
+                                    pst3.setString(5, (TablaReal.getValueAt(i, 1).toString()));
+                                    pst3.setString(6, codigo);
+                                    pst3.setString(7, requisitor);
+                                    pst3.setString(8, um);
+                                    pst3.setString(9, proveedor);
+
+                                    n = pst3.executeUpdate();
+
+                                }
+
+                                for (int i = 0; i < Tabla1.getRowCount(); i++) {
+                                    String proveedor = "";
+                                    String um = "";
+                                    String codigo = "";
+                                    String fech;
+                                    if ((Tabla1.getValueAt(i, 6)) == null) {
+                                        proveedor = "";
+                                    } else {
+                                        proveedor = (Tabla1.getValueAt(i, 6).toString());
+                                    }
+                                    if ((Tabla1.getValueAt(i, 5)) == null) {
+                                        um = "";
+                                    } else {
+                                        um = (Tabla1.getValueAt(i, 5).toString());
+                                    }
+
+                                    if ((Tabla1.getValueAt(i, 0)) == null) {
+                                        codigo = "";
+                                    } else {
+                                        codigo = (Tabla1.getValueAt(i, 0).toString());
+                                    }
+
+                                    if ((Tabla1.getValueAt(i, 8)) == null) {
+                                        fech = null;
+                                    } else {
+                                        fech = (Tabla1.getValueAt(i, 8).toString());
+                                    }
+
+                                    pst.setString(1, (Tabla1.getValueAt(i, 1).toString()));
+                                    pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
+                                    pst.setString(3, (Tabla1.getValueAt(i, 3).toString()));
+                                    pst.setString(4, (Tabla1.getValueAt(i, 4).toString()));
+                                    pst.setString(5, um);
+                                    pst.setString(6, proveedor);
+                                    pst.setString(7, id);
+                                    pst.setString(8, requisitor);
+                                    pst.setString(9, fech);
+                                    n2 = pst.executeUpdate();
+
+                                }
+                            } else {
+                                for (int i = 0; i < Tabla1.getRowCount(); i++) {
+                                    String proveedor = "";
+                                    String um = "";
+                                    String codigo = "";
+                                    String fech;
+                                    if ((Tabla1.getValueAt(i, 6)) == null) {
+                                        proveedor = "";
+                                    } else {
+                                        proveedor = (Tabla1.getValueAt(i, 6).toString());
+                                    }
+                                    if ((Tabla1.getValueAt(i, 5)) == null) {
+                                        um = "";
+                                    } else {
+                                        um = (Tabla1.getValueAt(i, 5).toString());
+                                    }
+
+                                    if ((Tabla1.getValueAt(i, 0)) == null) {
+                                        codigo = "";
+                                    } else {
+                                        codigo = (Tabla1.getValueAt(i, 0).toString());
+                                    }
+
+                                    if ((Tabla1.getValueAt(i, 8)) == null) {
+                                        fech = null;
+                                    } else {
+                                        fech = (Tabla1.getValueAt(i, 8).toString());
+                                    }
+                                    pst.setString(1, id);
+                                    pst.setString(2, (Tabla1.getValueAt(i, 2).toString()));
+                                    pst.setString(3, (Tabla1.getValueAt(i, 3).toString()));
+                                    pst.setString(4, (Tabla1.getValueAt(i, 4).toString()));
+                                    pst.setString(5, (Tabla1.getValueAt(i, 1).toString()));
+                                    pst.setString(6, codigo);
+                                    pst.setString(7, requisitor);
+                                    pst.setString(8, um);
+                                    pst.setString(9, proveedor);
+                                    pst.setString(10, fech);
+
+                                    n = pst.executeUpdate();
+                                }
+                            }
+
+                            agregarMaterial(id);
+
+                            if (n > 0) {
+                                espera.band = false;
+                                espera.dispose();
+                                JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE", "GUARDADO", JOptionPane.INFORMATION_MESSAGE);
+                            } else {
+                                JOptionPane.showMessageDialog(null, "ERROR AL INSERTAR DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                            }
+                            limpiarTabla();
+                        }
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(this, "ERROR AL MOSTRAR INFORMACION" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                        espera.dispose();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR COMPRA O SOLO COTIZAR", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                    espera.dispose();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR ESTADO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                espera.dispose();
+            }
         }
-        }
-        
+
     }//GEN-LAST:event_txtEnviarActionPerformed
 
     private void txtProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProyectoActionPerformed
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from Proyectos where Proyecto like '"+txtProyecto.getText()+"'";
+            String sql = "select * from Proyectos where Proyecto like '" + txtProyecto.getText() + "'";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[10];
-            while(rs.next()){
+            while (rs.next()) {
                 datos[0] = rs.getString("Proyecto");
             }
-            if(txtProyecto.getText().equals(datos[0]) || txtProyecto.getText().equals("MATERIAL DE OFICINA") || txtProyecto.getText().equals("MATERIAL DE LIMPIEZA") || txtProyecto.getText().equals("MATERIAL DE MANTENIMIENTO") || txtProyecto.getText().equals("HERRAMIENTAS") || txtProyecto.getText().equals("SEGURIDAD") || txtProyecto.getText().equals("VENTAS")){
+            if (txtProyecto.getText().equals(datos[0]) || txtProyecto.getText().equals("MATERIAL DE OFICINA") || txtProyecto.getText().equals("MATERIAL DE LIMPIEZA") || txtProyecto.getText().equals("MATERIAL DE MANTENIMIENTO") || txtProyecto.getText().equals("HERRAMIENTAS") || txtProyecto.getText().equals("SEGURIDAD") || txtProyecto.getText().equals("VENTAS")) {
                 txtProyecto.setEditable(false);
                 txtProyecto.setForeground(java.awt.Color.blue);
                 btnX2.setVisible(true);
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(this, "ESTE PROYECTO NO ESTA EN LA BASE DE DATOS");
                 txtProyecto.setText("");
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e);
         }
     }//GEN-LAST:event_txtProyectoActionPerformed
 
@@ -1416,9 +1424,8 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     private void txtDescripcionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescripcionKeyTyped
         char c = evt.getKeyChar();
-        if(Character.isLowerCase(c))
-        {
-            String cad = (""+c).toUpperCase();
+        if (Character.isLowerCase(c)) {
+            String cad = ("" + c).toUpperCase();
             c = cad.charAt(0);
             evt.setKeyChar(c);
         }
@@ -1427,30 +1434,30 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         int fila;
         fila = Tabla1.getSelectedRow();
-        if(fila < 0){
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA FILA","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else{
+        if (fila < 0) {
+            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA FILA", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else {
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
             DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
             miModelo.removeRow(fila);
             String Num = Tabla1.getValueAt(fila, 2).toString();
-            for (int i = TablaReal.getRowCount()-1; i >= 0; i--) {
-                if(TablaReal.getValueAt(i, 2).toString().equals(Num)){
+            for (int i = TablaReal.getRowCount() - 1; i >= 0; i--) {
+                if (TablaReal.getValueAt(i, 2).toString().equals(Num)) {
                     Modelo.removeRow(i);
                 }
             }
-            
+
         }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void btnSubirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubirActionPerformed
         seleccionar = new JFileChooser();
         archivo = null;
-        seleccionar.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)","pdf"));
-        if(seleccionar.showDialog(null, "SELECCIONAR ARCHIVO") == JFileChooser.APPROVE_OPTION){
+        seleccionar.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)", "pdf"));
+        if (seleccionar.showDialog(null, "SELECCIONAR ARCHIVO") == JFileChooser.APPROVE_OPTION) {
             archivo = seleccionar.getSelectedFile();
             txtSubir.setText(archivo.getName());
-            if(archivo.getName().endsWith("pdf")){
+            if (archivo.getName().endsWith("pdf")) {
 //                ImageIcon icono = new ImageIcon(getClass().getResource("/Imagenes/pdf_32.png"));
 //                lblIcono.setIcon(icono);
             }
@@ -1462,129 +1469,129 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     }//GEN-LAST:event_txtSubirActionPerformed
 
     private void importarExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_importarExcelActionPerformed
-        if(txtProyecto.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE PROYECTO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+        if (txtProyecto.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE PROYECTO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
         } else {
-        archivoExcel = new JFileChooser();
-        archivoEx = null;
-        Workbook book = null;
-        DefaultTableModel modelo = (DefaultTableModel) Tabla1.getModel();
-        archivoExcel.setFileFilter(new FileNameExtensionFilter("Excel (*.xlsx)","xlsx"));
-        if(archivoExcel.showDialog(null, "Abrir") == JFileChooser.APPROVE_OPTION){
-            archivoEx = archivoExcel.getSelectedFile();
-            String arch = archivoEx.getAbsolutePath();
-            try {
-            book=WorkbookFactory.create(new FileInputStream(arch));
-            Sheet hoja=book.getSheetAt(0);
-            Iterator FilaIterator=hoja.rowIterator();
-            int IndiceFila=-1;
-            int cont = -1;
-            while (FilaIterator.hasNext()) {
-                IndiceFila++;
-                Row fila=(Row)FilaIterator.next();
-                if(IndiceFila > 2){
-                
-                cont++;
-                Iterator ColumnaIterator=fila.cellIterator();
-                Object[]ListaColumna=new Object[9999];
-                
-                
-                modelo.addRow(ListaColumna);
-                int IndiceColumna=-1;
-                    while (ColumnaIterator.hasNext()){                
-                    IndiceColumna++;
-                    Cell celda=(Cell)ColumnaIterator.next();
-                    if(IndiceColumna > 1 && IndiceColumna < 6){
-                    String a = "";
-                        
-                    switch (celda.getCellType()){
-                        case NUMERIC:
-                            ListaColumna[IndiceColumna]=(celda.getNumericCellValue());
-                            break;
-                        case STRING:
-                            ListaColumna[IndiceColumna]=celda.getStringCellValue();
-                            break;
-                        case BOOLEAN:
-                            ListaColumna[IndiceColumna]=celda.getBooleanCellValue();
-                            break;
-                        default:
-                             break;
+            archivoExcel = new JFileChooser();
+            archivoEx = null;
+            Workbook book = null;
+            DefaultTableModel modelo = (DefaultTableModel) Tabla1.getModel();
+            archivoExcel.setFileFilter(new FileNameExtensionFilter("Excel (*.xlsx)", "xlsx"));
+            if (archivoExcel.showDialog(null, "Abrir") == JFileChooser.APPROVE_OPTION) {
+                archivoEx = archivoExcel.getSelectedFile();
+                String arch = archivoEx.getAbsolutePath();
+                try {
+                    book = WorkbookFactory.create(new FileInputStream(arch));
+                    Sheet hoja = book.getSheetAt(0);
+                    Iterator FilaIterator = hoja.rowIterator();
+                    int IndiceFila = -1;
+                    int cont = -1;
+                    while (FilaIterator.hasNext()) {
+                        IndiceFila++;
+                        Row fila = (Row) FilaIterator.next();
+                        if (IndiceFila > 2) {
+
+                            cont++;
+                            Iterator ColumnaIterator = fila.cellIterator();
+                            Object[] ListaColumna = new Object[9999];
+
+                            modelo.addRow(ListaColumna);
+                            int IndiceColumna = -1;
+                            while (ColumnaIterator.hasNext()) {
+                                IndiceColumna++;
+                                Cell celda = (Cell) ColumnaIterator.next();
+                                if (IndiceColumna > 1 && IndiceColumna < 6) {
+                                    String a = "";
+
+                                    switch (celda.getCellType()) {
+                                        case NUMERIC:
+                                            ListaColumna[IndiceColumna] = (celda.getNumericCellValue());
+                                            break;
+                                        case STRING:
+                                            ListaColumna[IndiceColumna] = celda.getStringCellValue();
+                                            break;
+                                        case BOOLEAN:
+                                            ListaColumna[IndiceColumna] = celda.getBooleanCellValue();
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    System.out.println(IndiceColumna + ", " + ListaColumna[IndiceColumna]);
+                                    switch (IndiceColumna) {
+                                        case 2:
+                                            //CODIGO
+                                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 2);
+                                            break;
+                                        case 3:
+                                            //DESCRIPCION
+                                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 3);
+                                            break;
+                                        case 4:
+                                            //CANTIDAD
+                                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 1);
+                                            break;
+                                        case 5:
+                                            //PROVEEDOR
+                                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 6);
+                                            System.out.println("--------------------------------------------------");
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                            }
+
+                        }
                     }
-                        System.out.println(IndiceColumna + ", "+ ListaColumna[IndiceColumna]);
-                    switch (IndiceColumna) {
-                        case 2:
-                            //CODIGO
-                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 2);
-                            break;
-                        case 3:
-                            //DESCRIPCION
-                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 3);
-                            break;
-                        case 4:
-                            //CANTIDAD
-                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 1);
-                            break;
-                        case 5:
-                            //PROVEEDOR
-                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont,6);
-                            System.out.println("--------------------------------------------------");
-                            break;
-                        default:
-                            break;
-                    }
+
+                    book.close();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "ERROR AL CREAR LIBRO" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                    Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, e);
+
                 }
-                }
-            
-            }  
+
             }
-                
-            book.close();
-        } catch (Exception e) {
-        JOptionPane.showMessageDialog(this, "ERROR AL CREAR LIBRO"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        Logger.getLogger(OrdenDeCompra.class.getName()).log(Level.SEVERE, null, e);
-        
-        }
-            
-        }
-        
+
         }
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                    Tabla1.setValueAt(txtProyecto.getText(), i, 4);
+            Tabla1.setValueAt(txtProyecto.getText(), i, 4);
         }
     }//GEN-LAST:event_importarExcelActionPerformed
 
     private void txtCantidadKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCantidadKeyTyped
         char c = evt.getKeyChar();
-        if(c<'0'||c>'9') evt.consume();
+        if (c < '0' || c > '9')
+            evt.consume();
     }//GEN-LAST:event_txtCantidadKeyTyped
 
     private void btnAgregar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregar1ActionPerformed
         boolean band = false;
         for (int i = 0; i < TablaReal.getRowCount(); i++) {
-            if(txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())){
+            if (txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())) {
                 band = true;
             }
         }
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
-            if(txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())){
+            if (txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())) {
                 band = true;
             }
         }
-        
-        if(band == true){
+
+        if (band == true) {
             JOptionPane.showMessageDialog(this, "ESTE NUMERO DE PARTE YA ESTA INCLUIDO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
             txtCodigo.setText("");
             txtDescripcion.setText("");
             txtCantidad.setText("");
-        }else if(txtCodigo.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN ARTICULO","ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-        }else if(txtDescripcion.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES LLENAR LA DESCRIPCION","ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-        }else{
-        JFrame frame = (JFrame) JOptionPane.getFrameForComponent(this);
-        esc = new Escoger(frame,true,txtCodigo.getText());
-        esc.btnGuardar.addActionListener(this);
-        esc.setVisible(true);
+        } else if (txtCodigo.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN ARTICULO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else if (txtDescripcion.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "DEBES LLENAR LA DESCRIPCION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else {
+            JFrame frame = (JFrame) JOptionPane.getFrameForComponent(this);
+            esc = new Escoger(frame, true, txtCodigo.getText());
+            esc.btnGuardar.addActionListener(this);
+            esc.setVisible(true);
         }
     }//GEN-LAST:event_btnAgregar1ActionPerformed
 
@@ -1615,10 +1622,10 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     }//GEN-LAST:event_rbtEditarActionPerformed
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-        if(evt.getClickCount() == 2){
-            if(Tabla1.getSelectedColumn() > -1){
+        if (evt.getClickCount() == 2) {
+            if (Tabla1.getSelectedColumn() > -1) {
                 JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                mat = new Material(f,true,Tabla1.getSelectedRow());
+                mat = new Material(f, true, Tabla1.getSelectedRow());
                 DefaultTableModel miModelo = (DefaultTableModel) mat.Tabla1.getModel();
                 String text = Tabla1.getValueAt(Tabla1.getSelectedRow(), 7).toString();
                 String buscar = "-";
@@ -1630,27 +1637,27 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                     String letra = String.valueOf(arreglo[j]);
                     if (buscar.equalsIgnoreCase(letra)) {
                         aux2 = j;
-                        String ad = (text.substring(aux,aux2));
-                        aux = j+1;
+                        String ad = (text.substring(aux, aux2));
+                        aux = j + 1;
                         String dat[] = new String[3];
                         dat[0] = ad;
                         dat[1] = Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString();
                         miModelo.addRow(dat);
                     }
                 }
-                
+
                 mat.lblMaterial.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
                 mat.btnGuardar.addActionListener(this);
                 mat.setVisible(true);
-            }else{
+            } else {
             }
         }
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void rbFechaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbFechaActionPerformed
-        if(rbFecha.isSelected()){
+        if (rbFecha.isSelected()) {
             fecha.setVisible(true);
-        }else{
+        } else {
             fecha.setVisible(false);
         }
     }//GEN-LAST:event_rbFechaActionPerformed
@@ -1742,105 +1749,104 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        if(esc != null){
-            if(e.getSource() == esc.btnGuardar){
+
+        if (esc != null) {
+            if (e.getSource() == esc.btnGuardar) {
                 boolean band = false;
-        boolean can = false;
-        String a = "", b = "";
-        try{
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            
-            for (int i = 0; i < esc.Tabla1.getRowCount(); i++) {
-                Statement st = con.createStatement();
-                if(esc.Tabla1.getValueAt(i, 1).toString().equals("")){
-                    
+                boolean can = false;
+                String a = "", b = "";
+                try {
+                    Connection con = null;
+                    Conexion con1 = new Conexion();
+                    con = con1.getConnection();
+
+                    for (int i = 0; i < esc.Tabla1.getRowCount(); i++) {
+                        Statement st = con.createStatement();
+                        if (esc.Tabla1.getValueAt(i, 1).toString().equals("")) {
+
+                        }
+                        String sql = "select * from Proyectos where Proyecto like '" + esc.Tabla1.getValueAt(i, 1).toString() + "'";
+                        ResultSet rs = st.executeQuery(sql);
+                        String d = "";
+                        while (rs.next()) {
+                            d = rs.getString("Proyecto");
+                        }
+
+                        if (esc.Tabla1.getValueAt(i, 1).equals("")) {
+                            band = true;
+                            a = a + String.valueOf(i + 1) + ", ";
+                        } else {
+                            if (esc.Tabla1.getValueAt(i, 1).equals(" ") && !esc.Tabla1.getValueAt(i, 1).toString().equals(d) && !esc.Tabla1.getValueAt(i, 1).toString().equals("MATERIAL DE LIMPIEZA") && !esc.Tabla1.getValueAt(i, 1).toString().equals("MATERIAL DE OFICINA") && !esc.Tabla1.getValueAt(i, 1).toString().equals("MATERIAL DE MANTENIMIENTO") && !esc.Tabla1.getValueAt(i, 1).toString().equals("HERRAMIENTAS") && !esc.Tabla1.getValueAt(i, 1).toString().equals("SEGURIDAD")) {
+                                band = true;
+                                a = a + String.valueOf(i + 1) + ", ";
+                            }
+                        }
+
+                        if (esc.Tabla1.getValueAt(i, 2) == null) {
+                            can = true;
+                            b = b + String.valueOf(i + 1) + ", ";
+                        } else {
+                            if (esc.Tabla1.getValueAt(i, 2).equals("")) {
+                                can = true;
+                                b = b + String.valueOf(i + 1) + ", ";
+                            }
+                        }
+                    }
+
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "ERROR: " + ex, "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
-                String sql = "select * from Proyectos where Proyecto like '"+esc.Tabla1.getValueAt(i, 1).toString()+"'";
-                ResultSet rs = st.executeQuery(sql);
-                String d = "";
-                while(rs.next()){
-                    d = rs.getString("Proyecto");
-                }
-                
-                if(esc.Tabla1.getValueAt(i, 1).equals("")){
-                    band = true;
-                    a = a+String.valueOf(i+1)+", ";
-                }else{
-                if(esc.Tabla1.getValueAt(i, 1).equals(" ") && !esc.Tabla1.getValueAt(i, 1).toString().equals(d) && !esc.Tabla1.getValueAt(i, 1).toString().equals("MATERIAL DE LIMPIEZA") && !esc.Tabla1.getValueAt(i, 1).toString().equals("MATERIAL DE OFICINA")  && !esc.Tabla1.getValueAt(i, 1).toString().equals("MATERIAL DE MANTENIMIENTO") && !esc.Tabla1.getValueAt(i, 1).toString().equals("HERRAMIENTAS") && !esc.Tabla1.getValueAt(i, 1).toString().equals("SEGURIDAD")){
-                    band = true;
-                    a = a+String.valueOf(i+1)+", ";
-                }
-                }
-                
-                if(esc.Tabla1.getValueAt(i, 2) == null){
-                    can = true;
-                    b = b+String.valueOf(i+1)+", ";
-                }else{
-                if(esc.Tabla1.getValueAt(i, 2).equals("")){
-                    can = true;
-                    b = b+String.valueOf(i+1)+", ";
-                }
-                }
-            }
-            
-        }catch(SQLException ex){
-            JOptionPane.showMessageDialog(this, "ERROR: "+ex,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
-        
-        if(band == true){
-            JOptionPane.showMessageDialog(this, "LA FILA NO. "+(a)+" NO COINCIDE CON LOS PROYECTOS");
-        }else if(can == true){
-            JOptionPane.showMessageDialog(this, "LA FILA NO. "+(b)+" NO HAY CANTIDAD");
-        }else{
-            int tot = 0;
-            for (int i = 0; i < esc.Tabla1.getRowCount(); i++) {
-                tot = tot + (Integer.parseInt(esc.Tabla1.getValueAt(i, 2).toString()));
-            }
-            esc.lblCantidad.setText(String.valueOf(tot));
-        
-                
-                DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-                DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
-                
-                String datos[] = new String[10];
-                datos[0] = "";
-                datos[1] = this.esc.lblCantidad.getText();
-                datos[2] = this.esc.lblParte.getText();
-                datos[3] = txtDescripcion.getText();
-                datos[4] = "DIFERENTES";
-                datos[5] = um;
-                datos[6] = proveedor;
-                
-                miModelo.addRow(datos);
-                for (int i = 0; i < esc.Tabla1.getRowCount(); i++) {
+
+                if (band == true) {
+                    JOptionPane.showMessageDialog(this, "LA FILA NO. " + (a) + " NO COINCIDE CON LOS PROYECTOS");
+                } else if (can == true) {
+                    JOptionPane.showMessageDialog(this, "LA FILA NO. " + (b) + " NO HAY CANTIDAD");
+                } else {
+                    int tot = 0;
+                    for (int i = 0; i < esc.Tabla1.getRowCount(); i++) {
+                        tot = tot + (Integer.parseInt(esc.Tabla1.getValueAt(i, 2).toString()));
+                    }
+                    esc.lblCantidad.setText(String.valueOf(tot));
+
+                    DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+                    DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
+
+                    String datos[] = new String[10];
                     datos[0] = "";
-                datos[1] = this.esc.Tabla1.getValueAt(i, 2).toString();
-                datos[2] = this.esc.lblParte.getText();
-                datos[3] = txtDescripcion.getText();
-                datos[4] = this.esc.Tabla1.getValueAt(i, 1).toString();
-                datos[5] = um;
-                datos[6] = proveedor;
-                    
-                    Modelo.addRow(datos);
+                    datos[1] = this.esc.lblCantidad.getText();
+                    datos[2] = this.esc.lblParte.getText();
+                    datos[3] = txtDescripcion.getText();
+                    datos[4] = "DIFERENTES";
+                    datos[5] = um;
+                    datos[6] = proveedor;
+
+                    miModelo.addRow(datos);
+                    for (int i = 0; i < esc.Tabla1.getRowCount(); i++) {
+                        datos[0] = "";
+                        datos[1] = this.esc.Tabla1.getValueAt(i, 2).toString();
+                        datos[2] = this.esc.lblParte.getText();
+                        datos[3] = txtDescripcion.getText();
+                        datos[4] = this.esc.Tabla1.getValueAt(i, 1).toString();
+                        datos[5] = um;
+                        datos[6] = proveedor;
+
+                        Modelo.addRow(datos);
+                    }
+                    esc.dispose();
+                    txtCodigo.setText("");
+                    txtDescripcion.setText("");
+                    txtCantidad.setText("");
                 }
-                esc.dispose();
-                txtCodigo.setText("");
-                txtDescripcion.setText("");
-                txtCantidad.setText("");
             }
         }
-        }
-        if(mat != null){
-            if(e.getSource() == mat.btnGuardar){
+        if (mat != null) {
+            if (e.getSource() == mat.btnGuardar) {
                 String cadena = "";
                 for (int i = 0; i < mat.Tabla1.getRowCount(); i++) {
-                    if(Tabla1.getValueAt(mat.fila, 7).toString().equals("") && mat.Tabla1.getRowCount() == 0 ){
-                        cadena = mat.Tabla1.getValueAt(i, 0).toString()+"-";
-                    }else{
-                    cadena = cadena + mat.Tabla1.getValueAt(i, 0).toString() + "-";
+                    if (Tabla1.getValueAt(mat.fila, 7).toString().equals("") && mat.Tabla1.getRowCount() == 0) {
+                        cadena = mat.Tabla1.getValueAt(i, 0).toString() + "-";
+                    } else {
+                        cadena = cadena + mat.Tabla1.getValueAt(i, 0).toString() + "-";
                     }
                 }
                 Tabla1.setValueAt(cadena, mat.fila, 7);
