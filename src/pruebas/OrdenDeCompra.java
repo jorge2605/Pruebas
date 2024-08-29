@@ -5,6 +5,7 @@ import Conexiones.ConexionChat;
 import Modelo.javamail;
 import VentanaEmergente.Compras.AgregarNota;
 import VentanaEmergente.Compras.Agrupar;
+import VentanaEmergente.Compras.ConfigCompras;
 import VentanaEmergente.Compras.CustomCellRenderer;
 import VentanaEmergente.Compras.Estado;
 import VentanaEmergente.Compras.Fecha;
@@ -88,6 +89,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     public String cantidad, descripcion, proveedor, id2;
     public int ta;
     public int id1 = -1;
+    Stack<ConfigCompras> config;
     ElegirProveedor elegir;
     boolean importar = false;
     String da[];
@@ -173,7 +175,6 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     }
 
     public void verPorProyecto(Connection con, DefaultTableModel miModelo, boolean orden) {
-
         try {
             Statement st = con.createStatement();
             Statement st2 = con.createStatement();
@@ -373,7 +374,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     public void importarLista(String requi) {
         DefaultTableModel miModelo = (DefaultTableModel) Tabla2.getModel();
         try {
-            Connection con = null;
+            Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             if (lblTitulo.getText().equals("PROYECTO:")) {
@@ -602,7 +603,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                                 miModelo.addRow(datos);
                             }
                             Statement st20 = con.createStatement();
-                            String sql20 = "select * from inventario where NumeroDeParte like '" + datos[2] + "'";
+                            String sql20 = "select NumeroDeParte from inventario where NumeroDeParte like '" + datos[2] + "'";
                             ResultSet rs20 = st20.executeQuery(sql20);
                             String sql21 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad, UM,Proveedor) values(?,?,?,?,?)";
                             PreparedStatement pst21 = con.prepareStatement(sql21);
@@ -635,7 +636,6 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     DecimalFormat formato = new DecimalFormat("#.##", separador);
                     reducirCantidad();
                     for (int i = 0; i < Tabla2.getRowCount(); i++) {
-
                         if (Tabla2.getValueAt(i, 5) != null) {
                             if (Tabla2.getValueAt(i, 5).toString().equals("")) {
                             } else {
@@ -1456,7 +1456,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             Statement st = con.createStatement();
             Statement st1 = con.createStatement();
             String sql = "select * from Requisiciones where NumRequisicion like '" + (Tabla1.getValueAt(ta, 2).toString()) + "'";
-            String sql1 = "select * from Requisicion where Id like '" + (Tabla1.getValueAt(ta, 2).toString()) + "'";
+            String sql1 = "select Id, Progreso from Requisicion where Id like '" + (Tabla1.getValueAt(ta, 2).toString()) + "'";
             ResultSet rs = st.executeQuery(sql);
             ResultSet rs1 = st1.executeQuery(sql1);
             String datos[] = new String[10];
@@ -2864,6 +2864,15 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
             verPrioridad();
 
+            String sql4 = "select NumEmpleado, Color from registroempleados where NumEmpleado like '" + this.numEmpleado + "'";
+            Statement st4 = con.createStatement();
+            ResultSet rs4 = st4.executeQuery(sql4);
+            String color = "#00a2ff";
+            
+            while(rs4.next()){
+                color = rs4.getString("Color");
+            }
+            
             Statement st2 = con.createStatement();
             String sql2 = "select PO from edicionpo where Estado like 'APROBADO' or Estado like 'COMPRADO'";
             ResultSet rs2 = st2.executeQuery(sql2);
@@ -2885,12 +2894,14 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             String sql = "select Progreso,NumeroEmpleado,Id,Fecha from Requisicion where Completado like 'NO' and Progreso != 'RECIBIDO'  and Progreso != 'EVALUACION' and Progreso != 'RECHAZADO' and Progreso != 'COTIZADO' order by Id desc";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[7];
+            config = new Stack<>();
             while (rs.next()) {
                 datos[0] = rs.getString("Progreso");
                 datos[1] = rs.getString("NumeroEmpleado");
                 datos[2] = rs.getString("Id");
                 datos[4] = rs.getString("Fecha");
                 miModelo.addRow(datos);
+                config.push(new ConfigCompras(this.numEmpleado, datos[2],color));
             }
 
             if (cont > 0) {
@@ -3064,7 +3075,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 Statement st1 = con.createStatement();
                 String datos[] = new String[20];
                 String sql = "select Requisitor,Cantidad,UM,Descripcion,Codigo,Proveedor, Proyecto, Id, TE,OC,Notas, Llego, FechaEsperada from Requisiciones where NumRequisicion like '" + numRequi + "' and Estado is null";
-                String sql1 = "select Id,Progreso, Cotizacion, Estado, Comentarios, Comprar from Requisicion where Id like '" + numRequi + "'";
+                String sql1 = "select Id,Progreso, NumeroCotizacion, Estado, Comentarios, Comprar from Requisicion where Id like '" + numRequi + "'";
                 ResultSet rs = st.executeQuery(sql);
                 ResultSet rs1 = st1.executeQuery(sql1);
 
@@ -3091,7 +3102,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 while (rs1.next()) {
                     datos[0] = rs1.getString("Id");
                     datos[1] = rs1.getString("Progreso");
-                    datos[8] = rs1.getString("Cotizacion");
+                    datos[8] = rs1.getString("NumeroCotizacion");
                     datos[9] = rs1.getString("Estado");
                     datos[7] = rs1.getString("Comentarios");
                     datos[12] = rs1.getString("Comprar");
@@ -3105,10 +3116,20 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 }
                 txtComentarios.setText(datos[7]);
                 if (datos[8] != null) {
-                    verCotizacion.setEnabled(true);
-                    jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circulo verde.png")));
-                    Noti n = new Noti();
-                    n.setVisible(true);
+                    if(!datos[8].equals("")){
+                        verCotizacion.setEnabled(true);
+                        jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circulo verde.png")));
+                        Thread hilo = new Thread() {
+                            public void run() {
+                                Noti n = new Noti();
+                                n.setVisible(true);
+                            }
+                        };
+                        hilo.start();
+                    } else {
+                    verCotizacion.setEnabled(false);
+                    jMenu3.setIcon(null);
+                    }
                 } else {
                     verCotizacion.setEnabled(false);
                     jMenu3.setIcon(null);
@@ -3241,7 +3262,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                 datos[8] = rs.getString("TE");
                 datos[9] = rs.getString("OC");
                 datos[10] = rs.getString("NumRequisicion");
-                String sql2 = "select * from requisicion where id like '" + datos[10] + "'";
+                String sql2 = "select Id, Progreso from requisicion where id like '" + datos[10] + "'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql2);
                 while (rs2.next()) {
@@ -3443,11 +3464,43 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         return false;
     }
     
+    public void verTabla(){
+        ColorCompras color = new ColorCompras();
+        color.numEmpleado = numEmpleado;
+        Tabla1 = color;
+        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "ESTADO", "REQUISITOR", "NUMERO DE REQUISICION", "PO", "FECHA"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        Tabla1.setComponentPopupMenu(jPopupMenu2);
+        jScrollPane1.setViewportView(Tabla1);
+        if (Tabla1.getColumnModel().getColumnCount() > 0) {
+            Tabla1.getColumnModel().getColumn(0).setMinWidth(150);
+            Tabla1.getColumnModel().getColumn(0).setPreferredWidth(150);
+            Tabla1.getColumnModel().getColumn(0).setMaxWidth(150);
+            Tabla1.getColumnModel().getColumn(1).setResizable(false);
+            Tabla1.getColumnModel().getColumn(2).setResizable(false);
+            Tabla1.getColumnModel().getColumn(3).setResizable(false);
+            Tabla1.getColumnModel().getColumn(4).setResizable(false);
+        }
+    }
+    
     public OrdenDeCompra(String numEmpleado) {
         initComponents();
-        verDatos();
+        
         this.numEmpleado = numEmpleado;
 
+        verDatos();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
 
         Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
@@ -5009,7 +5062,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                                     while (rs1.next()) {
                                         numRequi = rs1.getString("NumRequisicion");
                                     }
-                                    String sql2 = "select * from requisicion where Id like '" + numRequi + "'";
+                                    String sql2 = "select Id, Comprar from requisicion where Id like '" + numRequi + "'";
                                     Statement st2 = con.createStatement();
                                     ResultSet rs2 = st2.executeQuery(sql2);
                                     String com = null;
@@ -5066,7 +5119,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                         String sql = "update Requisicion set Progreso = ? where Id = ?";
                         PreparedStatement pst = con.prepareStatement(sql);
-                        String sql2 = "select * from Requisicion where Id like '" + lblRequi.getText() + "'";
+                        String sql2 = "select Id, Comprar, LiberacionAlmacen from Requisicion where Id like '" + lblRequi.getText() + "'";
                         ResultSet rs = st.executeQuery(sql2);
                         String datos[] = new String[10];
                         boolean liberacion = false;
@@ -5183,11 +5236,13 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             con = con1.getConnection();
             Statement st = con.createStatement();
             int fila = Tabla1.getSelectedRow();
-            String sql = "select * from requisicion where Id like '" + Tabla1.getValueAt(fila, 2).toString() + "'";
+            String sql = "select * from requisicionpdf where NumRequisicion like '" + Tabla1.getValueAt(fila, 2).toString() + "'";
             ResultSet rs = st.executeQuery(sql);
             byte[] b = null;
+            String nombre = "pdf.pdf";
             while (rs.next()) {
-                b = rs.getBytes("Cotizacion");
+                b = rs.getBytes("Pdf");
+                nombre = rs.getString("Nombre");
             }
 
             InputStream bos = new ByteArrayInputStream(b);
@@ -5196,13 +5251,13 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             byte[] datosPdf = new byte[tamInput];
             bos.read(datosPdf, 0, tamInput);
 
-            OutputStream out = new FileOutputStream("new.pdf");
+            OutputStream out = new FileOutputStream(nombre);
             out.write(datosPdf);
 
             out.close();
             bos.close();
 
-            Desktop.getDesktop().open(new File("new.pdf"));
+            Desktop.getDesktop().open(new File(nombre));
 
         } catch (SQLException | NumberFormatException | IOException e) {
             JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -5615,7 +5670,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     Conexion con1 = new Conexion();
                     con = con1.getConnection();
                     Statement st = con.createStatement();
-                    String sql = "select * from requisicion where Id like '" + requi + "'";
+                    String sql = "select Id, NumeroEmpleado, Progreso, Completado, Fecha, Comprar from requisicion where Id like '" + requi + "'";
                     ResultSet rs = st.executeQuery(sql);
                     String empleado = "";
                     String estado = "";

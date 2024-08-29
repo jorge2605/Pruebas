@@ -1,10 +1,14 @@
 package pruebas;
+import VentanaEmergente.Compras.ConfigCompras;
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import javax.swing.border.LineBorder;
 
 public class ColorCompras extends JTable {
+    
+    public String numEmpleado = "";
+    public ConfigCompras config;
+    
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int rowIndex, int columnIndex) {
         Component componente = super.prepareRenderer(renderer, rowIndex, columnIndex);
@@ -13,18 +17,23 @@ public class ColorCompras extends JTable {
             String valor = getValueAt(rowIndex, columnIndex).toString();
             switch (valor) {
                 case "NUEVO":
-                case "COTIZANDO":
-                case "APROBADO":
                     componente.setBackground(Color.WHITE);
                     componente.setForeground(Color.BLACK);
+                    break;
+                case "COTIZANDO":
+                    componente.setBackground(Color.decode("#ff0000"));
+                    componente.setForeground(Color.BLACK);
+                case "APROBADO":
+                        componente.setBackground(Color.green);
+                        componente.setForeground(Color.BLACK);
                     break;
                 case "RECHAZADO":
                     componente.setBackground(Color.decode("#ff0000"));
                     componente.setForeground(Color.BLACK);
                     break;
                 case "COMPRADO":
-                    componente.setBackground(Color.decode("#00a2ff"));
-                    componente.setForeground(Color.WHITE);
+                        componente.setBackground(Color.decode("#00a2ff"));
+                        componente.setForeground(Color.WHITE);
                     break;
                 case "RECIBIDO":
                     componente.setBackground(Color.decode("#4f9234"));

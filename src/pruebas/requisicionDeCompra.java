@@ -4,6 +4,7 @@ import Conexiones.Conexion;
 import Conexiones.ConexionChat;
 import VentanaEmergente.Inicio1.Espera;
 import VentanaEmergente.Requisiciones.Escoger;
+import VentanaEmergente.Requisiciones.IDRequisicion;
 import VentanaEmergente.Requisiciones.Material;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
@@ -1208,17 +1209,23 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                             editar = true;
                         }
 
+                        String coti;
+                        if(pe == null){
+                            coti = null;
+                        }else{
+                            coti = archivo.getName();
+                        }
+                        
                         pst1.setString(1, numeroEmpleado);
                         pst1.setString(2, "PEDIDO");
                         pst1.setString(3, estado);
                         pst1.setString(4, "EVALUACION");
                         pst1.setString(5, "NO");
                         pst1.setString(6, "");
-                        pst1.setString(7, "");
+                        pst1.setString(7, coti);
                         pst1.setString(8, txtFecha.getText());
                         pst1.setString(9, compra);
-                        pst1.setBytes(10, pe);
-                        pst1.setBoolean(11, editar);
+                        pst1.setBoolean(10, editar);
 
                         int n1 = pst1.executeUpdate();
 
@@ -1233,16 +1240,19 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                             }
                             String id = datos[1];
                             
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                            Date d = new Date();
-                            pst4.setString(1, id);
-                            pst4.setBytes(2, pe);
-                            pst4.setString(3, sdf.format(d));
-                            pst4.setString(4, archivo.getName());
-                            
-                            pst4.executeUpdate();
+                            if(archivo != null){
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                Date d = new Date();
+                                pst4.setString(1, id);
+                                pst4.setBytes(2, pe);
+                                pst4.setString(3, sdf.format(d));
+                                pst4.setString(4, coti);
+
+                                pst4.executeUpdate();
+                            }
                             
                             int n = 0;
+                            int n2 = 0;
 
                             if (band) {
                                 //REQUISICIONES MUESTRA
@@ -1368,7 +1378,11 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                             if (n > 0) {
                                 espera.band = false;
                                 espera.dispose();
-                                JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE", "GUARDADO", JOptionPane.INFORMATION_MESSAGE);
+                                JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+                                IDRequisicion requi = new IDRequisicion(f, true);
+                                requi.setLocationRelativeTo(f);
+                                requi.lblID.setText(id);
+                                requi.setVisible(true);
                             } else {
                                 JOptionPane.showMessageDialog(null, "ERROR AL INSERTAR DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
                             }

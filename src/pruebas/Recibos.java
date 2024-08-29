@@ -974,24 +974,17 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
     }//GEN-LAST:event_Tabla1MouseDragged
 
     private void txtNumeroCotizacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumeroCotizacionActionPerformed
-        if(txtNumeroCotizacion.getText().length() > 3){
-            if(txtNumeroCotizacion.getText().substring(0,3).equals("OCM")){
-                id = txtNumeroCotizacion.getText();
-            }else{
-                id = "OCM"+txtNumeroCotizacion.getText();
-            }
+        id = txtNumeroCotizacion.getText();
+        if(btnV1.isSelected()){
+          verDatos();  
+        }else if(btnV2.isSelected()){
+            verDatos2();
         }
-        
-            if(btnV1.isSelected()){
-              verDatos();  
-            }else if(btnV2.isSelected()){
-                verDatos2();
-            }
-            if(existeRelacion()){
-                panelRelacion.setVisible(true);
-            }else{
-                panelRelacion.setVisible(false);
-            }
+        if(existeRelacion()){
+            panelRelacion.setVisible(true);
+        }else{
+            panelRelacion.setVisible(false);
+        }
     }//GEN-LAST:event_txtNumeroCotizacionActionPerformed
 
     private void btnArticuloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArticuloActionPerformed

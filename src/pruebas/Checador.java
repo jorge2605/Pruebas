@@ -717,7 +717,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             Statement st = con.createStatement();
             String sql = "select * from empleadoscheck where NumSupervisor like '"+numEmpleado+"'";
             if(numEmpleado.equals("61") || getSupervisor().equals("GERENCIA")){
-                sql = "select * from empleadoscheck WHERE NumSupervisor like '"+numEmpleado+"' and Activo like 'true'";
+                sql = "select * from empleadoscheck WHERE Activo like 'true'";
             }
             ResultSet rs = st.executeQuery(sql);
             int cont = 0;
@@ -729,7 +729,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             String sql2 = "select * from empleadoscheck where NumSupervisor like '"+numEmpleado+"'";
             boolean redondeo = false;
             if(numEmpleado.equals("61") || getSupervisor().equals("GERENCIA")){
-                sql2 = "select * from empleadoscheck WHERE NumSupervisor like '"+numEmpleado+"' and Activo like 'true'";
+                sql2 = "select * from empleadoscheck WHERE Activo like 'true'";
                 redondeo = true;
             }
             ResultSet rs2 = st2.executeQuery(sql2);
