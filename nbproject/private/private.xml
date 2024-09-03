@@ -4,11 +4,11 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Pruebas/src/pruebas/Inicio1.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/Compras/ConfigCompras.java</file>
             <file>file:/C:/Pruebas/src/pruebas/InicioSesion.java</file>
             <file>file:/C:/Pruebas/src/pruebas/Disenio1.java</file>
             <file>file:/C:/Pruebas/src/pruebas/ColorCompras.java</file>
             <file>file:/C:/Pruebas/src/pruebas/OrdenDeCompra.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Checador/ColorChecador.java</file>
         </group>
     </open-files>
 </project-private>

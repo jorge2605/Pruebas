@@ -20,9 +20,14 @@ public class ColorCompras extends JTable {
                     componente.setBackground(Color.WHITE);
                     componente.setForeground(Color.BLACK);
                     break;
+                case "LLEGO, INCOMPETO":
+                    componente.setBackground(Color.yellow);
+                    componente.setForeground(Color.BLACK);
+                    break;
                 case "COTIZANDO":
                     componente.setBackground(Color.decode("#ff0000"));
                     componente.setForeground(Color.BLACK);
+                    break;
                 case "APROBADO":
                         componente.setBackground(Color.green);
                         componente.setForeground(Color.BLACK);
