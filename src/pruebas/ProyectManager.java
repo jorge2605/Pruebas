@@ -195,15 +195,13 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         }
     }
 
-    public void buscar(){
+    public final void buscar(String sql){
     DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
     try{
         Connection con = null;
         Conexion con1 = new Conexion();
         con = con1.getConnection();
         Statement st = con.createStatement();
-        String sql = "select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
-                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda,DueDate,Responsable from proyectos order by Id desc";
         ResultSet rs = st.executeQuery(sql);
         String datos[] = new String[20];
         while(rs.next()){
@@ -236,7 +234,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     }
 }
     
-    public void limpiarTabla(){
+    public final void limpiarTabla(){
         Tabla1 = new ColorVentas();
         Tabla1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
@@ -265,7 +263,8 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         this.numEmpleado = numEmpleado;
         limpiarTabla();
-        buscar();
+        buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
+                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda,DueDate,Responsable from proyectos order by Id desc");
         DefaultTableModel Modelo = (DefaultTableModel) Tabla1.getModel();
         elQueOrdena = new TableRowSorter<>(Modelo);
         Tabla1.setRowSorter(elQueOrdena);
@@ -289,6 +288,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        btnVer = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -385,7 +385,35 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         jTextField1.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jTextField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         jTextField1.setPreferredSize(new java.awt.Dimension(300, 25));
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
         jPanel3.add(jTextField1);
+
+        btnVer.setBackground(new java.awt.Color(255, 255, 255));
+        btnVer.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        btnVer.setForeground(new java.awt.Color(51, 51, 51));
+        btnVer.setText("Ver todos");
+        btnVer.setBorder(null);
+        btnVer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnVer.setFocusPainted(false);
+        btnVer.setPreferredSize(new java.awt.Dimension(120, 25));
+        btnVer.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnVerMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnVerMouseExited(evt);
+            }
+        });
+        btnVer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerActionPerformed(evt);
+            }
+        });
+        jPanel3.add(btnVer);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
@@ -902,9 +930,33 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         lblSalir.setForeground(Color.black);
     }//GEN-LAST:event_lblSalirMouseExited
 
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        String text = jTextField1.getText();
+        String sql = "select * from proyectos where Proyecto like '" + text + "%' or NumCotizacion like '" + text + "%' or OC like '" + text + "%'";
+        limpiarTabla();
+        buscar(sql);
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void btnVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerActionPerformed
+        limpiarTabla();
+        buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
+                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda,DueDate,Responsable from proyectos order by Id desc");
+    }//GEN-LAST:event_btnVerActionPerformed
+
+    private void btnVerMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerMouseEntered
+        btnVer.setBackground(new Color(0,102,204));
+        btnVer.setForeground(Color.white);
+    }//GEN-LAST:event_btnVerMouseEntered
+
+    private void btnVerMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerMouseExited
+        btnVer.setBackground(Color.white);
+        btnVer.setForeground(new Color(51,51,51));
+    }//GEN-LAST:event_btnVerMouseExited
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
+    private javax.swing.JButton btnVer;
     private javax.swing.JMenuItem editar;
     private javax.swing.JMenuItem filtrar;
     private javax.swing.JLabel jLabel1;

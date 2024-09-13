@@ -9,6 +9,7 @@ import VentanaEmergente.Inicio1.Configuracion;
 import VentanaEmergente.Inicio1.InicioAlmacen;
 import VentanaEmergente.Inicio1.InicioCostos;
 import VentanaEmergente.Inicio1.Mensajes;
+import VentanaEmergente.Inicio1.ModificacionesTowi;
 import VentanaEmergente.Inicio1.Notificaciones;
 import VentanaEmergente.Inicio1.ReporteError;
 import VentanaEmergente.Inicio1.precioDolar;
@@ -46,6 +47,7 @@ import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 
 public final class Inicio1 extends javax.swing.JFrame implements Observer,ActionListener{
 
@@ -392,6 +394,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         jButton3 = new javax.swing.JButton();
         lblCont = new javax.swing.JLabel();
         errores = new javax.swing.JButton();
+        btnModificar = new javax.swing.JButton();
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -676,6 +679,19 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             }
         });
 
+        btnModificar.setBackground(new java.awt.Color(255, 255, 255));
+        btnModificar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/modificar_16.png"))); // NOI18N
+        btnModificar.setBorder(null);
+        btnModificar.setBorderPainted(false);
+        btnModificar.setContentAreaFilled(false);
+        btnModificar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnModificar.setFocusPainted(false);
+        btnModificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModificarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -701,7 +717,9 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
                 .addComponent(jButton1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(errores)
-                .addContainerGap(239, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnModificar)
+                .addContainerGap(211, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -716,7 +734,8 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
                     .addComponent(lblNombre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblId1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel37, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(errores, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(errores, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnModificar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -2305,7 +2324,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 761, Short.MAX_VALUE)
+            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 755, Short.MAX_VALUE)
         );
 
         getContentPane().add(jDesktopPane1, java.awt.BorderLayout.CENTER);
@@ -3085,6 +3104,12 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         ver.setVisible(true);
     }//GEN-LAST:event_erroresActionPerformed
 
+    private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
+        ModificacionesTowi modificaciones = new ModificacionesTowi(this, true, lblId.getText());
+        modificaciones.setLocationRelativeTo(this);
+        modificaciones.setVisible(true);
+    }//GEN-LAST:event_btnModificarActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -3148,6 +3173,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     public javax.swing.JButton btnInventario;
     public javax.swing.JButton btnInventario1;
     public javax.swing.JButton btnInventario2;
+    private javax.swing.JButton btnModificar;
     public javax.swing.JButton btnOrden;
     public javax.swing.JButton btnOrden1;
     public javax.swing.JButton btnPedidos;

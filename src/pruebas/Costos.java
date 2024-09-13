@@ -134,10 +134,10 @@ public final class Costos extends javax.swing.JInternalFrame {
         SimpleDateFormat sdf = new SimpleDateFormat("MM");
         int mes = Integer.parseInt(sdf.format(d));
         
-        String[] spanishMonthNames = DateFormatSymbols.getInstance(new Locale("es")).getMonths();
-        for (int i = spanishMonthNames.length-1; i >= 0; i--) {
-            if(i <= mes){
-                cmbMes.addItem(spanishMonthNames[i]);
+        String[] monthNames = DateFormatSymbols.getInstance(Locale.getDefault()).getMonths();
+        for (int i = monthNames.length - 1; i >= 0; i--) {
+            if (i <= mes) {
+                cmbMes.addItem(monthNames[i]);
             }
         }
         
@@ -741,8 +741,9 @@ public final class Costos extends javax.swing.JInternalFrame {
         Date d = null;
         try {
             d = s1.parse(cmbMes.getSelectedItem().toString());
-        } catch (Exception ex) {
+        } catch (ParseException ex) {
             Logger.getLogger(Costos.class.getName()).log(Level.SEVERE, null, ex);
+            espera.dispose();
         }
         int year = Integer.parseInt(cmbAnio.getSelectedItem().toString());
         int month = Integer.parseInt(s2.format(d));
@@ -1213,7 +1214,8 @@ public final class Costos extends javax.swing.JInternalFrame {
                     while(rs2.next()){
                         dolar = Double.parseDouble(rs2.getString("Precio"));
                     }
-                    double tot = dolar * (Double.parseDouble(dat[1].replaceAll("[^0-9.]", "")));
+                    double tot;
+                    try{tot = dolar * (Double.parseDouble(dat[1].replaceAll("[^0-9.]", "")));}catch(Exception e){tot = 0;}
                     dat[1] = String.valueOf(formato.format(tot));
                 }
                 dat2[0] = rs.getString("Proyecto");

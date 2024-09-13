@@ -380,6 +380,7 @@ public class ReporteError extends javax.swing.JDialog {
             Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Logger.getLogger(ReporteError.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(this, ex);
         }
         try {
         Robot robot = new Robot();
@@ -400,17 +401,16 @@ public class ReporteError extends javax.swing.JDialog {
         byte pe[] = new byte[(int)file.length()];
                 
                 
-                try{
-                
-                InputStream input = new FileInputStream(file);
-                input.read(pe);
-                }catch(IOException e){
-                    
-                }
-        
-                Date d = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat();
-                String fecha = sdf.format(d);
+        try{
+            InputStream input = new FileInputStream(file);
+            input.read(pe);
+        }catch(IOException e){
+            JOptionPane.showMessageDialog(this, e);
+        }
+
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat();
+        String fecha = sdf.format(d);
                 
         pst.setString(1, txtAsunto.getText());
         pst.setString(2, txtComentario.getText());
@@ -432,7 +432,7 @@ public class ReporteError extends javax.swing.JDialog {
         }
         
         } catch (Exception e) {
-         e.printStackTrace();
+         JOptionPane.showMessageDialog(this, e);
         }
             this.setVisible(true);
         }

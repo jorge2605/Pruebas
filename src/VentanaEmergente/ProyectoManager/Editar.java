@@ -393,7 +393,8 @@ public class Editar extends javax.swing.JDialog {
                         }
                     }
                     proy.limpiarTabla();
-                    proy.buscar();
+                    proy.buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
+                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda,DueDate,Responsable from proyectos order by Id desc");
                     dispose();
                 }else{
                     JOptionPane.showMessageDialog(this, "NO SE GUARDARON LOS DATOS","ERROR",JOptionPane.ERROR_MESSAGE);
