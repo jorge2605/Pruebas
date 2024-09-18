@@ -15,6 +15,7 @@ import VentanaEmergente.Compras.Reclamos;
 import VentanaEmergente.Requisiciones.Material;
 import VentanaEmergente.Requisiciones.liberarCompra;
 import VentanaEmergente.verRequisiciones.Detalles;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,12 +24,18 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.PreparedStatement;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -53,6 +60,7 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
     boolean compras;
     liberarCompra lib;
     int tabla = 0;
+    boolean falta = true;
     
     public void limpiarTablaOrden(){
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
@@ -294,33 +302,45 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
    
    public void verDatos1(){
    try{
-   DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-   Connection con = null;
-   Conexion con1 = new Conexion();
-   con = con1.getConnection();
-   Statement st = con.createStatement();
-   String sql = "select NumeroEmpleado, Id, NumeroCotizacion, Estatus, Estado, Progreso, Costo, Fecha from Requisicion where NumeroEmpleado like '"+numEmpleado+"' order by Id desc";
-   ResultSet rs = st.executeQuery(sql);
-   String datos[] = new String[10];
-   while(rs.next()){
-   datos[0] = rs.getString("Id");
-   datos[1] = numEmpleado;
-   datos[2] = rs.getString("NumeroCotizacion");
-   datos[3] = rs.getString("Estatus");
-   datos[4] = rs.getString("Estado");
-   datos[5] = rs.getString("Progreso");
-   datos[6] = rs.getString("Costo");
-   datos[7] = rs.getString("Fecha");
-   miModelo.addRow(datos);
-   }
+        DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+        Connection con = null;
+        Conexion con1 = new Conexion();
+        con = con1.getConnection();
+        Statement st = con.createStatement();
+        String sql = "select NumeroEmpleado, Id, NumeroCotizacion, Estatus, Estado, Progreso, Costo, Fecha from Requisicion where NumeroEmpleado like '"+numEmpleado+"' order by Id desc";
+        ResultSet rs = st.executeQuery(sql);
+        String datos[] = new String[10];
+        while(rs.next()){
+            datos[0] = rs.getString("Id");
+            datos[1] = numEmpleado;
+            datos[2] = rs.getString("NumeroCotizacion");
+            datos[3] = rs.getString("Estatus");
+            datos[4] = rs.getString("Estado");
+            datos[5] = rs.getString("Progreso");
+            datos[6] = rs.getString("Costo");
+            datos[7] = rs.getString("Fecha");
+            miModelo.addRow(datos);
+       }
    }catch(SQLException e){
        JOptionPane.showMessageDialog(null,"ERROR AL VER DATOS TABLA 1","ERROR",JOptionPane.ERROR_MESSAGE);
    }
    }
    
-   public final void verTe(){
-       if(numEmpleado.equals("11") || numEmpleado.equals("35")  || numEmpleado.equals("3")  || numEmpleado.equals("1005") || numEmpleado.equals("104")  || numEmpleado.equals("71")  || numEmpleado.equals("57") || numEmpleado.equals("61") || numEmpleado.equals("7") ){
-           miVencido.setEnabled(true);
+   public final void verTe(String numEmpleado){
+       try{
+           Connection con;
+           Conexion con1 = new Conexion();
+           con = con1.getConnection();
+           String sql = "select * from registroempleados where Almacen like 'SI'";
+           Statement st = con.createStatement();
+           ResultSet rs = st.executeQuery(sql);
+           while(rs.next()){
+               if(numEmpleado.equals(rs.getString("NumEmpleado"))){
+                   miVencido.setEnabled(true);
+               }
+           }
+       }catch(SQLException e){
+           JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
        }
    }
    
@@ -359,7 +379,7 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
 
     jScrollPane2.setViewportView(Tabla1);
    Tabla1.setComponentPopupMenu(popMenu);
-   DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+   DefaultTableModel miModelo;
    String titulos[] = {"O.C","NO. REQUISICION","NO. EMPLEADO"};
    miModelo = (new DefaultTableModel (null,titulos){
     boolean[] canEdit = new boolean [] {
@@ -528,11 +548,71 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
     }
    }
    
+   public void verMisRequis(){
+       Thread hilo = new Thread() {
+        @Override
+        public void run() {
+            for(;;){
+                if(falta){
+                    try {
+                        rbtnAtrasadas.setForeground(new Color(150,0,0));
+                        sleep(500);
+                        rbtnAtrasadas.setForeground(new Color(0,112,192));
+                        sleep(500);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(VerRequisiciones.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }
+       };
+       hilo.start();
+   }
+   
+   public final void extraerRequisiciones(){
+       try{
+           Connection con;
+           Conexion con1 = new Conexion();
+           con = con1.getConnection();
+           Statement st = con.createStatement();
+           LocalDate fechaActual = LocalDate.now();
+           LocalDate nuevaFecha = fechaActual.minusDays(3);
+           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+           String nuevaFechaFormateada = nuevaFecha.format(formatter);
+           String sql = "select Progreso, Id, NumeroEmpleado, NumeroCotizacion, Estatus, Estado, Progreso, Costo, Fecha from requisicion where "
+                   + "(Progreso like 'COMPRADO' or Progreso like 'COTIZANDO' "
+                   + "or Progreso like 'COTIZADO' or Progreso like 'APROBADO' or Progreso like 'NUEVO' or Progreso like 'LLEGO, INCOMPETO'"
+                   + "or Progreso like 'EVALUACION') and FechaNew < '" + nuevaFechaFormateada + "' and NumeroEmpleado like '" + numEmpleado + "'";
+           ResultSet rs = st.executeQuery(sql);
+           DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+           String datos[] = new String[10];
+           while(rs.next()){
+               datos[0] = rs.getString("Id");
+                datos[1] = numEmpleado;
+                datos[2] = rs.getString("NumeroCotizacion");
+                datos[3] = rs.getString("Estatus");
+                datos[4] = rs.getString("Estado");
+                datos[5] = rs.getString("Progreso");
+                datos[6] = rs.getString("Costo");
+                datos[7] = rs.getString("Fecha");
+                miModelo.addRow(datos);
+           }
+       }catch(SQLException e){
+           JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+       }
+   }
+   
     public VerRequisiciones(String NoEmpleado) {
+        try {
+            UIManager.setLookAndFeel(new FlatMacLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         initComponents();
+        verMisRequis();
         this.numEmpleado = NoEmpleado;
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-        verTe();
+        verTe(numEmpleado);
         Tabla1.getTableHeader().setFont(new Font("Roboto", Font.PLAIN, 14));
         Tabla1.getTableHeader().setOpaque(false);
         Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
@@ -564,18 +644,19 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         verRelaciones = new javax.swing.JMenuItem();
         jPopupMenu2 = new javax.swing.JPopupMenu();
         jPanel4 = new javax.swing.JPanel();
-        titulo = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         panelX = new javax.swing.JPanel();
         lblX = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         cmbBuscar = new RSMaterialComponent.RSComboBoxMaterial();
         txtProyecto = new rojeru_san.RSMTextFull();
         jPanel5 = new javax.swing.JPanel();
-        rbtnMis = new RSMaterialComponent.RSRadioButtonMaterial();
-        rbtnTodas = new RSMaterialComponent.RSRadioButtonMaterial();
-        rSRadioButtonMaterial1 = new RSMaterialComponent.RSRadioButtonMaterial();
+        rbtnMis = new javax.swing.JRadioButton();
+        rbtnAtrasadas = new javax.swing.JRadioButton();
+        rbtnTodas = new javax.swing.JRadioButton();
+        rSRadioButtonMaterial1 = new javax.swing.JRadioButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         Tabla1 = new javax.swing.JTable();
@@ -616,23 +697,6 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setLayout(new java.awt.BorderLayout());
 
-        titulo.setFont(new java.awt.Font("Arial Rounded MT Bold", 0, 40)); // NOI18N
-        titulo.setForeground(new java.awt.Color(0, 165, 252));
-        titulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        titulo.setText("VER REQUISICIONES");
-        titulo.setPreferredSize(new java.awt.Dimension(190, 29));
-        titulo.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                tituloMouseDragged(evt);
-            }
-        });
-        titulo.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                tituloMousePressed(evt);
-            }
-        });
-        jPanel4.add(titulo, java.awt.BorderLayout.CENTER);
-
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
         panelX.setBackground(new java.awt.Color(255, 255, 255));
@@ -658,6 +722,12 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
 
         jPanel4.add(jPanel3, java.awt.BorderLayout.EAST);
 
+        jLabel12.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel12.setText("Requisiciones");
+        jPanel4.add(jLabel12, java.awt.BorderLayout.CENTER);
+
         getContentPane().add(jPanel4, java.awt.BorderLayout.NORTH);
 
         jPanel6.setLayout(new java.awt.BorderLayout());
@@ -678,6 +748,7 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         });
         jPanel2.add(cmbBuscar);
 
+        txtProyecto.setBackground(new java.awt.Color(255, 255, 255));
         txtProyecto.setModoMaterial(true);
         txtProyecto.setPlaceholder("Introducir");
         txtProyecto.addActionListener(new java.awt.event.ActionListener() {
@@ -690,8 +761,12 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
         jPanel5.setLayout(new java.awt.GridLayout(1, 3));
 
+        rbtnMis.setBackground(new java.awt.Color(255, 255, 255));
         buttonGroup1.add(rbtnMis);
+        rbtnMis.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        rbtnMis.setForeground(new java.awt.Color(0, 112, 192));
         rbtnMis.setText("Mis requisiciones");
+        rbtnMis.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         rbtnMis.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbtnMisActionPerformed(evt);
@@ -699,8 +774,24 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         });
         jPanel5.add(rbtnMis);
 
+        rbtnAtrasadas.setBackground(new java.awt.Color(255, 255, 255));
+        buttonGroup1.add(rbtnAtrasadas);
+        rbtnAtrasadas.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        rbtnAtrasadas.setForeground(new java.awt.Color(0, 112, 192));
+        rbtnAtrasadas.setText("Requisiciones atrasadas");
+        rbtnAtrasadas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        rbtnAtrasadas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rbtnAtrasadasActionPerformed(evt);
+            }
+        });
+        jPanel5.add(rbtnAtrasadas);
+
         buttonGroup1.add(rbtnTodas);
+        rbtnTodas.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        rbtnTodas.setForeground(new java.awt.Color(0, 112, 192));
         rbtnTodas.setText("Todas las requisiciones");
+        rbtnTodas.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         rbtnTodas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rbtnTodasActionPerformed(evt);
@@ -709,7 +800,10 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         jPanel5.add(rbtnTodas);
 
         buttonGroup1.add(rSRadioButtonMaterial1);
-        rSRadioButtonMaterial1.setText("Todas las OC");
+        rSRadioButtonMaterial1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        rSRadioButtonMaterial1.setForeground(new java.awt.Color(0, 112, 192));
+        rSRadioButtonMaterial1.setText("Todas O.C.");
+        rSRadioButtonMaterial1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         rSRadioButtonMaterial1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rSRadioButtonMaterial1ActionPerformed(evt);
@@ -790,6 +884,8 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         jPanel6.add(jPanel1, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel6, java.awt.BorderLayout.CENTER);
+
+        jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
 
         jMenu1.setText("File");
 
@@ -969,35 +1065,6 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         }
         
     }//GEN-LAST:event_verDetallesActionPerformed
-
-    private void rbtnMisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnMisActionPerformed
-        limpiarTabla3();
-        verDatos1();
-        tabla = 0;
-    }//GEN-LAST:event_rbtnMisActionPerformed
-
-    private void rbtnTodasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnTodasActionPerformed
-        System.out.println(compras);
-        if(compras){
-            limpiarTabla3();
-        }
-        seleccionarTabla();
-        tabla = 1;
-    }//GEN-LAST:event_rbtnTodasActionPerformed
-
-    private void rSRadioButtonMaterial1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSRadioButtonMaterial1ActionPerformed
-        limpiarTablaOrden();
-        verDatosOrden();
-        tabla = 3;
-    }//GEN-LAST:event_rSRadioButtonMaterial1ActionPerformed
-
-    private void tituloMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tituloMouseDragged
-        
-    }//GEN-LAST:event_tituloMouseDragged
-
-    private void tituloMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tituloMousePressed
-        
-    }//GEN-LAST:event_tituloMousePressed
 
     private void lblXMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseClicked
         dispose();
@@ -1179,6 +1246,31 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         
     }//GEN-LAST:event_cmbBuscarActionPerformed
 
+    private void rbtnMisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnMisActionPerformed
+        limpiarTabla3();
+        verDatos1();
+        tabla = 0;
+    }//GEN-LAST:event_rbtnMisActionPerformed
+
+    private void rbtnTodasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnTodasActionPerformed
+        if(compras){
+            limpiarTabla3();
+        }
+        seleccionarTabla();
+        tabla = 1;
+    }//GEN-LAST:event_rbtnTodasActionPerformed
+
+    private void rSRadioButtonMaterial1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rSRadioButtonMaterial1ActionPerformed
+        limpiarTablaOrden();
+        verDatosOrden();
+        tabla = 3;
+    }//GEN-LAST:event_rSRadioButtonMaterial1ActionPerformed
+
+    private void rbtnAtrasadasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rbtnAtrasadasActionPerformed
+        limpiarTabla3();
+        extraerRequisiciones();
+    }//GEN-LAST:event_rbtnAtrasadasActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
@@ -1186,6 +1278,7 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private RSMaterialComponent.RSComboBoxMaterial cmbBuscar;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
@@ -1206,10 +1299,10 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
     private javax.swing.JMenuItem miVencido;
     private javax.swing.JPanel panelX;
     private javax.swing.JPopupMenu popMenu;
-    private RSMaterialComponent.RSRadioButtonMaterial rSRadioButtonMaterial1;
-    private RSMaterialComponent.RSRadioButtonMaterial rbtnMis;
-    private RSMaterialComponent.RSRadioButtonMaterial rbtnTodas;
-    public javax.swing.JLabel titulo;
+    private javax.swing.JRadioButton rSRadioButtonMaterial1;
+    private javax.swing.JRadioButton rbtnAtrasadas;
+    private javax.swing.JRadioButton rbtnMis;
+    private javax.swing.JRadioButton rbtnTodas;
     private rojeru_san.RSMTextFull txtProyecto;
     private javax.swing.JMenuItem verDetalles;
     private javax.swing.JMenuItem verRelaciones;

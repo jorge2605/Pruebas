@@ -1,4 +1,3 @@
-
 package VentanaEmergente.Inicio1;
 
 import Conexiones.Conexion;
@@ -29,49 +28,47 @@ import javax.swing.table.DefaultTableModel;
 public class ReporteError extends javax.swing.JDialog {
 
     String numEmpleado;
-    
-    public void verDatos(){
-        try{
+
+    public void verDatos() {
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-            String sql = "select * from reporteerror where NumEmpleado like '"+numEmpleado+"'";
+            String sql = "select * from reporteerror where NumEmpleado like '" + numEmpleado + "'";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[10];
-            
-            while(rs.next()){
+
+            while (rs.next()) {
                 datos[0] = rs.getString("Id");
                 datos[1] = rs.getString("Fecha");
                 miModelo.addRow(datos);
             }
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public void limpiar(){
+
+    public void limpiar() {
         txtAsunto.setText("");
         txtComentario.setText("");
     }
-    
-    public void limpiarTabla(){
-        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
 
-            },
-            new String [] {
-                "No. Error", "Fecha"
-            }
+    public void limpiarTabla() {
+        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                    "No. Error", "Fecha"
+                }
         ) {
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean[]{
                 false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
 
@@ -80,8 +77,6 @@ public class ReporteError extends javax.swing.JDialog {
         Tabla1.setMinimumSize(new java.awt.Dimension(200, 800));
 
         Tabla1.setPreferredSize(new java.awt.Dimension(200, 800));
-
-
 
         jScrollPane3.setViewportView(Tabla1);
 
@@ -92,7 +87,7 @@ public class ReporteError extends javax.swing.JDialog {
         }
 
     }
-    
+
     public ReporteError(java.awt.Frame parent, boolean modal, String numEmpleado) {
         super(parent, modal);
         initComponents();
@@ -102,6 +97,7 @@ public class ReporteError extends javax.swing.JDialog {
         lblSolucion.setVisible(false);
         btnAgregar.setVisible(false);
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -370,101 +366,100 @@ public class ReporteError extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
-        if(txtAsunto.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES AGREGAR EL ASUNTO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else if(txtComentario.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES AGREGAR UN COMENTARIO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else{
-        this.setVisible(false);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(ReporteError.class.getName()).log(Level.SEVERE, null, ex);
-            JOptionPane.showMessageDialog(this, ex);
-        }
-        try {
-        Robot robot = new Robot();
-        Rectangle rect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        if (txtAsunto.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "DEBES AGREGAR EL ASUNTO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else if (txtComentario.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "DEBES AGREGAR UN COMENTARIO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+        } else {
+            this.setVisible(false);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ReporteError.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, ex);
+            }
+            try {
+                Robot robot = new Robot();
+                Rectangle rect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 
-       BufferedImage screesnShot = robot.createScreenCapture(rect);
+                BufferedImage screesnShot = robot.createScreenCapture(rect);
 
-        ImageIO.write(screesnShot, "JPG", 
-          new File ("BD/img/Screen.jpg"));
-        
-        Connection con = null;
-        Conexion con1 =  new Conexion();
-        con = con1.getConnection();
-        
-        String sql = "insert into reporteerror (Asunto, Comentarios, Imagen, Solucion, NumEmpleado, Fecha) values(?,?,?,?,?,?)";
-        PreparedStatement pst = con.prepareStatement(sql);
-        File file = new File("BD/img/Screen.jpg");
-        byte pe[] = new byte[(int)file.length()];
-                
-                
-        try{
-            InputStream input = new FileInputStream(file);
-            input.read(pe);
-        }catch(IOException e){
-            JOptionPane.showMessageDialog(this, e);
-        }
+                ImageIO.write(screesnShot, "JPG",
+                        new File("BD/img/Screen.jpg"));
 
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        String fecha = sdf.format(d);
-                
-        pst.setString(1, txtAsunto.getText());
-        pst.setString(2, txtComentario.getText());
-        pst.setBytes(3, pe);
-        pst.setString(4, "");
-        pst.setString(5, this.numEmpleado);
-        pst.setString(6, fecha);
-        
-        int n = pst.executeUpdate();
-        
-        if(n > 0){
-            JOptionPane.showMessageDialog(this, "REPORTE ENVIADO");
-            limpiar();
-            limpiarTabla();
-            verDatos();
-            txtSolucion.setVisible(false);
-            lblSolucion.setVisible(false);
-            btnAgregar.setVisible(false);
-        }
-        
-        } catch (Exception e) {
-         JOptionPane.showMessageDialog(this, e);
-        }
+                Connection con = null;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+
+                String sql = "insert into reporteerror (Asunto, Comentarios, Imagen, Solucion, NumEmpleado, Fecha) values(?,?,?,?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql);
+                File file = new File("BD/img/Screen.jpg");
+                byte pe[] = new byte[(int) file.length()];
+
+                try {
+                    InputStream input = new FileInputStream(file);
+                    input.read(pe);
+                } catch (IOException e) {
+                    JOptionPane.showMessageDialog(this, "Error:" + e);
+                }
+
+                Date d = new Date();
+                SimpleDateFormat sdf = new SimpleDateFormat();
+                String fecha = sdf.format(d);
+
+                pst.setString(1, txtAsunto.getText());
+                pst.setString(2, txtComentario.getText());
+                pst.setBytes(3, pe);
+                pst.setString(4, "");
+                pst.setString(5, this.numEmpleado);
+                pst.setString(6, fecha);
+
+                int n = pst.executeUpdate();
+
+                if (n > 0) {
+                    JOptionPane.showMessageDialog(this, "REPORTE ENVIADO");
+                    limpiar();
+                    limpiarTabla();
+                    verDatos();
+                    txtSolucion.setVisible(false);
+                    lblSolucion.setVisible(false);
+                    btnAgregar.setVisible(false);
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, e);
+            }
             this.setVisible(true);
         }
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void btnEnviarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEnviarMouseEntered
-        jPanel7.setBackground(new Color(0,93,139));
+        jPanel7.setBackground(new Color(0, 93, 139));
     }//GEN-LAST:event_btnEnviarMouseEntered
 
     private void btnEnviarMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEnviarMouseExited
-        jPanel7.setBackground(new Color(0,140,210));
+        jPanel7.setBackground(new Color(0, 140, 210));
     }//GEN-LAST:event_btnEnviarMouseExited
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from reporteerror where Id like '"+Tabla1.getValueAt(Tabla1.getSelectedRow(), 0)+"'";
+            String sql = "select * from reporteerror where Id like '" + Tabla1.getValueAt(Tabla1.getSelectedRow(), 0) + "'";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[10];
-            
-            while(rs.next()){
+
+            while (rs.next()) {
                 datos[0] = rs.getString("Asunto");
                 datos[1] = rs.getString("Comentarios");
                 datos[2] = rs.getString("Solucion");
             }
-            if(datos[2].equals("")){
+            if (datos[2].equals("")) {
                 txtSolucion.setVisible(false);
                 lblSolucion.setVisible(false);
-            }else{
+            } else {
                 txtSolucion.setVisible(true);
                 lblSolucion.setVisible(true);
                 txtSolucion.setText(datos[2]);
@@ -473,9 +468,9 @@ public class ReporteError extends javax.swing.JDialog {
             txtComentario.setText(datos[1]);
             btnEnviar.setEnabled(false);
             btnAgregar.setVisible(true);
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "Error: "+e,"error",JOptionPane.ERROR_MESSAGE);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_Tabla1MouseClicked
 
@@ -488,7 +483,7 @@ public class ReporteError extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void txtAsuntoKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtAsuntoKeyPressed
-        
+
     }//GEN-LAST:event_txtAsuntoKeyPressed
 
     public static void main(String args[]) {
@@ -518,7 +513,7 @@ public class ReporteError extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ReporteError dialog = new ReporteError(new javax.swing.JFrame(), true,"");
+                ReporteError dialog = new ReporteError(new javax.swing.JFrame(), true, "");
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

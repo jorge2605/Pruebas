@@ -65,7 +65,6 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         Thread hilo = new Thread() {
             public void run() {
                 for (;;) {
-                    System.out.println(pedido);
                     if (pedido) {
                         try {
                             sleep(500);
