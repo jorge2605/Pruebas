@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
@@ -135,6 +136,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         panelPrincipal.removeAll();
         revalidate();
         repaint();
+        agregarTitulos();
     }
     
     public final void addFila(String sql){
@@ -166,6 +168,66 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         
     }
     
+    public void agregarTitulos(){
+        //DESCRIPCION
+        JLabel descripcion = new javax.swing.JLabel();
+        descripcion.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        descripcion.setForeground(new java.awt.Color(51, 51, 51));
+        descripcion.setText("Descripcion");
+        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 9;
+        gridBagConstraints.ipady = 10;
+        gridBagConstraints.insets = new java.awt.Insets(15, 15, 15, 15);
+        panelPrincipal.add(descripcion, gridBagConstraints);
+        //Estado
+        JLabel estado = new javax.swing.JLabel();
+        estado.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        estado.setForeground(new java.awt.Color(51, 51, 51));
+        estado.setText("Estado");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 9;
+        gridBagConstraints.ipady = 10;
+        gridBagConstraints.insets = new java.awt.Insets(15, 15, 15, 15);
+        panelPrincipal.add(estado, gridBagConstraints);
+        //Fecha
+        JLabel fecha = new javax.swing.JLabel();
+        fecha.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        fecha.setForeground(new java.awt.Color(51, 51, 51));
+        fecha.setText("Fecha");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.ipadx = 9;
+        gridBagConstraints.ipady = 10;
+        gridBagConstraints.insets = new java.awt.Insets(15, 15, 15, 15);
+        panelPrincipal.add(fecha, gridBagConstraints);
+        //Requisitor
+        JLabel requisitor = new javax.swing.JLabel();
+        requisitor.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        requisitor.setForeground(new java.awt.Color(51, 51, 51));
+        requisitor.setText("Requisitor");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 9;
+        gridBagConstraints.ipady = 10;
+        gridBagConstraints.insets = new java.awt.Insets(15, 15, 15, 15);
+        panelPrincipal.add(requisitor, gridBagConstraints);
+        //Ultimo Label
+        JLabel label = new javax.swing.JLabel();
+        label.setText(" ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 100;
+        panelPrincipal.add(label, gridBagConstraints);
+    }
+    
     public final void verificacion(String numEmpleado){
         if(numEmpleado.equals("61")){
             panelAdmin.setVisible(true);
@@ -178,11 +240,6 @@ public class ModificacionesTowi extends javax.swing.JDialog {
     
     public ModificacionesTowi(java.awt.Frame parent, boolean modal, String numEmpleado) {
         super(parent, modal);
-        try {
-            UIManager.setLookAndFeel(new FlatMacLightLaf());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         initComponents();
         verificacion(numEmpleado);
         addFila("select * from modificaciones where Estado != 'Cancelado' and Estado != 'Terminado' order by idmodificaciones desc");

@@ -3,6 +3,7 @@ package pruebas;
 import Conexiones.Conexion;
 import Conexiones.ConexionChat;
 import VentanaEmergente.Inicio1.Espera;
+import VentanaEmergente.InicioSesion.Informacion;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
 
 public class InicioSesion extends javax.swing.JFrame  {
 
@@ -483,7 +485,7 @@ public class InicioSesion extends javax.swing.JFrame  {
         lblVersion.setBackground(new java.awt.Color(204, 204, 204));
         lblVersion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         lblVersion.setForeground(new java.awt.Color(204, 204, 204));
-        lblVersion.setText("2.5.3");
+        lblVersion.setText("2.5.4");
         lblVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblVersion.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -523,10 +525,9 @@ public class InicioSesion extends javax.swing.JFrame  {
 
         jButton1.setBackground(new java.awt.Color(255, 255, 255));
         jButton1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(0, 0, 153));
-        jButton1.setText("OLVIDE MI CONTRASEÑA");
-        jButton1.setBorder(null);
-        jButton1.setBorderPainted(false);
+        jButton1.setForeground(new java.awt.Color(255, 102, 0));
+        jButton1.setText("Ver actualizaciones");
+        jButton1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 102, 0), 2, true));
         jButton1.setContentAreaFilled(false);
         jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton1.setFocusPainted(false);
@@ -535,7 +536,7 @@ public class InicioSesion extends javax.swing.JFrame  {
                 jButton1ActionPerformed(evt);
             }
         });
-        panelP.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 310, 30));
+        panelP.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 170, 40));
 
         btnEntrar.setBackground(new java.awt.Color(0, 165, 252));
 
@@ -700,21 +701,15 @@ public class InicioSesion extends javax.swing.JFrame  {
     }//GEN-LAST:event_lblEntrarMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        String opc = JOptionPane.showInputDialog(this, "INGRESA NUMERO DE EMPLEADO");
-        try{
-            Connection con;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            String sql = "select ";
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e);
-        }
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        Informacion info = new Informacion(f, true);
+        info.setLocationRelativeTo(f);
+        info.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void panelMMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelMMousePressed
-            x = evt.getX();
-            y = evt.getY();
+        x = evt.getX();
+        y = evt.getY();
     }//GEN-LAST:event_panelMMousePressed
 
     private void panelMMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelMMouseDragged

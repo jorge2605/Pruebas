@@ -48,6 +48,10 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import javax.swing.table.DefaultTableModel;
 
 public final class Inicio1 extends javax.swing.JFrame implements Observer,ActionListener{
 
@@ -57,6 +61,8 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     InicioAlmacen inicioAlmacen;
     InicioCostos inicioCostos;
     int notiCostos;
+    int notiRequis;
+    boolean requis;
     Evaluacion evaluacion;
     public int HOME = 1;
     public int COSTOS = 2;
@@ -305,6 +311,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             String costos = null;
             while(rs2.next()){
                 costos = rs2.getString("Costos");
+                requis = rs2.getBoolean("VerRequisiciones");
             }
             return costos;
         }catch(SQLException e){
@@ -336,6 +343,55 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         hilo.start();
     }
     
+    public int extraerRequisiciones(){
+       try{
+           Connection con;
+           Conexion con1 = new Conexion();
+           con = con1.getConnection();
+           Statement st = con.createStatement();
+           LocalDate fechaActual = LocalDate.now();
+           LocalDate nuevaFecha = fechaActual.minusDays(3);
+           DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+           String nuevaFechaFormateada = nuevaFecha.format(formatter);
+           String sql = "select Progreso, Id, NumeroEmpleado, NumeroCotizacion, Estatus, Estado, Progreso, Costo, Fecha from requisicion where "
+                   + "(Progreso like 'COMPRADO' or Progreso like 'COTIZANDO' "
+                   + "or Progreso like 'COTIZADO' or Progreso like 'APROBADO' or Progreso like 'NUEVO' or Progreso like 'LLEGO, INCOMPETO'"
+                   + "or Progreso like 'EVALUACION') and FechaNew < '" + nuevaFechaFormateada + "' and NumeroEmpleado like '" + lblId.getText() + "'";
+           ResultSet rs = st.executeQuery(sql);
+           int cont = 0;
+           while(rs.next()){
+               cont++;
+           }
+           return cont;
+       }catch(SQLException e){
+           JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+       }
+       return 0;
+   }
+    
+    public void checkRequi(){
+        boolean band = true;
+        Thread hilo = new Thread(new Runnable() {
+            public void run() {
+                while(band) {
+                    try {
+                        notiRequis = extraerRequisiciones();
+                        if(notiRequis == 0){
+                            lblNotiRequis.setVisible(false);
+                        }else{
+                            lblNotiRequis.setVisible(true);
+                            lblNotiRequis.setText(String.valueOf(notiRequis));
+                        }
+                        sleep(900000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        });
+        hilo.start();
+    }
+    
     public void inicioCostos(JInternalFrame c){
         JInternalFrame cla = c;
         jDesktopPane1.add(cla);
@@ -350,6 +406,11 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     }
     
     public Inicio1(String numero, String nombre) {
+        try {
+            UIManager.setLookAndFeel(new FlatMacLightLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         initComponents();
         lblId.setText(numero);
         num = numero;
@@ -369,6 +430,13 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         getPrecioDolar();
         if(getEmpleadoCostos(numero) != null){
             checkCostos();
+        }else{
+            lblNotiCostos.setVisible(false);
+        }
+        if(requis){
+            checkRequi();
+        }else{
+            lblNotiRequis.setVisible(false);
         }
     }
 
@@ -525,6 +593,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         rSPanelRound29 = new rojeru_san.rspanel.RSPanelRound();
         btnVer = new javax.swing.JButton();
         jLabel28 = new javax.swing.JLabel();
+        lblNotiRequis = new javax.swing.JLabel();
         panel48 = new javax.swing.JPanel();
         rSPanelRound30 = new rojeru_san.rspanel.RSPanelRound();
         btnCotizacionVentas = new javax.swing.JButton();
@@ -2186,15 +2255,28 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         });
         rSPanelRound29.add(btnVer);
 
-        panel47.add(rSPanelRound29, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panel47.add(rSPanelRound29, gridBagConstraints);
 
         jLabel28.setFont(new java.awt.Font("Roboto Medium", 0, 14)); // NOI18N
         jLabel28.setForeground(new java.awt.Color(51, 51, 51));
         jLabel28.setText("Ver requisiciones");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         panel47.add(jLabel28, gridBagConstraints);
+
+        lblNotiRequis.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblNotiRequis.setForeground(new java.awt.Color(255, 255, 255));
+        lblNotiRequis.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lblNotiRequis.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/CR.png"))); // NOI18N
+        lblNotiRequis.setText("0");
+        lblNotiRequis.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        panel47.add(lblNotiRequis, gridBagConstraints);
 
         jPanel7.add(panel47);
 
@@ -3242,6 +3324,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JLabel lblId2;
     public static javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblNotiCostos;
+    private javax.swing.JLabel lblNotiRequis;
     private javax.swing.JMenuItem miReporte;
     private javax.swing.JPanel panel11;
     private javax.swing.JPanel panel12;

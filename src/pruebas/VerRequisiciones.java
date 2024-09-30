@@ -16,6 +16,7 @@ import VentanaEmergente.Requisiciones.Material;
 import VentanaEmergente.Requisiciones.liberarCompra;
 import VentanaEmergente.verRequisiciones.Detalles;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -636,6 +637,7 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
@@ -643,6 +645,8 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         verDetalles = new javax.swing.JMenuItem();
         verRelaciones = new javax.swing.JMenuItem();
         jPopupMenu2 = new javax.swing.JPopupMenu();
+        jMenuItem4 = new javax.swing.JMenuItem();
+        jPopupMenu1 = new javax.swing.JPopupMenu();
         jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         panelX = new javax.swing.JPanel();
@@ -690,6 +694,16 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
             }
         });
         popMenu.add(verRelaciones);
+
+        jMenuItem4.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf.png"))); // NOI18N
+        jMenuItem4.setText("Ver orden de compra                              ");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jPopupMenu2.add(jMenuItem4);
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(null);
@@ -816,7 +830,10 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         jPanel6.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel1.setLayout(new java.awt.GridLayout(2, 0, 15, 15));
+        java.awt.GridBagLayout jPanel1Layout = new java.awt.GridBagLayout();
+        jPanel1Layout.columnWeights = new double[] {1.0};
+        jPanel1Layout.rowWeights = new double[] {1.0, 1.0};
+        jPanel1.setLayout(jPanel1Layout);
 
         jScrollPane2.setToolTipText("hola");
 
@@ -856,7 +873,11 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
             Tabla1.getColumnModel().getColumn(7).setResizable(false);
         }
 
-        jPanel1.add(jScrollPane2);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel1.add(jScrollPane2, gridBagConstraints);
 
         Tabla2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -874,12 +895,17 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
                 return canEdit [columnIndex];
             }
         });
+        Tabla2.setComponentPopupMenu(jPopupMenu2);
         jScrollPane1.setViewportView(Tabla2);
         if (Tabla2.getColumnModel().getColumnCount() > 0) {
             Tabla2.getColumnModel().getColumn(0).setResizable(false);
         }
 
-        jPanel1.add(jScrollPane1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel1.add(jScrollPane1, gridBagConstraints);
 
         jPanel6.add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -1271,6 +1297,20 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
         extraerRequisiciones();
     }//GEN-LAST:event_rbtnAtrasadasActionPerformed
 
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        int row = Tabla2.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar una partida","Error",JOptionPane.ERROR_MESSAGE);
+        } else {
+            String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + Tabla2.getValueAt(row, 9).toString() + "-" + Tabla2.getValueAt(row, 11).toString() + ".pdf";
+            try {
+                Desktop.getDesktop().open(new File(ruta));
+            } catch (IOException ex) {
+                Logger.getLogger(VerRequisiciones.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
@@ -1284,12 +1324,14 @@ public class VerRequisiciones extends javax.swing.JInternalFrame implements Acti
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu jPopupMenu2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

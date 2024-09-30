@@ -15,6 +15,16 @@ public class Incidencias extends javax.swing.JDialog {
         this.setShape(shape);
     }
     
+    public String getIncidencia(){
+        this.setVisible(true);
+        return txtComentarios.getText();
+    }
+    
+    public void setComentario(String txt){
+        txtComentarios.setText(txt);
+        this.dispose();
+    }
+    
     public Incidencias(java.awt.Frame parent, boolean modal, String horaVieja, String horaNueva, String empleado) {
         super(parent, modal);
         initComponents();
@@ -28,6 +38,7 @@ public class Incidencias extends javax.swing.JDialog {
         txtHoraNueva.setText(horaNueva);
         txtHoraVieja.setText(horaVieja);
         txtEmpleado.setText(empleado);
+        txtComentarios.requestFocusInWindow();
     }
 
     @SuppressWarnings("unchecked")
@@ -54,12 +65,19 @@ public class Incidencias extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         txtComentarios = new javax.swing.JTextArea();
         btnGuardar = new scrollPane.BotonRedondo();
+        jPanel8 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
-        setPreferredSize(new java.awt.Dimension(737, 351));
+        setPreferredSize(new java.awt.Dimension(737, 479));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -122,7 +140,7 @@ public class Incidencias extends javax.swing.JDialog {
         java.awt.GridBagLayout jPanel5Layout = new java.awt.GridBagLayout();
         jPanel5Layout.columnWidths = new int[] {1, 1, 1, 1};
         jPanel5Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
-        jPanel5Layout.rowWeights = new double[] {0.0, 0.0, 0.0, 1.0};
+        jPanel5Layout.rowWeights = new double[] {0.0, 0.0, 0.0, 1.0, 1.0};
         jPanel5.setLayout(jPanel5Layout);
 
         jLabel1.setFont(new java.awt.Font("Lexend", 1, 14)); // NOI18N
@@ -224,11 +242,16 @@ public class Incidencias extends javax.swing.JDialog {
         txtComentarios.setRows(5);
         txtComentarios.setWrapStyleWord(true);
         txtComentarios.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
+        txtComentarios.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtComentariosKeyTyped(evt);
+            }
+        });
         jScrollPane1.setViewportView(txtComentarios);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 12, 12);
@@ -250,12 +273,94 @@ public class Incidencias extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.ipady = 11;
         gridBagConstraints.insets = new java.awt.Insets(17, 17, 17, 17);
         jPanel5.add(btnGuardar, gridBagConstraints);
+
+        jPanel8.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel8.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jButton1.setBackground(new java.awt.Color(153, 204, 255));
+        jButton1.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(102, 102, 102));
+        jButton1.setText("<html> <p style = 'text-align:center;width:100px;'> Checador descompuesto </p>");
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jButton1);
+
+        jButton3.setBackground(new java.awt.Color(153, 204, 255));
+        jButton3.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jButton3.setForeground(new java.awt.Color(102, 102, 102));
+        jButton3.setText("<html> <p style = 'text-align:center;width:100px;'> Taller sin luz </p>");
+        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jButton3);
+
+        jButton2.setBackground(new java.awt.Color(153, 204, 255));
+        jButton2.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(102, 102, 102));
+        jButton2.setText("<html> <p style = 'text-align:center;width:100px;'> Vacaciones</p>");
+        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jButton2);
+
+        jButton4.setBackground(new java.awt.Color(153, 204, 255));
+        jButton4.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jButton4.setForeground(new java.awt.Color(102, 102, 102));
+        jButton4.setText("<html> <p style = 'text-align:center;width:100px;'> Incapacidad</p>");
+        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jButton4);
+
+        jButton5.setBackground(new java.awt.Color(153, 204, 255));
+        jButton5.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jButton5.setForeground(new java.awt.Color(102, 102, 102));
+        jButton5.setText("<html> <p style = 'text-align:center;width:100px;'> Tiempo extra</p>");
+        jButton5.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jButton5);
+
+        jButton6.setBackground(new java.awt.Color(153, 204, 255));
+        jButton6.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jButton6.setForeground(new java.awt.Color(102, 102, 102));
+        jButton6.setText("<html> <p style = 'text-align:center;width:100px;'> Permiso por parte de supervisor</p>");
+        jButton6.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+        jPanel8.add(jButton6);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanel5.add(jPanel8, gridBagConstraints);
 
         jPanel6.add(jPanel5, java.awt.BorderLayout.CENTER);
 
@@ -292,6 +397,7 @@ public class Incidencias extends javax.swing.JDialog {
     }//GEN-LAST:event_jPanel3MousePressed
 
     private void lblXMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseClicked
+        txtComentarios.setText("");
         this.dispose();
     }//GEN-LAST:event_lblXMouseClicked
 
@@ -306,8 +412,36 @@ public class Incidencias extends javax.swing.JDialog {
     }//GEN-LAST:event_lblXMouseExited
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        
+        dispose();
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void txtComentariosKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtComentariosKeyTyped
+        
+    }//GEN-LAST:event_txtComentariosKeyTyped
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        setComentario("Checador descompuesto");
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        setComentario("Taller sin luz");
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        setComentario("Vacaciones");
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        setComentario("Incapacidad");
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        setComentario("Tiempo extra");
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        setComentario("Permiso por parte del supervisor");
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -326,6 +460,12 @@ public class Incidencias extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private scrollPane.BotonRedondo btnGuardar;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -339,6 +479,7 @@ public class Incidencias extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblX;
     private javax.swing.JPanel pnlX;

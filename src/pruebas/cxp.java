@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import VentanaEmergente.Inicio1.Espera;
+import VentanaEmergente.cxp.Comparar;
 import VentanaEmergente.cxp.extraerArticulo;
 import VentanaEmergente.cxp.info;
 import java.awt.Color;
@@ -228,6 +229,7 @@ public class cxp extends javax.swing.JInternalFrame {
         jPanel3 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         btnView = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         cmbMes = new RSMaterialComponent.RSComboBoxMaterial();
@@ -251,7 +253,8 @@ public class cxp extends javax.swing.JInternalFrame {
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel12.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
-        jLabel12.setForeground(new java.awt.Color(0, 165, 252));
+        jLabel12.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel12.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel12.setText("CXP");
         jPanel6.add(jLabel12);
 
@@ -319,6 +322,20 @@ public class cxp extends javax.swing.JInternalFrame {
             }
         });
         jPanel3.add(btnView);
+
+        jButton2.setBackground(new java.awt.Color(255, 255, 255));
+        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/comparar_32.png"))); // NOI18N
+        jButton2.setBorder(null);
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setFocusPainted(false);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton2);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.SOUTH);
 
@@ -830,6 +847,13 @@ public class cxp extends javax.swing.JInternalFrame {
         hilo.start();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        Comparar comparar = new Comparar(f,true);
+        comparar.setLocationRelativeTo(f);
+        comparar.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
@@ -837,6 +861,7 @@ public class cxp extends javax.swing.JInternalFrame {
     private RSMaterialComponent.RSComboBoxMaterial cmbAnio;
     private RSMaterialComponent.RSComboBoxMaterial cmbMes;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;

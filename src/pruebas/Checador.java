@@ -7,11 +7,13 @@ import VentanaEmergente.Checador.Incidencias;
 import VentanaEmergente.Checador.confEmpleado;
 import VentanaEmergente.Checador.editarEmpleado;
 import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -54,11 +56,14 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     String departamento;
     Stack<String> fecha;
     Incidencias incidencias;
-    //26
+    ColorChecador color;
     Object matrizTabla[][];
+    Object matrizIncidencias[][][];
+    JFrame frame;
     
     public void crearMatriz(){
         matrizTabla = new Object[Tabla1.getRowCount()][Tabla1.getColumnCount()];
+        matrizIncidencias = new Object[Tabla1.getRowCount()][Tabla1.getColumnCount()][3];
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
             for (int j = 0; j < Tabla1.getColumnCount(); j++) {
                 matrizTabla[i][j] = Tabla1.getValueAt(i, j);
@@ -251,6 +256,18 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             fuenteArticulos.setFamily("Roboto");
             fuenteArticulos.setColor(BaseColor.BLACK);
             fuenteArticulos.setStyle(com.itextpdf.text.Font.NORMAL);
+            
+            com.itextpdf.text.Font fuenteIncidenciasCabecera = new com.itextpdf.text.Font();
+            fuenteIncidenciasCabecera.setSize(10);
+            fuenteIncidenciasCabecera.setFamily("Roboto");
+            fuenteIncidenciasCabecera.setColor(BaseColor.WHITE);
+            fuenteIncidenciasCabecera.setStyle(com.itextpdf.text.Font.BOLD);
+            
+            com.itextpdf.text.Font fuenteIncidenciasFila = new com.itextpdf.text.Font();
+            fuenteIncidenciasFila.setSize(7);
+            fuenteIncidenciasFila.setFamily("Roboto");
+            fuenteIncidenciasFila.setColor(BaseColor.BLACK);
+            fuenteIncidenciasFila.setStyle(com.itextpdf.text.Font.NORMAL);
             
             
             //------------------------------------------------------------------------------------------------
@@ -563,7 +580,13 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                         if(j == 1){
                             cel.setHorizontalAlignment(Element.ALIGN_CENTER);
                         }
-                    
+                        if(matrizIncidencias[i][j][0] != null){
+                            if(!matrizIncidencias[i][j][2].equals("")){
+                                cel.setBackgroundColor(BaseColor.CYAN);
+                            }else{
+                                cel.setBackgroundColor(BaseColor.ORANGE);
+                            }
+                        }
                     tablaArticulos.addCell(cel);
                 }
                 sobra++;
@@ -643,6 +666,93 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             border(blank,0,1.5f,0,0f);
             tablaFirmas.addCell(blank);
             
+            //------------------------INCIDENCIAS-----------------------------------
+            PdfPTable tablaIncidencias = new PdfPTable(4);
+            tablaIncidencias.setWidthPercentage(100);
+            float med[] = {50,100,50,50};
+            tablaIncidencias.setWidths(med);
+            BaseColor naranja = new BaseColor(255, 94, 8);
+            
+            PdfPCell nombre = new PdfPCell(new Phrase("Nombre", fuenteIncidenciasCabecera));
+            nombre.setHorizontalAlignment(Element.ALIGN_CENTER);
+            nombre.setBorder(0);
+            nombre.setBackgroundColor(naranja);
+            
+            PdfPCell incidencia = new PdfPCell(new Phrase("Incidencia", fuenteIncidenciasCabecera));
+            incidencia.setHorizontalAlignment(Element.ALIGN_CENTER);
+            incidencia.setBorder(0);
+            incidencia.setBackgroundColor(naranja);
+            
+            PdfPCell horaCambiada = new PdfPCell(new Phrase("Hora cambio", fuenteIncidenciasCabecera));
+            horaCambiada.setHorizontalAlignment(Element.ALIGN_CENTER);
+            horaCambiada.setBorder(0);
+            horaCambiada.setBackgroundColor(naranja);
+            
+            PdfPCell horaOriginal = new PdfPCell(new Phrase("Hora Original", fuenteIncidenciasCabecera));
+            horaOriginal.setHorizontalAlignment(Element.ALIGN_CENTER);
+            horaOriginal.setBorder(0);
+            horaOriginal.setBackgroundColor(naranja);
+            
+            blank = new PdfPCell(new Phrase(" "));
+            border(blank,0,0,0,0);
+            
+            co1 = new PdfPCell(new Paragraph("Reporte de incidencias",fuente4));
+            co1.setBorder(0);
+            co1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            co1.setColspan(4);
+            tablaIncidencias.addCell(co1);
+            tablaIncidencias.addCell(blank);
+            tablaIncidencias.addCell(blank);
+            tablaIncidencias.addCell(blank);
+            tablaIncidencias.addCell(blank);
+            tablaIncidencias.addCell(nombre);
+            tablaIncidencias.addCell(incidencia);
+            tablaIncidencias.addCell(horaCambiada);
+            tablaIncidencias.addCell(horaOriginal);
+            
+            boolean isTabled = false;
+            
+            boolean band;
+            for (int i = 0; i < matrizIncidencias.length; i++) {
+                band = true;
+                for (int j = 0; j < matrizIncidencias[i].length; j ++) {
+                    if (matrizIncidencias[i][j][0] != null) {
+                        String entrada1;
+                        if(matrizIncidencias[i][j][2].equals("")){
+                            if(j%3 == 0){
+                               entrada1 = "NCS"; 
+                            }else{
+                                entrada1 = "NCE";
+                            }
+                        }else{
+                            entrada1 = matrizIncidencias[i][j][2].toString();
+                        }
+                        isTabled = true;
+                        String num = " ";
+                        if(band){
+                            num = Tabla1.getValueAt(i, 1).toString();
+                            band = false;
+                        }
+                        String empleado = num;
+                        PdfPCell cell = new PdfPCell(new Phrase(empleado, fuenteIncidenciasFila));
+                        border(cell,0,.5f,0,0);
+                        PdfPCell cell2 = new PdfPCell(new Phrase(matrizIncidencias[i][j][0].toString(), fuenteIncidenciasFila));
+                        border(cell2,0,.5f,0,0);
+                        PdfPCell cell3 = new PdfPCell(new Phrase(matrizIncidencias[i][j][1].toString(), fuenteIncidenciasFila));
+                        border(cell3,0,.5f,0,0);
+                        cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        PdfPCell cell4 = new PdfPCell(new Phrase(entrada1, fuenteIncidenciasFila));
+                        border(cell4,0,.5f,0,0);
+                        cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        
+                        tablaIncidencias.addCell(cell);
+                        tablaIncidencias.addCell(cell2);
+                        tablaIncidencias.addCell(cell3);
+                        tablaIncidencias.addCell(cell4);
+                    }
+                }
+            }
+            
             //---------------------DOCUMENTOS PARA AGREGAR-----------------------------------
             Image img = Image.getInstance("C:\\Pruebas\\BD\\3i.png");
             img.setAbsolutePosition(25, 500);
@@ -654,6 +764,10 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             document.add(tablaFechas);
             document.add(tablaArticulos);
             document.add(tablaFirmas);
+            if(isTabled){
+                document.newPage();
+                document.add(tablaIncidencias);
+            }
             //-------------------------------------------------------------------------------
             document.close();
             Desktop.getDesktop().open(new File(ruta));
@@ -792,9 +906,10 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     
     public void limpiarTabla(){
         addConfig();
-        ColorChecador c = new ColorChecador();
-        c.setConfig(config);
-        Tabla1 = c;
+        color = new ColorChecador();
+        color.setConfig(config);
+        color.setMatriz(matrizIncidencias);
+        Tabla1 = color;
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -809,6 +924,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                     return canEdit [columnIndex];
                 }
             });
+            Tabla1.setComponentPopupMenu(jPopupMenu1);
             Tabla1.setColorBorderRows(new java.awt.Color(255, 255, 255));
             Tabla1.setTableHeader(null);
             jScrollPane2.setViewportView(Tabla1);
@@ -824,31 +940,56 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             }
     }
     
-    public final void addKeyPressed(){
+    public void addKeyPressed(){
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
-                if (e.getID() == KeyEvent.KEY_PRESSED && (e.getKeyCode() == KeyEvent.VK_ENTER || e.getKeyCode() == KeyEvent.VK_UP || e.getKeyCode() == KeyEvent.VK_DOWN
-                         || e.getKeyCode() == KeyEvent.VK_LEFT || e.getKeyCode() == KeyEvent.VK_RIGHT)) {
-                    if (Tabla1.isEditing()) {
-                        Tabla1.getCellEditor().stopCellEditing();
+                if(Tabla1.isFocusOwner() || Tabla1.isEditing()){
+                    boolean band = Tabla1.isEditing();
+                    if (e.getID() == KeyEvent.KEY_PRESSED && (e.getKeyCode() == KeyEvent.VK_ENTER || (e.getKeyCode() == KeyEvent.VK_UP) || (e.getKeyCode() == KeyEvent.VK_DOWN)
+                             || (e.getKeyCode() == KeyEvent.VK_LEFT && !band) || (e.getKeyCode() == KeyEvent.VK_RIGHT && !band))) {
+                        if (Tabla1.isEditing()) {
+                            Tabla1.getCellEditor().stopCellEditing();
+                        }
+                        int row = Tabla1.getSelectedRow();
+                        int col = Tabla1.getSelectedColumn();
+                        String nombre = Tabla1.getValueAt(row, 1).toString();
+                        String hora;
+                        String comentarios;
+                        String horaVieja;
+                        try{hora = Tabla1.getValueAt(row, col).toString();}catch(Exception ex){hora = "00:00";}
+                        try{horaVieja = (String) matrizTabla[row][col];}catch(Exception ex){horaVieja = "00:00";}
+
+                        if(!horaVieja.equals(hora)){
+                            incidencias = new Incidencias(frame,true,horaVieja,hora,nombre);
+                            incidencias.setLocationRelativeTo(null);
+                            comentarios = incidencias.getIncidencia();
+                            matrizIncidencias[row][col][0] = comentarios;
+                            matrizIncidencias[row][col][1] = hora;
+                            matrizIncidencias[row][col][2] = horaVieja;
+                            if(comentarios.equals("")){
+                                Tabla1.setValueAt("", row, col);
+                            }
+                            color.setMatriz(matrizIncidencias);
+                        }
                     }
-                    int row = Tabla1.getSelectedRow();
-                    int col = Tabla1.getSelectedColumn();
-                    String nombre = Tabla1.getValueAt(row, 1).toString();
-                    String hora;
-                    String horaVieja;
-                    try{hora = Tabla1.getValueAt(row, col).toString();}catch(Exception ex){hora = "00:00";}
-                    try{horaVieja = (String) matrizTabla[row][col];}catch(Exception ex){horaVieja = "00:00";}
-                    
-                    incidencias = new Incidencias(null,true,horaVieja,hora,nombre);
-                    incidencias.setLocationRelativeTo(null);
-                    incidencias.setVisible(true);
+                    return false;
                 }
                 return false;
             }
         });
+    }
+    
+    public boolean verificarColumna(int col){
+        int numeros[] = {2 , 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18, 20, 21};
+        boolean band = false;
+        for (int i = 0; i < numeros.length; i++) {
+            if (numeros[i] == col){
+                band = true;
+            }
+        }
+        return band;
     }
     
     public Checador(String numEmpleado) {
@@ -858,7 +999,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         addConfig();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         addSemana();
-        limpiarTabla();
         try{
             if(getSupervisor().equals("GERENCIA")){
                 btnSubir.setEnabled(true);
@@ -868,13 +1008,17 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             JOptionPane.showMessageDialog(this, "No tienes acceso para ingresar a este modulo", "Error", JOptionPane.ERROR_MESSAGE);
             this.dispose();
         }
-//        addKeyPressed();
+        limpiarTabla();
+        addKeyPressed();
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        agregarIncidencia = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
@@ -957,6 +1101,20 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         jPanel10 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         Tabla1 = new ColorChecador();
+
+        jMenuItem1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jMenuItem1.setText("Menu         ");
+        jMenuItem1.setEnabled(false);
+        jPopupMenu1.add(jMenuItem1);
+
+        agregarIncidencia.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        agregarIncidencia.setText("Agregar Incidencia                                                     ");
+        agregarIncidencia.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agregarIncidenciaActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(agregarIncidencia);
 
         setBorder(null);
 
@@ -1084,7 +1242,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         btnSubir1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf.png"))); // NOI18N
         btnSubir1.setText("Descargar Pdf");
         btnSubir1.setColorHover(new java.awt.Color(204, 0, 0));
-        btnSubir1.setEnabled(false);
         btnSubir1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSubir1ActionPerformed(evt);
@@ -1122,10 +1279,11 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                             .addComponent(rSButtonRoundRipple3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnSubir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnSubir1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(panelRound1Layout.createSequentialGroup()
                                 .addGap(64, 64, 64)
-                                .addComponent(tgRedondear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jLabel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(tgRedondear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(19, 19, 19)))
                         .addGap(0, 6, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRound1Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
@@ -1517,6 +1675,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             }
         });
         Tabla1.setColorBorderRows(new java.awt.Color(255, 255, 255));
+        Tabla1.setComponentPopupMenu(jPopupMenu1);
         Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 Tabla1MouseClicked(evt);
@@ -1910,9 +2069,26 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         
     }//GEN-LAST:event_Tabla1KeyPressed
 
+    private void agregarIncidenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarIncidenciaActionPerformed
+        int row = Tabla1.getSelectedRow();
+        int col = Tabla1.getSelectedColumn();
+        if (verificarColumna(col)) {
+            incidencias = new Incidencias(null,true,"","",Tabla1.getValueAt(row, 1).toString());
+            incidencias.setLocationRelativeTo(null);
+            String comentarios = incidencias.getIncidencia();
+            matrizIncidencias[row][col][0] = comentarios;
+            matrizIncidencias[row][col][1] = "";
+            matrizIncidencias[row][col][2] = "";
+            if(comentarios.equals("")){
+                Tabla1.setValueAt("", row, col);
+            }
+        }
+    }//GEN-LAST:event_agregarIncidenciaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private rojerusan.RSTableMetro Tabla1;
+    private javax.swing.JMenuItem agregarIncidencia;
     private javax.swing.JPanel btnSalir;
     private rojeru_san.rsbutton.RSButtonRoundRipple btnSubir;
     private rojeru_san.rsbutton.RSButtonRoundRipple btnSubir1;
@@ -1961,6 +2137,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel12;
@@ -1980,6 +2157,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblEmpleado;
     private javax.swing.JLabel lblEstado;
