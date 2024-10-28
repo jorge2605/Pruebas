@@ -11,6 +11,7 @@ import java.sql.Statement;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import java.awt.Color;
+import java.awt.Component;
 import static java.lang.Thread.sleep;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -20,6 +21,7 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 public class InicioSesion extends javax.swing.JFrame  {
 
@@ -404,11 +406,60 @@ public class InicioSesion extends javax.swing.JFrame  {
         hilo.start();
     }
     
+    public void animarArriba(Component cb, Component cm){
+        try{
+            Thread hilo = new Thread(() ->{
+                for (int i = cb.getBounds().y; i > cb.getBounds().y - 20; i--) {
+                    int ax = i;
+                    SwingUtilities.invokeLater(() -> {
+                        panelP.add(cm, new org.netbeans.lib.awtextra.AbsoluteConstraints(cm.getBounds().x, ax, 70, 20));
+                        panelP.revalidate();
+                        panelP.repaint();
+                    });
+                    try {
+                        sleep(7);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            hilo.start();
+        }catch(Exception e){
+            System.out.println("error: "+e);
+        }
+    }
+    
+    public void animarAbajo(Component cb, Component cm){
+        try{
+            int mitad = cb.getHeight() / 3;
+            Thread thread = new Thread(() ->{
+                for (int i = cb.getBounds().y - 20; i < cb.getBounds().y + mitad; i++) {
+                    int ax = i;
+                    SwingUtilities.invokeLater(() -> {
+                        panelP.add(cm, new org.netbeans.lib.awtextra.AbsoluteConstraints(cm.getBounds().x, ax, 70, 20));
+                        panelP.revalidate();
+                        panelP.repaint();
+                    });
+                    try {
+                        sleep(7);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            });
+            thread.start();
+        }catch(Exception e){
+            System.out.println("error: "+e);
+        }
+    }
+    
     public InicioSesion() {
         initComponents();
         this.setTitle("SERVICIOS INDUSTRIALES 3i");
         this.setIconImage(new ImageIcon(getClass().getResource("/Imagenes/towi_Azul.png")).getImage());
         this.setBackground(new Color(0,0,0,0));
+        Usuario.setBackground(new Color(0,0,0,0));
+        Contra.setBackground(new Color(0,0,0,0));
         panelVersion.setBackground(new Color(0,0,0,0));
         try{
             verificarVersion();
@@ -426,9 +477,6 @@ public class InicioSesion extends javax.swing.JFrame  {
         panelVersion = new javax.swing.JPanel();
         lblVersion1 = new javax.swing.JLabel();
         lblVersion = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -436,12 +484,13 @@ public class InicioSesion extends javax.swing.JFrame  {
         jButton1 = new javax.swing.JButton();
         btnEntrar = new javax.swing.JPanel();
         lblEntrar = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
         panelM = new scrollPane.PanelRound();
         btnSalir = new javax.swing.JPanel();
         lblSalir = new javax.swing.JLabel();
-        Contra = new rojeru_san.RSMPassView();
-        Usuario = new rojeru_san.RSMTextFull();
+        lblUsuario = new javax.swing.JLabel();
+        Usuario = new javax.swing.JTextField();
+        lblContrasena = new javax.swing.JLabel();
+        Contra = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
@@ -485,7 +534,7 @@ public class InicioSesion extends javax.swing.JFrame  {
         lblVersion.setBackground(new java.awt.Color(204, 204, 204));
         lblVersion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         lblVersion.setForeground(new java.awt.Color(204, 204, 204));
-        lblVersion.setText("2.5.4");
+        lblVersion.setText("2.5.5");
         lblVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblVersion.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -494,21 +543,9 @@ public class InicioSesion extends javax.swing.JFrame  {
         });
         panelP.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 420, -1, -1));
 
-        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/usuario.png"))); // NOI18N
-        panelP.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, -1, -1));
-
-        jLabel7.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel7.setText("CONTRASEÑA");
-        panelP.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 240, -1, -1));
-
-        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/contrasena.png"))); // NOI18N
-        panelP.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, -1, -1));
-
         jLabel6.setFont(new java.awt.Font("Roboto Medium", 0, 30)); // NOI18N
         jLabel6.setText("INICIAR SESION");
-        panelP.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 290, 40));
+        panelP.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, 290, 40));
 
         jLabel4.setFont(new java.awt.Font("Roboto Medium", 0, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
@@ -536,9 +573,10 @@ public class InicioSesion extends javax.swing.JFrame  {
                 jButton1ActionPerformed(evt);
             }
         });
-        panelP.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 170, 40));
+        panelP.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 360, 490, 30));
 
         btnEntrar.setBackground(new java.awt.Color(0, 165, 252));
+        btnEntrar.setLayout(new java.awt.BorderLayout());
 
         lblEntrar.setBackground(new java.awt.Color(0, 124, 249));
         lblEntrar.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
@@ -558,27 +596,9 @@ public class InicioSesion extends javax.swing.JFrame  {
                 lblEntrarMouseExited(evt);
             }
         });
+        btnEntrar.add(lblEntrar, java.awt.BorderLayout.CENTER);
 
-        javax.swing.GroupLayout btnEntrarLayout = new javax.swing.GroupLayout(btnEntrar);
-        btnEntrar.setLayout(btnEntrarLayout);
-        btnEntrarLayout.setHorizontalGroup(
-            btnEntrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnEntrarLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(lblEntrar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-        btnEntrarLayout.setVerticalGroup(
-            btnEntrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnEntrarLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(lblEntrar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-        );
-
-        panelP.add(btnEntrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 330, -1, 30));
-
-        jLabel8.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel8.setText("USUARIO");
-        panelP.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 140, -1, -1));
+        panelP.add(btnEntrar, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 490, 30));
 
         panelM.setBackground(new java.awt.Color(255, 255, 255));
         panelM.setRoundBottomLeft(600);
@@ -637,30 +657,50 @@ public class InicioSesion extends javax.swing.JFrame  {
 
         panelP.add(panelM, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 40));
 
-        Contra.setBackground(new java.awt.Color(255, 255, 255));
-        Contra.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        Contra.setModoMaterial(true);
-        Contra.setNextFocusableComponent(btnEntrar);
-        Contra.setPlaceholder("Contraseña");
-        Contra.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ContraActionPerformed(evt);
-            }
-        });
-        panelP.add(Contra, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 270, 450, -1));
+        lblUsuario.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblUsuario.setForeground(new java.awt.Color(0, 102, 204));
+        lblUsuario.setText("Usuario:");
+        panelP.add(lblUsuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 200, 70, 20));
 
         Usuario.setBackground(new java.awt.Color(255, 255, 255));
-        Usuario.setBotonColor(new java.awt.Color(51, 153, 255));
-        Usuario.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        Usuario.setModoMaterial(true);
-        Usuario.setNextFocusableComponent(Contra);
-        Usuario.setPlaceholder("Usuario");
+        Usuario.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Usuario.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(204, 204, 204)));
+        Usuario.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                UsuarioFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                UsuarioFocusLost(evt);
+            }
+        });
         Usuario.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 UsuarioActionPerformed(evt);
             }
         });
-        panelP.add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 170, 460, -1));
+        panelP.add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 180, 490, 40));
+
+        lblContrasena.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblContrasena.setForeground(new java.awt.Color(0, 102, 204));
+        lblContrasena.setText("Contraseña:");
+        panelP.add(lblContrasena, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 270, 70, 20));
+
+        Contra.setBackground(new java.awt.Color(255, 255, 255));
+        Contra.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(204, 204, 204)));
+        Contra.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                ContraFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                ContraFocusLost(evt);
+            }
+        });
+        Contra.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ContraActionPerformed(evt);
+            }
+        });
+        panelP.add(Contra, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, 490, 40));
 
         getContentPane().add(panelP, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 870, 450));
 
@@ -718,22 +758,6 @@ public class InicioSesion extends javax.swing.JFrame  {
         this.setLocation(xx - (x), yy - y);
     }//GEN-LAST:event_panelMMouseDragged
 
-    private void ContraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ContraActionPerformed
-       try {
-           Acceso();
-       } catch (ClassNotFoundException ex) {
-           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
-       }
-    }//GEN-LAST:event_ContraActionPerformed
-
-    private void UsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsuarioActionPerformed
-       try {
-           Acceso();
-       } catch (ClassNotFoundException ex) {
-           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
-       }
-    }//GEN-LAST:event_UsuarioActionPerformed
-
     private void lblVersionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblVersionMouseClicked
         if(ERROR_AL_CONECTARSE != 1){
             int opc = JOptionPane.showConfirmDialog(this, "Towi se cerrara completamente, ¿Esta de acuerdo?");
@@ -767,6 +791,50 @@ public class InicioSesion extends javax.swing.JFrame  {
             }
         }
     }//GEN-LAST:event_panelVersionMouseClicked
+
+    private void UsuarioFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_UsuarioFocusGained
+        Usuario.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0,153,255)));
+        if(Usuario.getText().equals("")){
+            animarArriba(Usuario, lblUsuario);
+        }
+    }//GEN-LAST:event_UsuarioFocusGained
+
+    private void UsuarioFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_UsuarioFocusLost
+        Usuario.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(204, 204, 204)));
+        if(Usuario.getText().equals("")){
+            animarAbajo(Usuario, lblUsuario);
+        }
+    }//GEN-LAST:event_UsuarioFocusLost
+
+    private void UsuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_UsuarioActionPerformed
+        try {
+           Acceso();
+       } catch (ClassNotFoundException ex) {
+           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+       }
+    }//GEN-LAST:event_UsuarioActionPerformed
+
+    private void ContraFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_ContraFocusGained
+        Contra.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(0,153,255)));
+        if(Contra.getText().equals("")){
+            animarArriba(Contra, lblContrasena);
+        }
+    }//GEN-LAST:event_ContraFocusGained
+
+    private void ContraFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_ContraFocusLost
+        Contra.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, new java.awt.Color(204, 204, 204)));
+        if(Contra.getText().equals("")){
+            animarAbajo(Contra, lblContrasena);
+        }
+    }//GEN-LAST:event_ContraFocusLost
+
+    private void ContraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ContraActionPerformed
+        try {
+           Acceso();
+       } catch (ClassNotFoundException ex) {
+           Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
+       }
+    }//GEN-LAST:event_ContraActionPerformed
 
    
     public static void main(String args[]) {
@@ -804,21 +872,19 @@ public class InicioSesion extends javax.swing.JFrame  {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private rojeru_san.RSMPassView Contra;
-    private rojeru_san.RSMTextFull Usuario;
+    private javax.swing.JPasswordField Contra;
+    private javax.swing.JTextField Usuario;
     private javax.swing.JPanel btnEntrar;
     private javax.swing.JPanel btnSalir;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel lblContrasena;
     private javax.swing.JLabel lblEntrar;
     private javax.swing.JLabel lblSalir;
+    private javax.swing.JLabel lblUsuario;
     private javax.swing.JLabel lblVersion;
     private javax.swing.JLabel lblVersion1;
     private scrollPane.PanelRound panelM;

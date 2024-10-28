@@ -61,6 +61,35 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     Object matrizIncidencias[][][];
     JFrame frame;
     
+    public int buscarFilaEmpleado(String numEmpelado){
+        for (int i = 0; i < Tabla1.getRowCount(); i++) {
+            if(Tabla1.getValueAt(i, 0).toString().equals(numEmpelado)){
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    public void crearMatrizIncidencias(Connection con, String inicio, String numSemana) throws SQLException{
+        Statement st = con.createStatement();
+        String sql = "select * from incidencias_checador where NumSemana like '" + numSemana + "' and Inicio like '" + inicio + "'";
+        ResultSet rs = st.executeQuery(sql);
+        while(rs.next()){
+            int X = rs.getInt("X");
+            String empleado = rs.getString("NumEmpleado");
+            String comentario = rs.getString("comentario");
+            String hora = rs.getString("Hora");
+            int y = buscarFilaEmpleado(empleado);
+            if (y != -1) {
+                matrizIncidencias[y][X][0] = comentario;
+                matrizIncidencias[y][X][1] = hora;
+                matrizIncidencias[y][X][2] = matrizTabla[y][X];
+                Tabla1.setValueAt(hora, y, X);
+            }
+        }
+        color.setMatriz(matrizIncidencias);
+    }
+    
     public void crearMatriz(){
         matrizTabla = new Object[Tabla1.getRowCount()][Tabla1.getColumnCount()];
         matrizIncidencias = new Object[Tabla1.getRowCount()][Tabla1.getColumnCount()][3];
@@ -965,13 +994,17 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                             incidencias = new Incidencias(frame,true,horaVieja,hora,nombre);
                             incidencias.setLocationRelativeTo(null);
                             comentarios = incidencias.getIncidencia();
-                            matrizIncidencias[row][col][0] = comentarios;
-                            matrizIncidencias[row][col][1] = hora;
-                            matrizIncidencias[row][col][2] = horaVieja;
-                            if(comentarios.equals("")){
-                                Tabla1.setValueAt("", row, col);
+                            if(!comentarios.equals("")){
+                                matrizIncidencias[row][col][0] = comentarios;
+                                matrizIncidencias[row][col][1] = hora;
+                                matrizIncidencias[row][col][2] = horaVieja;
+                                if(comentarios.equals("")){
+                                    Tabla1.setValueAt("", row, col);
+                                }
+                                color.setMatriz(matrizIncidencias);
+                            }else{
+                                Tabla1.setValueAt(horaVieja, row, col);
                             }
-                            color.setMatriz(matrizIncidencias);
                         }
                     }
                     return false;
@@ -1001,8 +1034,12 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         addSemana();
         try{
             if(getSupervisor().equals("GERENCIA")){
-                btnSubir.setEnabled(true);
                 btnSubir1.setEnabled(true);
+                tgIncidencias.setVisible(true);
+                lblIncidencias.setVisible(true);
+            }else{
+                tgIncidencias.setVisible(false);
+                lblIncidencias.setVisible(false);
             }
         }catch(Exception ex){
             JOptionPane.showMessageDialog(this, "No tienes acceso para ingresar a este modulo", "Error", JOptionPane.ERROR_MESSAGE);
@@ -1022,7 +1059,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jLabel9 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         btnSalir = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -1030,7 +1067,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         panelRound1 = new scrollPane.PanelRound();
         btnVerMisEmpleados = new rojeru_san.rsbutton.RSButtonRoundRipple();
         rSButtonRoundRipple3 = new rojeru_san.rsbutton.RSButtonRoundRipple();
-        btnSubir = new rojeru_san.rsbutton.RSButtonRoundRipple();
         cmbSemana = new RSMaterialComponent.RSComboBoxMaterial();
         jLabel13 = new javax.swing.JLabel();
         lblEstado = new javax.swing.JLabel();
@@ -1039,6 +1075,8 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         btnSubir1 = new rojeru_san.rsbutton.RSButtonRoundRipple();
         tgRedondear = new toggle.ToggleButton();
         jLabel24 = new javax.swing.JLabel();
+        lblIncidencias = new javax.swing.JLabel();
+        tgIncidencias = new toggle.ToggleButton();
         jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -1126,10 +1164,11 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel9.setFont(new java.awt.Font("Arial Rounded MT Bold", 1, 48)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(0, 165, 252));
-        jLabel9.setText("Checador");
-        jPanel3.add(jLabel9);
+        jLabel15.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        jLabel15.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel15.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel15.setText("Asistencia");
+        jPanel3.add(jLabel15);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -1180,14 +1219,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         rSButtonRoundRipple3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rSButtonRoundRipple3ActionPerformed(evt);
-            }
-        });
-
-        btnSubir.setText("Subir horario");
-        btnSubir.setEnabled(false);
-        btnSubir.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSubirActionPerformed(evt);
             }
         });
 
@@ -1255,6 +1286,14 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel24.setText("Redondear:");
 
+        lblIncidencias.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblIncidencias.setForeground(new java.awt.Color(255, 255, 255));
+        lblIncidencias.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIncidencias.setText("Mostrar sin incidencias:");
+
+        tgIncidencias.setForeground(new java.awt.Color(0, 112, 192));
+        tgIncidencias.setSelected(true);
+
         javax.swing.GroupLayout panelRound1Layout = new javax.swing.GroupLayout(panelRound1);
         panelRound1.setLayout(panelRound1Layout);
         panelRound1Layout.setHorizontalGroup(
@@ -1273,21 +1312,25 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                             .addGroup(panelRound1Layout.createSequentialGroup()
                                 .addGap(12, 12, 12)
                                 .addComponent(lblEstado, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRound1Layout.createSequentialGroup()
+                        .addGap(0, 6, Short.MAX_VALUE)
+                        .addComponent(cmbSemana, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblIncidencias, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panelRound1Layout.createSequentialGroup()
-                        .addGroup(panelRound1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnVerMisEmpleados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(rSButtonRoundRipple3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSubir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnSubir1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(panelRound1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(panelRound1Layout.createSequentialGroup()
                                 .addGap(64, 64, 64)
-                                .addComponent(tgRedondear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(19, 19, 19)))
-                        .addGap(0, 6, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRound1Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(cmbSemana, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(tgIncidencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(panelRound1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(btnVerMisEmpleados, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(rSButtonRoundRipple3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnSubir1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel24, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(panelRound1Layout.createSequentialGroup()
+                                    .addGap(64, 64, 64)
+                                    .addComponent(tgRedondear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(19, 19, 19))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         panelRound1Layout.setVerticalGroup(
@@ -1311,11 +1354,13 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                 .addComponent(jLabel24)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(tgRedondear, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 224, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblIncidencias)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tgIncidencias, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
                 .addComponent(btnSubir1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnSubir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(39, 39, 39))
+                .addGap(51, 51, 51))
         );
 
         jPanel4.add(panelRound1, java.awt.BorderLayout.LINE_START);
@@ -1894,11 +1939,9 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
             }
             agregarDias(inicio);
             if(estado == null){
-                btnSubir.setEnabled(true);
                 lblEstado.setText("EDITANDO");
                 lblEstado.setForeground(Color.ORANGE);
             }else{
-                btnSubir.setEnabled(false);
                 lblEstado.setText("EDITADO");
                 lblEstado.setForeground(Color.RED);
             }
@@ -1908,123 +1951,18 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
                 lblSemana.setText(cmbSemana.getSelectedItem().toString());
             }
             crearMatriz();
+            if(tgIncidencias.isVisible()){
+                if(tgIncidencias.isSelected()){
+                    crearMatrizIncidencias(con, fecha.get(cmbSemana.getSelectedIndex()),lblSemana.getText());
+                }
+            }else{
+                crearMatrizIncidencias(con, fecha.get(cmbSemana.getSelectedIndex()),lblSemana.getText());
+            }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
         }
     }//GEN-LAST:event_btnVerMisEmpleadosActionPerformed
-
-    private void btnSubirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubirActionPerformed
-        int opc = JOptionPane.showConfirmDialog(this, "ESTAS SEGURO DE GUARDAR ESTE HORARIO?");
-        if(opc == 0){
-            try{
-                String sql = "update semanas set "+getSupervisor() + " = ? where NumSemana = ?";
-                PreparedStatement pst = con.prepareStatement(sql);
-
-                pst.setString(1, "OK");
-                pst.setString(2, lblSemana.getText());
-
-                int n = pst.executeUpdate();
-                int n1 = 0;
-                String sql2 = "update dias set Terminado = ?, Lunes = ?, Martes = ?,Miercoles = ?,Jueves = ?, "
-                        + "Viernes = ?, Sabado = ?, Domingo = ?, SLunes = ?, SMartes = ?, "
-                        + "SMiercoles = ?, SJueves = ?, SViernes = ?, SSabado = ?, SDomingo = ? where NumEmpleado = ? and NumSemana = ?";
-                PreparedStatement pst2 = con.prepareStatement(sql2);
-                
-                for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                    pst2.setString(1, "SI");
-                    
-                    if(Tabla1.getValueAt(i, 2).toString().equals("")){
-                        pst2.setString(2, null);//Lunes
-                    }else{
-                        pst2.setString(2, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 3).toString().equals("")){
-                        pst2.setString(3, null);//Lunes
-                    }else{
-                        pst2.setString(3, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 4).toString().equals("")){
-                        pst2.setString(4, null);//Lunes
-                    }else{
-                        pst2.setString(4, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 5).toString().equals("")){
-                        pst2.setString(5, null);//Lunes
-                    }else{
-                        pst2.setString(5, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 6).toString().equals("")){
-                        pst2.setString(6, null);//Lunes
-                    }else{
-                        pst2.setString(6, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 7).toString().equals("")){
-                        pst2.setString(7, null);//Lunes
-                    }else{
-                        pst2.setString(7, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 8).toString().equals("")){
-                        pst2.setString(8, null);//Lunes
-                    }else{
-                        pst2.setString(8, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 9).toString().equals("")){
-                        pst2.setString(9, null);//Lunes
-                    }else{
-                        pst2.setString(9, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 10).toString().equals("")){
-                        pst2.setString(10, null);//Lunes
-                    }else{
-                        pst2.setString(10, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 11).toString().equals("")){
-                        pst2.setString(11, null);//Lunes
-                    }else{
-                        pst2.setString(11, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 12).toString().equals("")){
-                        pst2.setString(12, null);//Lunes
-                    }else{
-                        pst2.setString(12, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 13).toString().equals("")){
-                        pst2.setString(13, null);//Lunes
-                    }else{
-                        pst2.setString(13, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 14).toString().equals("")){
-                        pst2.setString(14, null);//Lunes
-                    }else{
-                        pst2.setString(14, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 15).toString().equals("")){
-                        pst2.setString(15, null);//Lunes
-                    }else{
-                        pst2.setString(15, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    if(Tabla1.getValueAt(i, 16).toString().equals("")){
-                        pst2.setString(16, null);//Lunes
-                    }else{
-                        pst2.setString(16, Tabla1.getValueAt(i, 2).toString());//Lunes
-                    }
-                    pst2.setString(17, lblSemana.getText());
-                    
-                    n1 += pst2.executeUpdate();
-                }
-                
-                
-                if(n > 0 && n1 > 0){
-                    JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
-                    lblEstado.setText("EDITADO");
-                }
-
-            }catch(SQLException e){
-                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }//GEN-LAST:event_btnSubirActionPerformed
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
         if(evt.getClickCount() == 1){
@@ -2057,7 +1995,41 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
         if(Tabla1.getRowCount() < 0){
             JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN HORARIO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
         }else{
-            crearPdf();
+            int opc = JOptionPane.showConfirmDialog(this, "ESTAS SEGURO DE GUARDAR ESTE HORARIO?");
+            if(opc == 0){
+                try{
+                    //--------------------------------------------------------------------------------------------------------------------------------
+                    int n1 = 0;
+                    String sql2 = "insert into incidencias_checador(NumSemana, Inicio, X, NumEmpleado, Comentario, Hora) values(?,?,?,?,?,?)"
+                            + "on duplicate key update "
+                            + "Comentario = values(Comentario), Hora = values(Hora)";
+                    PreparedStatement pst2 = con.prepareStatement(sql2);
+
+                    for (int i = 0; i < matrizIncidencias.length; i++) {
+                        for (int j = 0; j < matrizIncidencias[i].length; j++) {
+                            Object comentario = matrizIncidencias[i][j][0];
+                            if(comentario != null){
+                                pst2.setString(1, lblSemana.getText());
+                                pst2.setString(2, fecha.get(cmbSemana.getSelectedIndex()));
+                                pst2.setInt(3, j);
+                                pst2.setString(4, Tabla1.getValueAt(i, 0).toString());
+                                pst2.setString(5, comentario.toString());
+                                pst2.setString(6, matrizIncidencias[i][j][1].toString());
+                                n1 += pst2.executeUpdate();
+                            }
+                        }
+                    }
+
+                    if (n1 > 0) {
+                        JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
+                        crearPdf();
+                    }else{
+                        crearPdf();
+                    }
+                }catch(SQLException e){
+                    JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+                }
+            }
         }
     }//GEN-LAST:event_btnSubir1ActionPerformed
 
@@ -2090,7 +2062,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private rojerusan.RSTableMetro Tabla1;
     private javax.swing.JMenuItem agregarIncidencia;
     private javax.swing.JPanel btnSalir;
-    private rojeru_san.rsbutton.RSButtonRoundRipple btnSubir;
     private rojeru_san.rsbutton.RSButtonRoundRipple btnSubir1;
     private rojeru_san.rsbutton.RSButtonRoundRipple btnVerMisEmpleados;
     private RSMaterialComponent.RSComboBoxMaterial cmbSemana;
@@ -2100,6 +2071,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
@@ -2136,7 +2108,6 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private javax.swing.JLabel jLabel66;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -2161,6 +2132,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblEmpleado;
     private javax.swing.JLabel lblEstado;
+    private javax.swing.JLabel lblIncidencias;
     private javax.swing.JLabel lblJueves;
     private javax.swing.JLabel lblLunes;
     private javax.swing.JLabel lblMartes;
@@ -2171,6 +2143,7 @@ public final class Checador extends javax.swing.JInternalFrame implements Action
     private javax.swing.JLabel lbldomingo;
     private scrollPane.PanelRound panelRound1;
     private rojeru_san.rsbutton.RSButtonRoundRipple rSButtonRoundRipple3;
+    private toggle.ToggleButton tgIncidencias;
     private toggle.ToggleButton tgRedondear;
     // End of variables declaration//GEN-END:variables
 

@@ -304,11 +304,6 @@ public class CancelarOrden extends javax.swing.JDialog implements ActionListener
             String oc = txtOrden.getText();
             if(orden.isSelected()){
                 campo = "OC";
-                if(oc.length() > 3){
-                    if(oc.substring(0,3).equals("OCM")){}else{
-                        oc = "OCM" + oc;
-                    }
-                }
             }else if(requisicion.isSelected()){
                 campo = "NumRequisicion";
             }

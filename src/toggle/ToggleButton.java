@@ -195,11 +195,13 @@ public class ToggleButton extends JComponent {
     }
 
     private void createImageShadow() {
-        int height = getHeight();
-        imageShadow = new BufferedImage(height, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = imageShadow.createGraphics();
-        g2.drawImage(createShadow(height), 0, 0, null);
-        g2.dispose();
+        if (isVisible()) {
+            int height = getHeight();
+            imageShadow = new BufferedImage(height, height, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = imageShadow.createGraphics();
+            g2.drawImage(createShadow(height), 0, 0, null);
+            g2.dispose();
+        }
     }
 
     private BufferedImage createShadow(int size) {

@@ -2,6 +2,7 @@ package VentanaEmergente.Prestamo;
 
 import Conexiones.Conexion;
 import Conexiones.ConexionChat;
+import VentanaEmergente.EntregaRequisicion.EntregaCantidad;
 import com.app.sockets.chat.Cliente;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -25,34 +26,35 @@ import javax.swing.table.DefaultTableModel;
 import pruebas.Inicio1;
 
 public class EntregaRequisicion extends java.awt.Dialog implements ActionListener{
-        JButton botones[];
-        JPanel panel[];
-        Articulos ar;
-        String id[];
-        String requi[], aviso[];
-        int con = 0;
-        String numEmpleado;
-        
-        public void verEmpleados(){
-            try{
-                Connection con = null;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                for (int i = 0; i < this.con; i++) {
-                    Statement st = con.createStatement();
-                    String sql = "select * from Requisicion where Id like '"+requi[i]+"'";
-                    ResultSet rs = st.executeQuery(sql);
-                    while(rs.next()){
-                        aviso[i] = rs.getString("NumeroEmpleado");
-                    }
+    JButton botones[];
+    JPanel panel[];
+    Articulos ar;
+    String id[];
+    String quantity[];
+    String requi[], aviso[];
+    int con = 0;
+    String numEmpleado;
+
+    public void verEmpleados(){
+        try{
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            for (int i = 0; i < this.con; i++) {
+                Statement st = con.createStatement();
+                String sql = "select * from Requisicion where Id like '"+requi[i]+"'";
+                ResultSet rs = st.executeQuery(sql);
+                while(rs.next()){
+                    aviso[i] = rs.getString("NumeroEmpleado");
                 }
-                
-            }catch(SQLException e){
-                JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
             }
+
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
-    
-        public void crearNotificacion(String folio,String numEmpleado){
+    }
+
+    public void crearNotificacion(String folio,String numEmpleado){
         verEmpleados();
         try{
             Connection con = null;
@@ -160,14 +162,14 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
             new Object [][] {
             },
             new String [] {
-                "ID", "CANTIDAD", "DESCRIPCION", "NUMERO DE PARTE", "COMENTARIOS", "SELECCIONAR"
+                "ID", "CANTIDAD", "DESCRIPCION", "NUMERO DE PARTE", "COMENTARIOS", "SELECCIONAR", "CANT. ENTR.", "CANTIDAD ENT."
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, true
+                false, false, false, false, true, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -184,6 +186,14 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
             Tabla1.getColumnModel().getColumn(1).setMinWidth(100);
             Tabla1.getColumnModel().getColumn(1).setPreferredWidth(100);
             Tabla1.getColumnModel().getColumn(1).setMaxWidth(100);
+        }
+    }
+    
+    public String getTablaNull(Object ret){
+        try{
+           return ret.toString();
+        }catch(Exception e){
+            return "0";
         }
     }
     
@@ -205,8 +215,7 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
 
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
@@ -240,15 +249,10 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jPanel3.setBackground(new java.awt.Color(0, 165, 252));
-        jPanel3.setForeground(new java.awt.Color(255, 255, 255));
-
-        jLabel1.setFont(new java.awt.Font("Roboto Medium", 0, 48)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("     ENTREGA DE REQUISICIONES     ");
-        jPanel3.add(jLabel1);
-
-        jPanel2.add(jPanel3);
+        jLabel9.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 165, 252));
+        jLabel9.setText("Entrega de requisiciones");
+        jPanel2.add(jLabel9);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -352,14 +356,14 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
 
             },
             new String [] {
-                "ID", "CANTIDAD", "DESCRIPCION", "NUMERO DE PARTE", "COMENTARIOS", "SELECCIONAR"
+                "ID", "CANTIDAD", "DESCRIPCION", "NUMERO DE PARTE", "COMENTARIOS", "SELECCIONAR", "CANT. ENT.", "CANTIDAD ENT."
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Object.class, java.lang.Object.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, true
+                false, false, false, false, true, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -439,14 +443,14 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
                                 .addContainerGap()
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEmpleado, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE))
+                        .addComponent(txtEmpleado, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel8Layout.createSequentialGroup()
                         .addGap(38, 38, 38)
                         .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(fecha, javax.swing.GroupLayout.DEFAULT_SIZE, 63, Short.MAX_VALUE)
+                            .addComponent(fecha, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
                             .addComponent(lblRequisiciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -520,6 +524,7 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
                 datos[1] = rs.getString("Cantidad");
                 datos[2] = rs.getString("Descripcion");
                 datos[3] = rs.getString("Codigo");
+                datos[8] = rs.getString("Folio");
                 datos[7] = rs.getString("Folio");
                 if(datos[7] == null){
                     miModelo.addRow(datos);
@@ -556,10 +561,19 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
             while(rs.next()){
                 datos[0] = rs.getString("Id");
                 datos[1] = rs.getString("Cantidad");
+                datos[7] = rs.getString("CantidadEntregada");
                 datos[2] = rs.getString("Descripcion");
                 datos[3] = rs.getString("Codigo");
-                datos[7] = rs.getString("Folio");
-                if(datos[7] == null){
+                datos[8] = rs.getString("Folio");
+                double cant = 0;
+                try{
+                    double can1 = Double.parseDouble(datos[1]);
+                    double can2 = Double.parseDouble(datos[7]);
+                    cant = can1 - can2;
+                }catch(Exception e){
+                    
+                }
+                if(datos[8] == null || cant != 0){
                     miModelo.addRow(datos);
                 }
             }
@@ -608,7 +622,19 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
     }//GEN-LAST:event_txtEmpleadoActionPerformed
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-        
+        if(Tabla1.getSelectedColumn() == 5){
+            if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 5).equals(true)){
+                JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+                String cantEntregada = getTablaNull(Tabla1.getValueAt(Tabla1.getSelectedRow(), 7));
+                String cant = getTablaNull(Tabla1.getValueAt(Tabla1.getSelectedRow(), 1));
+                EntregaCantidad entrega = new EntregaCantidad(f,true, cant, cantEntregada);
+                entrega.setLocationRelativeTo(f);
+                double cantidad = entrega.getCantidad();
+                Tabla1.setValueAt(cantidad, Tabla1.getSelectedRow(), 6);
+            }else{
+                Tabla1.setValueAt("", Tabla1.getSelectedRow(), 6);
+            }
+        }
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void txtEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtEmpleadoMouseClicked
@@ -641,35 +667,39 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
         botones = new JButton[cont];
         panel = new JPanel[cont];
         id = new String[cont];
+        quantity = new String[cont];
         int aux = 0;
         for (int i = 0; i < Tabla1.getRowCount(); i++) {
             if(Tabla1.getValueAt(i, 5) != null){
                 if(Tabla1.getValueAt(i, 5).equals(true)){
-            panel[aux] = new JPanel();
-            botones[aux] = new JButton(String.valueOf(
-                    "<html>"
-                   + "<b><font SIZE = 5><p>"+Tabla1.getValueAt(i, 3).toString()+"</p></font></b>"
-                   + "<b><font SIZE = 2><p>"+Tabla1.getValueAt(i, 0).toString()+"</p></font></b>"
-                   + "<b><font SIZE = 2><p>"+Tabla1.getValueAt(i, 1).toString()+"</p></font></b>"
-                    + "</html>"));
-            id[aux] = Tabla1.getValueAt(i, 0).toString();
-            botones[aux].addActionListener(this);
-            botones[aux].setBackground(new java.awt.Color(255, 255, 255));
-            botones[aux].setFont(new java.awt.Font("Roboto", 0, 16));
-            botones[aux].setBorder(null);
-            botones[aux].setBorderPainted(false);
-            botones[aux].setContentAreaFilled(false);
-            botones[aux].setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-            botones[aux].setFocusPainted(false);
-          
-            if(aux%2 == 0){
-                panel[aux].setBackground(new Color(238,238,238));
-            }else{
-                panel[aux].setBackground(Color.white);
-            }
-            panel[aux].add(botones[aux]);
-            ar.PanelArticulos.add(panel[aux]);
-            aux++;
+                    panel[aux] = new JPanel();
+                    botones[aux] = new JButton(String.valueOf(
+                            "<html>"
+                           + "<b><font SIZE = 5><p>"+Tabla1.getValueAt(i, 3).toString()+"</p></font></b>"
+                           + "<b><font SIZE = 2><p>"+Tabla1.getValueAt(i, 0).toString()+"</p></font></b>"
+                           + "<b><font SIZE = 2><p>"+Tabla1.getValueAt(i, 1).toString()+"</p></font></b>"
+                           + "<b><font SIZE = 3><p>"+Tabla1.getValueAt(i, 6).toString()+"</p></font></b>"
+                            + "</html>"));
+                    id[aux] = Tabla1.getValueAt(i, 0).toString();
+                    quantity[aux] = Tabla1.getValueAt(i, 1).toString();
+                    botones[aux].addActionListener(this);
+                    botones[aux].setBackground(new java.awt.Color(255, 255, 255));
+                    botones[aux].setFont(new java.awt.Font("Roboto", 0, 16));
+                    botones[aux].setBorder(null);
+                    botones[aux].setName(Tabla1.getValueAt(i, 6).toString() + "*" + getTablaNull(Tabla1.getValueAt(i, 7)));
+                    botones[aux].setBorderPainted(false);
+                    botones[aux].setContentAreaFilled(false);
+                    botones[aux].setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                    botones[aux].setFocusPainted(false);
+
+                    if(aux%2 == 0){
+                        panel[aux].setBackground(new Color(238,238,238));
+                    }else{
+                        panel[aux].setBackground(Color.white);
+                    }
+                    panel[aux].add(botones[aux]);
+                    ar.PanelArticulos.add(panel[aux]);
+                    aux++;
                 }
             }
         }
@@ -711,15 +741,14 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
     private javax.swing.JButton btnLimpiar;
     private com.toedter.calendar.JDateChooser fecha;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -787,15 +816,26 @@ public class EntregaRequisicion extends java.awt.Dialog implements ActionListene
             for (int i = 0; i < panel.length; i++) {
                 if(id[i] != null){
                     try{
-                        Connection con = null;  
+                        Connection con;  
                         Conexion con1 = new Conexion();
                         con = con1.getConnection();
-                        Statement st = con.createStatement();
-                        String sql = "update requisiciones set Folio = ? where Id = ?";
+                        double cantidad = Double.parseDouble(botones[i].getName().substring(0,botones[i].getName().indexOf("*"))) + 
+                                Double.parseDouble(botones[i].getName().substring(botones[i].getName().indexOf("*") + 1, botones[i].getName().length()));
+                        double cant = Double.parseDouble(quantity[i]);
+                        String sql = "update requisiciones set Folio = ?, CantidadEntregada = ? where Id = ?";
+                        if(cant == cantidad){
+                            sql = "update requisiciones set Folio = ?, CantidadEntregada = ?, Entregado = ? where Id = ?";
+                        }
                         PreparedStatement pst = con.prepareStatement(sql);
                         
                         pst.setInt(1, numero);
-                        pst.setString(2, id[i]);
+                        pst.setString(2, String.valueOf(cantidad));
+                        if(cant == cantidad){
+                            pst.setString(3, "SI");
+                            pst.setString(4, id[i]);
+                        }else{
+                            pst.setString(3, id[i]);
+                        }
                         
                         n = pst.executeUpdate();
                     }catch(SQLException ex){

@@ -572,8 +572,6 @@ public final class HTPP extends javax.swing.JInternalFrame implements ActionList
             dat[2] = comentarios;
             if(dat[0].equals("")){
                 JOptionPane.showMessageDialog(this, "Debes llenar las horas","Advertencia",JOptionPane.WARNING_MESSAGE);
-            }else if(dat[1].equals("")){
-                JOptionPane.showMessageDialog(this, "Debes llenar el proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
             }else{
                 String id;
                 if(depa.equals("maquinados")){
