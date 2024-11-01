@@ -956,7 +956,7 @@
                                             <Component class="javax.swing.JTable" name="TablaMaquinados">
                                               <Properties>
                                                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-                                                  <Table columnCount="9" rowCount="0">
+                                                  <Table columnCount="11" rowCount="0">
                                                     <Column editable="false" title="Empleado" type="java.lang.Object"/>
                                                     <Column editable="false" title="Proyecto" type="java.lang.Object"/>
                                                     <Column editable="false" title="Horas" type="java.lang.Object"/>
@@ -966,6 +966,8 @@
                                                     <Column editable="true" title="Costo" type="java.lang.Object"/>
                                                     <Column editable="false" title="ID" type="java.lang.Object"/>
                                                     <Column editable="false" title="Fecha" type="java.lang.Object"/>
+                                                    <Column editable="true" title="Plano" type="java.lang.Object"/>
+                                                    <Column editable="false" title="Maquina" type="java.lang.Object"/>
                                                   </Table>
                                                 </Property>
                                                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
@@ -1006,6 +1008,16 @@
                                                       <Renderer/>
                                                     </Column>
                                                     <Column maxWidth="0" minWidth="0" prefWidth="0" resizable="true">
+                                                      <Title/>
+                                                      <Editor/>
+                                                      <Renderer/>
+                                                    </Column>
+                                                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                                                      <Title/>
+                                                      <Editor/>
+                                                      <Renderer/>
+                                                    </Column>
+                                                    <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                                                       <Title/>
                                                       <Editor/>
                                                       <Renderer/>

@@ -578,4 +578,57 @@ public class revisarPlanos {
         }
     }
     
+    
+    public void terminarPlano(String plano, String proyecto, String empleado, String tiempo, String estacion){
+        try{
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            Date d = new Date();
+            String fecha = sdf.format(d);
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from " + estacion + " where Proyecto like '" + plano + "'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                //Si existe plano en calidad
+                String sql2 = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ?, Cronometro = ? where Proyecto = ?";
+                PreparedStatement pst = con.prepareStatement(sql2);
+                
+                pst.setString(1, "SI");
+                pst.setString(2, fecha);
+                pst.setString(3, fecha);
+                pst.setString(4, tiempo);
+                pst.setString(5, plano);
+                
+                int n = pst.executeUpdate();
+                
+                if(n == 0){
+                    JOptionPane.showMessageDialog(null, "Datos Incorrectos en " + estacion,"Error",JOptionPane.ERROR_MESSAGE);
+                }
+                
+            }else{
+                //Si no existe plano en calidad
+                String sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Cronometro, Prioridad, Empleado) values(?,?,?,?,?,?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql2);
+                
+                pst.setString(1, "SI");
+                pst.setString(2, fecha);
+                pst.setString(3, fecha);
+                pst.setString(4, plano);
+                pst.setString(5, proyecto);
+                pst.setString(6, tiempo);
+                pst.setString(7, "10");
+                pst.setString(8, empleado);
+                
+                int n = pst.executeUpdate();
+                
+                if(n == 0){
+                    JOptionPane.showMessageDialog(null, "Datos Incorrectos en " + estacion,"Error",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }

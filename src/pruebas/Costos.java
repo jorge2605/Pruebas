@@ -283,11 +283,11 @@ public final class Costos extends javax.swing.JInternalFrame {
             new Object [][] {
             },
             new String [] {
-                "Empleado", "Proyecto", "Horas", "Dimensiones", "Material", "Cantidad", "Costo", "ID", "Fecha"
+                "Empleado", "Proyecto", "Horas", "Dimensiones", "Material", "Cantidad", "Costo", "ID", "Fecha", "Plano", "Maquina"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, true, false, false
+                false, false, false, false, false, false, true, false, false, false, false
             };
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -435,7 +435,7 @@ public final class Costos extends javax.swing.JInternalFrame {
             }
             ResultSet rs = st.executeQuery(sql);
             DefaultTableModel miModelo = (DefaultTableModel) TablaMaquinados.getModel();
-            String datos[] = new String[10];
+            String datos[] = new String[15];
             while(rs.next()){
                 datos[0] = rs.getString("NumEmpleado");
                 datos[0] = getEmploye(datos[0]);
@@ -447,6 +447,8 @@ public final class Costos extends javax.swing.JInternalFrame {
                 datos[6] = rs.getString("Costo");
                 datos[7] = rs.getString("Id");
                 datos[8] = rs.getString("Fecha");
+                datos[9] = rs.getString("Plano");
+                datos[10] = rs.getString("Maquina");
                 miModelo.addRow(datos);
             }
         }catch(SQLException e){
@@ -1843,11 +1845,11 @@ public final class Costos extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Empleado", "Proyecto", "Horas", "Dimensiones", "Material", "Cantidad", "Costo", "ID", "Fecha"
+                "Empleado", "Proyecto", "Horas", "Dimensiones", "Material", "Cantidad", "Costo", "ID", "Fecha", "Plano", "Maquina"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, true, false, false
+                false, false, false, false, false, false, true, false, false, true, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {

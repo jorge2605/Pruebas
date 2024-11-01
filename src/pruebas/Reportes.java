@@ -848,7 +848,7 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         btnSalir.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel3.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText(" X ");
         jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -871,8 +871,8 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel9.setFont(new java.awt.Font("Roboto", 1, 48)); // NOI18N
-        jLabel9.setForeground(new java.awt.Color(0, 165, 252));
+        jLabel9.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 102, 153));
         jLabel9.setText("Reportes");
         jPanel8.add(jLabel9);
 

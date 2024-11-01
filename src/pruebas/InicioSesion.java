@@ -481,7 +481,6 @@ public class InicioSesion extends javax.swing.JFrame  {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         btnEntrar = new javax.swing.JPanel();
         lblEntrar = new javax.swing.JLabel();
         panelM = new scrollPane.PanelRound();
@@ -491,6 +490,8 @@ public class InicioSesion extends javax.swing.JFrame  {
         Usuario = new javax.swing.JTextField();
         lblContrasena = new javax.swing.JLabel();
         Contra = new javax.swing.JPasswordField();
+        btnEntrar1 = new javax.swing.JPanel();
+        lblEntrar1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
@@ -559,21 +560,6 @@ public class InicioSesion extends javax.swing.JFrame  {
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/fondo_1.png"))); // NOI18N
         panelP.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 0, 300, 450));
-
-        jButton1.setBackground(new java.awt.Color(255, 255, 255));
-        jButton1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 102, 0));
-        jButton1.setText("Ver actualizaciones");
-        jButton1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 102, 0), 2, true));
-        jButton1.setContentAreaFilled(false);
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.setFocusPainted(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        panelP.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 360, 490, 30));
 
         btnEntrar.setBackground(new java.awt.Color(0, 165, 252));
         btnEntrar.setLayout(new java.awt.BorderLayout());
@@ -702,6 +688,31 @@ public class InicioSesion extends javax.swing.JFrame  {
         });
         panelP.add(Contra, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, 490, 40));
 
+        btnEntrar1.setBackground(new java.awt.Color(255, 102, 0));
+        btnEntrar1.setLayout(new java.awt.BorderLayout());
+
+        lblEntrar1.setBackground(new java.awt.Color(255, 51, 0));
+        lblEntrar1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        lblEntrar1.setForeground(new java.awt.Color(255, 255, 255));
+        lblEntrar1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEntrar1.setText("VER ACTUALIZACIONES");
+        lblEntrar1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        lblEntrar1.setNextFocusableComponent(Usuario);
+        lblEntrar1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblEntrar1MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lblEntrar1MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lblEntrar1MouseExited(evt);
+            }
+        });
+        btnEntrar1.add(lblEntrar1, java.awt.BorderLayout.CENTER);
+
+        panelP.add(btnEntrar1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 370, 490, 30));
+
         getContentPane().add(panelP, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 870, 450));
 
         pack();
@@ -739,13 +750,6 @@ public class InicioSesion extends javax.swing.JFrame  {
            Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
        }
     }//GEN-LAST:event_lblEntrarMouseClicked
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        Informacion info = new Informacion(f, true);
-        info.setLocationRelativeTo(f);
-        info.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     private void panelMMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelMMousePressed
         x = evt.getX();
@@ -836,6 +840,23 @@ public class InicioSesion extends javax.swing.JFrame  {
        }
     }//GEN-LAST:event_ContraActionPerformed
 
+    private void lblEntrar1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblEntrar1MouseClicked
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        Informacion info = new Informacion(f, true);
+        info.setLocationRelativeTo(f);
+        info.setVisible(true);
+    }//GEN-LAST:event_lblEntrar1MouseClicked
+
+    private void lblEntrar1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblEntrar1MouseEntered
+        Color alto = new Color(204,51,0);
+        btnEntrar1.setBackground(alto);
+    }//GEN-LAST:event_lblEntrar1MouseEntered
+
+    private void lblEntrar1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblEntrar1MouseExited
+        Color bajo = new Color(255,102,0);
+        btnEntrar1.setBackground(bajo);
+    }//GEN-LAST:event_lblEntrar1MouseExited
+
    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -875,14 +896,15 @@ public class InicioSesion extends javax.swing.JFrame  {
     private javax.swing.JPasswordField Contra;
     private javax.swing.JTextField Usuario;
     private javax.swing.JPanel btnEntrar;
+    private javax.swing.JPanel btnEntrar1;
     private javax.swing.JPanel btnSalir;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel lblContrasena;
     private javax.swing.JLabel lblEntrar;
+    private javax.swing.JLabel lblEntrar1;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JLabel lblUsuario;
     private javax.swing.JLabel lblVersion;

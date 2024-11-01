@@ -11,23 +11,37 @@ import java.awt.event.MouseListener;
 import java.util.Stack;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import scrollPane.PanelRound;
 
 public class Visor extends javax.swing.JDialog {
 
     public Stack<String> rutas;
+    public PanelRound paneles[];
+    public int seleccionado = 0;
+    
+    public void setSeleccionado(){
+        for (PanelRound panele : paneles) {
+            panele.setBackground(new Color(220,220,220));
+        }
+        paneles[seleccionado].setBackground(new Color(0,102,255));
+    }
     
     public void verImagenes(){
         int cont = 0;
+        paneles = new PanelRound[rutas.size()];
         for (int i = 0; i < rutas.size(); i++) {
+            int sel = i;
             String ruta = rutas.get(i);
             ImageIcon image1 = new ImageIcon((ruta));
             Image scaledImage1 = image1.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
             JLabel imageLabel1 = new JLabel(new ImageIcon(scaledImage1));
             imageLabel1.setCursor(new Cursor(Cursor.HAND_CURSOR));
-            PanelRound pnl1 = new PanelRound();
+            paneles[i] = new PanelRound();
+            paneles[i].setBackground(new Color(222,222,222));
             if(cont == 0){
                 lblImagen.setIcon(new ImageIcon((ruta)));
+                paneles[0].setBackground(new Color(0,102,255));
             }
             imageLabel1.addMouseListener(new MouseListener() {
                 @Override
@@ -40,6 +54,8 @@ public class Visor extends javax.swing.JDialog {
                     revalidate();
                     repaint();
                     lblImagen.setIcon(new ImageIcon((ruta)));
+                    seleccionado = sel;
+                    setSeleccionado();
                 }
 
                 @Override
@@ -54,13 +70,13 @@ public class Visor extends javax.swing.JDialog {
                 public void mouseExited(MouseEvent e) {
                 }
             });
-            pnl1.setRoundBottomLeft(30);
-            pnl1.setRoundTopLeft(30);
-            pnl1.setRoundBottomRight(30);
-            pnl1.setRoundTopRight(30);
-            pnl1.setBackground(new Color(222,222,222));
-            pnl1.add(imageLabel1);
-            jPanel5.add(pnl1);
+            paneles[i].setRoundBottomLeft(30);
+            paneles[i].setRoundTopLeft(30);
+            paneles[i].setRoundBottomRight(30);
+            paneles[i].setRoundTopRight(30);
+            
+            paneles[i].add(imageLabel1);
+            jPanel5.add(paneles[i]);
             revalidate();
             repaint();
             cont++;
@@ -138,6 +154,7 @@ public class Visor extends javax.swing.JDialog {
         pnlImg.setBackground(new java.awt.Color(255, 255, 255));
         pnlImg.setLayout(new java.awt.BorderLayout());
 
+        lblImagen.setForeground(new java.awt.Color(0, 102, 255));
         lblImagen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         pnlImg.add(lblImagen, java.awt.BorderLayout.CENTER);
 
@@ -165,8 +182,36 @@ public class Visor extends javax.swing.JDialog {
     }//GEN-LAST:event_jLabel1MouseExited
 
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            dispose();
+        switch (evt.getKeyCode()) {
+            case KeyEvent.VK_ESCAPE:
+                dispose();
+                break;
+            case KeyEvent.VK_RIGHT:
+                if((seleccionado + 2) > rutas.size()){
+                    seleccionado = 0;
+                }else{
+                    seleccionado++;
+                }
+                lblImagen.removeAll();
+                revalidate();
+                repaint();
+                lblImagen.setIcon(new ImageIcon((rutas.get(seleccionado))));
+                setSeleccionado();
+                break;
+            case KeyEvent.VK_LEFT:
+                if((seleccionado - 1) < 0){
+                    seleccionado = rutas.size() - 1;
+                }else{
+                    seleccionado--;
+                }
+                lblImagen.removeAll();
+                revalidate();
+                repaint();
+                lblImagen.setIcon(new ImageIcon((rutas.get(seleccionado))));
+                setSeleccionado();
+                break;
+            default:
+                break;
         }
     }//GEN-LAST:event_formKeyPressed
 
