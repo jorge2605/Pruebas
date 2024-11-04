@@ -1,7 +1,6 @@
 package VentanaEmergente.Inicio1;
 
 import Conexiones.ConexionChat;
-import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
@@ -17,11 +16,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 
 public class ModificacionesTowi extends javax.swing.JDialog {
 
     public String id;
+    public java.awt.GridBagConstraints gridBagConstraints;
     
     public final void crearBotonDescripcion (String texto){
         JButton boton = new JButton();
@@ -34,7 +33,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         boton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         boton.setFocusPainted(false);
         boton.setPreferredSize(new java.awt.Dimension(300, 50));
-        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -92,7 +91,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         boton.setBorderPainted(false);
         boton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         boton.setFocusPainted(false);
-        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = pos;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.ipadx = 30;
@@ -174,7 +173,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         descripcion.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         descripcion.setForeground(new java.awt.Color(51, 51, 51));
         descripcion.setText("Descripcion");
-        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -214,7 +213,6 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.ipadx = 9;
         gridBagConstraints.ipady = 10;
         gridBagConstraints.insets = new java.awt.Insets(15, 15, 15, 15);
@@ -398,7 +396,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         jButton1.setBackground(new java.awt.Color(51, 153, 255));
         jButton1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("<html> <p style='width:100%;'> Modificaciones de towi para la creacion de nuevos apartados para usuarios que desean nuevas habilidades y modificaciones para mejor comodidad y rendimiento de ellos en su respectivo departamento");
+        jButton1.setText("hjkdrlgjkdslkjfhglkdjsh glkjds fhgkljdhslfkjghdlskfjhldkjf lkdjsh glk jdsflkg dlkg hdskljfg lkdskld gkljdh slkjgh ldsl dslkf glkdjs hfklhj dlskjh fgljkdsh flgkjh dlskfj ghldksjfh glkdjsfh glkjhlks djfghlkjsd fgkl");
         jButton1.setBorder(null);
         jButton1.setBorderPainted(false);
         jButton1.setComponentPopupMenu(jPopupMenu1);
@@ -439,7 +437,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         jButton3.setBackground(new java.awt.Color(51, 153, 255));
         jButton3.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("<html> <p style='width:100%;'>06-09-2024 askdjhaklsjdhalksd");
+        jButton3.setText("<html> <p style='width:100%;'>06-09-2024</p></html>");
         jButton3.setBorder(null);
         jButton3.setBorderPainted(false);
         jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));

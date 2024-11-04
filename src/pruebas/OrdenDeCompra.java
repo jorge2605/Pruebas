@@ -4900,7 +4900,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             JOptionPane.showMessageDialog(this, "DEBES LLENAR POR LO MENOS UN PRECIO O UN PROVEEDOR DE LA REQUISICION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
                         } else {
 
-                            ArrayList lista = new ArrayList<String>();
+                            Stack<String> lista = new Stack<>();
 
                             try {
                                 for (int i = 0; i < Tabla2.getRowCount(); i++) {
@@ -4911,47 +4911,29 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                                             Connection con;
                                             Conexion con1 = new Conexion();
                                             con = con1.getConnection();
-                                            Statement st = con.createStatement();
                                             Statement st2 = con.createStatement();
-                                            String sql = "select Proveedor, NumeroDeParte from Inventario where NumeroDeParte like '" + Tabla2.getValueAt(i, 2).toString() + "'";
-                                            ResultSet rs = st.executeQuery(sql);
                                             String sql2;
                                             ResultSet rs2;
                                             if (search != true) {
-                                                sql2 = "select OC from requisiciones where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
+                                                sql2 = "select OC, proveedor, Codigo from requisiciones where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
                                                 rs2 = st2.executeQuery(sql2);
                                             } else {
-                                                sql2 = "select OC from requisicionesmuestra where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
+                                                sql2 = "select OC, proveedor, Codigo from requisicionesmuestra where Id like '" + Tabla2.getValueAt(i, 0).toString() + "'";
                                                 rs2 = st2.executeQuery(sql2);
                                             }
-                                            String oc = "";
+                                            String oc;
                                             while (rs2.next()) {
                                                 oc = rs2.getString("OC");
-                                            }
-
-                                            if (oc == null) {
-                                                String datos[] = new String[10];
-                                                while (rs.next()) {
-                                                    datos[0] = rs.getString("Proveedor");
-                                                    datos[1] = rs.getString("NumeroDeParte");
-                                                }
-                                                int cont = 0;
-                                                boolean band = true;
-                                                if ((lista.isEmpty())) {
-                                                    lista.add(datos[0]);
-                                                } else {
-                                                    do {
-                                                        if ((lista.get(cont).toString()).equals(datos[0])) {
-                                                            band = false;
-                                                            break;
-                                                        }
-                                                        cont = cont + 1;
-                                                    } while (cont < (lista.size()));
-                                                    if (band == true) {
-                                                        lista.add(datos[0]);
+                                                if (oc == null) {
+                                                    String datos[] = new String[10];
+                                                    datos[0] = rs2.getString("Proveedor");
+                                                    datos[1] = rs2.getString("Codigo");
+                                                    if (lista.search(datos[0]) == -1) {
+                                                        lista.push(datos[0]);
                                                     }
                                                 }
                                             }
+                                            
                                         }
                                     }
                                 }
@@ -4959,17 +4941,12 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                             } catch (SQLException e) {
                                 JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                             }
-
                             if (!lista.isEmpty()) {
                                 da = new String[lista.size()];
                                 for (int i = 0; i < lista.size(); i++) {
-                                    da[i] = lista.get(i).toString();
+                                    da[i] = lista.get(i);
                                 }
-                                //            
-                                //            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-                                //            elegir = new ProveedoresCompras(lista.size(),da,j,true);
                                 JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-                                System.out.println(Arrays.toString(da));
                                 elegir = new ElegirProveedor(j, false, lista.size(), da, lblRequi.getText());
                                 elegir.setVisible(true);
                                 elegir.btnCrear.addActionListener(this);

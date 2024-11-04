@@ -250,7 +250,7 @@
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="ff" green="ff" red="ff" type="rgb"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="&lt;html&gt; &lt;p style=&apos;width:100%;&apos;&gt; Modificaciones de towi para la creacion de nuevos apartados para usuarios que desean nuevas habilidades y modificaciones para mejor comodidad y rendimiento de ellos en su respectivo departamento"/>
+                        <Property name="text" type="java.lang.String" value="hjkdrlgjkdslkjfhglkdjsh glkjds fhgkljdhslfkjghdlskfjhldkjf lkdjsh glk jdsflkg dlkg hdskljfg lkdskld gkljdh slkjgh ldsl dslkf glkdjs hfklhj dlskjh fgljkdsh flgkjh dlskfj ghldksjfh glkdjsfh glkjhlks djfghlkjsd fgkl"/>
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="null"/>
                         </Property>
@@ -313,7 +313,7 @@
                         <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
                           <Color blue="ff" green="ff" red="ff" type="rgb"/>
                         </Property>
-                        <Property name="text" type="java.lang.String" value="&lt;html&gt; &lt;p style=&apos;width:100%;&apos;&gt;06-09-2024 askdjhaklsjdhalksd"/>
+                        <Property name="text" type="java.lang.String" value="&lt;html&gt; &lt;p style=&apos;width:100%;&apos;&gt;06-09-2024&lt;/p&gt;&lt;/html&gt;"/>
                         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                           <Border info="null"/>
                         </Property>
