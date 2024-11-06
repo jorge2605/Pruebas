@@ -39,8 +39,15 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.ipadx = 22;
         gridBagConstraints.ipady = 22;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        panelPrincipal.add(boton, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(4,2,4,2);
+        scrollPane.PanelRound panelRound1 = new scrollPane.PanelRound();
+        panelRound1.setBackground(new java.awt.Color(51, 153, 255));
+        panelRound1.setRoundBottomLeft(15);
+        panelRound1.setRoundBottomRight(15);
+        panelRound1.setRoundTopLeft(15);
+        panelRound1.setRoundTopRight(15);
+        panelRound1.add(boton);
+        panelPrincipal.add(panelRound1, gridBagConstraints);
     }
     
     public final void crearBoton(String text, int pos, String ida){
@@ -96,8 +103,15 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.ipadx = 30;
         gridBagConstraints.ipady = 15;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
-        panelPrincipal.add(boton, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(4,2,4,2);
+        scrollPane.PanelRound panelRound1 = new scrollPane.PanelRound();
+        panelRound1.setBackground(new java.awt.Color(51, 153, 255));
+        panelRound1.setRoundBottomLeft(15);
+        panelRound1.setRoundBottomRight(15);
+        panelRound1.setRoundTopLeft(15);
+        panelRound1.setRoundTopRight(15);
+        panelRound1.add(boton);
+        panelPrincipal.add(panelRound1, gridBagConstraints);
     }
     
     public void setEstado(String estado, String id) {
@@ -168,6 +182,13 @@ public class ModificacionesTowi extends javax.swing.JDialog {
     }
     
     public void agregarTitulos(){
+        //Ultimo Label
+        jLabel9 = new javax.swing.JLabel();
+        jLabel9.setText(" ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 100;
+        panelPrincipal.add(jLabel9, gridBagConstraints);
         //DESCRIPCION
         JLabel descripcion = new javax.swing.JLabel();
         descripcion.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
@@ -217,13 +238,6 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         gridBagConstraints.ipady = 10;
         gridBagConstraints.insets = new java.awt.Insets(15, 15, 15, 15);
         panelPrincipal.add(requisitor, gridBagConstraints);
-        //Ultimo Label
-        JLabel label = new javax.swing.JLabel();
-        label.setText(" ");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 100;
-        panelPrincipal.add(label, gridBagConstraints);
     }
     
     public final void verificacion(String numEmpleado){
@@ -414,7 +428,7 @@ public class ModificacionesTowi extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.ipadx = 22;
         gridBagConstraints.ipady = 22;
-        gridBagConstraints.insets = new java.awt.Insets(8, 8, 8, 8);
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         panelPrincipal.add(jButton1, gridBagConstraints);
 
         jButton2.setBackground(new java.awt.Color(255, 204, 51));
@@ -598,12 +612,10 @@ public class ModificacionesTowi extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        limpiarPantalla();
         addFila("select * from modificaciones order by idmodificaciones desc");
     }//GEN-LAST:event_jButton12ActionPerformed
 
     private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        limpiarPantalla();
         addFila("select * from modificaciones where Estado != 'Cancelado' and Estado != 'Terminado' order by idmodificaciones desc");        
     }//GEN-LAST:event_jButton13ActionPerformed
 

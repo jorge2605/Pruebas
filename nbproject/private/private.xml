@@ -5,10 +5,15 @@
         <group>
             <file>file:/C:/Pruebas/src/pruebas/CambiarEstado.java</file>
             <file>file:/C:/Pruebas/src/pruebas/Inicio1.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/Reportes.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/InicioSesion/Visor.java</file>
+            <file>file:/C:/Pruebas/src/Conexiones/ConexionChat.java</file>
             <file>file:/C:/Pruebas/src/pruebas/InicioSesion.java</file>
             <file>file:/C:/Pruebas/src/VentanaEmergente/CambiarEstado/InformacionProyectos.java</file>
+            <file>file:/C:/Pruebas/src/Conexiones/Conexion.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Inicio1/ModificacionesTowi.java</file>
             <file>file:/C:/Pruebas/src/pruebas/OrdenDeCompra.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/InicioSesion/Informacion.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/Maquinados.java</file>
         </group>
     </open-files>
 </project-private>
