@@ -1,11 +1,9 @@
 package Conexiones;
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.Statement;
 
 public class ConexionChat {
     
@@ -15,6 +13,7 @@ public class ConexionChat {
     con = null;
     Class.forName("com.mysql.jdbc.Driver");
     con = (Connection) DriverManager.getConnection("jdbc:mysql://192.168.100.40:3306/chat?autoReconnect=true&useSSL=false","Jorge","123456789Aa.");
+//    con = (Connection) DriverManager.getConnection("jdbc:mysql://192.168.100.14:3306/chat?autoReconnect=true&useSSL=false","Jorge","123456789Aa.");
     return con;
     }
     Statement createStatement(){

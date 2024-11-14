@@ -14,7 +14,7 @@ public class Espera extends javax.swing.JFrame {
         Thread hilo = new Thread(){
             public void run(){
                 for(;;){
-                    if (band == true){
+                    if (band){
                         try {
                             sleep(1000);
                             if(jLabel1.getText().equals("POR FAVOR ESPERE")){
@@ -29,8 +29,6 @@ public class Espera extends javax.swing.JFrame {
                             } catch (InterruptedException ex) {
                             Logger.getLogger(Espera.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                        
-                    
                     }else{
                         break;
                     }

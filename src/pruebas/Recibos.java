@@ -532,7 +532,7 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
 
         cbRack.setBackground(new java.awt.Color(255, 255, 255));
         cbRack.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        cbRack.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "L", "M", "N", "O", "P" }));
+        cbRack.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q" }));
         cbRack.setBorder(null);
         cbRack.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
             public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {

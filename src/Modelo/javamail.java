@@ -114,21 +114,19 @@ public class javamail {
         }
     }
     
-    public static void sendAlmacen(String destinatario, String copia, String asunto, Stack<String> material, Stack<String> cant,  Stack<String> cantR){
-        System.out.println("inicia");
+    public void sendAlmacen(String destinatario, String copia, String asunto, Stack<String> material, Stack<String> cant,  Stack<String> cantR){
         Properties props = new Properties();
-        props.put("mail.smtp.host", "smtp-mail.outlook.com");
+        props.put("mail.smtp.host", "mail.si3i.com");
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         props.put("mail.smtp.ssl.trust", "*");
         
         System.setProperty("mail.debug", "true");
         
         Authenticator auth = new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("towi3i@outlook.com", "26052000Aa.");
+                return new PasswordAuthentication("almacen01@si3i.com", "almacen01?");
             }
         };
         
@@ -136,7 +134,7 @@ public class javamail {
 
         try {
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress("towi3i@outlook.com"));
+            message.setFrom(new InternetAddress("almacen01@si3i.com"));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(destinatario));
             message.setRecipients(Message.RecipientType.CC, InternetAddress.parse(copia));
             message.setSubject(asunto);
@@ -194,7 +192,6 @@ public class javamail {
             multipart.addBodyPart(messageBodyPart);
             
             message.setContent(multipart);
-            System.out.println("medio");
             Transport.send(message);
 
             System.out.println("El correo ha sido enviado correctamente.");

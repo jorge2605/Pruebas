@@ -110,11 +110,11 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                 
             },
             new String [] {
-                "Codigo", "Descripcion", "Cantidad", "Proyecto", "Cantidad Encontrada", "Localizacion"
+                "Codigo", "Descripcion", "Cantidad", "Proyecto", "Cantidad Encontrada", "Localizacion", "Id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true,false
+                false, false, false, false, true,false, false
             };
             
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -155,7 +155,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select Codigo, Descripcion, Cantidad, Proyecto from requisiciones where NumRequisicion like '" + requisicion + "'";
+            String sql = "select Codigo, Descripcion, Cantidad, Proyecto, Id from requisiciones where NumRequisicion like '" + requisicion + "'";
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[10];
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
@@ -164,6 +164,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                 datos[1] = rs.getString("Descripcion");
                 datos[2] = rs.getString("Cantidad");
                 datos[3] = rs.getString("Proyecto");
+                datos[4] = rs.getString("Id");
                 String sql2 = "select NumeroDeParte,Ubicacion from inventario where NumeroDeParte like '"+datos[0]+"'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql2);
@@ -430,17 +431,17 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
 
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
             },
             new String [] {
-                "Codigo", "Descripcion", "Cantidad", "Proyecto"
+                "Codigo", "Descripcion", "Cantidad", "Proyecto", "Id"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -645,6 +646,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                 int n = 0;
                 
                 Stack<String> pila = new Stack<>();
+                Stack<String> id = new Stack<>();
                 for (int i = 0; i < Tabla1.getRowCount(); i++) {
                     String cantidad;
                     try{cantidad = Tabla1.getValueAt(i, 4).toString();}catch(Exception e){cantidad = "";}
@@ -654,9 +656,12 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                     try{codigo = Tabla1.getValueAt(i, 0).toString();}catch(Exception e){codigo = "";}
                     String ubicacion;
                     try{ubicacion = Tabla1.getValueAt(i, 5).toString();}catch(Exception e){ubicacion = "";}
+                    String ide;
+                    try{ide = Tabla1.getValueAt(i, 6).toString();}catch(Exception e){ide = "";}
                     
                     if(!cantidad.equals("0")){
                         pila.push(codigo);
+                        id.push(ide);
                     }
                     
                     pst.setString(1, cantidad);
@@ -700,7 +705,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                     limpiarBotones();
                     addBotonesPedido();
                     JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                    guardar guardar = new guardar(f,true,pila,lblRequisicion.getText());
+                    guardar guardar = new guardar(f,true,pila,lblRequisicion.getText(), id);
                     guardar.setLocationRelativeTo(f);
                     guardar.setVisible(true);
                 }

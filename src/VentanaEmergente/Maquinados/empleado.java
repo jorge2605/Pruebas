@@ -1,21 +1,25 @@
 package VentanaEmergente.Maquinados;
 
+import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
+import javax.swing.JFrame;
 
 public class empleado extends javax.swing.JDialog {
 
     int x,y;
+    String numero;
+    Frame frame;
     
     public String getEmpleado(){
-        initComponents();
         txtEmpleado.requestFocusInWindow();
-        return txtEmpleado.getText();
+        setVisible(true);
+        return numero;
     }
     
     public empleado(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        setLocationRelativeTo(parent);
-        
+        initComponents();
+        frame = parent;
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -124,6 +128,11 @@ public class empleado extends javax.swing.JDialog {
         btnX.setContentAreaFilled(false);
         btnX.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnX.setFocusPainted(false);
+        btnX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnXActionPerformed(evt);
+            }
+        });
         pnlX.add(btnX);
 
         jPanel4.add(pnlX);
@@ -139,10 +148,12 @@ public class empleado extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmpleadoActionPerformed
+        numero = txtEmpleado.getText();
         dispose();
     }//GEN-LAST:event_txtEmpleadoActionPerformed
 
     private void btnIngresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIngresarActionPerformed
+        numero = txtEmpleado.getText();
         dispose();
     }//GEN-LAST:event_btnIngresarActionPerformed
 
@@ -160,6 +171,10 @@ public class empleado extends javax.swing.JDialog {
         int yy = evt.getYOnScreen();
         this.setLocation(xx - (x), yy - y);
     }//GEN-LAST:event_jLabel1MouseDragged
+
+    private void btnXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXActionPerformed
+        
+    }//GEN-LAST:event_btnXActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

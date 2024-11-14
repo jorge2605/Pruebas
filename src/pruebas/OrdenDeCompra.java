@@ -17,6 +17,8 @@ import VentanaEmergente.Compras.TransferirRequisicion;
 import VentanaEmergente.Compras.enviarCorreo;
 import VentanaEmergente.Compras.verificarTotales;
 import com.app.sockets.chat.Cliente;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import java.io.File;
@@ -51,6 +53,7 @@ import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
@@ -58,6 +61,7 @@ import com.toedter.calendar.JDateChooser;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
@@ -76,6 +80,7 @@ import javax.swing.JTextField;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import jdk.internal.loader.AbstractClassLoaderValue;
+import static pruebas.Disenio1.generateBarcode;
 import scrollPane.ScrollBarCustom;
 
 public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionListener {
@@ -1641,7 +1646,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                         String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + cadena2 + ".pdf";
 //        String ruta = "C:\\Users\\AlmacenPC\\Documents\\Prueba Crear multiple\\"+cadena2+".pdf";
-                        Document document = new Document();
+                        Document document = new Document(PageSize.A4, 36, 36, 36, 60);
                         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
                         document.open();
                         //------------------------------FUENTES---------------------------------
@@ -2061,34 +2066,56 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         tbl4.addCell(c22);
                         tbl4.addCell(c33);
 
-                        //----------------------------------------------------------------------
-                        Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
-                        img.setAbsolutePosition((20), (775));
-                        document.add(img);
-                        document.add(p);
-                        document.add(p7);
-                        document.add(p8);
-                        document.add(p1);
-                        document.add(p2);
-                        document.add(p3);
-                        document.add(p4);
-                        document.add(p5);
-                        document.add(p6);
-                        document.add(Chunk.NEWLINE);
-                        document.add(p9);
-                        document.add(tbl);
-                        document.add(Chunk.NEWLINE);
-                        document.add(tbl1);
-                        document.add(Chunk.NEWLINE);
-                        document.add(tbl2);
-                        document.add(tbl3);
-                        document.add(tbl4);
-                        document.add(p10);
-                        document.add(p11);
-                        document.add(p12);
-                        document.close();
-                        document.open();
-
+                        //Agregar codigo de barras
+                        BufferedImage barcodeImage = Disenio1.generateBarcodeSinLetras(cadena);
+                        try (FileOutputStream out = new FileOutputStream("barcode.png")) {
+                            javax.imageio.ImageIO.write(barcodeImage, "png", out);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                        // Crear un archivo temporal para la imagen del código de barras
+                            File tempFile = File.createTempFile("barcode", ".png");
+                            javax.imageio.ImageIO.write(barcodeImage, "png", tempFile);
+                        
+                            Image im = Image.getInstance(tempFile.getAbsolutePath());
+                            im.setAbsolutePosition((PageSize.A4.getWidth() / 2) - 60, (10));
+                            im.scaleAbsolute(120, 30);
+                            document.add(im);
+                            
+                            //----------------------------------------------------------------------
+                            Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
+                            img.setAbsolutePosition((20), (775));
+                            document.add(img);
+                            document.add(p);
+                            document.add(p7);
+                            document.add(p8);
+                            document.add(p1);
+                            document.add(p2);
+                            document.add(p3);
+                            document.add(p4);
+                            document.add(p5);
+                            document.add(p6);
+                            document.add(Chunk.NEWLINE);
+                            document.add(p9);
+                            document.add(tbl);
+                            document.add(Chunk.NEWLINE);
+                            document.add(tbl1);
+                            document.add(Chunk.NEWLINE);
+                            document.add(tbl2);
+                            document.add(tbl3);
+                            document.add(tbl4);
+                            document.add(p10);
+                            document.add(p11);
+                            document.add(p12);
+                            
+                            document.close();
+                            document.open();
+                            tempFile.delete();
+                        
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                         pila.push(cadena2);
                         pilaProv.push(provedor);
                         id.push(Tabla2.getValueAt(i, 0).toString());
@@ -2258,7 +2285,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                         String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\" + cadena2 + ".pdf";
 //        String ruta = "C:\\Users\\AlmacenPC\\Documents\\Prueba Crear multiple\\"+cadena2+".pdf";
-                        Document document = new Document();
+                        Document document = new Document(PageSize.A4, 36, 36, 36, 60);
                         PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(ruta));
                         document.open();
                         //------------------------------FUENTES---------------------------------
@@ -2640,33 +2667,52 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         tbl4.addCell(c11);
                         tbl4.addCell(c22);
                         tbl4.addCell(c33);
-                        //----------------------------------------------------------------------
-                        Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
-                        img.setAbsolutePosition((20), (775));
-                        document.add(img);
-                        document.add(p);
-                        document.add(p7);
-                        document.add(p8);
-                        document.add(p1);
-                        document.add(p2);
-                        document.add(p3);
-                        document.add(p4);
-                        document.add(p5);
-                        document.add(p6);
-                        document.add(Chunk.NEWLINE);
-                        document.add(p9);
-                        document.add(tbl);
-                        document.add(Chunk.NEWLINE);
-                        document.add(tbl1);
-                        document.add(Chunk.NEWLINE);
-                        document.add(tbl2);
-                        document.add(tbl3);
-                        document.add(tbl4);
-                        document.add(p10);
-                        document.add(p11);
-                        document.add(p12);
-                        document.close();
-
+                        
+                        //Agregar codigo de barras
+                        BufferedImage barcodeImage = Disenio1.generateBarcodeSinLetras(cadena);
+                        try (FileOutputStream out = new FileOutputStream("barcode.png")) {
+                            javax.imageio.ImageIO.write(barcodeImage, "png", out);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        try {
+                        // Crear un archivo temporal para la imagen del código de barras
+                            File tempFile = File.createTempFile("barcode", ".png");
+                            javax.imageio.ImageIO.write(barcodeImage, "png", tempFile);
+                        
+                            Image im = Image.getInstance(tempFile.getAbsolutePath());
+                            im.setAbsolutePosition((PageSize.A4.getWidth() / 2) - 60, (10));
+                            im.scaleAbsolute(120, 30);
+                            document.add(im);
+                            //----------------------------------------------------------------------
+                            Image img = Image.getInstance("C:\\Pruebas\\BD\\3.png");
+                            img.setAbsolutePosition((20), (775));
+                            document.add(img);
+                            document.add(p);
+                            document.add(p7);
+                            document.add(p8);
+                            document.add(p1);
+                            document.add(p2);
+                            document.add(p3);
+                            document.add(p4);
+                            document.add(p5);
+                            document.add(p6);
+                            document.add(Chunk.NEWLINE);
+                            document.add(p9);
+                            document.add(tbl);
+                            document.add(Chunk.NEWLINE);
+                            document.add(tbl1);
+                            document.add(Chunk.NEWLINE);
+                            document.add(tbl2);
+                            document.add(tbl3);
+                            document.add(tbl4);
+                            document.add(p10);
+                            document.add(p11);
+                            document.add(p12);
+                            document.close();
+                        }catch(Exception ex){
+                            JOptionPane.showMessageDialog(this, "Error al crear codigo de barras: " + ex);
+                        }
                     } catch (SQLException ee) {
                         JOptionPane.showMessageDialog(this, "ERROR VER BASE DE DATOS" + ee, "ERROR", JOptionPane.ERROR_MESSAGE);
                     } catch (FileNotFoundException ex) {
@@ -3645,6 +3691,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem12 = new javax.swing.JMenuItem();
+        jMenuItem14 = new javax.swing.JMenuItem();
 
         jMenuItem2.setText("jMenuItem2");
 
@@ -4585,6 +4632,14 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
             }
         });
         jMenu4.add(jMenuItem12);
+
+        jMenuItem14.setText("Orden de compra");
+        jMenuItem14.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem14ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem14);
 
         jMenuBar1.add(jMenu4);
 
@@ -5705,6 +5760,10 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         transferir.setVisible(true);
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
+    private void jMenuItem14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem14ActionPerformed
+        OrdenDeCompraNormal();
+    }//GEN-LAST:event_jMenuItem14ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem AbrirOrden;
@@ -5756,6 +5815,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
+    private javax.swing.JMenuItem jMenuItem14;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;

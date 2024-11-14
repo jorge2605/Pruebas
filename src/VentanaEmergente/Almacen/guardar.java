@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 public class guardar extends javax.swing.JDialog implements MouseListener{
 
     public JLabel lblCodigo[];
+    public Stack<String> id;
     public JFormattedTextField txtFormato[];
     public String requisicion;
     
@@ -75,10 +76,11 @@ public class guardar extends javax.swing.JDialog implements MouseListener{
         return band;
     }
     
-    public guardar(java.awt.Frame parent, boolean modal, Stack<String> codigo, String requisicion) {
+    public guardar(java.awt.Frame parent, boolean modal, Stack<String> codigo, String requisicion, Stack<String> id) {
         super(parent, modal);
         initComponents();
         addFormato(codigo);
+        this.id = id;
         this.requisicion = requisicion;
     }
 
@@ -204,14 +206,14 @@ public class guardar extends javax.swing.JDialog implements MouseListener{
                 Connection con;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
-                String sql = "update requisiciones set Ubicacion = ? where Codigo = ? and NumRequisicion = ?";
+                String sql = "update requisiciones set Ubicacion = ? where Codigo = ? and Id = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
                 
                 int n = 0;
                 for (int i = 0; i < txtFormato.length; i++) {
                     pst.setString(1, txtFormato[i].getText());
                     pst.setString(2, lblCodigo[i].getText());
-                    pst.setString(3, this.requisicion);
+                    pst.setString(3, id.get(i));
 
                     n += pst.executeLargeUpdate();
                 }
@@ -271,7 +273,7 @@ public class guardar extends javax.swing.JDialog implements MouseListener{
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                guardar dialog = new guardar(new javax.swing.JFrame(), true, null, "4272");
+                guardar dialog = new guardar(new javax.swing.JFrame(), true, null, "4272", null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

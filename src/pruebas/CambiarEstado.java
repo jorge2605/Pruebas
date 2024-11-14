@@ -1047,7 +1047,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
             }else{
                 Thread hilo = new Thread() {
                    public void run(){
-                       Informacion.setText("Informacion de planos " + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "                         ");
+                        Informacion.setText("Informacion de planos " + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "                         ");
                         espera.activar();
                         espera.setVisible(true);
                         limpiarTabla();

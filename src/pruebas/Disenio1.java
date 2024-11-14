@@ -215,6 +215,26 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
         return canvas.getBufferedImage();
     }
     
+    public static BufferedImage generateBarcodeSinLetras(String code) throws IOException {
+        Code39Bean barcodeBean = new Code39Bean();
+        final int dpi = 150;
+        
+        // Configuración del generador de código de barras
+        barcodeBean.setModuleWidth(0.2); // Reducir el ancho del módulo
+        barcodeBean.setWideFactor(3);  // Ajustar el factor de ampliación
+        barcodeBean.doQuietZone(false);  // Deshabilitar la zona de silencio
+        
+        // Deshabilitar el texto debajo del código de barras
+        barcodeBean.setMsgPosition(org.krysalis.barcode4j.HumanReadablePlacement.HRP_NONE);
+        
+        // Crear el canvas para el código de barras
+        BitmapCanvasProvider canvas = new BitmapCanvasProvider(dpi, BufferedImage.TYPE_BYTE_BINARY, false, 0);
+        barcodeBean.generateBarcode(canvas, code);
+        canvas.finish();
+        
+        return canvas.getBufferedImage();
+    }
+    
     public String convertirPdf(File selectedFile, String path, Dimension dim){
             try {
                 String numeroPlano = txtProyecto.getText().substring(0, txtProyecto.getText().indexOf(" "));

@@ -34,6 +34,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class Maquinados extends javax.swing.JInternalFrame implements ActionListener {
 
@@ -121,14 +122,30 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         }
     }
     
+    public void setEmpleado(){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "'";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                lblEmpleado.setText(rs.getString("Nombre") + " " + rs.getString("Apellido"));
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public String getNumEmpleado(){
         String empleado;
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         emp = new empleado(f,true);
-        empleado = emp.getEmpleado();
-        
         emp.btnX.addActionListener(this);
-        emp.setVisible(true);
+        empleado = emp.getEmpleado();
+        numEmpleado = empleado;
+        setEmpleado();
         return empleado;
     }
     
@@ -289,6 +306,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         initComponents();
         this.numEmpleado = numEmpleado;
         jScrollPane5.getVerticalScrollBar().setUnitIncrement(15);
+        SwingUtilities.invokeLater(() -> getNumEmpleado());
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
     }
 
@@ -351,6 +369,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel10 = new javax.swing.JLabel();
         panelRound1 = new scrollPane.PanelRound();
         jButton1 = new javax.swing.JButton();
+        lblEmpleado = new javax.swing.JLabel();
 
         setBorder(null);
 
@@ -521,7 +540,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel14.setText("*");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         jPanel11.add(jLabel14, gridBagConstraints);
 
         jLabel15.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
@@ -529,7 +548,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel15.setText("*");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         jPanel11.add(jLabel15, gridBagConstraints);
 
         jLabel16.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
@@ -537,7 +556,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel16.setText("*");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         jPanel11.add(jLabel16, gridBagConstraints);
 
         jLabel18.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
@@ -545,7 +564,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel18.setText("*");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         jPanel11.add(jLabel18, gridBagConstraints);
 
         jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
@@ -554,7 +573,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel4.setText("Plano:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel4, gridBagConstraints);
@@ -568,7 +587,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         txtPlano2.setPreferredSize(new java.awt.Dimension(300, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(txtPlano2, gridBagConstraints);
@@ -579,7 +598,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel5.setText("Proyecto:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel5, gridBagConstraints);
@@ -593,7 +612,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         txtProyecto.setPreferredSize(new java.awt.Dimension(300, 30));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(txtProyecto, gridBagConstraints);
@@ -604,7 +623,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel6.setText("Dimensiones:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel6, gridBagConstraints);
@@ -625,7 +644,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(txtDimensiones, gridBagConstraints);
@@ -636,7 +655,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel7.setText("Material:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel7, gridBagConstraints);
@@ -657,7 +676,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(txtMaterial, gridBagConstraints);
@@ -668,7 +687,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel8.setText("Cantidad:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel8, gridBagConstraints);
@@ -694,7 +713,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(txtCantidad, gridBagConstraints);
@@ -705,7 +724,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel9.setText("Comentarios:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel9, gridBagConstraints);
@@ -725,7 +744,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(txtComentarios, gridBagConstraints);
@@ -850,7 +869,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 13;
         jPanel11.add(jPanel19, gridBagConstraints);
@@ -861,7 +880,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel10.setText("Maquina:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(13, 9, 13, 9);
         jPanel11.add(jLabel10, gridBagConstraints);
@@ -891,12 +910,21 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.ipadx = 80;
         gridBagConstraints.ipady = 13;
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
         jPanel11.add(panelRound1, gridBagConstraints);
+
+        lblEmpleado.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        lblEmpleado.setForeground(new java.awt.Color(51, 51, 51));
+        lblEmpleado.setText("Empleado");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 3;
+        jPanel11.add(lblEmpleado, gridBagConstraints);
 
         jPanel9.add(jPanel11, java.awt.BorderLayout.CENTER);
 
@@ -1158,6 +1186,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JLabel lblEmpleado;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JLabel lblTC;
     private javax.swing.JLabel lblTF;
@@ -1193,8 +1222,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         }
         if(emp != null){
             if(e.getSource() == emp.btnX){
-                emp.dispose();
                 this.dispose();
+                emp.dispose();
             }
         }
     }

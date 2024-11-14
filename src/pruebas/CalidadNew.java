@@ -578,7 +578,8 @@ public class CalidadNew extends javax.swing.JInternalFrame implements MouseListe
         Tabla1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
 
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{},
+                new Object[][]
+                {{"","","","","","","","",""}},
                 new String[]{
                     "Punto", "Nominal", "Limite alto", "Limite bajo", "Real", "Aprobado", "Observaciones", "X", "Y"
                 }
@@ -794,7 +795,7 @@ public class CalidadNew extends javax.swing.JInternalFrame implements MouseListe
         Tabla1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-
+                {null, null, null, null, null, null, null, null, null}
             },
             new String [] {
                 "Punto", "Nominal", "Limite alto", "Limite bajo", "Real", "Aprobado", "Observaciones", "X", "Y"

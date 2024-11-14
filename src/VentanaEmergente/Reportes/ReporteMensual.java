@@ -3,6 +3,7 @@ package VentanaEmergente.Reportes;
 import Conexiones.Conexion;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -74,21 +76,21 @@ public final class ReporteMensual extends javax.swing.JDialog {
     
     public void limpiarTabla(){
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        new Object [][] {
 
-            },
-            new String [] {
-                "REQUISICION", "PO", "N.P", "DESCRIPCION","CANTIDAD", "MONEDA","P.U" ,"TOTAL", "PRECIO RECIBIDO", "PRECIO FALTANTE", "FECHA REQUISICION", "FECHA RECIBO"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false,false,false, false, false
-            };
-            
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
+        },
+        new String [] {
+            "Requisicion", "PO", "N.P", "Descripcion", "Cantidad", "Moneda", "P.U", "Total", "Precio recibido", "Precio faltante", "Fecha requisicion", "Fecha recibo", "Fecha O.C.", "Fecha T.E.", "Proveedor", "Proyecto"
+        }
+    ) {
+        boolean[] canEdit = new boolean [] {
+            false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+        };
+
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return canEdit [columnIndex];
+        }
+    });
         Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
         Tabla1.getTableHeader().setOpaque(false);
         Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
@@ -180,7 +182,7 @@ public final class ReporteMensual extends javax.swing.JDialog {
             }
             String sql = "SELECT * FROM ordencompra WHERE RequisicionNo between '"+inicio+"' and '"+fin+"' order by Id desc;";
             ResultSet rs = st.executeQuery(sql);
-            String datos[] = new String[18];
+            String datos[] = new String[20];
             double total = 0;
             int ini = Integer.parseInt(inicio);
             while(rs.next()){
@@ -200,7 +202,7 @@ public final class ReporteMensual extends javax.swing.JDialog {
                 }
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql2);
-                String d[] = new String[15];
+                String d[] = new String[20];
                 double t1 = 0,t2 = 0;
                 double total2 = 0;
                 while(rs2.next()){
@@ -215,6 +217,7 @@ public final class ReporteMensual extends javax.swing.JDialog {
                     datos[15] = rs2.getString("Precio");
                     datos[16] = rs2.getString("FechaRecibo");
                     datos[17] = rs2.getString("NumRequisicion");
+                    datos[18] = rs2.getString("TE");
                     String sql3 = "SELECT * FROM registroprov_compras where Nombre like '"+datos[9]+"'";
                     Statement st3 = con.createStatement();
                     ResultSet rs3 = st3.executeQuery(sql3);
@@ -233,6 +236,14 @@ public final class ReporteMensual extends javax.swing.JDialog {
                         numrequi = rs6.getString("Fecha");
                     }
                     
+                    String sql8 = "select Fecha,OrdenNo from ordencompra where OrdenNo like '"+datos[0]+"'";
+                    Statement st8 = con.createStatement();
+                    ResultSet rs8 = st8.executeQuery(sql8);
+                    String fechaOC = "";
+                    while(rs8.next()){
+                        fechaOC = rs8.getString("Fecha");
+
+                    }
                     if(moneda.equals("MXN")){
                             totalMxn += (Double.parseDouble(rs2.getString("Precio")) * Double.parseDouble(rs2.getString("Cantidad")));
                             precio = (Double.parseDouble(rs2.getString("Precio")) * Double.parseDouble(rs2.getString("Cantidad")));
@@ -273,6 +284,10 @@ public final class ReporteMensual extends javax.swing.JDialog {
                     d[9] = String.valueOf(t2);
                     d[10] = numrequi;
                     d[11] = datos[16];
+                    d[12] = fechaOC;
+                    d[13] = datos[18];
+                    d[14] = datos[9];
+                    d[15] = datos[10];
                 
                 total += precioTotal;
                 if(total2 != 0){
@@ -280,6 +295,7 @@ public final class ReporteMensual extends javax.swing.JDialog {
                 }
                     }catch(Exception e){
                         System.out.println("error "+e);
+                        e.printStackTrace();
                     }
                 }
             }
@@ -343,15 +359,16 @@ public final class ReporteMensual extends javax.swing.JDialog {
                 datos[15] = rs.getString("Precio");
                 datos[16] = rs.getString("FechaRecibo");
                 datos[17] = rs.getString("NumRequisicion");
+                datos[18] = rs.getString("TE");
                 if(datos[0] != null){
                     if(!datos[0].equals("")){
                         String val;
                         try{
-                            val = datos[0].substring(0,3);
+                            val = datos[0].substring(0,2);
                         }catch(Exception e){
                             val = "";
                         }
-                        if(val.equals("OCM")){
+                        if(val.equals("OC")){
                             String sql3 = "SELECT * FROM registroprov_compras where Nombre like '"+datos[9]+"'";
                             Statement st3 = con.createStatement();
                             ResultSet rs3 = st3.executeQuery(sql3);
@@ -370,6 +387,15 @@ public final class ReporteMensual extends javax.swing.JDialog {
                             while(rs6.next()){
                                 numrequi = rs6.getString("Fecha");
                                 progreso = rs6.getString("Progreso");
+
+                            }
+
+                            String sql8 = "select Fecha,OrdenNo from ordencompra where OrdenNo like '"+datos[0]+"'";
+                            Statement st8 = con.createStatement();
+                            ResultSet rs8 = st8.executeQuery(sql8);
+                            String fechaOC = "";
+                            while(rs8.next()){
+                                fechaOC = rs8.getString("Fecha");
 
                             }
                             if(!progreso.equals("CANCELADO")){
@@ -418,6 +444,10 @@ public final class ReporteMensual extends javax.swing.JDialog {
                                 d[9] = String.valueOf(t2);
                                 d[10] = numrequi;
                                 d[11] = datos[16];
+                                d[12] = fechaOC;
+                                d[13] = datos[18];
+                                d[14] = datos[9];
+                                d[15] = datos[10];
 
                 //            total += precioTotal;
                                 if(total2 != 0){
@@ -529,7 +559,7 @@ public final class ReporteMensual extends javax.swing.JDialog {
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel1.setFont(new java.awt.Font("Roboto Black", 0, 36)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 102, 204));
         jLabel1.setText("           REPORTE MENSUAL DE GASTOS           ");
         jLabel1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 0, 0, new java.awt.Color(0, 102, 204)));
@@ -860,11 +890,11 @@ public final class ReporteMensual extends javax.swing.JDialog {
 
             },
             new String [] {
-                "REQUISICION", "PO", "N.P", "DESCRIPCION", "CANTIDAD", "MONEDA", "P.U", "TOTAL", "PRECIO RECIBIDO", "PRECIO FALTANTE", "FECHA REQUISICION", "FECHA RECIBO"
+                "Requisicion", "PO", "N.P", "Descripcion", "Cantidad", "Moneda", "P.U", "Total", "Precio recibido", "Precio faltante", "Fecha requisicion", "Fecha recibo", "Fecha O.C.", "Fecha T.E.", "Proveedor", "Proyecto"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, true, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -896,291 +926,299 @@ public final class ReporteMensual extends javax.swing.JDialog {
         if(Tabla1.getRowCount() == 0){
             JOptionPane.showMessageDialog(this, "LA TABLA DEBE CONTENER REGISTROS");
         }else{
-            Workbook book;
-            try {
-                JFileChooser fc = new JFileChooser();
-                File archivo = null;
-                fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
-                int n = fc.showSaveDialog(this);
+            JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+            Thread hilo = new Thread() {
+                public void run(){
+                    Workbook book;
+                    try {
+                        btnExcel.setEnabled(false);
+                        JFileChooser fc = new JFileChooser();
+                        File archivo = null;
+                        fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
+                        int n = fc.showSaveDialog(f);
 
-                if(n == JFileChooser.APPROVE_OPTION){
-                    archivo = fc.getSelectedFile();
-                }
-                String a = ""+archivo;
-                if(a.endsWith("xls")){
-                    book = new  HSSFWorkbook();
-                }else {
-                    book = new XSSFWorkbook();
-                    a = archivo + ".xlsx";
-                }
-
-                Sheet hoja = book.createSheet("Reporte de ordenes de compra");
-                Row fila = hoja.createRow(2);
-                Cell col = fila.createCell(2);
-
-                //-------------------------------ESTILOS
-                Font font = book.createFont();
-                CellStyle estilo1 = book.createCellStyle();
-
-                Font font3 = book.createFont();
-                CellStyle estilo3 = book.createCellStyle();
-
-                font.setBold(true);
-
-                font.setColor(IndexedColors.BLACK.getIndex());
-                font.setFontHeightInPoints((short)12);
-                estilo1.setFont(font);
-
-                estilo1.setAlignment(HorizontalAlignment.LEFT);
-
-                font3.setBold(false);
-                font3.setColor(IndexedColors.BLACK.getIndex());
-                font3.setFontHeightInPoints((short)15);
-                estilo3.setFont(font3);
-
-                estilo3.setAlignment(HorizontalAlignment.CENTER);
-                estilo3.setWrapText(true);
-
-                //--------------------------------------
-                //        hoja.setColumnWidth(2, 5000);
-                //---------------------------------------
-
-                hoja.setColumnWidth(2, 8200);
-                hoja.setColumnWidth(3, 3300);
-                hoja.setColumnWidth(4, 3600);
-                hoja.setColumnWidth(5, 14000);
-                hoja.setColumnWidth(6, 4100);
-                hoja.setColumnWidth(7, 4100);
-
-                Font font1 = book.createFont();
-                XSSFCellStyle style = (XSSFCellStyle) book.createCellStyle();
-
-                XSSFColor color = new XSSFColor(new java.awt.Color(32, 55, 99)); // RGB: (255, 0, 0) - Rojo
-                style.setFillForegroundColor(color);
-                style.setFillPattern(SOLID_FOREGROUND);
-                style.setAlignment(HorizontalAlignment.CENTER);
-
-                font1.setBold(true);
-                font1.setColor(IndexedColors.WHITE.getIndex());
-                font1.setFontHeightInPoints((short)16);
-                style.setFont(font1);
-
-                Font font2 = book.createFont();
-                XSSFCellStyle style2 = (XSSFCellStyle) book.createCellStyle();
-
-                style2.setVerticalAlignment(VerticalAlignment.BOTTOM);
-                style2.setAlignment(HorizontalAlignment.CENTER);
-                style2.setWrapText(true);
-
-                font2.setBold(true);
-                font2.setColor(IndexedColors.BLACK.getIndex());
-                font2.setFontHeightInPoints((short)12);
-                style2.setFont(font2);
-                //        -----------------------------------------------------
-                Font font4 = book.createFont();
-                XSSFCellStyle style4 = (XSSFCellStyle) book.createCellStyle();
-
-                XSSFColor color4 = new XSSFColor(new java.awt.Color(216, 225, 242)); // RGB: (255, 0, 0) - Rojo
-                style4.setFillForegroundColor(color4);
-                style4.setFillPattern(SOLID_FOREGROUND);
-                style4.setAlignment(HorizontalAlignment.CENTER);
-
-                font4.setBold(true);
-                font4.setColor(IndexedColors.BLACK.getIndex());
-                font4.setFontHeightInPoints((short)12);
-                style4.setFont(font4);
-                //        -----------------------------------------------------
-                XSSFCellStyle style5 = (XSSFCellStyle) book.createCellStyle();
-
-                XSSFColor color5 = new XSSFColor(new java.awt.Color(188, 199, 231)); // RGB: (255, 0, 0) - Rojo
-                style5.setFillForegroundColor(color5);
-                style5.setFillPattern(SOLID_FOREGROUND);
-                style5.setAlignment(HorizontalAlignment.CENTER);
-
-                style5.setFont(font4);
-                //        -----------------------------------------------------
-                XSSFCellStyle style6 = (XSSFCellStyle) book.createCellStyle();
-
-                XSSFColor color6 = new XSSFColor(new java.awt.Color(142, 168, 216)); // RGB: (255, 0, 0) - Rojo
-                style6.setFillForegroundColor(color6);
-                style6.setFillPattern(SOLID_FOREGROUND);
-                style6.setAlignment(HorizontalAlignment.CENTER);
-
-                style6.setFont(font4);
-
-                hoja.addMergedRegion(new CellRangeAddress (
-                    2,
-                    2,
-                    2,
-                    11
-                ));
-
-                hoja.addMergedRegion(new CellRangeAddress (
-                    4,
-                    4,
-                    3,
-                    5
-                ));
-
-                hoja.addMergedRegion(new CellRangeAddress (
-                    5,
-                    5,
-                    3,
-                    5
-                ));
-                hoja.addMergedRegion(new CellRangeAddress (
-                    6,
-                    6,
-                    3,
-                    5
-                ));
-
-                Map<String, Object> properties = new HashMap<String, Object>();
-                properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
-                properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-                properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
-                properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-
-                properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-                properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-                properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-                properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-
-                col.setCellStyle(style);
-                col.setCellValue("Reporte de ordenes de compra");
-                
-                //-----------------------------------------------------------------
-                //-----------------------------------------------------------------
-                //-----------------------------------------------------------------
-                Row fila2 = hoja.createRow(4);
-                Cell col2 = fila2.createCell(2);
-
-                col2.setCellStyle(style2);
-                col2.setCellValue("Total MXN:");
-                //--------------------------------------------------------------
-                Cell col5 = fila2.createCell(3);
-                DecimalFormat formato = new DecimalFormat("#,##0.00");
-                
-                Number ad = 0;
-                try{
-                ad = formato.parse(lblTotalMxn.getText());
-                }catch(Exception e){
-                    ad = 0;
-                }
-                double t = ad.doubleValue();
-                
-                col5.setCellStyle(style4);
-                col5.setCellValue(t);
-                //        ---------------------------------------------------
-                Row fila3 = hoja.createRow(5);
-                Cell col3 = fila3.createCell(2);
-
-                col3.setCellStyle(style2);
-                col3.setCellValue("Total USD:");
-                
-                //-----------------------------------------------------------------
-                //-----------------------------------------------------------------
-                //-----------------------------------------------------------------
-                Cell col6 = fila3.createCell(3);
-                
-                try{
-                ad = formato.parse(lblTotalUsd.getText());
-                }catch(Exception e){
-                    ad = 0;
-                }
-                t = ad.doubleValue();
-                col6.setCellStyle(style5);
-                col6.setCellValue(t);
-                //--------------------------------------------------------------
-                Row fila4 = hoja.createRow(6);
-                Cell col4 = fila4.createCell(2);
-
-                col4.setCellStyle(style2);
-                col4.setCellValue("Precio venta:");
-                //--------------------------------------------
-                Cell col7 = fila4.createCell(3);
-                
-                try{
-                ad = formato.parse(lblCostoProyecto.getText());
-                }catch(Exception e){
-                    ad = 0;
-                }
-                t = ad.doubleValue();
-                col7.setCellStyle(style6);
-                col7.setCellValue(t);
-
-                //-----------------------------------------------------------------
-                
-                for (int i = -1; i < Tabla1.getRowCount(); i++) {
-                    Row fila10=hoja.createRow(i+9);
-                    for (int j = 0; j < Tabla1.getColumnCount(); j++) {
-                        Cell celda=fila10.createCell(j+2);
-                        if(i == -1 && (j >= 0 && j < Tabla1.getColumnCount())){
-                            XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
-                            Font f = book.createFont();
-                            XSSFColor color1 = new XSSFColor(new java.awt.Color(49, 84, 151)); // RGB: (255, 0, 0) - Rojo
-                            s.setFillForegroundColor(color1);
-                            s.setFillPattern(SOLID_FOREGROUND);
-                            f.setBold(true);
-
-                            f.setColor(IndexedColors.WHITE.getIndex());
-                            s.setFont(f);
-                            s.setAlignment(HorizontalAlignment.CENTER);
-                            celda.setCellStyle(s);
-                        }
-
-                        if(i > -1 && (j > -1 && j < Tabla1.getColumnCount()) && (i%2 == 0)){
-                            XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
-                            XSSFColor color1 = new XSSFColor(new java.awt.Color(216, 225, 242));
-                            s.setFillForegroundColor(color1);
-                            s.setFillPattern(SOLID_FOREGROUND);
-                            celda.setCellStyle(s);
-                        }
-
-                        if(i==-1){
-                            celda.setCellValue(String.valueOf(Tabla1.getColumnName(j)));
-                            //                        CellUtil.setCellStyleProperties(celda, properties);
-                        }else{
-                            if(j == 3){
-                                XSSFCellStyle ss = (XSSFCellStyle) book.createCellStyle();
-                                ss.setWrapText(true);
-
-                                if(i%2 == 0){
-                                    XSSFColor color1 = new XSSFColor(new java.awt.Color(216, 225, 242));
-                                    ss.setFillForegroundColor(color1);
-                                    ss.setFillPattern(SOLID_FOREGROUND);
-
-                                }
-                                celda.setCellStyle(ss);
-                            }
-                            if(j >= 6 && j < 10){
-                                double d = Double.parseDouble((String) Tabla1.getValueAt(i, j));
-                                String ni = d + "";
-                                ad = formato.parse(ni);
-                                t = ad.doubleValue();
-                                celda.setCellValue(t);
+                        if(n == JFileChooser.APPROVE_OPTION){
+                            archivo = fc.getSelectedFile();
+                            String a = ""+archivo;
+                            if(a.endsWith("xls")){
+                                book = new  HSSFWorkbook();
+                            }else if(a.endsWith("xlsx")){
+                                book = new XSSFWorkbook();
                             }else{
-                                celda.setCellValue(String.valueOf(Tabla1.getValueAt(i, j)));
-                                //                        CellUtil.setCellStyleProperties(celda, properties);
+                                a = archivo + ".xlsx";
+                                book = new XSSFWorkbook();
                             }
-                        }
-                        try{
-                            book.write(new FileOutputStream(a));
-                        }catch(Exception e){
-                            JOptionPane.showMessageDialog(this, "Error: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-                        }
 
+                            Sheet hoja = book.createSheet("Reporte de ordenes de compra");
+                            Row fila = hoja.createRow(2);
+                            Cell col = fila.createCell(2);
+
+                            //-------------------------------ESTILOS
+                            Font font = book.createFont();
+                            CellStyle estilo1 = book.createCellStyle();
+
+                            Font font3 = book.createFont();
+                            CellStyle estilo3 = book.createCellStyle();
+
+                            font.setBold(true);
+
+                            font.setColor(IndexedColors.BLACK.getIndex());
+                            font.setFontHeightInPoints((short)12);
+                            estilo1.setFont(font);
+
+                            estilo1.setAlignment(HorizontalAlignment.LEFT);
+
+                            font3.setBold(false);
+                            font3.setColor(IndexedColors.BLACK.getIndex());
+                            font3.setFontHeightInPoints((short)15);
+                            estilo3.setFont(font3);
+
+                            estilo3.setAlignment(HorizontalAlignment.CENTER);
+                            estilo3.setWrapText(true);
+
+                            //--------------------------------------
+                            //        hoja.setColumnWidth(2, 5000);
+                            //---------------------------------------
+
+                            hoja.setColumnWidth(2, 8200);
+                            hoja.setColumnWidth(3, 3300);
+                            hoja.setColumnWidth(4, 3600);
+                            hoja.setColumnWidth(5, 14000);
+                            hoja.setColumnWidth(6, 4100);
+                            hoja.setColumnWidth(7, 4100);
+
+                            Font font1 = book.createFont();
+                            XSSFCellStyle style = (XSSFCellStyle) book.createCellStyle();
+
+                            XSSFColor color = new XSSFColor(new java.awt.Color(32, 55, 99)); // RGB: (255, 0, 0) - Rojo
+                            style.setFillForegroundColor(color);
+                            style.setFillPattern(SOLID_FOREGROUND);
+                            style.setAlignment(HorizontalAlignment.CENTER);
+
+                            font1.setBold(true);
+                            font1.setColor(IndexedColors.WHITE.getIndex());
+                            font1.setFontHeightInPoints((short)16);
+                            style.setFont(font1);
+
+                            Font font2 = book.createFont();
+                            XSSFCellStyle style2 = (XSSFCellStyle) book.createCellStyle();
+
+                            style2.setVerticalAlignment(VerticalAlignment.BOTTOM);
+                            style2.setAlignment(HorizontalAlignment.CENTER);
+                            style2.setWrapText(true);
+
+                            font2.setBold(true);
+                            font2.setColor(IndexedColors.BLACK.getIndex());
+                            font2.setFontHeightInPoints((short)12);
+                            style2.setFont(font2);
+                            //        -----------------------------------------------------
+                            Font font4 = book.createFont();
+                            XSSFCellStyle style4 = (XSSFCellStyle) book.createCellStyle();
+
+                            XSSFColor color4 = new XSSFColor(new java.awt.Color(216, 225, 242)); // RGB: (255, 0, 0) - Rojo
+                            style4.setFillForegroundColor(color4);
+                            style4.setFillPattern(SOLID_FOREGROUND);
+                            style4.setAlignment(HorizontalAlignment.CENTER);
+
+                            font4.setBold(true);
+                            font4.setColor(IndexedColors.BLACK.getIndex());
+                            font4.setFontHeightInPoints((short)12);
+                            style4.setFont(font4);
+                            //        -----------------------------------------------------
+                            XSSFCellStyle style5 = (XSSFCellStyle) book.createCellStyle();
+
+                            XSSFColor color5 = new XSSFColor(new java.awt.Color(188, 199, 231)); // RGB: (255, 0, 0) - Rojo
+                            style5.setFillForegroundColor(color5);
+                            style5.setFillPattern(SOLID_FOREGROUND);
+                            style5.setAlignment(HorizontalAlignment.CENTER);
+
+                            style5.setFont(font4);
+                            //        -----------------------------------------------------
+                            XSSFCellStyle style6 = (XSSFCellStyle) book.createCellStyle();
+
+                            XSSFColor color6 = new XSSFColor(new java.awt.Color(142, 168, 216)); // RGB: (255, 0, 0) - Rojo
+                            style6.setFillForegroundColor(color6);
+                            style6.setFillPattern(SOLID_FOREGROUND);
+                            style6.setAlignment(HorizontalAlignment.CENTER);
+
+                            style6.setFont(font4);
+
+                            hoja.addMergedRegion(new CellRangeAddress (
+                                2,
+                                2,
+                                2,
+                                17
+                            ));
+
+                            hoja.addMergedRegion(new CellRangeAddress (
+                                4,
+                                4,
+                                3,
+                                5
+                            ));
+
+                            hoja.addMergedRegion(new CellRangeAddress (
+                                5,
+                                5,
+                                3,
+                                5
+                            ));
+                            hoja.addMergedRegion(new CellRangeAddress (
+                                6,
+                                6,
+                                3,
+                                5
+                            ));
+
+                            Map<String, Object> properties = new HashMap<String, Object>();
+                            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+                            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+                            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+                            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+
+                            properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                            properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                            properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+                            properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+
+                            col.setCellStyle(style);
+                            col.setCellValue("Reporte de ordenes de compra");
+
+                            //-----------------------------------------------------------------
+                            //-----------------------------------------------------------------
+                            //-----------------------------------------------------------------
+                            Row fila2 = hoja.createRow(4);
+                            Cell col2 = fila2.createCell(2);
+
+                            col2.setCellStyle(style2);
+                            col2.setCellValue("Total MXN:");
+                            //--------------------------------------------------------------
+                            Cell col5 = fila2.createCell(3);
+                            DecimalFormat formato = new DecimalFormat("#,##0.00");
+
+                            Number ad = 0;
+                            try{
+                                ad = formato.parse(lblTotalMxn.getText());
+                            }catch(Exception e){
+                                ad = 0;
+                            }
+                            double t = ad.doubleValue();
+
+                            col5.setCellStyle(style4);
+                            col5.setCellValue(t);
+                            //        ---------------------------------------------------
+                            Row fila3 = hoja.createRow(5);
+                            Cell col3 = fila3.createCell(2);
+
+                            col3.setCellStyle(style2);
+                            col3.setCellValue("Total USD:");
+
+                            //-----------------------------------------------------------------
+                            //-----------------------------------------------------------------
+                            //-----------------------------------------------------------------
+                            Cell col6 = fila3.createCell(3);
+
+                            try{
+                            ad = formato.parse(lblTotalUsd.getText());
+                            }catch(Exception e){
+                                ad = 0;
+                            }
+                            t = ad.doubleValue();
+                            col6.setCellStyle(style5);
+                            col6.setCellValue(t);
+                            //--------------------------------------------------------------
+                            Row fila4 = hoja.createRow(6);
+                            Cell col4 = fila4.createCell(2);
+
+                            col4.setCellStyle(style2);
+                            col4.setCellValue("Precio venta:");
+                            //--------------------------------------------
+                            Cell col7 = fila4.createCell(3);
+
+                            try{
+                            ad = formato.parse(lblCostoProyecto.getText());
+                            }catch(Exception e){
+                                ad = 0;
+                            }
+                            t = ad.doubleValue();
+                            col7.setCellStyle(style6);
+                            col7.setCellValue(t);
+
+                            //-----------------------------------------------------------------
+
+                            for (int i = -1; i < Tabla1.getRowCount(); i++) {
+                                Row fila10=hoja.createRow(i+9);
+                                for (int j = 0; j < Tabla1.getColumnCount(); j++) {
+                                    Cell celda=fila10.createCell(j+2);
+                                    if(i == -1 && (j >= 0 && j < Tabla1.getColumnCount())){
+                                        XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
+                                        Font f = book.createFont();
+                                        XSSFColor color1 = new XSSFColor(new java.awt.Color(49, 84, 151)); // RGB: (255, 0, 0) - Rojo
+                                        s.setFillForegroundColor(color1);
+                                        s.setFillPattern(SOLID_FOREGROUND);
+                                        f.setBold(true);
+
+                                        f.setColor(IndexedColors.WHITE.getIndex());
+                                        s.setFont(f);
+                                        s.setAlignment(HorizontalAlignment.CENTER);
+                                        celda.setCellStyle(s);
+                                    }
+
+                                    if(i > -1 && (j > -1 && j < Tabla1.getColumnCount()) && (i%2 == 0)){
+                                        XSSFCellStyle s = (XSSFCellStyle) book.createCellStyle();
+                                        XSSFColor color1 = new XSSFColor(new java.awt.Color(216, 225, 242));
+                                        s.setFillForegroundColor(color1);
+                                        s.setFillPattern(SOLID_FOREGROUND);
+                                        celda.setCellStyle(s);
+                                    }
+
+                                    if(i==-1){
+                                        celda.setCellValue(String.valueOf(Tabla1.getColumnName(j)));
+                                        //                        CellUtil.setCellStyleProperties(celda, properties);
+                                    }else{
+                                        if(j == 3){
+                                            XSSFCellStyle ss = (XSSFCellStyle) book.createCellStyle();
+                                            ss.setWrapText(true);
+
+                                            if(i%2 == 0){
+                                                XSSFColor color1 = new XSSFColor(new java.awt.Color(216, 225, 242));
+                                                ss.setFillForegroundColor(color1);
+                                                ss.setFillPattern(SOLID_FOREGROUND);
+
+                                            }
+                                            celda.setCellStyle(ss);
+                                        }
+                                        if(j >= 6 && j < 10){
+                                            double d = Double.parseDouble((String) Tabla1.getValueAt(i, j));
+                                            String ni = d + "";
+                                            ad = formato.parse(ni);
+                                            t = ad.doubleValue();
+                                            celda.setCellValue(t);
+                                        }else{
+                                            celda.setCellValue(String.valueOf(Tabla1.getValueAt(i, j)));
+                                        }
+                                    }
+                                    book.write(new FileOutputStream(a));
+                                }
+                            }
+                            btnExcel.setEnabled(true);
+                            book.close();
+                            Desktop.getDesktop().open(new File(a));
+                        }
+                        btnExcel.setEnabled(true);
+                    } catch (FileNotFoundException ex) {
+                        btnExcel.setEnabled(true);
+                        Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        btnExcel.setEnabled(true);
+                        Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ParseException ex) {
+                        btnExcel.setEnabled(true);
+                        Logger.getLogger(ReporteMensual.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
-                
-                book.close();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (ParseException ex) {
-                Logger.getLogger(ReporteMensual.class.getName()).log(Level.SEVERE, null, ex);
             }
+        };
+        hilo.start();
         }
     }//GEN-LAST:event_btnExcelActionPerformed
 
