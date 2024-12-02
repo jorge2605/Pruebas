@@ -30,6 +30,19 @@ public class Fechas{
     FF Noviembre2024 = new FF("2024-10-28","2024-11-01",5,44);
     FF Diciembre2024 = new FF("2024-11-02","2024-12-29",4,49);
     
+    FF Enero2025 = new FF("2024-12-30","2025-02-02",5,1);
+    FF Febrero2025 = new FF("2025-02-03","2025-03-02",4,6);
+    FF Marzo2025 = new FF("2025-03-03","2025-04-06",5,10);
+    FF Abril2025 = new FF("2025-04-07","2025-05-04",4,15);
+    FF Mayo2025 = new FF("2025-05-05","2025-06-01",4,19);
+    FF Junio2025 = new FF("2025-06-02","2025-07-06",5,23);
+    FF Julio2025 = new FF("2025-07-07","2025-08-03",4,28);
+    FF Agosto2025 = new FF("2025-08-04","2025-08-31",4,32);
+    FF Septiembre2025 = new FF("2025-09-01","2025-10-05",5,36);
+    FF Octubre2025 = new FF("2025-10-06","2025-11-02",4,41);
+    FF Noviembre2025 = new FF("2025-11-03","2025-11-30",4,45);
+    FF Diciembre2025 = new FF("2025-12-01","2025-12-28",4,49);
+    
     public Fechas(int mes, int año){
         if(mes == 1 && año == 2023){
             fecha = Enero2023;
@@ -79,6 +92,30 @@ public class Fechas{
             fecha = Noviembre2024;
         }else if(mes == 12 && año == 2024){
             fecha = Diciembre2024;
+        }else if(mes == 1 && año == 2025){
+            fecha = Enero2025;
+        }else if(mes == 2 && año == 2025){
+            fecha = Febrero2025;
+        }else if(mes == 3 && año == 2025){
+            fecha = Marzo2025;
+        }else if(mes == 4 && año == 2025){
+            fecha = Abril2025;
+        }else if(mes == 5 && año == 2025){
+            fecha = Mayo2025;
+        }else if(mes == 6 && año == 2025){
+            fecha = Junio2025;
+        }else if(mes == 7 && año == 2025){
+            fecha = Julio2025;
+        }else if(mes == 8 && año == 2025){
+            fecha = Agosto2025;
+        }else if(mes == 9 && año == 2025){
+            fecha = Septiembre2025;
+        }else if(mes == 10 && año == 2025){
+            fecha = Octubre2025;
+        }else if(mes == 11 && año == 2025){
+            fecha = Noviembre2025;
+        }else if(mes == 12 && año == 2025){
+            fecha = Diciembre2025;
         }else{
             JOptionPane.showMessageDialog(null, "No hay registro de esta fecha","Error",JOptionPane.ERROR_MESSAGE);
         }

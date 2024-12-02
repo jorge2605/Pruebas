@@ -361,7 +361,7 @@ public class javamail {
         }
     }
     
-    public void sendOC(String notas, JTable tabla, String asunto, String to, String from, String pass, String orden, String ordenNo, String ordenReal){
+    public void sendOC(String notas, String asunto, String to, String from, String pass, String ordenNo, String ordenReal, String copia){
         Properties props = new Properties();
         props.put("mail.smtp.host", "mail.si3i.com");
         props.put("mail.smtp.port", "587");
@@ -382,7 +382,7 @@ public class javamail {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse("compras01@si3i.com"));
+            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse("compras01@si3i.com,"+copia));
             message.setSubject(asunto);
             
             

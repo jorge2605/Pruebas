@@ -56,7 +56,7 @@ public class addProveedor extends javax.swing.JDialog {
                             Conexion con1 = new Conexion();
                             con = con1.getConnection();
                             Statement st = con.createStatement();
-                            String sql = "insert into registroProv_Compras (Nombre,Contacto,Direccion,Telefono,Condiciones,Iva,Moneda,Correo,Celular) values(?,?,?,?,?,?,?,?,?)";
+                            String sql = "insert into registroProv_Compras (Nombre,Contacto,Direccion,Telefono,Condiciones,Iva,Moneda,Correo,Celular,CorreoCopia) values(?,?,?,?,?,?,?,?,?,?)";
                             PreparedStatement pst = con.prepareStatement(sql);
 
                             pst.setString(1, txtProv.getText());
@@ -68,6 +68,7 @@ public class addProveedor extends javax.swing.JDialog {
                             pst.setString(7, cmbMoneda.getSelectedItem().toString());
                             pst.setString(8, txtCorreo.getText());
                             pst.setString(9, txtTelefonoPersonal.getText());
+                            pst.setString(10, txtCorreoCopia.getText());
 
                             int n = pst.executeUpdate();
                             if(n > 0){
@@ -77,6 +78,7 @@ public class addProveedor extends javax.swing.JDialog {
                                 txtTelefono.setText("");
                                 txtCorreo.setText("");
                                 txtTelefonoPersonal.setText("");
+                                txtCorreoCopia.setText("");
                                 JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE");
                             }
 
@@ -90,7 +92,7 @@ public class addProveedor extends javax.swing.JDialog {
                             con = con1.getConnection();
                             Statement st = con.createStatement();
                             String sql = "update registroProv_Compras set Nombre = ?,Contacto = ?,Direccion = ?,Telefono = ?,Condiciones = ?,Iva = ?"
-                                    + ",Moneda = ?, Correo = ?, Celular = ? where Nombre = ?";
+                                    + ",Moneda = ?, Correo = ?, Celular = ?, CorreoCopia = ? where Nombre = ?";
                             PreparedStatement pst = con.prepareStatement(sql);
 
                             pst.setString(1, txtProv.getText());
@@ -102,7 +104,8 @@ public class addProveedor extends javax.swing.JDialog {
                             pst.setString(7, cmbMoneda.getSelectedItem().toString());
                             pst.setString(8,txtCorreo.getText());
                             pst.setString(9,txtTelefonoPersonal.getText());
-                            pst.setString(10,txtProv.getText());
+                            pst.setString(10,txtCorreoCopia.getText());
+                            pst.setString(11,txtProv.getText());
 
                             int n = pst.executeUpdate();
                             if(n > 0){
@@ -112,6 +115,7 @@ public class addProveedor extends javax.swing.JDialog {
                                 txtTelefono.setText("");
                                 txtTelefonoPersonal.setText("");
                                 txtCorreo.setText("");
+                                txtCorreoCopia.setText("");
                                 JOptionPane.showMessageDialog(this, "DATOS ACTUALIZADOS CORRECTAMENTE");
                             }
 
@@ -137,6 +141,7 @@ public class addProveedor extends javax.swing.JDialog {
                 txtTelefono.setText(rs.getString("Telefono"));
                 txtIva.setText(rs.getString("Iva"));
                 txtCorreo.setText(rs.getString("Correo"));
+                txtCorreoCopia.setText(rs.getString("CorreoCopia"));
                 cmbCondicion.setSelectedItem(rs.getString("Condiciones"));
                 cmbMoneda.setSelectedItem(rs.getString("Moneda"));
             }
@@ -173,11 +178,12 @@ public class addProveedor extends javax.swing.JDialog {
         txtTelefonoPersonal = new RSComponentShade.RSFormatFieldShade();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        txtCorreoCopia = new rojeru_san.RSMTextFull();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(477, 688));
         setUndecorated(true);
-        setPreferredSize(new java.awt.Dimension(436, 763));
+        setPreferredSize(new java.awt.Dimension(436, 667));
 
         panelRound1.setBackground(new java.awt.Color(51, 51, 51));
         panelRound1.setRoundBottomLeft(100);
@@ -213,7 +219,7 @@ public class addProveedor extends javax.swing.JDialog {
                 txtProvActionPerformed(evt);
             }
         });
-        panelRound1.add(txtProv, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 90, 420, -1));
+        panelRound1.add(txtProv, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, 420, -1));
 
         txtContacto.setBackground(new java.awt.Color(51, 51, 51));
         txtContacto.setForeground(new java.awt.Color(255, 255, 255));
@@ -227,7 +233,7 @@ public class addProveedor extends javax.swing.JDialog {
         txtContacto.setNextFocusableComponent(txtIva);
         txtContacto.setPlaceholder("Contacto");
         txtContacto.setSelectionColor(new java.awt.Color(255, 255, 255));
-        panelRound1.add(txtContacto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 420, -1));
+        panelRound1.add(txtContacto, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 110, 420, -1));
 
         txtIva.setBackground(new java.awt.Color(51, 51, 51));
         txtIva.setForeground(new java.awt.Color(255, 255, 255));
@@ -241,21 +247,21 @@ public class addProveedor extends javax.swing.JDialog {
         txtIva.setPlaceholder("Iva");
         txtIva.setSelectionColor(new java.awt.Color(255, 255, 255));
         txtIva.setSoloNumeros(true);
-        panelRound1.add(txtIva, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 430, 420, -1));
+        panelRound1.add(txtIva, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 350, 420, -1));
 
         cmbMoneda.setBackground(new java.awt.Color(51, 51, 51));
         cmbMoneda.setForeground(new java.awt.Color(255, 255, 255));
         cmbMoneda.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SELECCIONAR MONEDA", "MXN", "DLLS" }));
         cmbMoneda.setColorMaterial(new java.awt.Color(255, 255, 255));
         cmbMoneda.setNextFocusableComponent(btnGuardar);
-        panelRound1.add(cmbMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 630, 420, -1));
+        panelRound1.add(cmbMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 560, 420, -1));
 
         cmbCondicion.setBackground(new java.awt.Color(51, 51, 51));
         cmbCondicion.setForeground(new java.awt.Color(255, 255, 255));
         cmbCondicion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SELECCIONAR CONDICION", "CREDITO", "CONTADO" }));
         cmbCondicion.setColorMaterial(new java.awt.Color(255, 255, 255));
         cmbCondicion.setNextFocusableComponent(cmbMoneda);
-        panelRound1.add(cmbCondicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 550, 420, -1));
+        panelRound1.add(cmbCondicion, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 510, 420, -1));
 
         btnLimpiar.setText("Limpiar");
         btnLimpiar.setNextFocusableComponent(txtProv);
@@ -264,7 +270,7 @@ public class addProveedor extends javax.swing.JDialog {
                 btnLimpiarActionPerformed(evt);
             }
         });
-        panelRound1.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 720, 130, -1));
+        panelRound1.add(btnLimpiar, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 610, 130, -1));
 
         btnGuardar.setText("Guardar");
         btnGuardar.setNextFocusableComponent(btnLimpiar);
@@ -273,7 +279,7 @@ public class addProveedor extends javax.swing.JDialog {
                 btnGuardarActionPerformed(evt);
             }
         });
-        panelRound1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 720, 150, -1));
+        panelRound1.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 610, 150, -1));
 
         txtTelefono.setBackground(new java.awt.Color(51, 51, 51));
         txtTelefono.setForeground(new java.awt.Color(255, 255, 255));
@@ -296,7 +302,7 @@ public class addProveedor extends javax.swing.JDialog {
                 txtTelefonoKeyTyped(evt);
             }
         });
-        panelRound1.add(txtTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 420, 40));
+        panelRound1.add(txtTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, 420, 40));
 
         panelX.setBackground(new java.awt.Color(51, 51, 51));
 
@@ -330,7 +336,7 @@ public class addProveedor extends javax.swing.JDialog {
         txtDireccion1.setNextFocusableComponent(txtTelefono);
         txtDireccion1.setPlaceholder("Direccion");
         txtDireccion1.setSelectionColor(new java.awt.Color(255, 255, 255));
-        panelRound1.add(txtDireccion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 230, 420, -1));
+        panelRound1.add(txtDireccion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 420, -1));
 
         txtCorreo.setBackground(new java.awt.Color(51, 51, 51));
         txtCorreo.setForeground(new java.awt.Color(255, 255, 255));
@@ -340,10 +346,10 @@ public class addProveedor extends javax.swing.JDialog {
         txtCorreo.setCaretColor(new java.awt.Color(255, 255, 255));
         txtCorreo.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
         txtCorreo.setModoMaterial(true);
-        txtCorreo.setNextFocusableComponent(cmbCondicion);
+        txtCorreo.setNextFocusableComponent(txtCorreoCopia);
         txtCorreo.setPlaceholder("Correo");
         txtCorreo.setSelectionColor(new java.awt.Color(255, 255, 255));
-        panelRound1.add(txtCorreo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 500, 420, 40));
+        panelRound1.add(txtCorreo, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 410, 420, 40));
 
         txtTelefonoPersonal.setBackground(new java.awt.Color(51, 51, 51));
         txtTelefonoPersonal.setForeground(new java.awt.Color(255, 255, 255));
@@ -366,15 +372,28 @@ public class addProveedor extends javax.swing.JDialog {
                 txtTelefonoPersonalKeyTyped(evt);
             }
         });
-        panelRound1.add(txtTelefonoPersonal, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 370, 420, 40));
+        panelRound1.add(txtTelefonoPersonal, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 300, 420, 40));
 
         jLabel2.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
         jLabel2.setText("Personal");
-        panelRound1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, -1, -1));
+        panelRound1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, -1, -1));
 
         jLabel3.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
         jLabel3.setText("Oficina");
-        panelRound1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, -1, -1));
+        panelRound1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 210, -1, -1));
+
+        txtCorreoCopia.setBackground(new java.awt.Color(51, 51, 51));
+        txtCorreoCopia.setForeground(new java.awt.Color(255, 255, 255));
+        txtCorreoCopia.setBordeColorFocus(new java.awt.Color(255, 255, 255));
+        txtCorreoCopia.setBordeColorNoFocus(new java.awt.Color(102, 102, 102));
+        txtCorreoCopia.setBotonColor(new java.awt.Color(51, 51, 51));
+        txtCorreoCopia.setCaretColor(new java.awt.Color(255, 255, 255));
+        txtCorreoCopia.setFont(new java.awt.Font("Lexend", 0, 14)); // NOI18N
+        txtCorreoCopia.setModoMaterial(true);
+        txtCorreoCopia.setNextFocusableComponent(cmbCondicion);
+        txtCorreoCopia.setPlaceholder("Correo Copia");
+        txtCorreoCopia.setSelectionColor(new java.awt.Color(255, 255, 255));
+        panelRound1.add(txtCorreoCopia, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 460, 420, 40));
 
         getContentPane().add(panelRound1, java.awt.BorderLayout.CENTER);
 
@@ -494,6 +513,7 @@ public class addProveedor extends javax.swing.JDialog {
     private javax.swing.JPanel panelX;
     private rojeru_san.RSMTextFull txtContacto;
     private rojeru_san.RSMTextFull txtCorreo;
+    private rojeru_san.RSMTextFull txtCorreoCopia;
     private rojeru_san.RSMTextFull txtDireccion1;
     private rojeru_san.RSMTextFull txtIva;
     public rojeru_san.RSMTextFull txtProv;

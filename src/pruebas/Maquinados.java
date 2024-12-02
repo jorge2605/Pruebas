@@ -1027,11 +1027,15 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select Plano, Proyecto, Cantidad, Material from planos where Plano like '" + txtPlano.getText() + "'";
+            String plan = txtPlano.getText();
+            if(txtPlano.getText().contains("/")){
+                plan = plan.substring(0,plan.indexOf("/"));
+            }
+            String sql = "select Plano, Proyecto, Cantidad, Material from planos where Plano like '" + plan + "'";
             ResultSet rs = st.executeQuery(sql);
             String plano = null;
             while(rs.next()){
-                plano = rs.getString("Plano");
+                plan = rs.getString("Plano");
                 txtPlano2.setText(plano);
                 txtProyecto.setText(rs.getString("Proyecto"));
                 txtCantidad.setText(rs.getString("Cantidad"));
@@ -1040,7 +1044,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
             KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
             manager.focusNextComponent();
             if(plano == null){
-                plano = verificarNomenclatura(txtPlano.getText(),PLANO );
+                plano = verificarNomenclatura(plan,PLANO );
                 verPlano(plano);
             }
             txtPlano.setText("");

@@ -604,6 +604,10 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         btnCostos = new javax.swing.JButton();
         jLabel33 = new javax.swing.JLabel();
         lblNotiCostos = new javax.swing.JLabel();
+        panel49 = new javax.swing.JPanel();
+        rSPanelRound35 = new rojeru_san.rspanel.RSPanelRound();
+        btnCalendario = new javax.swing.JButton();
+        jLabel34 = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
 
         miReporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/excel_1.png"))); // NOI18N
@@ -2402,6 +2406,52 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
 
         jPanel7.add(jPanel41);
 
+        panel49.setBackground(new java.awt.Color(255, 255, 255));
+        panel49.setLayout(new java.awt.GridBagLayout());
+
+        rSPanelRound35.setBackground(new java.awt.Color(235, 235, 235));
+        rSPanelRound35.setColorBackground(new java.awt.Color(245, 245, 245));
+        rSPanelRound35.setColorBorde(new java.awt.Color(245, 245, 245));
+        rSPanelRound35.setPreferredSize(new java.awt.Dimension(90, 90));
+        rSPanelRound35.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
+
+        btnCalendario.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        btnCalendario.setForeground(new java.awt.Color(0, 153, 255));
+        btnCalendario.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/calendario_64.png"))); // NOI18N
+        btnCalendario.setBorder(null);
+        btnCalendario.setContentAreaFilled(false);
+        btnCalendario.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCalendario.setFocusPainted(false);
+        btnCalendario.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnCalendario.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        btnCalendario.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnCalendario.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnCalendarioMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnCalendarioMouseExited(evt);
+            }
+        });
+        btnCalendario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCalendarioActionPerformed(evt);
+            }
+        });
+        rSPanelRound35.add(btnCalendario);
+
+        panel49.add(rSPanelRound35, new java.awt.GridBagConstraints());
+
+        jLabel34.setFont(new java.awt.Font("Roboto Medium", 0, 14)); // NOI18N
+        jLabel34.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel34.setText("Calendario");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panel49.add(jLabel34, gridBagConstraints);
+
+        jPanel7.add(panel49);
+
         jPanel3.add(jPanel7);
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
@@ -3217,6 +3267,27 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         }
     }//GEN-LAST:event_jButton5ActionPerformed
 
+    private void btnCalendarioMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCalendarioMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCalendarioMouseEntered
+
+    private void btnCalendarioMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCalendarioMouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCalendarioMouseExited
+
+    private void btnCalendarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalendarioActionPerformed
+        Calendario c = new Calendario(lblId.getText(),this);
+        jDesktopPane1.add(c);
+        c.toFront();
+        c.setLocation(jDesktopPane1.getWidth() / 2 - c.getWidth() / 2, jDesktopPane1.getHeight() / 2 - c.getHeight() / 2);
+        try{
+            c.setMaximum(true);
+        }catch(PropertyVetoException e){
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+        }
+        c.setVisible(true);
+    }//GEN-LAST:event_btnCalendarioActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -3259,6 +3330,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton btnAcabados;
     public javax.swing.JButton btnActualizar;
+    public javax.swing.JButton btnCalendario;
     public javax.swing.JButton btnCalidad;
     public javax.swing.JButton btnChecador;
     public javax.swing.JButton btnCnc;
@@ -3326,6 +3398,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JLabel jLabel31;
     private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel33;
+    private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -3382,6 +3455,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JPanel panel46;
     private javax.swing.JPanel panel47;
     private javax.swing.JPanel panel48;
+    private javax.swing.JPanel panel49;
     private scrollPane.PanelRound panelPedidos;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound1;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound10;
@@ -3410,6 +3484,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private rojeru_san.rspanel.RSPanelRound rSPanelRound32;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound33;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound34;
+    private rojeru_san.rspanel.RSPanelRound rSPanelRound35;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound4;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound5;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound6;

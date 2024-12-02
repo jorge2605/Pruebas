@@ -1095,7 +1095,7 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
                         }
                     }
                 }
-                if (n > 0 && n6 > 0) {
+                if (n > 0) {
 
                     String orden = "select * from OrdenCompra where OrdenNo like '" + id + "'";
                     Statement stOrden = con.createStatement();

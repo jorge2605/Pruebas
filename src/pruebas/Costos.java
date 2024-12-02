@@ -55,6 +55,7 @@ import VentanaEmergente.Costos.ConfTabla;
 import VentanaEmergente.Costos.addEmpleado;
 import VentanaEmergente.Inicio1.Espera;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Stack;
 
@@ -69,6 +70,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     Espera espera = new Espera();
     Stack<String[]> empleados;
     String tipoSeleccion;
+    Stack<String> fechasSeleccionadas;
     
     private void pasteClipboard(JTable table) {
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -160,6 +162,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
+        TablaHoras.setShowGrid(true);
         TablaHoras.setSelectionBackground(new java.awt.Color(0,102,255));
         TablaHoras.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
@@ -382,15 +385,19 @@ public final class Costos extends javax.swing.JInternalFrame {
         return -1;
     }
     
-    public int getSuma(int fila, int col, String hora){
-        int suma = 0;
+    public String getSuma(int fila, int col, String hora){
+        String horaTabla;
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("HH:mm");
         try{
-            try{suma = Integer.parseInt(TablaHoras.getValueAt(fila, col).toString());}catch(Exception e){suma = 0;}
-            return Integer.parseInt(hora) + suma;
+            try{horaTabla = (TablaHoras.getValueAt(fila, col).toString());}catch(Exception e){horaTabla = "00:00";}
+            LocalTime tiempo1 = LocalTime.parse(hora, format);
+            LocalTime tiempo2 = LocalTime.parse(horaTabla, format);
+            LocalTime res = tiempo1.plusHours(tiempo2.getHour()).plusMinutes(tiempo2.getMinute());
+            return res.format(format);
         }catch(Exception e){
             
         }
-        return suma;
+        return "00:00";
     }
     
     public void getAllEmployes(){
@@ -551,8 +558,10 @@ public final class Costos extends javax.swing.JInternalFrame {
         }
     }
     
-    public void verHoras(String tipo){
-        insertarSemanasHoras();
+    public void verHoras(String tipo, String inicio, String fin){
+        if(inicio == null){
+            insertarSemanasHoras();
+        }
         try{
             limpiarTablaHoras();
             Connection con;
@@ -576,6 +585,11 @@ public final class Costos extends javax.swing.JInternalFrame {
             int lastDay = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
             calendar.set(Calendar.DAY_OF_MONTH, lastDay);
             String dia2 = s3.format(calendar.getTime());
+            
+            if(inicio != null){
+                dia1 = inicio;
+                dia2 = fin;
+            }
             
             String sql = "select * from htpp where Fecha between '"+dia1+"' and '"+dia2+"'";
             if(tipo.equals("proyecto")){
@@ -1423,6 +1437,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jPopupMenu1 = new javax.swing.JPopupMenu();
@@ -1488,6 +1503,9 @@ public final class Costos extends javax.swing.JInternalFrame {
         jPanel34 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
         cmbSemanas = new javax.swing.JComboBox<>();
+        lblFec = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        cmbDias = new javax.swing.JComboBox<>();
         jPanel12 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         TablaOrdenes = new javax.swing.JTable();
@@ -1779,6 +1797,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         });
         TablaHoras.setSelectionBackground(new java.awt.Color(0, 102, 255));
         TablaHoras.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        TablaHoras.setShowGrid(true);
         jScrollPane2.setViewportView(TablaHoras);
         if (TablaHoras.getColumnModel().getColumnCount() > 0) {
             TablaHoras.getColumnModel().getColumn(0).setMinWidth(150);
@@ -2018,11 +2037,14 @@ public final class Costos extends javax.swing.JInternalFrame {
         jPanel33.add(jLabel1, java.awt.BorderLayout.PAGE_START);
 
         jPanel34.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel34.setLayout(new java.awt.GridBagLayout());
 
         jLabel23.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
         jLabel23.setForeground(new java.awt.Color(102, 102, 102));
         jLabel23.setText("Seleccionar Semana:");
-        jPanel34.add(jLabel23);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 7, 0, 7);
+        jPanel34.add(jLabel23, gridBagConstraints);
 
         cmbSemanas.setBackground(new java.awt.Color(255, 255, 255));
         cmbSemanas.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
@@ -2034,7 +2056,36 @@ public final class Costos extends javax.swing.JInternalFrame {
                 cmbSemanasActionPerformed(evt);
             }
         });
-        jPanel34.add(cmbSemanas);
+        jPanel34.add(cmbSemanas, new java.awt.GridBagConstraints());
+
+        lblFec.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        lblFec.setForeground(new java.awt.Color(102, 102, 102));
+        lblFec.setText("Fecha");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 7, 0, 7);
+        jPanel34.add(lblFec, gridBagConstraints);
+
+        jLabel24.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel24.setText("Seleccionar Dia:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 7, 0, 7);
+        jPanel34.add(jLabel24, gridBagConstraints);
+
+        cmbDias.setBackground(new java.awt.Color(255, 255, 255));
+        cmbDias.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
+        cmbDias.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar" }));
+        cmbDias.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        cmbDias.setPreferredSize(new java.awt.Dimension(180, 25));
+        cmbDias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbDiasActionPerformed(evt);
+            }
+        });
+        jPanel34.add(cmbDias, new java.awt.GridBagConstraints());
 
         jPanel33.add(jPanel34, java.awt.BorderLayout.CENTER);
 
@@ -2502,7 +2553,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                                 espera.setVisible(true);
                                 tipoSeleccion = "mes";
                                 obtenerFechas();
-                                verHoras("mes");
+                                verHoras("mes",null,null);
                                 ordenesDeCompra("mes");
                                 almacen("mes");
                                 verCostosIndirectos("mes");
@@ -2533,7 +2584,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                             espera.setExtendedState(Inicio1.MAXIMIZED_BOTH);
                             espera.setVisible(true);
                             obtenerFechas();
-                            verHoras("mes");
+                            verHoras("mes",null,null);
                             ordenesDeCompra("mes");
                             almacen("mes");
                             verCostosIndirectos("mes");
@@ -2704,7 +2755,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                         JOptionPane.showMessageDialog(null, "Debes introducir un numero de proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
                     }else{
                         tipoSeleccion = "proyecto";
-                        verHoras("proyecto");
+                        verHoras("proyecto",null,null);
                         ordenesDeCompraProyecto();
                         almacen("proyecto");
                         verCostosIndirectos("proyecto");
@@ -2930,9 +2981,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnGuardar1ActionPerformed
 
     private void cmbSemanasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSemanasActionPerformed
-        if(espera.isVisible()){
-            
-        }else{
+        if(!espera.isVisible()){
             if(cmbSemanas.getSelectedIndex() > 0){
                 try{
                     String fi = fechaInicio;
@@ -2946,13 +2995,42 @@ public final class Costos extends javax.swing.JInternalFrame {
                     date = LocalDate.parse(newDateString, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     newDate = date.plusDays(6);
                     ff = newDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-                    agregarMaquinados(newDateString, ff, tipoSeleccion);
-                    agregarIntegracion(newDateString, ff, tipoSeleccion);
-                    agregarDiseño(newDateString, ff, tipoSeleccion);
-                    agregarCalidad(newDateString, ff, tipoSeleccion);
                     
-                    System.out.println("Inicio: "+ newDateString + " ----- Termino: " + ff);
+                    fechasSeleccionadas = new Stack<>();
+                    cmbDias.removeAllItems();
+                    cmbDias.addItem("Seleccionar");
+                    verHoras("mes",newDateString, ff);
+                    
+                    lblFec.setText("Inicio: "+ newDateString + " | Termino: " + ff);
+                    DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                    LocalDate fecInicio = LocalDate.parse(newDateString,format);
+                    LocalDate fecFinal = LocalDate.parse(ff,format);
+                    SimpleDateFormat s1 = new SimpleDateFormat("MMMM");
+                    SimpleDateFormat s2 = new SimpleDateFormat("MM");
+                    Date d = s1.parse(cmbMes.getSelectedItem().toString());
+                    String mes = s2.format(d);
+                    try{
+                        for (int i = 1; i < TablaHoras.getColumnCount(); i++) {
+                            String dia = String.valueOf(i);
+                            if(i < 10){
+                                dia = "0" + i;
+                            }
+                            String fec = cmbAnio.getSelectedItem().toString() + "-" + mes + "-" + dia;
+                            LocalDate fechaTabla = LocalDate.parse(fec,format);
+                            if((fechaTabla.isAfter(fecInicio) || fechaTabla.isEqual(fecInicio)) && (fechaTabla.isBefore(fecFinal) || fechaTabla.isEqual(fecFinal))){
+                                TablaHoras.getColumnModel().getColumn(i).setHeaderValue(dia);
+                                fechasSeleccionadas.push(fechaTabla.toString());
+                                cmbDias.addItem(fechaTabla.toString());
+                                repaint();
+                            }else{
+                                TablaHoras.getColumnModel().getColumn(i).setHeaderValue("");
+                                repaint();
+                            }
+                        }
+                    }catch(Exception e){
+                        JOptionPane.showMessageDialog(this, "Error: "+e);
+                    }
+                    
                 }catch(Exception e){
                     JOptionPane.showMessageDialog(this, "Error al seleccionar Semana " + e, "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -2961,6 +3039,14 @@ public final class Costos extends javax.swing.JInternalFrame {
             }
         }
     }//GEN-LAST:event_cmbSemanasActionPerformed
+
+    private void cmbDiasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbDiasActionPerformed
+        if(!espera.isVisible()){
+            if(cmbDias.getSelectedIndex() > 0){
+                verHoras("mes",cmbDias.getSelectedItem().toString(), cmbDias.getSelectedItem().toString());
+            }
+        }
+    }//GEN-LAST:event_cmbDiasActionPerformed
 
     
 
@@ -2982,6 +3068,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnTablaNominas;
     private javax.swing.ButtonGroup buttonGroup1;
     private RSMaterialComponent.RSComboBoxMaterial cmbAnio;
+    private javax.swing.JComboBox<String> cmbDias;
     private RSMaterialComponent.RSComboBoxMaterial cmbMes;
     private javax.swing.JComboBox<String> cmbSemanas;
     private javax.swing.JLabel jLabel1;
@@ -3000,6 +3087,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -3055,6 +3143,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblFec;
     private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblPrecioDolar;
     private javax.swing.JLabel lblPrecioDolar1;

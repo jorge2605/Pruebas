@@ -39,6 +39,7 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
     Stack<String> pila;
     public JTable tabla;
     public String correo;
+    public String correoCopia;
     public String contra;
     int sel = 0;
     public String transaccion;
@@ -394,7 +395,6 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
         Stack<String> pil = new Stack<>();
         Stack<String> get;
         for (int i = 0; i < label.length; i++) {
-            System.out.println(i);
             get = (setear(label[i].getText()));
             for (int k = 0; k < get.size(); k++) {
                 boolean esta = true;
@@ -444,7 +444,7 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
             try{
                 if(transaccion.equals("orden")){
                     String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\"+numRequi+".pdf";
-                    mail.sendOC(nota, tabla, asunto, getProveedor(pil.get(i)), correo, contra, numRequi, ruta,ordenReal);
+                    mail.sendOC(nota, asunto, getProveedor(pil.get(i)), correo, contra, ruta,ordenReal,correoCopia);
                 }else{
                     mail.jorge(material, nota, tabla,asunto,getProveedor(pil.get(i)),correo,contra);
                 }

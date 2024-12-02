@@ -186,7 +186,7 @@ public class ReporteMes extends javax.swing.JDialog {
             String fecha1 = sdf.format(Fecha1.getDatoFecha());
             String fecha2 = sdf.format(Fecha2.getDatoFecha());
             
-            String sql = "select Id, FechaNew from requisicion where FechaNew between '" + fecha1 + "' and '" + fecha2 + "'";
+            String sql = "select Id, FechaNew from requisicion where FechaNew between '" + fecha1 + "' and '" + fecha2 + "' and Progreso != 'CANCELADO'";
             ResultSet rs = st.executeQuery(sql);
             
             int pr = 0;
@@ -213,6 +213,8 @@ public class ReporteMes extends javax.swing.JDialog {
             }
             if(chbOrden.isSelected()){
                 orden = " and OC is not null and OC != ''";
+            }else {
+                orden = " and OC is null";
             }
             
             String sql2 = "select * from requisiciones where NumRequisicion between '" + primeraRequisicion +"' and '" + UltimaRequisicion + "' " + precio + llego + orden;
@@ -351,7 +353,6 @@ public class ReporteMes extends javax.swing.JDialog {
 
         chbPrecio.setBackground(new java.awt.Color(255, 255, 255));
         chbPrecio.setFont(new java.awt.Font("Lexend", 1, 12)); // NOI18N
-        chbPrecio.setSelected(true);
         chbPrecio.setText("Con precio");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
