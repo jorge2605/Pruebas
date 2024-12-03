@@ -5,12 +5,11 @@
         <group>
             <file>file:/C:/Pruebas/src/pruebas/Inicio1.java</file>
             <file>file:/C:/Pruebas/src/pruebas/Calendario.java</file>
-            <file>file:/C:/Pruebas/src/pruebas/Reportes.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/InicioSesion/Visor.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Calendario/SeleccionarFecha.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Calendario/InfoAgenda.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/ProyectManager.java</file>
             <file>file:/C:/Pruebas/src/pruebas/InicioSesion.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/Calendario/EliminarFecha.java</file>
-            <file>file:/C:/Pruebas/src/pruebas/Disenio1.java</file>
-            <file>file:/C:/Pruebas/src/pruebas/Maquinados.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Calendario/AgregarFechas.java</file>
             <file>file:/C:/Pruebas/src/pruebas/OrdenDeCompra.java</file>
         </group>
     </open-files>

@@ -7,10 +7,13 @@ public class ColorVentas extends JTable{
     @Override
         public Component prepareRenderer(TableCellRenderer renderer, int rowIndex, int ColumnIndex)
     {
-        Component componente = null;
-//        try{
+        Component componente;
+        componente = super.prepareRenderer(renderer, rowIndex, ColumnIndex);
+        if (isRowSelected(rowIndex)) {
+            componente.setBackground(Color.BLUE);
+            componente.setForeground(Color.WHITE); // Cambiar texto a blanco para mejor contraste
+        } else {
             try{
-            componente = super.prepareRenderer(renderer, rowIndex, ColumnIndex);
             }catch(Exception e){
                 System.out.println("error: "+e);
             }
@@ -45,11 +48,7 @@ public class ColorVentas extends JTable{
                         break; 
                 }
             }
-
-
-//        }catch(Exception e){
-//                System.out.println("error");
-//        }
+        }
         return componente;
     }
 }

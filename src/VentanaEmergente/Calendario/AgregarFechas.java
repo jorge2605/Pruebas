@@ -11,6 +11,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 public class AgregarFechas extends java.awt.Dialog {
@@ -58,6 +60,21 @@ public class AgregarFechas extends java.awt.Dialog {
         }
     }
     
+    public void setFechas(int x, int y, JLabel desde, JLabel hasta){
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        SeleccionarFecha sel = new SeleccionarFecha(f, true);
+        sel.setLocation(x, y);
+        if((x + sel.getWidth()) > f.getWidth()){
+            sel.setLocation(x - sel.getWidth(), y);
+        }
+        Date date[] = sel.getFechas();
+        if(date != null){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            desde.setText(sdf.format(date[0]));
+            hasta.setText(sdf.format(date[1]));
+        }
+    }
+    
     public void limpiarForm(){
         txtProyecto.setText("");
         txtDescripcion.setText("");
@@ -101,6 +118,31 @@ public class AgregarFechas extends java.awt.Dialog {
         jLabel11 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDescripcion = new javax.swing.JTextArea();
+        panelRound1 = new scrollPane.PanelRound();
+        jPanel5 = new javax.swing.JPanel();
+        btnDiseno = new javax.swing.JButton();
+        lblDesdeD = new javax.swing.JLabel();
+        lblHastaD = new javax.swing.JLabel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        btnHerramentista = new javax.swing.JButton();
+        lblDesdeH = new javax.swing.JLabel();
+        lblHastaH = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
+        btnIntegracion = new javax.swing.JButton();
+        lblDesdeI = new javax.swing.JLabel();
+        lblHastaI = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jLabel21 = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        btnCompras = new javax.swing.JButton();
+        lblDesdeC = new javax.swing.JLabel();
+        lblHastaC = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(759, 800));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -255,7 +297,7 @@ public class AgregarFechas extends java.awt.Dialog {
         color.setBackground(new java.awt.Color(255, 255, 255));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 4;
         jPanel2.add(color, gridBagConstraints);
 
@@ -339,7 +381,255 @@ public class AgregarFechas extends java.awt.Dialog {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 10);
         jPanel2.add(jScrollPane1, gridBagConstraints);
+
+        panelRound1.setBackground(new java.awt.Color(240, 240, 240));
+        panelRound1.setRoundBottomLeft(30);
+        panelRound1.setRoundBottomRight(30);
+        panelRound1.setRoundTopLeft(30);
+        panelRound1.setRoundTopRight(30);
+        panelRound1.setLayout(new java.awt.GridLayout(1, 0));
+
+        jPanel5.setBackground(new java.awt.Color(240, 240, 240));
+        java.awt.GridBagLayout jPanel5Layout = new java.awt.GridBagLayout();
+        jPanel5Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        jPanel5.setLayout(jPanel5Layout);
+
+        btnDiseno.setBackground(new java.awt.Color(204, 204, 255));
+        btnDiseno.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnDiseno.setForeground(new java.awt.Color(255, 255, 255));
+        btnDiseno.setText("Diseno");
+        btnDiseno.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnDisenoMouseClicked(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel5.add(btnDiseno, gridBagConstraints);
+
+        lblDesdeD.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblDesdeD.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeD.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel5.add(lblDesdeD, gridBagConstraints);
+
+        lblHastaD.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblHastaD.setForeground(new java.awt.Color(51, 51, 51));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel5.add(lblHastaD, gridBagConstraints);
+
+        jLabel16.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel16.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel16.setText("Desde:");
+        jLabel16.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        jPanel5.add(jLabel16, gridBagConstraints);
+
+        jLabel17.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel17.setText("Hasta:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        jPanel5.add(jLabel17, gridBagConstraints);
+
+        panelRound1.add(jPanel5);
+
+        jPanel4.setBackground(new java.awt.Color(240, 240, 240));
+        java.awt.GridBagLayout jPanel4Layout = new java.awt.GridBagLayout();
+        jPanel4Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        jPanel4.setLayout(jPanel4Layout);
+
+        btnHerramentista.setBackground(new java.awt.Color(153, 204, 255));
+        btnHerramentista.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnHerramentista.setForeground(new java.awt.Color(255, 255, 255));
+        btnHerramentista.setText("Herramentista");
+        btnHerramentista.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnHerramentistaMouseClicked(evt);
+            }
+        });
+        btnHerramentista.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHerramentistaActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel4.add(btnHerramentista, gridBagConstraints);
+
+        lblDesdeH.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblDesdeH.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeH.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel4.add(lblDesdeH, gridBagConstraints);
+
+        lblHastaH.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblHastaH.setForeground(new java.awt.Color(51, 51, 51));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel4.add(lblHastaH, gridBagConstraints);
+
+        jLabel12.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel12.setText("Desde:");
+        jLabel12.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        jPanel4.add(jLabel12, gridBagConstraints);
+
+        jLabel13.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel13.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel13.setText("Hasta:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        jPanel4.add(jLabel13, gridBagConstraints);
+
+        panelRound1.add(jPanel4);
+
+        jPanel6.setBackground(new java.awt.Color(240, 240, 240));
+        java.awt.GridBagLayout jPanel6Layout = new java.awt.GridBagLayout();
+        jPanel6Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        jPanel6.setLayout(jPanel6Layout);
+
+        btnIntegracion.setBackground(new java.awt.Color(153, 153, 255));
+        btnIntegracion.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnIntegracion.setForeground(new java.awt.Color(255, 255, 255));
+        btnIntegracion.setText("Integracion");
+        btnIntegracion.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnIntegracionMouseClicked(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel6.add(btnIntegracion, gridBagConstraints);
+
+        lblDesdeI.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblDesdeI.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeI.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel6.add(lblDesdeI, gridBagConstraints);
+
+        lblHastaI.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblHastaI.setForeground(new java.awt.Color(51, 51, 51));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel6.add(lblHastaI, gridBagConstraints);
+
+        jLabel20.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel20.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel20.setText("Desde:");
+        jLabel20.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        jPanel6.add(jLabel20, gridBagConstraints);
+
+        jLabel21.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel21.setText("Hasta:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        jPanel6.add(jLabel21, gridBagConstraints);
+
+        panelRound1.add(jPanel6);
+
+        jPanel7.setBackground(new java.awt.Color(240, 240, 240));
+        java.awt.GridBagLayout jPanel7Layout = new java.awt.GridBagLayout();
+        jPanel7Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        jPanel7.setLayout(jPanel7Layout);
+
+        btnCompras.setBackground(new java.awt.Color(255, 102, 102));
+        btnCompras.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnCompras.setForeground(new java.awt.Color(255, 255, 255));
+        btnCompras.setText("Comrpras");
+        btnCompras.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnComprasMouseClicked(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel7.add(btnCompras, gridBagConstraints);
+
+        lblDesdeC.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblDesdeC.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeC.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel7.add(lblDesdeC, gridBagConstraints);
+
+        lblHastaC.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblHastaC.setForeground(new java.awt.Color(51, 51, 51));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel7.add(lblHastaC, gridBagConstraints);
+
+        jLabel24.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel24.setText("Desde:");
+        jLabel24.setToolTipText("");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        jPanel7.add(jLabel24, gridBagConstraints);
+
+        jLabel25.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel25.setText("Hasta:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        jPanel7.add(jLabel25, gridBagConstraints);
+
+        panelRound1.add(jPanel7);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        jPanel2.add(panelRound1, gridBagConstraints);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -400,6 +690,26 @@ public class AgregarFechas extends java.awt.Dialog {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void btnHerramentistaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHerramentistaActionPerformed
+        
+    }//GEN-LAST:event_btnHerramentistaActionPerformed
+
+    private void btnHerramentistaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnHerramentistaMouseClicked
+        setFechas(evt.getXOnScreen(), evt.getYOnScreen(), lblDesdeH, lblHastaH);
+    }//GEN-LAST:event_btnHerramentistaMouseClicked
+
+    private void btnIntegracionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnIntegracionMouseClicked
+        setFechas(evt.getXOnScreen(), evt.getYOnScreen(), lblDesdeI, lblHastaI);
+    }//GEN-LAST:event_btnIntegracionMouseClicked
+
+    private void btnComprasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnComprasMouseClicked
+        setFechas(evt.getXOnScreen(), evt.getYOnScreen(), lblDesdeC, lblHastaC);
+    }//GEN-LAST:event_btnComprasMouseClicked
+
+    private void btnDisenoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnDisenoMouseClicked
+        setFechas(evt.getXOnScreen(), evt.getYOnScreen(), lblDesdeD, lblHastaD);
+    }//GEN-LAST:event_btnDisenoMouseClicked
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -418,6 +728,10 @@ public class AgregarFechas extends java.awt.Dialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.toedter.calendar.JDateChooser FechaFin;
     private com.toedter.calendar.JDateChooser FechaInicio;
+    private javax.swing.JButton btnCompras;
+    private javax.swing.JButton btnDiseno;
+    private javax.swing.JButton btnHerramentista;
+    private javax.swing.JButton btnIntegracion;
     private javax.swing.JComboBox<String> cmbDepartamento;
     private javax.swing.JComboBox<String> cmbEstatus;
     private javax.swing.JColorChooser color;
@@ -425,6 +739,14 @@ public class AgregarFechas extends java.awt.Dialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -433,10 +755,23 @@ public class AgregarFechas extends java.awt.Dialog {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblDesdeC;
+    private javax.swing.JLabel lblDesdeD;
+    private javax.swing.JLabel lblDesdeH;
+    private javax.swing.JLabel lblDesdeI;
+    private javax.swing.JLabel lblHastaC;
+    private javax.swing.JLabel lblHastaD;
+    private javax.swing.JLabel lblHastaH;
+    private javax.swing.JLabel lblHastaI;
+    private scrollPane.PanelRound panelRound1;
     private javax.swing.JTextArea txtDescripcion;
     private javax.swing.JTextField txtEmpleado;
     private javax.swing.JTextField txtFecha;
-    private javax.swing.JTextField txtProyecto;
+    public javax.swing.JTextField txtProyecto;
     // End of variables declaration//GEN-END:variables
 }

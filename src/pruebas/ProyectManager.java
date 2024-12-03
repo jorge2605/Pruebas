@@ -1,7 +1,9 @@
 package pruebas;
 
 import Conexiones.Conexion;
+import VentanaEmergente.Calendario.AgregarFechas;
 import VentanaEmergente.ProyectoManager.Editar;
+import VentanaEmergente.ProyectoManager.InfoProyectos;
 import VentanaEmergente.ProyectoManager.addFecha;
 import VentanaEmergente.ProyectoManager.addPrioridadCompras;
 import VentanaEmergente.ProyectoManager.filtrar;
@@ -28,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -77,6 +80,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     int row, col;
     String numEmpleado;
     filtrar filtro;
+    Stack<InfoProyectos> proyectos;
 
     public void filtrarXProyecto(){
         limpiarTabla();
@@ -195,6 +199,37 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         }
     }
 
+    public final void getAgenda(){
+        try{
+            proyectos = new Stack<>();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from agenda where Estatus like 'Terminado'";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                String proyecto = rs.getString("Proyecto");
+                String fecha = rs.getString("Fecha");
+                String depa = rs.getString("Departamento");
+                proyectos.push(new InfoProyectos(proyecto,fecha, depa));
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public int getProyecto(String proyecto, String depa){
+        int pos = -1;
+        for (int i = 0; i < proyectos.size(); i++) {
+            InfoProyectos inf = proyectos.get(i);
+            if(proyecto.equals(inf.getProyecto()) && inf.getDepa().equals(depa)){
+                return i;
+            }
+        }
+        return pos;
+    }
+    
     public final void buscar(String sql){
     DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
     try{
@@ -217,16 +252,11 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             datos[9] = rs.getString("Facturado");
             datos[10] = rs.getString("Costo");
             datos[11] = rs.getString("Moneda");
-            if(datos[8] != null){
-            if(!datos[8].equals("CERRADO")){
-            datos[12] = atrazo(datos[7]);
-            }else{
-                 datos[12] = "";
-            }
-            }
-            datos[13] = rs.getString("Comentarios");
-            datos[14] = rs.getString("DueDate");
-            datos[15] = rs.getString("Responsable");
+            try{datos[12] = proyectos.get(getProyecto(datos[3], "HERRAMENTISTA")).getFecha();}catch(Exception e){datos[12] = "";}
+            try{datos[13] = proyectos.get(getProyecto(datos[3], "DISEÑO")).getFecha();}catch(Exception e){datos[13] = "";}
+            try{datos[14] = proyectos.get(getProyecto(datos[3], "INTEGRACION")).getFecha();}catch(Exception e){datos[14] = "";}
+            try{datos[15] = proyectos.get(getProyecto(datos[3], "COMPRAS")).getFecha();}catch(Exception e){datos[15] = "";}
+            
             miModelo.addRow(datos);
             }
         }catch(SQLException e){
@@ -241,7 +271,8 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             new Object [][] {
             },
             new String [] {
-                "NO REQUISICION", "NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA", "ATRAZADO", "ACCIONES", "DUE DATE", "RESPONSABLE"
+                "NO REQUISICION", "NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA",
+                "FECHA HERRAMENTISTA", "FECHA DISENO", "FECHA INTEGRACION", "FECHA COMPRAS"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -252,8 +283,13 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             }
         });
         Tabla1.setComponentPopupMenu(jPopupMenu1);
-        Tabla1.setGridColor(new java.awt.Color(255, 255, 255));
+        Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.BOLD, 14));
+        Tabla1.getTableHeader().setOpaque(false);
+        Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
+        Tabla1.getTableHeader().setForeground(Color.white);
         Tabla1.setRowHeight(25);
+        Tabla1.setShowVerticalLines(false);
+        Tabla1.setGridColor(new Color(240,240,240));
         scrollTabla.getViewport().setBackground(Color.white);
         scrollTabla.setViewportView(Tabla1);
     }
@@ -262,9 +298,10 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         initComponents();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         this.numEmpleado = numEmpleado;
+        getAgenda();
         limpiarTabla();
         buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
-                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda,DueDate,Responsable from proyectos order by Id desc");
+                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda from proyectos order by Id desc");
         DefaultTableModel Modelo = (DefaultTableModel) Tabla1.getModel();
         elQueOrdena = new TableRowSorter<>(Modelo);
         Tabla1.setRowSorter(elQueOrdena);
@@ -281,6 +318,9 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         verDocumentos = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         filtrar = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        agregarFecha = new javax.swing.JMenuItem();
+        eliminarFecha = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         scrollTabla = new javax.swing.JScrollPane();
@@ -330,6 +370,18 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             }
         });
         jPopupMenu1.add(filtrar);
+        jPopupMenu1.add(jSeparator3);
+
+        agregarFecha.setText("Agregar fecha a proyecto ");
+        agregarFecha.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                agregarFechaActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(agregarFecha);
+
+        eliminarFecha.setText("Eliminar fecga de proyecto");
+        jPopupMenu1.add(eliminarFecha);
 
         setBorder(null);
 
@@ -348,11 +400,11 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
 
             },
             new String [] {
-                "NO REQUISICION", "NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA", "ATRAZADO", "ACCIONES", "DUE DATE", "RESPONSABLE"
+                "NO REQUISICION", "NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -940,7 +992,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     private void btnVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerActionPerformed
         limpiarTabla();
         buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
-                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda,DueDate,Responsable from proyectos order by Id desc");
+                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda from proyectos order by Id desc");
     }//GEN-LAST:event_btnVerActionPerformed
 
     private void btnVerMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVerMouseEntered
@@ -953,11 +1005,21 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         btnVer.setForeground(new Color(51,51,51));
     }//GEN-LAST:event_btnVerMouseExited
 
+    private void agregarFechaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarFechaActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        AgregarFechas agregar = new AgregarFechas(f, true, numEmpleado);
+        agregar.setLocationRelativeTo(f);
+        agregar.txtProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
+        agregar.setVisible(true);
+    }//GEN-LAST:event_agregarFechaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
+    private javax.swing.JMenuItem agregarFecha;
     private javax.swing.JButton btnVer;
     private javax.swing.JMenuItem editar;
+    private javax.swing.JMenuItem eliminarFecha;
     private javax.swing.JMenuItem filtrar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
@@ -975,6 +1037,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JPanel pan;
@@ -1019,43 +1082,5 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
                 s.dispose();
             }
         }
-//            if(e.getSource() == this.verDoc.btnSubir1){
-//                seleccionar = new JFileChooser();
-//                cotizacion = null;
-//                seleccionar.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)","pdf"));
-//                    if(seleccionar.showDialog(null, "SELECCIONAR ARCHIVO") == JFileChooser.APPROVE_OPTION){
-//                        cotizacion = seleccionar.getSelectedFile();
-////                        this.verDoc.txtCotizacion.setText(cotizacion.getName());
-//                        panel1.setBackground(Color.green);
-//                }
-//            }else if(e.getSource() == this.verDoc.btnSubir2){
-//                sel = new JFileChooser();
-//                orden = null;
-//                sel.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)","pdf"));
-//                    if(sel.showDialog(null, "SELECCIONAR ARCHIVO") == JFileChooser.APPROVE_OPTION){
-//                        orden = sel.getSelectedFile();
-//                        this.verDoc.txtOrden.setText(orden.getName());
-//                        panel2.setBackground(Color.green);
-//                }
-//            }else if(e.getSource() == this.verDoc.btnSubir3){
-//                selec = new JFileChooser();
-//                espe = null;
-//                selec.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)","pdf"));
-//                    if(selec.showDialog(null, "SELECCIONAR ARCHIVO") == JFileChooser.APPROVE_OPTION){
-//                        espe = selec.getSelectedFile();
-//                        this.verDoc.txtSpec.setText(espe.getName());
-//                        panel3.setBackground(Color.green);
-//                }
-//            }else if(e.getSource() == this.verDoc.btnSubir4){
-//                sele = new JFileChooser();
-//                factura = null;
-//                sele.setFileFilter(new FileNameExtensionFilter("PDF (*.pdf)","pdf"));
-//                    if(sele.showDialog(null, "SELECCIONAR ARCHIVO") == JFileChooser.APPROVE_OPTION){
-//                        factura = sele.getSelectedFile();
-//                        this.verDoc.txtFactura.setText(factura.getName());
-//                        panel4.setBackground(Color.green);
-//                }
-//            }
-//        }
     }
 }
