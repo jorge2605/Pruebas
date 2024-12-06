@@ -281,14 +281,14 @@ public class EliminarFecha extends java.awt.Dialog {
     }//GEN-LAST:event_cmbBuscarActionPerformed
 
     private void txtProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProyectoActionPerformed
-        verFechas("select * from agenda where Proyecto like '" + txtProyecto.getText() + "%' and Estatus != 'Cancelado'");
+        verFechas("select * from agenda where Proyecto like '" + txtProyecto.getText() + "%' and Estatus like 'Nuevo'");
     }//GEN-LAST:event_txtProyectoActionPerformed
 
     private void cmbDepartamentoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbDepartamentoActionPerformed
         if (cmbDepartamento.getSelectedIndex() == 0){
             JOptionPane.showMessageDialog(this, "Debes seleccionar algun departamento","Advertencia",JOptionPane.WARNING_MESSAGE);
         } else {
-            verFechas("select * from agenda where Departamento like '" + cmbDepartamento.getSelectedItem().toString() + "' and Estatus != 'Cancelado'");
+            verFechas("select * from agenda where Departamento like '" + cmbDepartamento.getSelectedItem().toString() + "' and Estatus like 'Nuevo'");
         }
     }//GEN-LAST:event_cmbDepartamentoActionPerformed
 
@@ -296,7 +296,7 @@ public class EliminarFecha extends java.awt.Dialog {
         if (fecha.getDate() != null){
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String fec = sdf.format(fecha.getDate());
-            verFechas("select * from agenda where FechaInicio like '" + fec + "' and Estatus != 'Cancelado'");
+            verFechas("select * from agenda where FechaInicio like '" + fec + "' and Estatus like 'Nuevo'");
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

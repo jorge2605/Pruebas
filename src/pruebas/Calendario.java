@@ -1,12 +1,13 @@
 package pruebas;
 
-import Componentes.PanelMultiColor;
+import componentes.PanelMultiColor;
 import Conexiones.Conexion;
 import VentanaEmergente.Calendario.AgregarFechas;
 import VentanaEmergente.Calendario.EliminarFecha;
 import VentanaEmergente.Calendario.InfoAgenda;
 import VentanaEmergente.Calendario.Modelo.PropiedadesFechas;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
@@ -16,6 +17,7 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.Locale;
@@ -27,6 +29,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import com.toedter.calendar.JYearChooser;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 public class Calendario extends javax.swing.JInternalFrame {
 
@@ -36,7 +41,7 @@ public class Calendario extends javax.swing.JInternalFrame {
     Stack<PropiedadesFechas> props;
     
     public void limpiarPanel(){
-        jPanel3.removeAll();
+        panelAno.removeAll();
         revalidate();
         repaint();
     }
@@ -75,57 +80,6 @@ public class Calendario extends javax.swing.JInternalFrame {
         return false;
     }
     
-    public final void setCalendario(){
-        int mes = jComboBox1.getSelectedIndex()+1;
-        int ano = Ano.getYear();
-        int dia = 1;
-        LocalDate fecha = LocalDate.of(ano, mes, dia);
-        LocalDate primerDia = fecha.withDayOfMonth(1);
-        String diaSemana = primerDia.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es","ES"));
-        LocalDate fechaEspecifica = LocalDate.of(ano, mes, dia);
-        
-        int ultimoDia = fechaEspecifica.lengthOfMonth();
-        limpiarPanel();
-        boolean day = false;
-        int cont = 1;
-        for (int i = 0; i < 42; i++) {
-            if(getDay(diaSemana.toUpperCase()) == i){
-                day = true;
-            }
-            JPanel panel = new JPanel();
-            if(day && cont <= ultimoDia){
-                String fec = ano + "-" + mes + "-" + cont;
-                Stack<Color> pila = new Stack<>();
-                for (int j = 0; j < props.size(); j++) {
-                    if(compararDias(fec, props.get(j).getFechaInicio(), props.get(j).getFechaFinal())){
-                        int r = Integer.parseInt(props.get(j).getColor().split(",")[0]);
-                        int g = Integer.parseInt(props.get(j).getColor().split(",")[1]);
-                        int b = Integer.parseInt(props.get(j).getColor().split(",")[2]);
-                        pila.push(new Color(r,g,b));
-                    }
-                }
-                if(pila.isEmpty()){
-                    pila.push(Color.white);
-                }
-                panel = new PanelMultiColor(pila);
-                panel.setBackground(new java.awt.Color(255, 255, 255));
-                panel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(230, 230, 230)));
-                java.awt.GridBagLayout pnl1Layout = new java.awt.GridBagLayout();
-                pnl1Layout.columnWeights = new double[] {1.0};
-                pnl1Layout.rowWeights = new double[] {1.0};
-                panel.setLayout(pnl1Layout);
-                JLabel label = new javax.swing.JLabel();
-                label.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-                label.setText(String.valueOf(cont));
-                panel.add(label, new java.awt.GridBagConstraints());
-                cont++;
-            } else {
-                panel.setBackground(new Color(230,230,230));
-            }
-            jPanel3.add(panel);
-        }
-    }
-    
     public void crearFecha(String proyecto, String color, String f1, String f2, String descripcion, String id, JFrame f){
         JButton boton = new javax.swing.JButton();
         boton.setFont(new java.awt.Font("Roboto Medium", 0, 12)); // NOI18N
@@ -147,7 +101,7 @@ public class Calendario extends javax.swing.JInternalFrame {
                 boolean band = info.ver();
                 if (band) {
                     verFechas(f);
-                    setCalendario();
+                    pintarCalendario();
                 }
             }
         });
@@ -193,13 +147,6 @@ public class Calendario extends javax.swing.JInternalFrame {
         }
     }
     
-    public final void setMes(){
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM");
-        int mes = Integer.parseInt(sdf.format(d));
-        jComboBox1.setSelectedIndex(mes - 1);
-    }
-    
     public final void setEmpleado(){
         try{
             Connection con;
@@ -226,13 +173,144 @@ public class Calendario extends javax.swing.JInternalFrame {
         }
     }
     
+    public JPanel getPanel(int i){
+        switch (i) {
+            case 0: return enero;
+            case 1: return febrero;
+            case 2: return marzo;
+            case 3: return abril;
+            case 4: return mayo;
+            case 5: return junio;
+            case 6: return julio;
+            case 7: return agosto;
+            case 8: return septiembre;
+            case 9: return octubre;
+            case 10: return noviembre;
+            case 11: return diciembre;
+            default: return null;
+        }
+    }
+    
+    public int getDia(String dia){
+        switch(dia){
+            case "lunes": return 0;
+            case "martes": return 1;
+            case "miércoles": return 2;
+            case "jueves": return 3;
+            case "viernes": return 4;
+            case "sábado": return 5;
+            case "domingo": return 6;
+            default: return -1;
+        }
+    }
+    
+    public void agregarDias(JPanel pan){
+        JLabel label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("L");
+        pan.add(label);
+        label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("M");
+        pan.add(label);
+        label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("M");
+        pan.add(label);
+        label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("J");
+        pan.add(label);
+        label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("V");
+        pan.add(label);
+        label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("S");
+        pan.add(label);
+        label = new JLabel();
+        label.setFont(new Font("Roboto",Font.BOLD, 12));
+        label.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        label.setText("D");
+        pan.add(label);
+    }
+    
+    public final void pintarCalendario(){
+        enero.removeAll();
+        febrero.removeAll();
+        marzo.removeAll();
+        abril.removeAll();
+        mayo.removeAll();
+        junio.removeAll();
+        julio.removeAll();
+        agosto.removeAll();
+        septiembre.removeAll();
+        octubre.removeAll();
+        noviembre.removeAll();
+        diciembre.removeAll();
+        for (int i = 0; i < 12; i++) {
+            int year = Ano.getYear();
+            LocalDate firstDay = LocalDate.of(year, (i + 1), 1);
+            String dayOfWeek = firstDay.getDayOfWeek().getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
+            int dia = getDia(dayOfWeek);
+            YearMonth yearMonth = YearMonth.of(year, (i + 1));
+            int totalDias = yearMonth.lengthOfMonth();
+            JPanel panel = getPanel(i);
+            int cont = 0;
+            agregarDias(panel);
+            int sab = 0;
+            for (int j = 0; j < 42; j++) {
+                sab++;
+                if(j >= dia && j < (totalDias + dia)){
+                    cont++;
+                    String fec = year + "-" + (i + 1) + "-" + cont;
+                    Stack<Color> pila = new Stack<>();
+                    for (int k = 0; k < props.size(); k++) {
+                        if(compararDias(fec, props.get(k).getFechaInicio(), props.get(k).getFechaFinal())){
+                            int r = Integer.parseInt(props.get(k).getColor().split(",")[0]);
+                            int g = Integer.parseInt(props.get(k).getColor().split(",")[1]);
+                            int b = Integer.parseInt(props.get(k).getColor().split(",")[2]);
+                            pila.push(new Color(r,g,b));
+                        }
+                    }
+                    if(pila.isEmpty()){
+                        pila.push(Color.white);
+                    }
+                    PanelMultiColor pan = new PanelMultiColor(pila);
+                    pan.setBackground(new java.awt.Color(255, 255, 45, 0));
+                    JLabel label = new javax.swing.JLabel();
+                    label.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+                    label.setText(String.valueOf(cont));
+                    pan.add(label);
+                    panel.add(pan);
+                    revalidate();
+                    repaint();
+                }else{
+                    JPanel pan = new javax.swing.JPanel();
+                    pan.setBackground(new java.awt.Color(255, 255, 45, 0));
+                    if(sab == 7){
+                        sab = 0;
+                        pan.setBackground(new Color(240,240,240));
+                    }
+                    panel.add(pan);
+                }
+            }
+        }
+    }
+    
     public Calendario(String numEmpleado, JFrame f) {
         initComponents();
         this.numEmpleado = numEmpleado;
         setEmpleado();
-        setMes();
         verFechas(f);
-        setCalendario();
+        pintarCalendario();
         jScrollPane1.getVerticalScrollBar().setUnitIncrement(15);
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
     }
@@ -240,6 +318,7 @@ public class Calendario extends javax.swing.JInternalFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel1 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -248,31 +327,50 @@ public class Calendario extends javax.swing.JInternalFrame {
         pan = new javax.swing.JPanel();
         panelSalir = new javax.swing.JPanel();
         lblSalir = new javax.swing.JLabel();
-        jPanel2 = new javax.swing.JPanel();
+        panelCalendario = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
-        jComboBox1 = new javax.swing.JComboBox<>();
         Ano = new com.toedter.calendar.JYearChooser();
         panelAdministrador = new javax.swing.JPanel();
         jLabel8 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
-        jPanel6 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        panelMes = new javax.swing.JPanel();
+        panelAno = new javax.swing.JPanel();
+        enero = new componentes.PanelRound();
+        febrero = new componentes.PanelRound();
+        marzo = new componentes.PanelRound();
+        abril = new componentes.PanelRound();
+        mayo = new componentes.PanelRound();
+        junio = new componentes.PanelRound();
+        julio = new componentes.PanelRound();
+        agosto = new componentes.PanelRound();
+        septiembre = new componentes.PanelRound();
+        octubre = new componentes.PanelRound();
+        noviembre = new componentes.PanelRound();
+        diciembre = new componentes.PanelRound();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jLabel26 = new javax.swing.JLabel();
+        jLabel27 = new javax.swing.JLabel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel30 = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel10 = new javax.swing.JPanel();
         jLabel53 = new javax.swing.JLabel();
         jLabel54 = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setBorder(null);
 
@@ -319,24 +417,21 @@ public class Calendario extends javax.swing.JInternalFrame {
 
         jPanel1.add(jPanel4, java.awt.BorderLayout.NORTH);
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setLayout(new java.awt.BorderLayout(20, 0));
+        panelCalendario.setBackground(new java.awt.Color(255, 255, 255));
+        panelCalendario.setLayout(new java.awt.BorderLayout(20, 0));
 
         jPanel8.setBackground(new java.awt.Color(255, 255, 255));
         jPanel8.setLayout(new java.awt.BorderLayout());
 
         jPanel11.setBackground(new java.awt.Color(255, 255, 255));
 
-        jComboBox1.setFont(new java.awt.Font("Roboto", 0, 18)); // NOI18N
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE" }));
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
+        Ano.setBackground(new java.awt.Color(255, 255, 255));
+        Ano.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        Ano.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                AnoPropertyChange(evt);
             }
         });
-        jPanel11.add(jComboBox1);
-
-        Ano.setBackground(new java.awt.Color(255, 255, 255));
         jPanel11.add(Ano);
 
         jPanel8.add(jPanel11, java.awt.BorderLayout.CENTER);
@@ -378,62 +473,283 @@ public class Calendario extends javax.swing.JInternalFrame {
 
         jPanel8.add(panelAdministrador, java.awt.BorderLayout.PAGE_START);
 
-        jPanel2.add(jPanel8, java.awt.BorderLayout.PAGE_START);
+        panelCalendario.add(jPanel8, java.awt.BorderLayout.PAGE_START);
 
-        jPanel7.setLayout(new java.awt.BorderLayout());
+        panelMes.setLayout(new java.awt.BorderLayout());
 
-        jPanel6.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel6.setLayout(new java.awt.GridLayout(1, 0));
+        panelAno.setBackground(new java.awt.Color(240, 240, 240));
+        java.awt.GridBagLayout panelAnoLayout = new java.awt.GridBagLayout();
+        panelAnoLayout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        panelAnoLayout.rowWeights = new double[] {0.0, 1.0, 0.0, 1.0, 0.0, 1.0};
+        panelAno.setLayout(panelAnoLayout);
 
-        jLabel1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Lunes");
-        jPanel6.add(jLabel1);
+        enero.setBackground(new java.awt.Color(255, 255, 255));
+        enero.setRoundBottomLeft(60);
+        enero.setRoundBottomRight(60);
+        enero.setRoundTopLeft(60);
+        enero.setRoundTopRight(60);
+        enero.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(enero, gridBagConstraints);
 
-        jLabel2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Martes");
-        jPanel6.add(jLabel2);
+        febrero.setBackground(new java.awt.Color(255, 255, 255));
+        febrero.setRoundBottomLeft(60);
+        febrero.setRoundBottomRight(60);
+        febrero.setRoundTopLeft(60);
+        febrero.setRoundTopRight(60);
+        febrero.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(febrero, gridBagConstraints);
 
-        jLabel3.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Miercoles");
-        jPanel6.add(jLabel3);
+        marzo.setBackground(new java.awt.Color(255, 255, 255));
+        marzo.setRoundBottomLeft(60);
+        marzo.setRoundBottomRight(60);
+        marzo.setRoundTopLeft(60);
+        marzo.setRoundTopRight(60);
+        marzo.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(marzo, gridBagConstraints);
 
-        jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Jueves");
-        jPanel6.add(jLabel4);
+        abril.setBackground(new java.awt.Color(255, 255, 255));
+        abril.setRoundBottomLeft(60);
+        abril.setRoundBottomRight(60);
+        abril.setRoundTopLeft(60);
+        abril.setRoundTopRight(60);
+        abril.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(abril, gridBagConstraints);
 
-        jLabel5.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel5.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Viernes");
-        jPanel6.add(jLabel5);
+        mayo.setBackground(new java.awt.Color(255, 255, 255));
+        mayo.setRoundBottomLeft(60);
+        mayo.setRoundBottomRight(60);
+        mayo.setRoundTopLeft(60);
+        mayo.setRoundTopRight(60);
+        mayo.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(mayo, gridBagConstraints);
 
-        jLabel6.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel6.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel6.setText("Sabado");
-        jPanel6.add(jLabel6);
+        junio.setBackground(new java.awt.Color(255, 255, 255));
+        junio.setRoundBottomLeft(60);
+        junio.setRoundBottomRight(60);
+        junio.setRoundTopLeft(60);
+        junio.setRoundTopRight(60);
+        junio.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(junio, gridBagConstraints);
 
-        jLabel7.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("Domingo");
-        jPanel6.add(jLabel7);
+        julio.setBackground(new java.awt.Color(255, 255, 255));
+        julio.setRoundBottomLeft(60);
+        julio.setRoundBottomRight(60);
+        julio.setRoundTopLeft(60);
+        julio.setRoundTopRight(60);
+        julio.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(julio, gridBagConstraints);
 
-        jPanel7.add(jPanel6, java.awt.BorderLayout.PAGE_START);
+        agosto.setBackground(new java.awt.Color(255, 255, 255));
+        agosto.setRoundBottomLeft(60);
+        agosto.setRoundBottomRight(60);
+        agosto.setRoundTopLeft(60);
+        agosto.setRoundTopRight(60);
+        agosto.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(agosto, gridBagConstraints);
 
-        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel3.setLayout(new java.awt.GridLayout(6, 7, 3, 3));
-        jPanel7.add(jPanel3, java.awt.BorderLayout.CENTER);
+        septiembre.setBackground(new java.awt.Color(255, 255, 255));
+        septiembre.setRoundBottomLeft(60);
+        septiembre.setRoundBottomRight(60);
+        septiembre.setRoundTopLeft(60);
+        septiembre.setRoundTopRight(60);
+        septiembre.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(septiembre, gridBagConstraints);
 
-        jPanel2.add(jPanel7, java.awt.BorderLayout.CENTER);
+        octubre.setBackground(new java.awt.Color(255, 255, 255));
+        octubre.setRoundBottomLeft(60);
+        octubre.setRoundBottomRight(60);
+        octubre.setRoundTopLeft(60);
+        octubre.setRoundTopRight(60);
+        octubre.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(octubre, gridBagConstraints);
+
+        noviembre.setBackground(new java.awt.Color(255, 255, 255));
+        noviembre.setRoundBottomLeft(60);
+        noviembre.setRoundBottomRight(60);
+        noviembre.setRoundTopLeft(60);
+        noviembre.setRoundTopRight(60);
+        noviembre.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(noviembre, gridBagConstraints);
+
+        diciembre.setBackground(new java.awt.Color(255, 255, 255));
+        diciembre.setRoundBottomLeft(60);
+        diciembre.setRoundBottomRight(60);
+        diciembre.setRoundTopLeft(60);
+        diciembre.setRoundTopRight(60);
+        diciembre.setLayout(new java.awt.GridLayout(7, 7));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panelAno.add(diciembre, gridBagConstraints);
+
+        jLabel22.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel22.setText("Febrero");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel22, gridBagConstraints);
+
+        jLabel23.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel23.setText("Marzo");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel23, gridBagConstraints);
+
+        jLabel24.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel24.setText("Abril");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel24, gridBagConstraints);
+
+        jLabel25.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel25.setText("Mayo");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel25, gridBagConstraints);
+
+        jLabel26.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel26.setText("Junio");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel26, gridBagConstraints);
+
+        jLabel27.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel27.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel27.setText("Julio");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel27, gridBagConstraints);
+
+        jLabel28.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel28.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel28.setText("Agosto");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel28, gridBagConstraints);
+
+        jLabel29.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel29.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel29.setText("Septiembre");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel29, gridBagConstraints);
+
+        jLabel9.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel9.setText("Octubre");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel9, gridBagConstraints);
+
+        jLabel10.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel10.setText("Noviembre");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel10, gridBagConstraints);
+
+        jLabel11.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel11.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel11.setText("Diciembre");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel11, gridBagConstraints);
+
+        jLabel30.setFont(new java.awt.Font("Roboto Black", 1, 14)); // NOI18N
+        jLabel30.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel30.setText("Enero");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        panelAno.add(jLabel30, gridBagConstraints);
+
+        panelMes.add(panelAno, java.awt.BorderLayout.CENTER);
+
+        panelCalendario.add(panelMes, java.awt.BorderLayout.CENTER);
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
         jPanel9.setLayout(new java.awt.BorderLayout());
@@ -462,11 +778,30 @@ public class Calendario extends javax.swing.JInternalFrame {
 
         jPanel9.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
-        jPanel2.add(jPanel9, java.awt.BorderLayout.EAST);
+        panelCalendario.add(jPanel9, java.awt.BorderLayout.EAST);
 
-        jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
+        jPanel1.add(panelCalendario, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        jMenuBar1.setBackground(new java.awt.Color(255, 255, 255));
+
+        jMenu1.setText("Ver por");
+
+        jMenuItem1.setText("Mes");
+        jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Año                                      ");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -485,12 +820,6 @@ public class Calendario extends javax.swing.JInternalFrame {
         lblSalir.setForeground(Color.black);
     }//GEN-LAST:event_lblSalirMouseExited
 
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        if(this.isVisible()){
-            setCalendario();
-        }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         AgregarFechas calendario = new AgregarFechas(f,true,this.numEmpleado);
@@ -505,39 +834,75 @@ public class Calendario extends javax.swing.JInternalFrame {
         eliminar.setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        pintarCalendario();
+        panelMes.removeAll();
+        panelAno.setVisible(true);
+        java.awt.GridBagLayout pan = (java.awt.GridBagLayout) panelAno.getLayout();
+        pan.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        pan.rowWeights = new double[] {0.0, 1.0, 0.0, 1.0, 0.0, 1.0};
+        panelAno.setLayout(pan);
+        panelMes.add(panelAno, java.awt.BorderLayout.CENTER);
+        revalidate();
+        repaint();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void AnoPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_AnoPropertyChange
+        pintarCalendario();
+    }//GEN-LAST:event_AnoPropertyChange
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private com.toedter.calendar.JYearChooser Ano;
+    private componentes.PanelRound abril;
+    private componentes.PanelRound agosto;
+    private componentes.PanelRound diciembre;
+    private componentes.PanelRound enero;
+    private componentes.PanelRound febrero;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel27;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel53;
     private javax.swing.JLabel jLabel54;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
+    private componentes.PanelRound julio;
+    private componentes.PanelRound junio;
     private javax.swing.JLabel lblSalir;
+    private componentes.PanelRound marzo;
+    private componentes.PanelRound mayo;
+    private componentes.PanelRound noviembre;
+    private componentes.PanelRound octubre;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelAdministrador;
+    private javax.swing.JPanel panelAno;
+    private javax.swing.JPanel panelCalendario;
+    private javax.swing.JPanel panelMes;
     private javax.swing.JPanel panelSalir;
+    private componentes.PanelRound septiembre;
     // End of variables declaration//GEN-END:variables
 }

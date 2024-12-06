@@ -161,17 +161,17 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         return boton;
     }
     
-    public void verDocumentos(){
+    public final void verDocumentos(){
         limpiarPaneles();
         try{
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from archivosproyectos where Proyecto like '"+proyecto+"'";
+            String sql = "select Documento, Proyecto, NombreArchivo, Id from archivosproyectos where Proyecto like '"+proyecto+"'";
             ResultSet rs = st.executeQuery(sql);
-            String doc = "";
-            String nombre = "";
+            String doc;
+            String nombre;
             int id;
             pnlSpec = new JPanel[30];
             pnlCotizacion = new JPanel[30];
@@ -311,12 +311,6 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
         super(parent, modal);
         initComponents();
         proyecto = Proyecto;
-        Color color = new Color(0,165,252);
-        scroll1.setVerticalScrollBar(new ScrollBarCustom(color));
-        scroll2.setVerticalScrollBar(new ScrollBarCustom(color));
-        scroll3.setVerticalScrollBar(new ScrollBarCustom(color));
-        scroll4.setVerticalScrollBar(new ScrollBarCustom(color));
-        scroll5.setVerticalScrollBar(new ScrollBarCustom(color));
         
         verDocumentos();
     }
@@ -838,15 +832,15 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
 
         jPanel18.setBackground(new java.awt.Color(255, 255, 255));
 
-        jPanel19.setBackground(new java.awt.Color(0, 102, 156));
+        jPanel19.setBackground(new java.awt.Color(255, 255, 255));
 
-        jLabel3.setFont(new java.awt.Font("Roboto Medium", 0, 36)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("PROYECTO:");
+        jLabel3.setFont(new java.awt.Font("Roboto", 1, 36)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel3.setText("Proyecto:");
         jPanel19.add(jLabel3);
 
-        lblProyecto.setFont(new java.awt.Font("Roboto Medium", 0, 36)); // NOI18N
-        lblProyecto.setForeground(new java.awt.Color(255, 255, 255));
+        lblProyecto.setFont(new java.awt.Font("Roboto", 1, 36)); // NOI18N
+        lblProyecto.setForeground(new java.awt.Color(0, 102, 204));
         lblProyecto.setText(" ");
         jPanel19.add(lblProyecto);
 

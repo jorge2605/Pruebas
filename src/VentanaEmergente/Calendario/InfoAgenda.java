@@ -7,7 +7,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 public class InfoAgenda extends java.awt.Dialog {
 
@@ -38,14 +41,6 @@ public class InfoAgenda extends java.awt.Dialog {
     }
     
     public void setColores(Color color){
-        txtFecha1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        txtFecha2.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        txtFecha.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        txtEstatus.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        txtEmpleado.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        txtDepa.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, color));
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, color));
         jScrollPane2.setBorder(javax.swing.BorderFactory.createMatteBorder(2, 2, 2, 2, color));
     }
     
@@ -57,6 +52,7 @@ public class InfoAgenda extends java.awt.Dialog {
     public InfoAgenda(java.awt.Frame parent, boolean modal, String nomEmpleado) {
         super(parent, modal);
         initComponents();
+        SwingUtilities.invokeLater(txtComentarios::requestFocusInWindow);
         this.nomEmpleado = nomEmpleado;
     }
 
@@ -364,13 +360,17 @@ public class InfoAgenda extends java.awt.Dialog {
                 Connection con;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
-                String sql = "update agenda set Comentarios = ?, Estatus = ?, EmpleadoFin = ? where idAgenda = ?";
+                String sql = "update agenda set Comentarios = ?, Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where idAgenda = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
 
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date d = new Date();
+                
                 pst.setString(1, txtComentarios.getText());
                 pst.setString(2, "Terminado");
                 pst.setString(3, nomEmpleado);
-                pst.setString(4, lblId.getText());
+                pst.setString(4, sdf.format(d));
+                pst.setString(5, lblId.getText());
 
                 int n = pst.executeUpdate();
 

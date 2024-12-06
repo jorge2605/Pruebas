@@ -1,6 +1,7 @@
 package VentanaEmergente.Ventas;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 public class ColorVentas extends JTable{
@@ -13,10 +14,6 @@ public class ColorVentas extends JTable{
             componente.setBackground(Color.BLUE);
             componente.setForeground(Color.WHITE); // Cambiar texto a blanco para mejor contraste
         } else {
-            try{
-            }catch(Exception e){
-                System.out.println("error: "+e);
-            }
             String valor;
             if(getValueAt(rowIndex, 8) == null){
                 valor = "";
@@ -24,7 +21,6 @@ public class ColorVentas extends JTable{
                 valor = getValueAt(rowIndex, 8).toString();
             }
             if(valor.getClass().equals(String.class)){
-
                 switch (valor) {
                     case "DETENIDO":
                         componente.setBackground(Color.decode("#c00000"));
@@ -47,6 +43,18 @@ public class ColorVentas extends JTable{
                         componente.setForeground(null);
                         break; 
                 }
+            }
+        }
+        if(ColumnIndex > 11){
+            String val;
+            try{val = getValueAt(rowIndex, ColumnIndex).toString();}catch(Exception e){val = "";}
+            componente.setFont(new Font("Roboto", Font.BOLD,12));
+            if(val.contains("N")){
+                componente.setForeground(Color.PINK);
+            }else if(val.contains("R")){
+                componente.setForeground(Color.red);
+            }else if(val.contains("V")){
+                componente.setForeground(new Color(255,255,255));
             }
         }
         return componente;

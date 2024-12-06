@@ -14,6 +14,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -40,6 +41,16 @@ import pruebas.Inicio1;
 public class ReporteMes extends javax.swing.JDialog {
 
     Espera espera;
+    Stack<String> omitidas;
+    
+    public boolean verificarRequi(String requi){
+        for (int i = 0; i < omitidas.size(); i++) {
+            if(omitidas.get(i).equals(requi)){
+                return false;
+            }
+        }
+        return true;
+    }
     
     private void crearExcel(){
         Workbook book;
@@ -186,14 +197,19 @@ public class ReporteMes extends javax.swing.JDialog {
             String fecha1 = sdf.format(Fecha1.getDatoFecha());
             String fecha2 = sdf.format(Fecha2.getDatoFecha());
             
-            String sql = "select Id, FechaNew from requisicion where FechaNew between '" + fecha1 + "' and '" + fecha2 + "' and Progreso != 'CANCELADO'";
+            String sql = "select Id, FechaNew, Progreso from requisicion where FechaNew between '" + fecha1 + "' and '" + fecha2 + "'";
             ResultSet rs = st.executeQuery(sql);
             
+            omitidas = new Stack<>();
             int pr = 0;
             int primeraRequisicion = -1;
             int UltimaRequisicion = -1;
             while(rs.next()){
                 int d = rs.getInt("Id");
+                String pro = rs.getString("Progreso");
+                if(pro.contains("CANCELADO")){
+                    omitidas.push(String.valueOf(d));
+                }
                 if(pr == 0){
                     primeraRequisicion = d;
                 }
@@ -242,47 +258,49 @@ public class ReporteMes extends javax.swing.JDialog {
                 datos[16] = rs2.getString("Notas");
                 datos[17] = rs2.getString("cantidadStock");
                 datos[18] = rs2.getString("FechaEsperada");
-                Row fila10=hoja.createRow(i+7);
-                for (int j = 0; j < 19; j++) {
-                    Cell celda=fila10.createCell(j+2);
-                    if(i == -1 && (j >= 0 && j <=18)){
-                        CellStyle s = book.createCellStyle();
-                        Font f = book.createFont();
-                        f.setBold(true);
-                        f.setColor(IndexedColors.WHITE.getIndex());
-                        s.setFont(f);
-                        s.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
-                        s.setFillPattern(SOLID_FOREGROUND);
-                        celda.setCellStyle(s);
-                    }
-                    if(i > -1 && (j > -1 && j <= 18) && (i%2 == 0)){
-                        CellStyle s = book.createCellStyle();
-                        s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                        s.setFillPattern(SOLID_FOREGROUND);
-                        celda.setCellStyle(s);
-                    }
-
-                    if(i==-1){
-                        celda.setCellValue(String.valueOf(datos[j]));
-    //                        CellUtil.setCellStyleProperties(celda, properties);
-                    }else{
-                        if(j == 3){
-                        CellStyle ss = book.createCellStyle();
-                        ss.setWrapText(true);
-
-                            if(i%2 == 0){
-                            ss.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                            ss.setFillPattern(SOLID_FOREGROUND);
-
-                            }
-                            celda.setCellStyle(ss);
+                if(verificarRequi(datos[0])){
+                    Row fila10=hoja.createRow(i+7);
+                    for (int j = 0; j < 19; j++) {
+                        Cell celda=fila10.createCell(j+2);
+                        if(i == -1 && (j >= 0 && j <=18)){
+                            CellStyle s = book.createCellStyle();
+                            Font f = book.createFont();
+                            f.setBold(true);
+                            f.setColor(IndexedColors.WHITE.getIndex());
+                            s.setFont(f);
+                            s.setFillForegroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+                            s.setFillPattern(SOLID_FOREGROUND);
+                            celda.setCellStyle(s);
                         }
-                        celda.setCellValue(String.valueOf(datos[j]));
+                        if(i > -1 && (j > -1 && j <= 18) && (i%2 == 0)){
+                            CellStyle s = book.createCellStyle();
+                            s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                            s.setFillPattern(SOLID_FOREGROUND);
+                            celda.setCellStyle(s);
+                        }
+
+                        if(i==-1){
+                            celda.setCellValue(String.valueOf(datos[j]));
+        //                        CellUtil.setCellStyleProperties(celda, properties);
+                        }else{
+                            if(j == 3){
+                            CellStyle ss = book.createCellStyle();
+                            ss.setWrapText(true);
+
+                                if(i%2 == 0){
+                                ss.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                                ss.setFillPattern(SOLID_FOREGROUND);
+
+                                }
+                                celda.setCellStyle(ss);
+                            }
+                            celda.setCellValue(String.valueOf(datos[j]));
+                        }
+                        File ad = new File(a);
+                        book.write(new FileOutputStream(a));                
                     }
-                    File ad = new File(a);
-                    book.write(new FileOutputStream(a));                
+                    i++;
                 }
-                i++;
             }
             book.close();
             espera.dispose();

@@ -14,6 +14,7 @@ import java.util.Stack;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class AgregarFechas extends java.awt.Dialog {
 
@@ -75,13 +76,89 @@ public class AgregarFechas extends java.awt.Dialog {
         }
     }
     
+    public boolean validarFechas(){
+        if (!lblHastaH.getText().equals("")) {
+            return true;
+        } else if (!lblHastaC.getText().equals("")) {
+            return true;
+        } else if (!lblHastaD.getText().equals("")) {
+            return true;
+        } else if (!lblHastaI.getText().equals("")) {
+            return true;
+        }
+        return false;
+    }
+    
     public void limpiarForm(){
         txtProyecto.setText("");
         txtDescripcion.setText("");
-        FechaFin.setDate(null);
-        FechaInicio.setDate(null);
         cmbEstatus.setSelectedIndex(0);
-        cmbDepartamento.setSelectedIndex(0);
+    }
+    
+    public int agregarFecha(PreparedStatement pst, String fecha1, String fecha2, String depa, int n) throws SQLException{
+        pst.setString(1, fecha1);
+        pst.setString(2, fecha2);
+        pst.setString(3, cmbEstatus.getSelectedItem().toString());
+        pst.setString(4, depa);
+        pst.setString(5, txtEmpleado.getText());
+        pst.setString(6, txtFecha.getText());
+        pst.setString(7, color.getColor().getRed() + "," + color.getColor().getGreen() + "," + color.getColor().getBlue());
+        pst.setString(8, txtProyecto.getText());
+        pst.setString(9, txtDescripcion.getText());
+        
+        n += pst.executeUpdate();
+        return n;
+    }
+    
+    public void agregarPanelR(String text, JPanel panel, Color color){
+        scrollPane.PanelRound panelRound3 = new scrollPane.PanelRound();
+        panelRound3.setRoundBottomLeft(20);
+        panelRound3.setRoundBottomRight(20);
+        panelRound3.setRoundTopLeft(20);
+        panelRound3.setRoundTopRight(20);
+        panelRound3.setToolTipText(text);
+        panelRound3.setBackground(color);
+
+        java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        panel.add(panelRound3, gridBagConstraints);
+    }
+    
+    public JPanel getPanel(String depa){
+        switch (depa) {
+            case "HERRAMENTISTA":
+                return panelHerr;
+            case "DISEÑO":
+                return panelDiseno;
+            case "INTEGRACION":
+                return panelInte;
+            default:
+                return panelCompras;
+        }
+    }
+    
+    public void buscarProyectos(String proyecto){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from agenda where Proyecto like '" + proyecto + "'";
+            ResultSet rs = st.executeQuery(sql);
+            while(rs.next()){
+                String depa = rs.getString("Departamento");
+                String fechaInicio = rs.getString("FechaInicio");
+                String fechaFin = rs.getString("FechaInicio");
+                String colo = rs.getString("Color");
+                String[] col = colo.split(",");
+                int r = Integer.parseInt(col[0]);
+                int g = Integer.parseInt(col[1]);
+                int b = Integer.parseInt(col[2]);
+                agregarPanelR("Desde: " + fechaInicio + " Hasta: " + fechaFin, getPanel(depa), new Color(r,g,b));
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
     }
     
     public AgregarFechas(java.awt.Frame parent, boolean modal,String numEmpleado) {
@@ -103,41 +180,35 @@ public class AgregarFechas extends java.awt.Dialog {
         txtEmpleado = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         txtFecha = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        FechaInicio = new com.toedter.calendar.JDateChooser();
-        jLabel5 = new javax.swing.JLabel();
-        FechaFin = new com.toedter.calendar.JDateChooser();
         jLabel6 = new javax.swing.JLabel();
         cmbEstatus = new javax.swing.JComboBox<>();
-        jLabel9 = new javax.swing.JLabel();
         color = new javax.swing.JColorChooser();
         jButton1 = new javax.swing.JButton();
-        cmbDepartamento = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
         txtProyecto = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtDescripcion = new javax.swing.JTextArea();
         panelRound1 = new scrollPane.PanelRound();
-        jPanel5 = new javax.swing.JPanel();
+        panelDiseno = new javax.swing.JPanel();
         btnDiseno = new javax.swing.JButton();
         lblDesdeD = new javax.swing.JLabel();
         lblHastaD = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
+        panelHerr = new javax.swing.JPanel();
         btnHerramentista = new javax.swing.JButton();
         lblDesdeH = new javax.swing.JLabel();
         lblHastaH = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
-        jPanel6 = new javax.swing.JPanel();
+        panelInte = new javax.swing.JPanel();
         btnIntegracion = new javax.swing.JButton();
         lblDesdeI = new javax.swing.JLabel();
         lblHastaI = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
-        jPanel7 = new javax.swing.JPanel();
+        panelCompras = new javax.swing.JPanel();
         btnCompras = new javax.swing.JButton();
         lblDesdeC = new javax.swing.JLabel();
         lblHastaC = new javax.swing.JLabel();
@@ -215,55 +286,13 @@ public class AgregarFechas extends java.awt.Dialog {
         gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 10);
         jPanel2.add(txtFecha, gridBagConstraints);
 
-        jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel4.setText("Desde: ");
-        jLabel4.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanel2.add(jLabel4, gridBagConstraints);
-
-        FechaInicio.setBackground(new java.awt.Color(255, 255, 255));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipady = 10;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 10);
-        jPanel2.add(FechaInicio, gridBagConstraints);
-
-        jLabel5.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel5.setText("Hasta: ");
-        jLabel5.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanel2.add(jLabel5, gridBagConstraints);
-
-        FechaFin.setBackground(new java.awt.Color(255, 255, 255));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipady = 10;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 10);
-        jPanel2.add(FechaFin, gridBagConstraints);
-
         jLabel6.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel6.setText("Estatus:");
         jLabel6.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
@@ -275,29 +304,17 @@ public class AgregarFechas extends java.awt.Dialog {
         cmbEstatus.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 10;
         gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 10);
         jPanel2.add(cmbEstatus, gridBagConstraints);
 
-        jLabel9.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel9.setText("Departamento:");
-        jLabel9.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(2, 6, 2, 6);
-        jPanel2.add(jLabel9, gridBagConstraints);
-
         color.setBackground(new java.awt.Color(255, 255, 255));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 4;
         jPanel2.add(color, gridBagConstraints);
 
@@ -312,24 +329,11 @@ public class AgregarFechas extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.ipady = 5;
         jPanel2.add(jButton1, gridBagConstraints);
-
-        cmbDepartamento.setBackground(new java.awt.Color(255, 255, 255));
-        cmbDepartamento.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        cmbDepartamento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "DISEÑO", "HERRAMENTISTA", "COMPRAS", "INTEGRACION" }));
-        cmbDepartamento.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipady = 10;
-        gridBagConstraints.insets = new java.awt.Insets(4, 0, 4, 10);
-        jPanel2.add(cmbDepartamento, gridBagConstraints);
 
         jLabel10.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -346,6 +350,11 @@ public class AgregarFechas extends java.awt.Dialog {
         txtProyecto.setBackground(new java.awt.Color(255, 255, 255));
         txtProyecto.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        txtProyecto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtProyectoActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
@@ -391,10 +400,10 @@ public class AgregarFechas extends java.awt.Dialog {
         panelRound1.setRoundTopRight(30);
         panelRound1.setLayout(new java.awt.GridLayout(1, 0));
 
-        jPanel5.setBackground(new java.awt.Color(240, 240, 240));
+        panelDiseno.setBackground(new java.awt.Color(240, 240, 240));
         java.awt.GridBagLayout jPanel5Layout = new java.awt.GridBagLayout();
         jPanel5Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
-        jPanel5.setLayout(jPanel5Layout);
+        panelDiseno.setLayout(jPanel5Layout);
 
         btnDiseno.setBackground(new java.awt.Color(204, 204, 255));
         btnDiseno.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
@@ -407,27 +416,29 @@ public class AgregarFechas extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel5.add(btnDiseno, gridBagConstraints);
+        panelDiseno.add(btnDiseno, gridBagConstraints);
 
         lblDesdeD.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblDesdeD.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeD.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblDesdeD.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel5.add(lblDesdeD, gridBagConstraints);
+        panelDiseno.add(lblDesdeD, gridBagConstraints);
 
         lblHastaD.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblHastaD.setForeground(new java.awt.Color(51, 51, 51));
+        lblHastaD.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel5.add(lblHastaD, gridBagConstraints);
+        panelDiseno.add(lblHastaD, gridBagConstraints);
 
         jLabel16.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel16.setForeground(new java.awt.Color(102, 102, 102));
@@ -435,23 +446,23 @@ public class AgregarFechas extends java.awt.Dialog {
         jLabel16.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        jPanel5.add(jLabel16, gridBagConstraints);
+        gridBagConstraints.gridy = 2;
+        panelDiseno.add(jLabel16, gridBagConstraints);
 
         jLabel17.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel17.setForeground(new java.awt.Color(102, 102, 102));
         jLabel17.setText("Hasta:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        jPanel5.add(jLabel17, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        panelDiseno.add(jLabel17, gridBagConstraints);
 
-        panelRound1.add(jPanel5);
+        panelRound1.add(panelDiseno);
 
-        jPanel4.setBackground(new java.awt.Color(240, 240, 240));
+        panelHerr.setBackground(new java.awt.Color(240, 240, 240));
         java.awt.GridBagLayout jPanel4Layout = new java.awt.GridBagLayout();
         jPanel4Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
-        jPanel4.setLayout(jPanel4Layout);
+        panelHerr.setLayout(jPanel4Layout);
 
         btnHerramentista.setBackground(new java.awt.Color(153, 204, 255));
         btnHerramentista.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
@@ -469,27 +480,29 @@ public class AgregarFechas extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel4.add(btnHerramentista, gridBagConstraints);
+        panelHerr.add(btnHerramentista, gridBagConstraints);
 
         lblDesdeH.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblDesdeH.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeH.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblDesdeH.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel4.add(lblDesdeH, gridBagConstraints);
+        panelHerr.add(lblDesdeH, gridBagConstraints);
 
         lblHastaH.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblHastaH.setForeground(new java.awt.Color(51, 51, 51));
+        lblHastaH.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel4.add(lblHastaH, gridBagConstraints);
+        panelHerr.add(lblHastaH, gridBagConstraints);
 
         jLabel12.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel12.setForeground(new java.awt.Color(102, 102, 102));
@@ -497,23 +510,23 @@ public class AgregarFechas extends java.awt.Dialog {
         jLabel12.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        jPanel4.add(jLabel12, gridBagConstraints);
+        gridBagConstraints.gridy = 2;
+        panelHerr.add(jLabel12, gridBagConstraints);
 
         jLabel13.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(102, 102, 102));
         jLabel13.setText("Hasta:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        jPanel4.add(jLabel13, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        panelHerr.add(jLabel13, gridBagConstraints);
 
-        panelRound1.add(jPanel4);
+        panelRound1.add(panelHerr);
 
-        jPanel6.setBackground(new java.awt.Color(240, 240, 240));
+        panelInte.setBackground(new java.awt.Color(240, 240, 240));
         java.awt.GridBagLayout jPanel6Layout = new java.awt.GridBagLayout();
         jPanel6Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
-        jPanel6.setLayout(jPanel6Layout);
+        panelInte.setLayout(jPanel6Layout);
 
         btnIntegracion.setBackground(new java.awt.Color(153, 153, 255));
         btnIntegracion.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
@@ -526,27 +539,29 @@ public class AgregarFechas extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel6.add(btnIntegracion, gridBagConstraints);
+        panelInte.add(btnIntegracion, gridBagConstraints);
 
         lblDesdeI.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblDesdeI.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeI.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblDesdeI.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel6.add(lblDesdeI, gridBagConstraints);
+        panelInte.add(lblDesdeI, gridBagConstraints);
 
         lblHastaI.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblHastaI.setForeground(new java.awt.Color(51, 51, 51));
+        lblHastaI.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel6.add(lblHastaI, gridBagConstraints);
+        panelInte.add(lblHastaI, gridBagConstraints);
 
         jLabel20.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel20.setForeground(new java.awt.Color(102, 102, 102));
@@ -554,23 +569,23 @@ public class AgregarFechas extends java.awt.Dialog {
         jLabel20.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        jPanel6.add(jLabel20, gridBagConstraints);
+        gridBagConstraints.gridy = 2;
+        panelInte.add(jLabel20, gridBagConstraints);
 
         jLabel21.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel21.setForeground(new java.awt.Color(102, 102, 102));
         jLabel21.setText("Hasta:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        jPanel6.add(jLabel21, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        panelInte.add(jLabel21, gridBagConstraints);
 
-        panelRound1.add(jPanel6);
+        panelRound1.add(panelInte);
 
-        jPanel7.setBackground(new java.awt.Color(240, 240, 240));
+        panelCompras.setBackground(new java.awt.Color(240, 240, 240));
         java.awt.GridBagLayout jPanel7Layout = new java.awt.GridBagLayout();
         jPanel7Layout.columnWeights = new double[] {1.0, 1.0, 1.0, 1.0};
-        jPanel7.setLayout(jPanel7Layout);
+        panelCompras.setLayout(jPanel7Layout);
 
         btnCompras.setBackground(new java.awt.Color(255, 102, 102));
         btnCompras.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
@@ -583,27 +598,29 @@ public class AgregarFechas extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel7.add(btnCompras, gridBagConstraints);
+        panelCompras.add(btnCompras, gridBagConstraints);
 
         lblDesdeC.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblDesdeC.setForeground(new java.awt.Color(51, 51, 51));
+        lblDesdeC.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblDesdeC.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel7.add(lblDesdeC, gridBagConstraints);
+        panelCompras.add(lblDesdeC, gridBagConstraints);
 
         lblHastaC.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblHastaC.setForeground(new java.awt.Color(51, 51, 51));
+        lblHastaC.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        jPanel7.add(lblHastaC, gridBagConstraints);
+        panelCompras.add(lblHastaC, gridBagConstraints);
 
         jLabel24.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel24.setForeground(new java.awt.Color(102, 102, 102));
@@ -611,22 +628,22 @@ public class AgregarFechas extends java.awt.Dialog {
         jLabel24.setToolTipText("");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        jPanel7.add(jLabel24, gridBagConstraints);
+        gridBagConstraints.gridy = 2;
+        panelCompras.add(jLabel24, gridBagConstraints);
 
         jLabel25.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
         jLabel25.setForeground(new java.awt.Color(102, 102, 102));
         jLabel25.setText("Hasta:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        jPanel7.add(jLabel25, gridBagConstraints);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        panelCompras.add(jLabel25, gridBagConstraints);
 
-        panelRound1.add(jPanel7);
+        panelRound1.add(panelCompras);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanel2.add(panelRound1, gridBagConstraints);
@@ -644,20 +661,14 @@ public class AgregarFechas extends java.awt.Dialog {
     }//GEN-LAST:event_closeDialog
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (FechaInicio.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "Debes llenar informacion en Fecha Inicio","Advertencia",JOptionPane.WARNING_MESSAGE);
-        } else if (proyectos.search(txtProyecto.getText()) == -1) {
+        if (proyectos.search(txtProyecto.getText()) == -1) {
             JOptionPane.showMessageDialog(this, "El proyecto que ingresaste no existe","Advertencia",JOptionPane.WARNING_MESSAGE);
-        } else if (cmbDepartamento.getSelectedItem().toString().equals("Seleccionar")) {
-            JOptionPane.showMessageDialog(this, "Debes seleccionar el departamento al que se asignara la tarea","Advertencia",JOptionPane.WARNING_MESSAGE);
         } else if (txtProyecto.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "Debes ingresar un proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
-        } else if (FechaFin.getDate() == null) {
-            JOptionPane.showMessageDialog(this, "Debes llenar informacion en Fecha Fin","Advertencia",JOptionPane.WARNING_MESSAGE);
-        } else if (FechaFin.getDate().before(FechaInicio.getDate())) {
-            JOptionPane.showMessageDialog(this, "La fecha de Inicio debe ser mayor a la fecha Final","Advertencia",JOptionPane.WARNING_MESSAGE);
         } else if (color.getColor().equals(Color.white)) {
             JOptionPane.showMessageDialog(this, "Debes seleccionar un color","Advertencia",JOptionPane.WARNING_MESSAGE);
+        } else if (validarFechas() == false) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar fechas para al menos un departamento","Advertencia",JOptionPane.WARNING_MESSAGE);
         } else{
             try{
                 Connection con;
@@ -667,17 +678,20 @@ public class AgregarFechas extends java.awt.Dialog {
                 String sql = "insert into agenda(FechaInicio, FechaFin, Estatus, Departamento, Creador, Fecha, Color, Proyecto, Descripcion) values(?,?,?,?,?,?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
 
-                pst.setString(1, sdf.format(FechaInicio.getDate()));
-                pst.setString(2, sdf.format(FechaFin.getDate()));
-                pst.setString(3, cmbEstatus.getSelectedItem().toString());
-                pst.setString(4, cmbDepartamento.getSelectedItem().toString());
-                pst.setString(5, txtEmpleado.getText());
-                pst.setString(6, txtFecha.getText());
-                pst.setString(7, color.getColor().getRed() + "," + color.getColor().getGreen() + "," + color.getColor().getBlue());
-                pst.setString(8, txtProyecto.getText());
-                pst.setString(9, txtDescripcion.getText());
-
-                int n = pst.executeUpdate();
+                int n = 0;
+                
+                if(!lblDesdeH.getText().equals("")){
+                    n = agregarFecha(pst, lblDesdeH.getText(), lblHastaH.getText(), "HERRAMENTISTA", n);
+                }
+                if(!lblDesdeD.getText().equals("")){
+                    n = agregarFecha(pst, lblDesdeD.getText(), lblHastaD.getText(), "DISEÑO", n);
+                }
+                if(!lblDesdeI.getText().equals("")){
+                    n = agregarFecha(pst, lblDesdeI.getText(), lblHastaI.getText(), "INTEGRACION", n);
+                }
+                if(!lblDesdeC.getText().equals("")){
+                    n = agregarFecha(pst, lblDesdeC.getText(), lblHastaC.getText(), "COMPRAS", n);
+                }
 
                 if(n > 0){
                     JOptionPane.showMessageDialog(this, "Datos guardados correctamente");
@@ -710,6 +724,10 @@ public class AgregarFechas extends java.awt.Dialog {
         setFechas(evt.getXOnScreen(), evt.getYOnScreen(), lblDesdeD, lblHastaD);
     }//GEN-LAST:event_btnDisenoMouseClicked
 
+    private void txtProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProyectoActionPerformed
+        buscarProyectos(txtProyecto.getText());
+    }//GEN-LAST:event_txtProyectoActionPerformed
+
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -726,13 +744,10 @@ public class AgregarFechas extends java.awt.Dialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private com.toedter.calendar.JDateChooser FechaFin;
-    private com.toedter.calendar.JDateChooser FechaInicio;
     private javax.swing.JButton btnCompras;
     private javax.swing.JButton btnDiseno;
     private javax.swing.JButton btnHerramentista;
     private javax.swing.JButton btnIntegracion;
-    private javax.swing.JComboBox<String> cmbDepartamento;
     private javax.swing.JComboBox<String> cmbEstatus;
     private javax.swing.JColorChooser color;
     private javax.swing.JButton jButton1;
@@ -747,18 +762,11 @@ public class AgregarFechas extends java.awt.Dialog {
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblDesdeC;
     private javax.swing.JLabel lblDesdeD;
@@ -768,6 +776,10 @@ public class AgregarFechas extends java.awt.Dialog {
     private javax.swing.JLabel lblHastaD;
     private javax.swing.JLabel lblHastaH;
     private javax.swing.JLabel lblHastaI;
+    private javax.swing.JPanel panelCompras;
+    private javax.swing.JPanel panelDiseno;
+    private javax.swing.JPanel panelHerr;
+    private javax.swing.JPanel panelInte;
     private scrollPane.PanelRound panelRound1;
     private javax.swing.JTextArea txtDescripcion;
     private javax.swing.JTextField txtEmpleado;

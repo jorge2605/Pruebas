@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import VentanaEmergente.Calendario.AgregarFechas;
+import VentanaEmergente.Calendario.CodigoColores;
 import VentanaEmergente.ProyectoManager.Editar;
 import VentanaEmergente.ProyectoManager.InfoProyectos;
 import VentanaEmergente.ProyectoManager.addFecha;
@@ -110,13 +111,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
                 datos[9] = rs.getString("Facturado");
                 datos[10] = rs.getString("Costo");
                 datos[11] = rs.getString("Moneda");
-                if(datos[8] != null){
-                if(!datos[8].equals("CERRADO")){
-                datos[12] = atrazo(datos[7]);
-                }else{
-                     datos[12] = "";
-                }
-                }
                 datos[13] = rs.getString("Comentarios");
                 datos[14] = rs.getString("DueDate");
                 datos[15] = rs.getString("Responsable");
@@ -172,33 +166,21 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     }
 }
 
-    public String atrazo(String fechaInicio){
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        String dias = "";
-        Date firstDate;
-        if(fechaInicio == null || fechaInicio.equals("")){
-            return "";
-        }else{
-        try {
-            firstDate = sdf.parse(fechaInicio);
-            Date secondDate = new Date();
-
-            long diff = secondDate.getTime() - firstDate.getTime();
-
-            TimeUnit time = TimeUnit.DAYS; 
-            long diffrence = time.convert(diff, TimeUnit.MILLISECONDS);
-            if(diffrence < 0){
-                dias = "";
-            }else{
-            dias = String.valueOf(diffrence);
-            }
-        } catch (ParseException ex) {
-            Logger.getLogger(ProyectManager.class.getName()).log(Level.SEVERE, null, ex);
+    public String getLetra(Date fechaAhora, String fechaTermino, String fechaFin, SimpleDateFormat sdf){
+        Date fecTer;
+        Date fecFin;
+        try{fecTer = sdf.parse(fechaTermino);}catch(Exception e){fecTer = null;}
+        try{fecFin = sdf.parse(fechaFin);}catch(Exception e){fecFin = null;}
+        if(fecTer == null && fechaAhora.after(fecFin)){
+            return "R";
+        }else if(fecTer != null && fechaAhora.after(fecFin)){
+            return "N";
+        }else if(fecTer != null && fecTer.before(fechaAhora)){
+            return "V";
         }
-        return dias;
-        }
+        return "";
     }
-
+    
     public final void getAgenda(){
         try{
             proyectos = new Stack<>();
@@ -206,13 +188,16 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from agenda where Estatus like 'Terminado'";
+            String sql = "select * from agenda";
             ResultSet rs = st.executeQuery(sql);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date d = new Date();
             while(rs.next()){
                 String proyecto = rs.getString("Proyecto");
-                String fecha = rs.getString("Fecha");
+                String fechaFin = rs.getString("FechaFin");
+                String fecha = rs.getString("FechaTermino");
                 String depa = rs.getString("Departamento");
-                proyectos.push(new InfoProyectos(proyecto,fecha, depa));
+                proyectos.push(new InfoProyectos(proyecto,fechaFin + getLetra(d, fecha, fechaFin, sdf), depa));
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
@@ -271,7 +256,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             new Object [][] {
             },
             new String [] {
-                "NO REQUISICION", "NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA",
+                "ID","NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA",
                 "FECHA HERRAMENTISTA", "FECHA DISENO", "FECHA INTEGRACION", "FECHA COMPRAS"
             }
         ) {
@@ -292,6 +277,11 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         Tabla1.setGridColor(new Color(240,240,240));
         scrollTabla.getViewport().setBackground(Color.white);
         scrollTabla.setViewportView(Tabla1);
+        if (Tabla1.getColumnModel().getColumnCount() > 0) {
+            Tabla1.getColumnModel().getColumn(0).setMinWidth(0);
+            Tabla1.getColumnModel().getColumn(0).setPreferredWidth(0);
+            Tabla1.getColumnModel().getColumn(0).setMaxWidth(0);
+        }
     }
     
     public ProyectManager(String numEmpleado) {
@@ -329,6 +319,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         btnVer = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -423,6 +414,11 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             }
         });
         scrollTabla.setViewportView(Tabla1);
+        if (Tabla1.getColumnModel().getColumnCount() > 0) {
+            Tabla1.getColumnModel().getColumn(0).setMinWidth(0);
+            Tabla1.getColumnModel().getColumn(0).setPreferredWidth(0);
+            Tabla1.getColumnModel().getColumn(0).setMaxWidth(0);
+        }
 
         jPanel2.add(scrollTabla, java.awt.BorderLayout.CENTER);
 
@@ -466,6 +462,17 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             }
         });
         jPanel3.add(btnVer);
+
+        jButton1.setBackground(new java.awt.Color(255, 102, 0));
+        jButton1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("Ver codigos de colores");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(jButton1);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_START);
 
@@ -547,7 +554,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     }// </editor-fold>//GEN-END:initComponents
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-        System.out.println("ads");
         if(Tabla1.getSelectedColumn() == 14){
             JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
             row = Tabla1.getSelectedRow();
@@ -919,45 +925,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         verDoc = new verDocumentos(f,true,Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
         verDoc.lblProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
-        try{
-            Connection con = null;
-            Conexion  con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            String sql = "select Proyecto, Documento, Archivo from archivosproyectos where Proyecto like '"+Tabla1.getValueAt(row, 3).toString()+"'";
-            ResultSet rs = st.executeQuery(sql);
-            spec = null;
-            coti = null;
-            oc = null;
-            factura = null;
-            while(rs.next()){
-                String archivo = rs.getString("Documento");
-                System.out.println(archivo);
-                if(archivo.equals("0")){
-                    oc = rs.getBytes("Archivo");
-                }else if(archivo.equals("1")){
-                    coti = rs.getBytes("Archivo");
-                }else if(archivo.equals("2")){
-                    spec = rs.getBytes("Archivo");
-                }else if(archivo.equals("3")){
-                    fac = rs.getBytes("Archivo");
-                }
-            }
-            if(coti == null){
-//                verDoc.btnDes1.setEnabled(false);
-            }
-            if(oc == null){
-//                verDoc.btnDes2.setEnabled(false);
-            }
-            if(spec == null){
-//                verDoc.btnDes3.setEnabled(false);
-            }
-            if(fac == null){
-//                verDoc.btnDes4.setEnabled(false);
-            }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
         verDoc.setVisible(true);
     }//GEN-LAST:event_verDocumentosActionPerformed
 
@@ -1010,8 +977,16 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         AgregarFechas agregar = new AgregarFechas(f, true, numEmpleado);
         agregar.setLocationRelativeTo(f);
         agregar.txtProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
+        agregar.buscarProyectos(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
         agregar.setVisible(true);
     }//GEN-LAST:event_agregarFechaActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        CodigoColores codigo = new CodigoColores(f, true);
+        codigo.setLocationRelativeTo(f);
+        codigo.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1021,6 +996,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     private javax.swing.JMenuItem editar;
     private javax.swing.JMenuItem eliminarFecha;
     private javax.swing.JMenuItem filtrar;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JMenu jMenu1;
