@@ -127,6 +127,7 @@ public class ReporteMes extends javax.swing.JDialog {
             hoja.setColumnWidth(18, valorFijo * 150);//Notas
             hoja.setColumnWidth(19, valorFijo * 50);//Cantidad stock
             hoja.setColumnWidth(20, valorFijo * 95);//Fecha Esperada
+            hoja.setColumnWidth(21, valorFijo * 95);//Fecha Esperada
 
             Font font1 = book.createFont();
             CellStyle style = book.createCellStyle();
@@ -147,7 +148,7 @@ public class ReporteMes extends javax.swing.JDialog {
             2,
             2,
             2,
-            20
+            21
             ));
 
             Map<String, Object> properties = new HashMap<String, Object>();
@@ -170,7 +171,7 @@ public class ReporteMes extends javax.swing.JDialog {
                 "Requisicion", "Codigo", "Descripcion", "Proyecto", "Cantidad",
                 "Requisitor", "UM", "Proveedor", "Precio", "Llego",
                 "OC", "Fecha Recibo", "TE", "Cantidad Recibida", "Ubicacion",
-                "Cantidad entregada", "Notas", "Cantidad Stock", "Fecha Esperada"
+                "Cantidad entregada", "Notas", "Cantidad Stock", "Fecha Esperada", "Fecha Requi"
             };
 
             
@@ -201,12 +202,15 @@ public class ReporteMes extends javax.swing.JDialog {
             ResultSet rs = st.executeQuery(sql);
             
             omitidas = new Stack<>();
+            HashMap<String, String> hash = new HashMap();
             int pr = 0;
             int primeraRequisicion = -1;
             int UltimaRequisicion = -1;
             while(rs.next()){
                 int d = rs.getInt("Id");
                 String pro = rs.getString("Progreso");
+                String fec = rs.getString("FechaNew");
+                hash.put(String.valueOf(d), fec);
                 if(pro.contains("CANCELADO")){
                     omitidas.push(String.valueOf(d));
                 }
@@ -219,7 +223,7 @@ public class ReporteMes extends javax.swing.JDialog {
             
             String precio = "";
             String llego = "";
-            String orden = "";
+            String orden;
             
             if(chbPrecio.isSelected()){
                 precio = " and Precio is not null and Precio != ''";
@@ -236,7 +240,7 @@ public class ReporteMes extends javax.swing.JDialog {
             String sql2 = "select * from requisiciones where NumRequisicion between '" + primeraRequisicion +"' and '" + UltimaRequisicion + "' " + precio + llego + orden;
             Statement st2 = con.createStatement();
             ResultSet rs2 = st2.executeQuery(sql2);
-            String datos[] = new String[19];
+            String datos[] = new String[20];
             int i = 0;
             while(rs2.next()){
                 datos[0] = rs2.getString("NumRequisicion");
@@ -258,11 +262,15 @@ public class ReporteMes extends javax.swing.JDialog {
                 datos[16] = rs2.getString("Notas");
                 datos[17] = rs2.getString("cantidadStock");
                 datos[18] = rs2.getString("FechaEsperada");
+                datos[18] = rs2.getString("FechaEsperada");
+                if(hash.containsKey(datos[0])){
+                    datos[19] = hash.get(datos[0]);
+                }
                 if(verificarRequi(datos[0])){
                     Row fila10=hoja.createRow(i+7);
-                    for (int j = 0; j < 19; j++) {
+                    for (int j = 0; j < 20; j++) {
                         Cell celda=fila10.createCell(j+2);
-                        if(i == -1 && (j >= 0 && j <=18)){
+                        if(i == -1 && (j >= 0 && j <=19)){
                             CellStyle s = book.createCellStyle();
                             Font f = book.createFont();
                             f.setBold(true);
@@ -272,7 +280,7 @@ public class ReporteMes extends javax.swing.JDialog {
                             s.setFillPattern(SOLID_FOREGROUND);
                             celda.setCellStyle(s);
                         }
-                        if(i > -1 && (j > -1 && j <= 18) && (i%2 == 0)){
+                        if(i > -1 && (j > -1 && j <= 19) && (i%2 == 0)){
                             CellStyle s = book.createCellStyle();
                             s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
                             s.setFillPattern(SOLID_FOREGROUND);
@@ -281,7 +289,6 @@ public class ReporteMes extends javax.swing.JDialog {
 
                         if(i==-1){
                             celda.setCellValue(String.valueOf(datos[j]));
-        //                        CellUtil.setCellStyleProperties(celda, properties);
                         }else{
                             if(j == 3){
                             CellStyle ss = book.createCellStyle();
@@ -296,7 +303,6 @@ public class ReporteMes extends javax.swing.JDialog {
                             }
                             celda.setCellValue(String.valueOf(datos[j]));
                         }
-                        File ad = new File(a);
                         book.write(new FileOutputStream(a));                
                     }
                     i++;
