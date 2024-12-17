@@ -181,7 +181,7 @@ public final class Costos extends javax.swing.JInternalFrame {
             new Object [][] {
             },
             new String [] {
-                "Requisicion", "PO", "N.P", "Descripcion", "Cantidad", "Moneda", "P.U", "Total", "Precio Recibido", "Precio Faltante", "Fecha Orden", "Fecha Recibido", "Proyecto"
+                "Requisicion", "PO", "N.P", "Descripcion", "Cantidad", "Moneda", "P.U", "Total MXN", "Proveedor", "Fecha Orden", "Fecha Recibido", "Proyecto"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -787,12 +787,11 @@ public final class Costos extends javax.swing.JInternalFrame {
             double recibidoUsd = 0;
             double faltanteUsd = 0;
             String datos[] = new String[20];
-            double total = 0;
+            DecimalFormat format = new DecimalFormat("#,###.##");
             DefaultTableModel miModelo = (DefaultTableModel) TablaOrdenes.getModel();
             while(rs.next()){
                 //RESULTADO DE ORDENES DE COMPRAS
-                double precio = 0;
-                double precioTotal = 0, precioRecibido = 0, precioFaltante = 0;
+                double precio;
                 datos[0] = rs.getString("OrdenNo");
                 datos[8] = rs.getString("RequisicionNo");
                 
@@ -867,15 +866,13 @@ public final class Costos extends javax.swing.JInternalFrame {
                     dat[2] = datos[11];
                     dat[3] = datos[12];
                     dat[4] = datos[13];
-                    dat[6] = datos[14];
-                    dat[7] = String.valueOf(precio);
-//                    dat[8] = String.valueOf(t1);
-                    dat[9] = String.valueOf(t2);
-                    dat[10] = numrequi;
-                    dat[11] = datos[16];
-                    dat[12] = datos[10];
+                    dat[6] = format.format(Double.parseDouble(datos[14]));
+                    totalMxn += precio * Double.parseDouble(lblPrecioDolar.getText());
+                    dat[7] = String.valueOf(format.format(precio * Double.parseDouble(lblPrecioDolar.getText())));
+                    dat[9] = numrequi;
+                    dat[10] = datos[16];
+                    dat[11] = datos[10];
                     dat[8] = datos[18];
-                    total += precioTotal;
                 if(total2 != 0){
                     miModelo.addRow(dat); 
                 }
@@ -885,14 +882,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                 }
             
             }
-//            DecimalFormat formato = new DecimalFormat("#,##0.00");
-//            lblTotalMxn.setText(formato.format(totalMxn));
-//            lblRecibidoMxn.setText(formato.format(recibidoMxn));
-//            lblFaltanteMxn.setText(formato.format(faltanteMxn));
-//            lblTotalUsd.setText(formato.format(totalUsd));
-//            lblRecibidoUsd.setText(formato.format(recibidoUsd));
-//            lblFaltanteUsd.setText(formato.format(faltanteUsd));
-//            btnExcel.setEnabled(true);
+            lblTotalCompras.setText("Total Mxn:" + (format.format(totalMxn)));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -918,7 +908,7 @@ public final class Costos extends javax.swing.JInternalFrame {
             //RESULTADO DE ORDENES DE COMPRAS
             double precio = 0;
             double precioTotal = 0, precioRecibido = 0, precioFaltante = 0;
-            
+            DecimalFormat format = new DecimalFormat("#,###.##");
             String sql2 = "select Proveedor,Proyecto, Codigo, Descripcion, Cantidad, Precio, FechaRecibo, NumRequisicion, OC, Llego from requisiciones where Proyecto like '"+txtProyecto.getText()+"' and OC is not null and OC != ''";
             Statement st2 = con.createStatement();
             ResultSet rs2 = st2.executeQuery(sql2);
@@ -992,13 +982,13 @@ public final class Costos extends javax.swing.JInternalFrame {
                 dat[2] = datos[11];
                 dat[3] = datos[12];
                 dat[4] = datos[13];
-                dat[6] = datos[14];
-                dat[7] = String.valueOf(precio);
+                dat[6] = format.format(Double.parseDouble(datos[14]));
+                totalMxn += precio * Double.parseDouble(lblPrecioDolar.getText());
+                dat[7] = String.valueOf(format.format(precio * Double.parseDouble(lblPrecioDolar.getText())));
+                dat[9] = numrequi;
+                dat[10] = datos[16];
+                dat[11] = datos[10];
                 dat[8] = datos[18];
-                dat[9] = String.valueOf(t2);
-                dat[10] = numrequi;
-                dat[11] = datos[16];
-                dat[12] = datos[10];
 
             total += precioTotal;
             if(total2 != 0){
@@ -1008,14 +998,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                     System.out.println("error "+e);
                 }
             }
-//            DecimalFormat formato = new DecimalFormat("#,##0.00");
-//            lblTotalMxn.setText(formato.format(totalMxn));
-//            lblRecibidoMxn.setText(formato.format(recibidoMxn));
-//            lblFaltanteMxn.setText(formato.format(faltanteMxn));
-//            lblTotalUsd.setText(formato.format(totalUsd));
-//            lblRecibidoUsd.setText(formato.format(recibidoUsd));
-//            lblFaltanteUsd.setText(formato.format(faltanteUsd));
-//            btnExcel.setEnabled(true);
+            lblTotalCompras.setText("Total Mxn:" + (format.format(totalMxn)));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -1100,12 +1083,14 @@ public final class Costos extends javax.swing.JInternalFrame {
                 d[1] = datos[1];//CANTIDAD
                 d[2] = datos[2];//PROYECTO
                 d[3] = datos[3];//REQUISITOR
+                totalMxn += precioMxn + (precioUsd * Double.parseDouble(lblPrecioDolar.getText()));
                 d[6] = String.valueOf(precioMxn);//TOTAL MXN
                 d[7] = String.valueOf(precioUsd);//TOTAL USD
                 d[8] = datos[8];//TOTAL USD
                 miModelo.addRow(d);
             }
-
+            DecimalFormat format = new DecimalFormat("#,###.##");
+            lblTotalAlmacen.setText(format.format(totalMxn));
 //            lblTotalMxn.setValue(totalMxn);
 //            lblTotalUsd.setValue(totalUsd);
         }catch(SQLException e){
@@ -1509,11 +1494,15 @@ public final class Costos extends javax.swing.JInternalFrame {
         jPanel12 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         TablaOrdenes = new javax.swing.JTable();
+        jPanel35 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        lblTotalCompras = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         TablaAlmacen = new javax.swing.JTable();
+        jPanel36 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
+        lblTotalAlmacen = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
@@ -2119,11 +2108,22 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel12.add(jScrollPane4, java.awt.BorderLayout.CENTER);
 
+        jPanel35.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel35.setLayout(new java.awt.BorderLayout());
+
         jLabel2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(0, 51, 153));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Ordenes de compra");
-        jPanel12.add(jLabel2, java.awt.BorderLayout.PAGE_START);
+        jPanel35.add(jLabel2, java.awt.BorderLayout.PAGE_START);
+
+        lblTotalCompras.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblTotalCompras.setForeground(new java.awt.Color(51, 51, 51));
+        lblTotalCompras.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalCompras.setText("Total Mxn:");
+        jPanel35.add(lblTotalCompras, java.awt.BorderLayout.CENTER);
+
+        jPanel12.add(jPanel35, java.awt.BorderLayout.NORTH);
 
         tabbed.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/po.png")), jPanel12, "Ordenes de compra"); // NOI18N
 
@@ -2151,11 +2151,22 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel13.add(jScrollPane5, java.awt.BorderLayout.CENTER);
 
+        jPanel36.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel36.setLayout(new java.awt.BorderLayout());
+
         jLabel3.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(0, 51, 153));
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Almacen");
-        jPanel13.add(jLabel3, java.awt.BorderLayout.PAGE_START);
+        jPanel36.add(jLabel3, java.awt.BorderLayout.PAGE_START);
+
+        lblTotalAlmacen.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblTotalAlmacen.setForeground(new java.awt.Color(51, 51, 51));
+        lblTotalAlmacen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalAlmacen.setText("Total MXN:");
+        jPanel36.add(lblTotalAlmacen, java.awt.BorderLayout.CENTER);
+
+        jPanel13.add(jPanel36, java.awt.BorderLayout.NORTH);
 
         tabbed.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/almacen.png")), jPanel13, "Almacen"); // NOI18N
 
@@ -3123,6 +3134,8 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -3148,6 +3161,8 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblPrecioDolar;
     private javax.swing.JLabel lblPrecioDolar1;
     private javax.swing.JLabel lblSalir;
+    private javax.swing.JLabel lblTotalAlmacen;
+    private javax.swing.JLabel lblTotalCompras;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelMeses;
     private javax.swing.JPanel panelProyecto;

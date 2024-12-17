@@ -3,13 +3,18 @@ package pruebas;
 import Conexiones.Conexion;
 import Controlador.maquinados.revisarPlanos;
 import VentanaEmergente.Inicio1.Espera;
+import VentanaEmergente.Maquinados.CustomDocumentFilter;
 import VentanaEmergente.Maquinados.IngresarTiempo;
+import VentanaEmergente.Maquinados.ReporteMaquinados;
 import VentanaEmergente.Maquinados.empleado;
 import com.mysql.jdbc.Connection;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.KeyboardFocusManager;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
@@ -35,6 +40,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.text.AbstractDocument;
 
 public class Maquinados extends javax.swing.JInternalFrame implements ActionListener {
 
@@ -302,11 +308,59 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         }
     }
     
+    public void setLabels(String dim1, String dim2, String dim3, String dim4){
+        Point x1 = null,x2 = null,x3 = null ,x4 = null;
+        if(dim2 != null){
+            x1 = new Point(26,147);
+            x2 = new Point(169,258);
+        }
+        if(dim3 != null){
+            x1 = new Point(25,213);
+            x2 = new Point(145,342);
+            x3 = new Point(311,278);
+        }
+        if(dim4 != null){
+            x1 = new Point(326,132);
+            x2 = new Point(33,76);
+            x3 = new Point(60,140);
+            x4 = new Point(193,158);
+        }
+        if(dim1 != null){
+            JLabel lab = new JLabel("" + dim1);
+            lab.setFont(new Font("Roboto", Font.BOLD, 14));
+            lab.setPreferredSize(new Dimension(40, 20));
+            lab.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            panelImagen.add(lab,new org.netbeans.lib.awtextra.AbsoluteConstraints((int)x1.getX(), (int) x1.getY(), -1, -1));
+        }
+        if(dim2 != null){
+            JLabel lab = new JLabel("" + dim2);
+            lab.setFont(new Font("Roboto", Font.BOLD, 14));
+            lab.setPreferredSize(new Dimension(40, 20));
+            lab.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            panelImagen.add(lab,new org.netbeans.lib.awtextra.AbsoluteConstraints((int)x2.getX(), (int) x2.getY(), -1, -1));
+        }
+        if(dim3 != null){
+            JLabel lab = new JLabel("" + dim3);
+            lab.setFont(new Font("Roboto", Font.BOLD, 14));
+            lab.setPreferredSize(new Dimension(40, 20));
+            lab.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            panelImagen.add(lab, new org.netbeans.lib.awtextra.AbsoluteConstraints((int)x3.getX(), (int) x3.getY(), -1, -1));
+        }
+        if(dim4 != null){
+            JLabel lab = new JLabel("" + dim4);
+            lab.setFont(new Font("Roboto", Font.BOLD, 14));
+            lab.setPreferredSize(new Dimension(40, 20));
+            lab.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            panelImagen.add(lab,new org.netbeans.lib.awtextra.AbsoluteConstraints((int)x4.getX(), (int) x4.getY(), -1, -1));
+        }
+    }
+    
     public Maquinados(String numEmpleado) {
         initComponents();
         this.numEmpleado = numEmpleado;
         jScrollPane5.getVerticalScrollBar().setUnitIncrement(15);
         SwingUtilities.invokeLater(() -> getNumEmpleado());
+        ((AbstractDocument) txtDimensiones.getDocument()).setDocumentFilter(new CustomDocumentFilter());
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
     }
 
@@ -326,6 +380,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jPanel3 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         panelGastos = new javax.swing.JPanel();
+        panelReporte = new scrollPane.PanelRound();
+        jButton2 = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -370,6 +426,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         panelRound1 = new scrollPane.PanelRound();
         jButton1 = new javax.swing.JButton();
         lblEmpleado = new javax.swing.JLabel();
+        panelImagen = new javax.swing.JPanel();
+        lblImagen = new javax.swing.JLabel();
 
         setBorder(null);
 
@@ -429,6 +487,32 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         panelGastos.setBackground(new java.awt.Color(255, 255, 255));
         panelGastos.setMaximumSize(new java.awt.Dimension(150, 100));
         panelGastos.setPreferredSize(new java.awt.Dimension(100, 60));
+
+        panelReporte.setBackground(new java.awt.Color(255, 102, 0));
+        panelReporte.setRoundBottomRight(20);
+        panelReporte.setRoundTopLeft(20);
+        panelReporte.setRoundTopRight(20);
+        panelReporte.setLayout(new java.awt.BorderLayout());
+
+        jButton2.setBackground(new java.awt.Color(255, 255, 255));
+        jButton2.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
+        jButton2.setText("Ingresar Reporte");
+        jButton2.setBorder(null);
+        jButton2.setBorderPainted(false);
+        jButton2.setContentAreaFilled(false);
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.setFocusPainted(false);
+        jButton2.setPreferredSize(new java.awt.Dimension(150, 25));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        panelReporte.add(jButton2, java.awt.BorderLayout.CENTER);
+
+        panelGastos.add(panelReporte);
+
         jScrollPane5.setViewportView(panelGastos);
 
         jPanel3.add(jScrollPane5, java.awt.BorderLayout.CENTER);
@@ -492,7 +576,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
 
         jLabel1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(0, 102, 204));
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Ingresa numero de Plano");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -532,7 +616,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
 
         jPanel11.setBackground(new java.awt.Color(255, 255, 255));
         java.awt.GridBagLayout jPanel11Layout = new java.awt.GridBagLayout();
-        jPanel11Layout.columnWeights = new double[] {0.0, 0.0, 0.0, 0.0};
+        jPanel11Layout.columnWeights = new double[] {0.0, 0.0, 1.0, 0.0};
         jPanel11.setLayout(jPanel11Layout);
 
         jLabel14.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
@@ -640,6 +724,17 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
             }
             public void focusLost(java.awt.event.FocusEvent evt) {
                 txtDimensionesFocusLost(evt);
+            }
+        });
+        txtDimensiones.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtDimensionesKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtDimensionesKeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDimensionesKeyTyped(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -926,6 +1021,23 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         gridBagConstraints.gridwidth = 3;
         jPanel11.add(lblEmpleado, gridBagConstraints);
 
+        panelImagen.setBackground(new java.awt.Color(240, 240, 240));
+        panelImagen.setPreferredSize(new java.awt.Dimension(400, 400));
+        panelImagen.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                panelImagenMouseClicked(evt);
+            }
+        });
+        panelImagen.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        panelImagen.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, -1, -1));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 9;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        jPanel11.add(panelImagen, gridBagConstraints);
+
         jPanel9.add(jPanel11, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
@@ -1156,6 +1268,90 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        ReporteMaquinados reporte = new ReporteMaquinados(f, true);
+        reporte.setLocationRelativeTo(f);
+        reporte.setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void txtDimensionesKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDimensionesKeyPressed
+        
+    }//GEN-LAST:event_txtDimensionesKeyPressed
+
+    private void txtDimensionesKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDimensionesKeyTyped
+        
+    }//GEN-LAST:event_txtDimensionesKeyTyped
+
+    private void txtDimensionesKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDimensionesKeyReleased
+        panelImagen.removeAll();
+        revalidate();
+        repaint();
+        String [] cont = txtDimensiones.getText().split("x");
+        if(cont.length > 4){
+            JOptionPane.showMessageDialog(this, "Solo puedes agregar 4 medidas","Advertencia",JOptionPane.WARNING_MESSAGE);
+            String text = "";
+            for (int i = 0; i < cont.length; i++) {
+                if(i < 5){
+                    if(i != 4){
+                        text = text + cont[i] + "x";
+                    } else {
+                        text = text.substring(0, text.length() - 1);
+                    }
+                }
+            }
+            txtDimensiones.setText(text);
+        }else{
+            switch (cont.length) {
+                case 0:
+                    lblImagen = new javax.swing.JLabel();
+                    lblImagen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/redodno.png")));
+                    panelImagen.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, -1, -1));
+                    revalidate();
+                    repaint();
+                    lblImagen.setLocation((panelImagen.getWidth()/2) - (lblImagen.getWidth() / 2), (panelImagen.getHeight()/2) - (lblImagen.getHeight()/ 2));
+                    setLabels(txtDimensiones.getText(), null, null, null);
+                    break;
+                case 2:
+                    lblImagen = new javax.swing.JLabel();
+                    lblImagen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/redodno.png")));
+                    panelImagen.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, -1, -1));
+                    revalidate();
+                    repaint();
+                    lblImagen.setLocation((panelImagen.getWidth()/2) - (lblImagen.getWidth() / 2), (panelImagen.getHeight()/2) - (lblImagen.getHeight()/ 2));
+                    setLabels(cont[0], cont[1], null, null);
+                    break;
+                case 3:
+                    lblImagen = new javax.swing.JLabel();
+                    lblImagen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/cuadrado.png")));
+                    panelImagen.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, -1, -1));
+                    revalidate();
+                    repaint();
+                    lblImagen.setLocation((panelImagen.getWidth()/2) - (lblImagen.getWidth() / 2), (panelImagen.getHeight()/2) - (lblImagen.getHeight()/ 2));
+                    setLabels(cont[0], cont[1], cont[2], null);
+                    break;
+                case 4:
+                    lblImagen = new javax.swing.JLabel();
+                    lblImagen.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/angulo.png")));
+                    panelImagen.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, -1, -1));
+                    revalidate();
+                    repaint();
+                    lblImagen.setLocation((panelImagen.getWidth()/2) - (lblImagen.getWidth() / 2), (panelImagen.getHeight()/2) - (lblImagen.getHeight()/ 2));
+                    setLabels(cont[0], cont[1], cont[2], cont[3]);
+                    break;
+                default:
+                    lblImagen.setIcon(null);
+                    break;
+            }
+        }
+    }//GEN-LAST:event_txtDimensionesKeyReleased
+
+    private void panelImagenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panelImagenMouseClicked
+        System.out.println("X = "+evt.getX());
+        System.out.println("Y = "+evt.getY());
+        System.out.println("--------------------------------");
+    }//GEN-LAST:event_panelImagenMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCnc;
@@ -1164,6 +1360,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JButton btnRecti;
     private javax.swing.JButton btnTorno;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel12;
@@ -1191,6 +1388,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblEmpleado;
+    private javax.swing.JLabel lblImagen;
     private javax.swing.JLabel lblSalir;
     private javax.swing.JLabel lblTC;
     private javax.swing.JLabel lblTF;
@@ -1198,6 +1396,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JLabel lblTT;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelGastos;
+    private javax.swing.JPanel panelImagen;
+    private scrollPane.PanelRound panelReporte;
     private scrollPane.PanelRound panelRound1;
     private javax.swing.JPanel panelSalir;
     private javax.swing.JPanel pnlCnc;
