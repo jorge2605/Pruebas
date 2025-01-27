@@ -4,6 +4,8 @@ import Conexiones.Conexion;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.sql.Connection;
@@ -60,10 +62,10 @@ public class ReporteMaquinados extends java.awt.Dialog {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(jsonString);
         String tp = jsonNode.get("tp").asText();
-        String cnc1 = jsonNode.get("text").asText();
-        String cnc11 = jsonNode.get("text2").asText();
-        text.setText(cnc1);
-        text.setText(cnc11);
+        String sp = jsonNode.get("sp").asText();
+        String pp = jsonNode.get("pp").asText();
+        text.setText(sp);
+        text2.setText(pp);
         TP.setText(tp);
     }
     
@@ -106,6 +108,16 @@ public class ReporteMaquinados extends java.awt.Dialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public String formatoJSON(JLabel tp, JTextField sp, JTextField pp){
+        char comillas = '"';
+        String json = "{"
+                + comillas + "tp" + comillas + ":" + comillas + tp.getText() + comillas + ","
+                + comillas + "sp" + comillas + ":" + comillas + sp.getText() + comillas + ","
+                + comillas + "pp" + comillas + ":" + comillas + pp.getText() + comillas + "}"
+                ;
+        return json;
     }
     
     public ReporteMaquinados(java.awt.Frame parent, boolean modal) {
@@ -1097,8 +1109,42 @@ public class ReporteMaquinados extends java.awt.Dialog {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            String sql = "insert into reporte_maquinados ()";
+            String sql = "insert into reporte_maquinados (Anio, Semana, Cnc1, Cnc2, Cnc3, Cnc4, Cnc5, Fresa1, Fresa2, Fresa3, Fresa4, Torno, Recti) "
+                    + "values (?,?,?,?,?,?,?,?,?,?,?,?,?) "
+                    + "on duplicate key update "
+                    + "Cnc1 = values(Cnc1), "
+                    + "Cnc2 = values(Cnc2), "
+                    + "Cnc3 = values(Cnc3), "
+                    + "Cnc4 = values(Cnc4), "
+                    + "Cnc5 = values(Cnc5), "
+                    + "Fresa1 = values(Fresa1), "
+                    + "Fresa2 = values(Fresa2), "
+                    + "Fresa3 = values(Fresa3), "
+                    + "Fresa4 = values(Fresa4), "
+                    + "Torno = values(Torno), "
+                    + "Recti = values(Recti)";
             PreparedStatement pst = con.prepareStatement(sql);
+            
+            pst.setString(1, anio.getValue() + "");
+            pst.setString(2, semana.getYear()+ "");
+            pst.setString(3, formatoJSON(TP1, txtCnc1, txtCnc11));
+            pst.setString(4, formatoJSON(TP2, txtCnc2, txtCnc21));
+            pst.setString(5, formatoJSON(TP3, txtCnc3, txtCnc31));
+            pst.setString(6, formatoJSON(TP4, txtCnc4, txtCnc41));
+            pst.setString(7, formatoJSON(TP5, txtCnc5, txtCnc51));
+            pst.setString(8, formatoJSON(TP6, txtFresa1, txtFresa11));
+            pst.setString(9, formatoJSON(TP7, txtFresa2, txtFresa21));
+            pst.setString(10, formatoJSON(TP8, txtFresa3, txtFresa31));
+            pst.setString(11, formatoJSON(TP9, txtFresa4, txtFresa41));
+            pst.setString(12, formatoJSON(TP10, txtTorno, txtTorno));
+            pst.setString(13, formatoJSON(TP11, txtRecti, txtRecti));
+            
+            int n = pst.executeUpdate();
+            
+            if(n > 0){
+                JOptionPane.showMessageDialog(this, "Datos Guardados");
+            }
+            
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error: " + e, "Error",JOptionPane.ERROR_MESSAGE);
         }

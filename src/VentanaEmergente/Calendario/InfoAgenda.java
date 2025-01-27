@@ -7,8 +7,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
@@ -16,6 +20,7 @@ public class InfoAgenda extends java.awt.Dialog {
 
     public boolean band = false;
     String nomEmpleado;
+    java.awt.Frame parent;
     
     public void verInformacion(String id){
         try{
@@ -34,6 +39,11 @@ public class InfoAgenda extends java.awt.Dialog {
                 txtDepa.setText(rs.getString("Departamento"));
                 txtProyecto.setText(rs.getString("Proyecto"));
                 txtDescripcion.setText(rs.getString("Descripcion"));
+                if(rs.getBoolean("HabilitarCierre")){
+                    btnCambiar.setVisible(true);
+                } else {
+                    btnCambiar.setVisible(false);
+                }
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
@@ -54,6 +64,7 @@ public class InfoAgenda extends java.awt.Dialog {
         initComponents();
         SwingUtilities.invokeLater(txtComentarios::requestFocusInWindow);
         this.nomEmpleado = nomEmpleado;
+        this.parent = parent;
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -85,6 +96,7 @@ public class InfoAgenda extends java.awt.Dialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtComentarios = new javax.swing.JTextArea();
         jButton1 = new javax.swing.JButton();
+        btnCambiar = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(494, 618));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -104,7 +116,7 @@ public class InfoAgenda extends java.awt.Dialog {
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
-        jPanel2Layout.columnWeights = new double[] {1.0, 1.0};
+        jPanel2Layout.columnWeights = new double[] {1.0, 0.0, 1.0};
         jPanel2.setLayout(jPanel2Layout);
 
         panelColor.setRoundBottomLeft(15);
@@ -112,7 +124,9 @@ public class InfoAgenda extends java.awt.Dialog {
         panelColor.setRoundTopLeft(15);
         panelColor.setRoundTopRight(15);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.ipadx = 150;
         gridBagConstraints.ipady = 10;
         jPanel2.add(panelColor, gridBagConstraints);
@@ -123,6 +137,8 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel2.setText("Fecha de Inicio:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel2, gridBagConstraints);
@@ -133,6 +149,8 @@ public class InfoAgenda extends java.awt.Dialog {
         txtFecha1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
@@ -143,7 +161,9 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setText("Fecha final:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel3, gridBagConstraints);
@@ -153,7 +173,9 @@ public class InfoAgenda extends java.awt.Dialog {
         txtFecha2.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         txtFecha2.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
@@ -165,6 +187,8 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel4.setText("Estatus:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel4, gridBagConstraints);
@@ -175,6 +199,8 @@ public class InfoAgenda extends java.awt.Dialog {
         txtEstatus.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
@@ -185,7 +211,9 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Empleado creador:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel5, gridBagConstraints);
@@ -195,7 +223,9 @@ public class InfoAgenda extends java.awt.Dialog {
         txtEmpleado.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         txtEmpleado.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
@@ -207,6 +237,8 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel6.setText("Fecha termino:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel6, gridBagConstraints);
@@ -219,7 +251,7 @@ public class InfoAgenda extends java.awt.Dialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 6);
         jPanel2.add(txtFecha, gridBagConstraints);
 
         jLabel7.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
@@ -227,7 +259,9 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel7.setText("Departamento:");
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel7, gridBagConstraints);
@@ -237,7 +271,8 @@ public class InfoAgenda extends java.awt.Dialog {
         txtDepa.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         txtDepa.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
@@ -249,7 +284,8 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel8.setText("Proyecto:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel8, gridBagConstraints);
@@ -260,7 +296,8 @@ public class InfoAgenda extends java.awt.Dialog {
         txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipady = 9;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
@@ -272,7 +309,8 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel9.setText("Descripcion:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel9, gridBagConstraints);
@@ -290,7 +328,8 @@ public class InfoAgenda extends java.awt.Dialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         jPanel2.add(jScrollPane1, gridBagConstraints);
@@ -301,7 +340,8 @@ public class InfoAgenda extends java.awt.Dialog {
         jLabel10.setText("Comentarios:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 0);
         jPanel2.add(jLabel10, gridBagConstraints);
@@ -318,7 +358,8 @@ public class InfoAgenda extends java.awt.Dialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         jPanel2.add(jScrollPane2, gridBagConstraints);
@@ -334,11 +375,26 @@ public class InfoAgenda extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.ipady = 5;
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 10, 0);
         jPanel2.add(jButton1, gridBagConstraints);
+
+        btnCambiar.setBackground(new java.awt.Color(255, 153, 0));
+        btnCambiar.setFont(new java.awt.Font("Roboto", 1, 10)); // NOI18N
+        btnCambiar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCambiar.setText("Cambiar");
+        btnCambiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCambiarActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        jPanel2.add(btnCambiar, gridBagConstraints);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
@@ -363,13 +419,10 @@ public class InfoAgenda extends java.awt.Dialog {
                 String sql = "update agenda set Comentarios = ?, Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where idAgenda = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Date d = new Date();
-                
                 pst.setString(1, txtComentarios.getText());
                 pst.setString(2, "Terminado");
                 pst.setString(3, nomEmpleado);
-                pst.setString(4, sdf.format(d));
+                pst.setString(4, txtFecha.getText());
                 pst.setString(5, lblId.getText());
 
                 int n = pst.executeUpdate();
@@ -385,6 +438,14 @@ public class InfoAgenda extends java.awt.Dialog {
             }
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnCambiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCambiarActionPerformed
+        CambiarFecha cambiar = new CambiarFecha(parent, true);
+        String fecha = cambiar.getFecha();
+        if (fecha != null) {
+            txtFecha.setText(fecha);
+        }
+    }//GEN-LAST:event_btnCambiarActionPerformed
 
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -402,6 +463,7 @@ public class InfoAgenda extends java.awt.Dialog {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCambiar;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;

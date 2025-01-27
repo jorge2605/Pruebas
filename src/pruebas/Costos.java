@@ -52,8 +52,10 @@ import javax.swing.Action;
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import VentanaEmergente.Costos.ConfTabla;
+import VentanaEmergente.Costos.TablaPrincipalCostos;
 import VentanaEmergente.Costos.addEmpleado;
 import VentanaEmergente.Inicio1.Espera;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -238,11 +240,11 @@ public final class Costos extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Costo Indirecto", "Costo MP", "Total", "Precio proyecto", "Ganancia o perdida"
+                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Gasto Indirecto", "Costo MP", "Total", "Precio proyecto", "Ganancia o perdida", "Margen Beneficio"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -443,6 +445,9 @@ public final class Costos extends javax.swing.JInternalFrame {
             ResultSet rs = st.executeQuery(sql);
             DefaultTableModel miModelo = (DefaultTableModel) TablaMaquinados.getModel();
             String datos[] = new String[15];
+            Stack<String> cnc = new Stack<>();
+            Stack<String> fresa = new Stack<>();
+            Stack<String> torno = new Stack<>();
             while(rs.next()){
                 datos[0] = rs.getString("NumEmpleado");
                 datos[0] = getEmploye(datos[0]);
@@ -456,11 +461,40 @@ public final class Costos extends javax.swing.JInternalFrame {
                 datos[8] = rs.getString("Fecha");
                 datos[9] = rs.getString("Plano");
                 datos[10] = rs.getString("Maquina");
+                switch (datos[10]) {
+                    case "Cnc":
+                        cnc.push(datos[2]);
+                        break;
+                    case "Fresadora":
+                        fresa.push(datos[2]);
+                        break;
+                    case "Torno":
+                        torno.push(datos[2]);
+                        break;
+                    default:
+                        break;
+                }
                 miModelo.addRow(datos);
             }
+            
+            lblCnc1.setText(getDuracion(cnc));
+            lblFresa1.setText(getDuracion(fresa));
+            lblTorno1.setText(getDuracion(torno));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public String getDuracion(Stack<String> maquina){
+        Duration hcnc = Duration.ZERO;
+        for (int i = 0; i < maquina.size(); i++) {
+            String[] partes = maquina.get(i).split(":");
+            int hora = Integer.parseInt(partes[0]);
+            int min;
+            try{min = Integer.parseInt(partes[1]);}catch(Exception e){min = 0;};
+            hcnc = hcnc.plusHours(hora).plusMinutes(min);
+        }
+        return hcnc.toHours() + ":" + hcnc.toMinutes() % 60;
     }
     
     public void agregarIntegracion(String dia1, String dia2, String tipo){
@@ -472,11 +506,12 @@ public final class Costos extends javax.swing.JInternalFrame {
             Statement st = con.createStatement();
             String sql = "select * from htpp where Departamento like '1' and Fecha between '"+dia1+"' and '"+dia2+"'";
             if(tipo.equals("proyecto")){
-                sql = "select * from htpp where Departamento like '1' and Proyecto like '" + txtProyecto.getText() + "'";
+                sql = "select * from htpp where Departamento like '1' and Proyecto like '" + txtProyecto.getText() + "%'";
             }
             ResultSet rs = st.executeQuery(sql);
             DefaultTableModel miModelo = (DefaultTableModel) TablaIntegracion.getModel();
             String datos[] = new String[10];
+            Stack<String> integracion = new Stack<>();
             while(rs.next()){
                 datos[0] = rs.getString("NumEmpleado");
                 datos[0] = getEmploye(datos[0]);
@@ -485,8 +520,10 @@ public final class Costos extends javax.swing.JInternalFrame {
                 datos[3] = rs.getString("Ocupacion");
                 datos[4] = rs.getString("Id");
                 datos[5] = rs.getString("Fecha");
+                integracion.push(datos[2]);
                 miModelo.addRow(datos);
             }
+            lblIntegracion.setText(getDuracion(integracion));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -506,6 +543,7 @@ public final class Costos extends javax.swing.JInternalFrame {
             ResultSet rs = st.executeQuery(sql);
             DefaultTableModel miModelo = (DefaultTableModel) TablaDiseño.getModel();
             String datos[] = new String[10];
+            Stack<String> diseno = new Stack<>();
             while(rs.next()){
                 datos[0] = rs.getString("NumEmpleado");
                 datos[0] = getEmploye(datos[0]);
@@ -514,8 +552,10 @@ public final class Costos extends javax.swing.JInternalFrame {
                 datos[3] = rs.getString("Notas");
                 datos[4] = rs.getString("Id");
                 datos[5] = rs.getString("Fecha");
+                diseno.push(datos[2]);
                 miModelo.addRow(datos);
             }
+            lblHorasDiseno.setText(getDuracion(diseno));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -800,7 +840,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                 ResultSet rs2 = st2.executeQuery(sql2);
                 String dat[] = new String[15];
                 double t1 = 0,t2 = 0;
-                double total2 = 0;
+                double total2;
                 while(rs2.next()){
                     //RESULTADO DE REQUISICIONES DE COMPRA
                     try{
@@ -860,21 +900,27 @@ public final class Costos extends javax.swing.JInternalFrame {
                     }
                     //     0           1     2       3               4       5         6                     7               8
                     //"REQUISICION", "PO", "N.P", "DESCRIPCION",Cantidad "MONEDA", "PRECIO TOTAL", "PRECIO RECIBIDO", "PRECIO FALTANTE", "fecha requi", "fecha recibo"
-                    total2+=precio;
+                    total2=precio;
                     dat[0] = datos[8];
                     dat[1] = datos[0];
                     dat[2] = datos[11];
                     dat[3] = datos[12];
                     dat[4] = datos[13];
                     dat[6] = format.format(Double.parseDouble(datos[14]));
-                    totalMxn += precio * Double.parseDouble(lblPrecioDolar.getText());
-                    dat[7] = String.valueOf(format.format(precio * Double.parseDouble(lblPrecioDolar.getText())));
+                    double total = precio * Double.parseDouble(lblPrecioDolar.getText());
+                    if(moneda.equals("MXN")){
+                        total = precio;
+                    }
+                    totalMxn += total;
+                    dat[7] = String.valueOf(format.format(total));
                     dat[9] = numrequi;
                     dat[10] = datos[16];
                     dat[11] = datos[10];
                     dat[8] = datos[18];
                 if(total2 != 0){
                     miModelo.addRow(dat); 
+                }else{
+                    System.err.println("no se agrego la partida " + datos[2]);
                 }
                     }catch(Exception e){
                         System.out.println("error "+e);
@@ -882,7 +928,12 @@ public final class Costos extends javax.swing.JInternalFrame {
                 }
             
             }
-            lblTotalCompras.setText("Total Mxn:" + (format.format(totalMxn)));
+            double total = 0;
+            DecimalFormat df = new DecimalFormat("#,###.##");
+            for (int i = 0; i < TablaOrdenes.getRowCount(); i++) {
+                try{total += Double.parseDouble(TablaOrdenes.getValueAt(i, 7).toString().replace(",", ""));}catch(Exception e){System.out.println("error");}
+            }
+            lblTotalCompras.setText(df.format(total));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -983,8 +1034,11 @@ public final class Costos extends javax.swing.JInternalFrame {
                 dat[3] = datos[12];
                 dat[4] = datos[13];
                 dat[6] = format.format(Double.parseDouble(datos[14]));
-                totalMxn += precio * Double.parseDouble(lblPrecioDolar.getText());
-                dat[7] = String.valueOf(format.format(precio * Double.parseDouble(lblPrecioDolar.getText())));
+                if (moneda.equals("DLLS")) {
+                    dat[7] = String.valueOf(format.format(precio * Double.parseDouble(lblPrecioDolar.getText())));
+                } else {
+                    dat[7] = format.format(precio);
+                }
                 dat[9] = numrequi;
                 dat[10] = datos[16];
                 dat[11] = datos[10];
@@ -998,7 +1052,12 @@ public final class Costos extends javax.swing.JInternalFrame {
                     System.out.println("error "+e);
                 }
             }
-            lblTotalCompras.setText("Total Mxn:" + (format.format(totalMxn)));
+            double tot = 0;
+            DecimalFormat df = new DecimalFormat("#,###.##");
+            for (int i = 0; i < TablaOrdenes.getRowCount(); i++) {
+                try{tot += Double.parseDouble(TablaOrdenes.getValueAt(i, 7).toString().replace(",", ""));}catch(Exception e){System.out.println("error");}
+            }
+            lblTotalCompras.setText(df.format(tot));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -1089,10 +1148,14 @@ public final class Costos extends javax.swing.JInternalFrame {
                 d[8] = datos[8];//TOTAL USD
                 miModelo.addRow(d);
             }
-            DecimalFormat format = new DecimalFormat("#,###.##");
-            lblTotalAlmacen.setText(format.format(totalMxn));
-//            lblTotalMxn.setValue(totalMxn);
-//            lblTotalUsd.setValue(totalUsd);
+            double total = 0;
+            DecimalFormat df = new DecimalFormat("#,###.##");
+            double precioDolar = Double.parseDouble(lblPrecioDolar.getText());
+            for (int i = 0; i < TablaAlmacen.getRowCount(); i++) {
+                try{total += Double.parseDouble(TablaAlmacen.getValueAt(i, 6).toString().replace(",", ""));}catch(Exception e){System.out.println("error");}
+                try{total += (Double.parseDouble(TablaAlmacen.getValueAt(i, 7).toString().replace(",", ""))) * precioDolar;}catch(Exception e){System.out.println("error");}
+            }
+            lblTotalAlmacen.setText(df.format(total));
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
         }
@@ -1194,16 +1257,23 @@ public final class Costos extends javax.swing.JInternalFrame {
             con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "select Proyecto, Estatus, Costo,Moneda from proyectos where Estatus like 'EN PROCESO'";
+            if(tipo.equals("proyecto")){
+                sql = "select Proyecto, Estatus, Costo,Moneda from proyectos where Proyecto like '" + txtProyecto.getText() + "'";
+            }
             ResultSet rs = st.executeQuery(sql);
             String dat[] = new String[10];
             String dat2[] = new String[10];
             DefaultTableModel miModelo = (DefaultTableModel) TablaIndirecto.getModel();
             DefaultTableModel miModelo2 = (DefaultTableModel) TablaPrincipal.getModel();
-            DecimalFormat formato = new DecimalFormat("#,##0.00");
+            DecimalFormat formato = new DecimalFormat("#,###.##");
+            String precio = null;
+            String moneda = null;
             while(rs.next()){
                 dat[0] = rs.getString("Proyecto");
                 dat[1] = rs.getString("Costo");
                 dat[7] = rs.getString("Moneda");
+                moneda = dat[7];
+                precio = dat[1];
                 if(dat[7] == null){
                     dat[7] = "";
                 }
@@ -1219,11 +1289,60 @@ public final class Costos extends javax.swing.JInternalFrame {
                     try{tot = dolar * (Double.parseDouble(dat[1].replaceAll("[^0-9.]", "")));}catch(Exception e){tot = 0;}
                     dat[1] = String.valueOf(formato.format(tot));
                 }
+                Stack<String> pila = new Stack<>();
+                pila.push(lblCnc1.getText());
+                pila.push(lblFresa1.getText());
+                pila.push(lblTorno1.getText());
                 dat2[0] = rs.getString("Proyecto");
+                dat2[1] = lblHorasDiseno.getText();
+                dat2[2] = getDuracion(pila);
+                dat2[3] = lblIntegracion.getText();
                 miModelo.addRow(dat);
                 miModelo2.addRow(dat2);
             }
-            
+            String sql2 = "select * from costohoras";
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery(sql2);
+            double precioDiseno = 0;
+            double precioHerramentista = 0;
+            double precioElectro = 0;
+            while(rs2.next()){
+                precioDiseno = rs2.getDouble("MODDiseño");
+                precioHerramentista = rs2.getDouble("MODHerramentista");
+                precioElectro = rs2.getDouble("MODElectromecanico");
+            }
+            if(tipo.equals("proyecto")){
+                double precioProyecto;
+                for (int i = 0; i < TablaPrincipal.getRowCount(); i++) {
+                    String horasDis[] = TablaPrincipal.getValueAt(i, 1).toString().split(":");
+                    String horasHerr[] = TablaPrincipal.getValueAt(i, 2).toString().split(":");
+                    String horasEle[] = TablaPrincipal.getValueAt(i, 3).toString().split(":");
+                    double totalPrecio = (precioDiseno * Double.parseDouble(horasDis[0])) + ((Double.parseDouble(horasDis[1]) * precioDiseno) / 60);
+                    totalPrecio += (precioHerramentista * Double.parseDouble(horasHerr[0])) + ((Double.parseDouble(horasHerr[1]) * precioHerramentista) / 60);
+                    totalPrecio += (precioElectro * Double.parseDouble(horasEle[0])) + ((Double.parseDouble(horasEle[1]) * precioElectro) / 60);
+                    TablaPrincipal.setValueAt(formato.format(totalPrecio), i, 4);
+                    if(precio != null){
+                        double precioIndirecto = Double.parseDouble(precio.replace(",", "")) * .20;
+                        precioProyecto = Double.parseDouble(precio.replace(",", ""));
+                        if(moneda.equals("DLLS")){
+                            precioIndirecto = precioIndirecto * Double.parseDouble(lblPrecioDolar.getText());
+                            precioProyecto = precioProyecto * Double.parseDouble(lblPrecioDolar.getText());
+                        }
+                        TablaPrincipal.setValueAt((formato.format(precioIndirecto)), i, 5);
+                        double costoMP;
+                        costoMP = Double.parseDouble(lblTotalCompras.getText().replace(",", "")) + Double.parseDouble(lblTotalAlmacen.getText().replace(",", ""));
+                        for (int j = 0; j < TablaMaquinados.getRowCount(); j++) {
+                            try{costoMP += Double.parseDouble(TablaMaquinados.getValueAt(j, 6).toString());}catch(Exception e){}
+                        }
+                        TablaPrincipal.setValueAt(formato.format(costoMP), i, 6);
+                        double total = totalPrecio + costoMP + precioIndirecto;
+                        TablaPrincipal.setValueAt(formato.format(total), i, 7);
+                        TablaPrincipal.setValueAt(formato.format(precioProyecto), i, 8);
+                        TablaPrincipal.setValueAt(formato.format(precioProyecto - total), i, 9);
+                        TablaPrincipal.setValueAt(formato.format((precioProyecto - total) / precioProyecto), i, 10);
+                    }
+                }
+            }
             double total = 0, suma = 0;
             for (int i = 0; i < TablaIndirecto.getRowCount(); i++) {
                 try{
@@ -1456,7 +1575,7 @@ public final class Costos extends javax.swing.JInternalFrame {
         tabbed = new javax.swing.JTabbedPane();
         jPanel11 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
-        TablaPrincipal = new javax.swing.JTable();
+        TablaPrincipal = new TablaPrincipalCostos();
         jScrollPane1 = new javax.swing.JScrollPane();
         jPanel8 = new javax.swing.JPanel();
         jPanel9 = new javax.swing.JPanel();
@@ -1466,23 +1585,41 @@ public final class Costos extends javax.swing.JInternalFrame {
         TablaHoras = new javax.swing.JTable();
         jLabel22 = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
-        jLabel17 = new javax.swing.JLabel();
         jScrollPane9 = new javax.swing.JScrollPane();
         TablaMaquinados = new javax.swing.JTable();
         jPanel32 = new javax.swing.JPanel();
         btnGuardar1 = new scrollPane.BotonRedondo();
+        jPanel37 = new javax.swing.JPanel();
+        jLabel17 = new javax.swing.JLabel();
+        jPanel38 = new javax.swing.JPanel();
+        lblCnc = new javax.swing.JLabel();
+        lblCnc1 = new javax.swing.JLabel();
+        lblFresa = new javax.swing.JLabel();
+        lblFresa1 = new javax.swing.JLabel();
+        lblTorno = new javax.swing.JLabel();
+        lblTorno1 = new javax.swing.JLabel();
         jPanel29 = new javax.swing.JPanel();
         jScrollPane10 = new javax.swing.JScrollPane();
         TablaIntegracion = new javax.swing.JTable();
+        jPanel42 = new javax.swing.JPanel();
         jLabel19 = new javax.swing.JLabel();
+        jPanel43 = new javax.swing.JPanel();
+        lblCnc2 = new javax.swing.JLabel();
+        lblIntegracion = new javax.swing.JLabel();
         jPanel30 = new javax.swing.JPanel();
         jScrollPane11 = new javax.swing.JScrollPane();
         TablaDiseño = new javax.swing.JTable();
+        jPanel40 = new javax.swing.JPanel();
         jLabel20 = new javax.swing.JLabel();
+        jPanel41 = new javax.swing.JPanel();
+        jlabel = new javax.swing.JLabel();
+        lblHorasDiseno = new javax.swing.JLabel();
         jPanel31 = new javax.swing.JPanel();
         jScrollPane12 = new javax.swing.JScrollPane();
         TablaCalidad = new javax.swing.JTable();
+        jPanel39 = new javax.swing.JPanel();
         jLabel21 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
         jPanel33 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel34 = new javax.swing.JPanel();
@@ -1496,12 +1633,16 @@ public final class Costos extends javax.swing.JInternalFrame {
         TablaOrdenes = new javax.swing.JTable();
         jPanel35 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        jPanel44 = new javax.swing.JPanel();
+        lblTotalCompras1 = new javax.swing.JLabel();
         lblTotalCompras = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jScrollPane5 = new javax.swing.JScrollPane();
         TablaAlmacen = new javax.swing.JTable();
         jPanel36 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
+        jPanel45 = new javax.swing.JPanel();
+        lblTotalAlmacen1 = new javax.swing.JLabel();
         lblTotalAlmacen = new javax.swing.JLabel();
         jPanel14 = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
@@ -1733,15 +1874,20 @@ public final class Costos extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Costo Indirecto", "Costo MP", "Total", "Precio proyecto", "Ganancia o perdida"
+                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Gasto Indirecto", "Costo MP", "Total", "Precio proyecto", "Ganancia o perdida", "Margen Beneficio"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        TablaPrincipal.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                TablaPrincipalMouseClicked(evt);
             }
         });
         jScrollPane3.setViewportView(TablaPrincipal);
@@ -1839,12 +1985,6 @@ public final class Costos extends javax.swing.JInternalFrame {
         jPanel28.setBackground(new java.awt.Color(255, 255, 255));
         jPanel28.setLayout(new java.awt.BorderLayout());
 
-        jLabel17.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel17.setForeground(new java.awt.Color(153, 0, 0));
-        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel17.setText("Maquinados");
-        jPanel28.add(jLabel17, java.awt.BorderLayout.PAGE_START);
-
         jScrollPane9.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane9.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
@@ -1893,6 +2033,52 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel28.add(jPanel32, java.awt.BorderLayout.PAGE_END);
 
+        jPanel37.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel37.setLayout(new java.awt.BorderLayout());
+
+        jLabel17.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(153, 0, 0));
+        jLabel17.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel17.setText("Maquinados");
+        jPanel37.add(jLabel17, java.awt.BorderLayout.PAGE_START);
+
+        jPanel38.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 40, 5));
+
+        lblCnc.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblCnc.setForeground(new java.awt.Color(0, 102, 255));
+        lblCnc.setText("Horas Cnc: ");
+        jPanel38.add(lblCnc);
+
+        lblCnc1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblCnc1.setForeground(new java.awt.Color(0, 102, 255));
+        lblCnc1.setText("0");
+        jPanel38.add(lblCnc1);
+
+        lblFresa.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblFresa.setForeground(new java.awt.Color(255, 102, 0));
+        lblFresa.setText("Horas Fresadora:  ");
+        jPanel38.add(lblFresa);
+
+        lblFresa1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblFresa1.setForeground(new java.awt.Color(255, 102, 0));
+        lblFresa1.setText("0");
+        jPanel38.add(lblFresa1);
+
+        lblTorno.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblTorno.setForeground(new java.awt.Color(0, 204, 0));
+        lblTorno.setText("Horas Torno: ");
+        jPanel38.add(lblTorno);
+
+        lblTorno1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblTorno1.setForeground(new java.awt.Color(0, 204, 0));
+        lblTorno1.setText("0");
+        jPanel38.add(lblTorno1);
+
+        jPanel37.add(jPanel38, java.awt.BorderLayout.CENTER);
+
+        jPanel28.add(jPanel37, java.awt.BorderLayout.NORTH);
+
         tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/torno_16.png")), jPanel28); // NOI18N
 
         jPanel29.setBackground(new java.awt.Color(255, 255, 255));
@@ -1926,11 +2112,30 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel29.add(jScrollPane10, java.awt.BorderLayout.CENTER);
 
+        jPanel42.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel42.setLayout(new java.awt.BorderLayout());
+
         jLabel19.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel19.setForeground(new java.awt.Color(153, 0, 0));
         jLabel19.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel19.setText("Integracion");
-        jPanel29.add(jLabel19, java.awt.BorderLayout.PAGE_START);
+        jPanel42.add(jLabel19, java.awt.BorderLayout.PAGE_START);
+
+        jPanel43.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblCnc2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblCnc2.setForeground(new java.awt.Color(0, 102, 255));
+        lblCnc2.setText("Horas Integracion: ");
+        jPanel43.add(lblCnc2);
+
+        lblIntegracion.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblIntegracion.setForeground(new java.awt.Color(0, 102, 255));
+        lblIntegracion.setText("0");
+        jPanel43.add(lblIntegracion);
+
+        jPanel42.add(jPanel43, java.awt.BorderLayout.CENTER);
+
+        jPanel29.add(jPanel42, java.awt.BorderLayout.NORTH);
 
         tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/integracion_16.png")), jPanel29); // NOI18N
 
@@ -1965,11 +2170,32 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel30.add(jScrollPane11, java.awt.BorderLayout.CENTER);
 
+        jPanel40.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel40.setLayout(new java.awt.BorderLayout());
+
         jLabel20.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel20.setForeground(new java.awt.Color(153, 0, 0));
         jLabel20.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel20.setText("Diseño");
-        jPanel30.add(jLabel20, java.awt.BorderLayout.PAGE_START);
+        jPanel40.add(jLabel20, java.awt.BorderLayout.PAGE_START);
+
+        jPanel41.setBackground(new java.awt.Color(255, 255, 255));
+
+        jlabel.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jlabel.setForeground(new java.awt.Color(0, 102, 255));
+        jlabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jlabel.setText("Horas Diseno: ");
+        jPanel41.add(jlabel);
+
+        lblHorasDiseno.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        lblHorasDiseno.setForeground(new java.awt.Color(0, 102, 255));
+        lblHorasDiseno.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHorasDiseno.setText("0");
+        jPanel41.add(lblHorasDiseno);
+
+        jPanel40.add(jPanel41, java.awt.BorderLayout.PAGE_END);
+
+        jPanel30.add(jPanel40, java.awt.BorderLayout.NORTH);
 
         tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/diseño_16.png")), jPanel30); // NOI18N
 
@@ -2004,11 +2230,22 @@ public final class Costos extends javax.swing.JInternalFrame {
 
         jPanel31.add(jScrollPane12, java.awt.BorderLayout.CENTER);
 
+        jPanel39.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel39.setLayout(new java.awt.BorderLayout());
+
         jLabel21.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel21.setForeground(new java.awt.Color(153, 0, 0));
         jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel21.setText("Calidad");
-        jPanel31.add(jLabel21, java.awt.BorderLayout.PAGE_START);
+        jPanel39.add(jLabel21, java.awt.BorderLayout.PAGE_START);
+
+        jLabel25.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel25.setForeground(new java.awt.Color(0, 102, 255));
+        jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel25.setText("jLabel25");
+        jPanel39.add(jLabel25, java.awt.BorderLayout.CENTER);
+
+        jPanel31.add(jPanel39, java.awt.BorderLayout.NORTH);
 
         tabbed2.addTab("", new javax.swing.ImageIcon(getClass().getResource("/Iconos/calidad_16.png")), jPanel31); // NOI18N
 
@@ -2117,11 +2354,21 @@ public final class Costos extends javax.swing.JInternalFrame {
         jLabel2.setText("Ordenes de compra");
         jPanel35.add(jLabel2, java.awt.BorderLayout.PAGE_START);
 
+        jPanel44.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblTotalCompras1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblTotalCompras1.setForeground(new java.awt.Color(51, 51, 51));
+        lblTotalCompras1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalCompras1.setText("Total Mxn:");
+        jPanel44.add(lblTotalCompras1);
+
         lblTotalCompras.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblTotalCompras.setForeground(new java.awt.Color(51, 51, 51));
         lblTotalCompras.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTotalCompras.setText("Total Mxn:");
-        jPanel35.add(lblTotalCompras, java.awt.BorderLayout.CENTER);
+        lblTotalCompras.setText("0");
+        jPanel44.add(lblTotalCompras);
+
+        jPanel35.add(jPanel44, java.awt.BorderLayout.PAGE_END);
 
         jPanel12.add(jPanel35, java.awt.BorderLayout.NORTH);
 
@@ -2160,11 +2407,21 @@ public final class Costos extends javax.swing.JInternalFrame {
         jLabel3.setText("Almacen");
         jPanel36.add(jLabel3, java.awt.BorderLayout.PAGE_START);
 
+        jPanel45.setBackground(new java.awt.Color(255, 255, 255));
+
+        lblTotalAlmacen1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblTotalAlmacen1.setForeground(new java.awt.Color(51, 51, 51));
+        lblTotalAlmacen1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTotalAlmacen1.setText("Total MXN:");
+        jPanel45.add(lblTotalAlmacen1);
+
         lblTotalAlmacen.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         lblTotalAlmacen.setForeground(new java.awt.Color(51, 51, 51));
         lblTotalAlmacen.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTotalAlmacen.setText("Total MXN:");
-        jPanel36.add(lblTotalAlmacen, java.awt.BorderLayout.CENTER);
+        lblTotalAlmacen.setText("0");
+        jPanel45.add(lblTotalAlmacen);
+
+        jPanel36.add(jPanel45, java.awt.BorderLayout.CENTER);
 
         jPanel13.add(jPanel36, java.awt.BorderLayout.NORTH);
 
@@ -2581,33 +2838,21 @@ public final class Costos extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_cmbMesActionPerformed
 
     private void cmbAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbAnioActionPerformed
-        if(this.isVisible()){
-            band = true;
-        }
-        if(cmbMes.getSelectedItem() != null && cmbAnio.getSelectedItem() != null){
-            JFrame j = (JFrame) JOptionPane.getFrameForComponent(this);
-            Thread hilo = new Thread() {
-                public void run() {
-                    if(band){
-                       if(cmbMes.getSelectedItem() != null && cmbAnio.getSelectedItem() != null){
-                            espera.activar();
-                            espera.setLocationRelativeTo(j);
-                            espera.setExtendedState(Inicio1.MAXIMIZED_BOTH);
-                            espera.setVisible(true);
-                            obtenerFechas();
-                            verHoras("mes",null,null);
-                            ordenesDeCompra("mes");
-                            almacen("mes");
-                            verCostosIndirectos("mes");
-                            agregarProyectos("mes");
-                            agregarNominas("mes");
-                            addFechas();
-                            espera.setVisible(false);
-                       }
-                   }
+        if (this.isVisible()) {
+            Date d = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
+            int anio = Integer.parseInt(sdf.format(d));
+            if (anio > Integer.parseInt(cmbAnio.getSelectedItem().toString())) {
+                cmbMes.removeAllItems();
+                String[] monthNames = DateFormatSymbols.getInstance(Locale.getDefault()).getMonths();
+                for (String monthName : monthNames) {
+                    cmbMes.addItem(monthName);
                 }
-            };
-            hilo.start();
+
+                cmbMes.removeItemAt(12);
+            }else {
+                insertarSemanas();
+            }
         }
     }//GEN-LAST:event_cmbAnioActionPerformed
 
@@ -2770,8 +3015,8 @@ public final class Costos extends javax.swing.JInternalFrame {
                         ordenesDeCompraProyecto();
                         almacen("proyecto");
                         verCostosIndirectos("proyecto");
-                        agregarProyectos("proyecto");
                         agregarNominas("proyecto");
+                        agregarProyectos("proyecto");
                     }
                 }
             }
@@ -3059,6 +3304,10 @@ public final class Costos extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_cmbDiasActionPerformed
 
+    private void TablaPrincipalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaPrincipalMouseClicked
+        
+    }//GEN-LAST:event_TablaPrincipalMouseClicked
+
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -3099,6 +3348,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -3136,7 +3386,16 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel34;
     private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
+    private javax.swing.JPanel jPanel37;
+    private javax.swing.JPanel jPanel38;
+    private javax.swing.JPanel jPanel39;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel40;
+    private javax.swing.JPanel jPanel41;
+    private javax.swing.JPanel jPanel42;
+    private javax.swing.JPanel jPanel43;
+    private javax.swing.JPanel jPanel44;
+    private javax.swing.JPanel jPanel45;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
@@ -3156,13 +3415,25 @@ public final class Costos extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel jlabel;
+    private javax.swing.JLabel lblCnc;
+    private javax.swing.JLabel lblCnc1;
+    private javax.swing.JLabel lblCnc2;
     private javax.swing.JLabel lblFec;
     private javax.swing.JLabel lblFecha;
+    private javax.swing.JLabel lblFresa;
+    private javax.swing.JLabel lblFresa1;
+    private javax.swing.JLabel lblHorasDiseno;
+    private javax.swing.JLabel lblIntegracion;
     private javax.swing.JLabel lblPrecioDolar;
     private javax.swing.JLabel lblPrecioDolar1;
     private javax.swing.JLabel lblSalir;
+    private javax.swing.JLabel lblTorno;
+    private javax.swing.JLabel lblTorno1;
     private javax.swing.JLabel lblTotalAlmacen;
+    private javax.swing.JLabel lblTotalAlmacen1;
     private javax.swing.JLabel lblTotalCompras;
+    private javax.swing.JLabel lblTotalCompras1;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelMeses;
     private javax.swing.JPanel panelProyecto;

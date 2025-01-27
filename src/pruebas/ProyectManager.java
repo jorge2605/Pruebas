@@ -5,6 +5,7 @@ import VentanaEmergente.Calendario.AgregarFechas;
 import VentanaEmergente.Calendario.CodigoColores;
 import VentanaEmergente.ProyectoManager.Editar;
 import VentanaEmergente.ProyectoManager.InfoProyectos;
+import VentanaEmergente.ProyectoManager.InformeProyect;
 import VentanaEmergente.ProyectoManager.addFecha;
 import VentanaEmergente.ProyectoManager.addPrioridadCompras;
 import VentanaEmergente.ProyectoManager.filtrar;
@@ -188,7 +189,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String sql = "select * from agenda";
+            String sql = "select * from agenda where Estatus != 'Cancelado'";
             ResultSet rs = st.executeQuery(sql);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Date d = new Date();
@@ -218,7 +219,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     public final void buscar(String sql){
     DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
     try{
-        Connection con = null;
+        Connection con;
         Conexion con1 = new Conexion();
         con = con1.getConnection();
         Statement st = con.createStatement();
@@ -237,11 +238,11 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             datos[9] = rs.getString("Facturado");
             datos[10] = rs.getString("Costo");
             datos[11] = rs.getString("Moneda");
-            try{datos[12] = proyectos.get(getProyecto(datos[3], "HERRAMENTISTA")).getFecha();}catch(Exception e){datos[12] = "";}
-            try{datos[13] = proyectos.get(getProyecto(datos[3], "DISEÑO")).getFecha();}catch(Exception e){datos[13] = "";}
-            try{datos[14] = proyectos.get(getProyecto(datos[3], "INTEGRACION")).getFecha();}catch(Exception e){datos[14] = "";}
-            try{datos[15] = proyectos.get(getProyecto(datos[3], "COMPRAS")).getFecha();}catch(Exception e){datos[15] = "";}
-            
+            try{datos[14] = proyectos.get(getProyecto(datos[3], "HERRAMENTISTA")).getFecha();}catch(Exception e){datos[14] = "";}
+            try{datos[12] = proyectos.get(getProyecto(datos[3], "DISEÑO")).getFecha();}catch(Exception e){datos[12] = "";}
+            try{datos[15] = proyectos.get(getProyecto(datos[3], "INTEGRACION")).getFecha();}catch(Exception e){datos[15] = "";}
+            try{datos[13] = proyectos.get(getProyecto(datos[3], "COMPRAS")).getFecha();}catch(Exception e){datos[13] = "";}
+            datos[16] = rs.getString("FechaCierre");
             miModelo.addRow(datos);
             }
         }catch(SQLException e){
@@ -257,11 +258,11 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             },
             new String [] {
                 "ID","NO COTIZACION", "ORDEN COMPRA", "PROYECTO", "DESCRIPCION", "FECHA", "PLANTA", "FECHA COMPROMISO", "ESTATUS", "FACTURADO", "COSTO", "MONEDA",
-                "FECHA HERRAMENTISTA", "FECHA DISENO", "FECHA INTEGRACION", "FECHA COMPRAS"
+                "DISENO", "COMPRAS", "MAQUINADOS", "INTEGRACION", "FECHA CIERRE"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -291,7 +292,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         getAgenda();
         limpiarTabla();
         buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
-                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda from proyectos order by Id desc");
+                + "Planta,FechaEntrega,Estatus, Facturado, Comentarios, Costo, Moneda, FechaCierre from proyectos order by Id desc");
         DefaultTableModel Modelo = (DefaultTableModel) Tabla1.getModel();
         elQueOrdena = new TableRowSorter<>(Modelo);
         Tabla1.setRowSorter(elQueOrdena);
@@ -311,6 +312,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         jSeparator3 = new javax.swing.JPopupMenu.Separator();
         agregarFecha = new javax.swing.JMenuItem();
         eliminarFecha = new javax.swing.JMenuItem();
+        informe = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         scrollTabla = new javax.swing.JScrollPane();
@@ -332,6 +334,16 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
+
+        jPopupMenu1.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                jPopupMenu1PopupMenuWillBecomeVisible(evt);
+            }
+        });
 
         editar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/editar (1).png"))); // NOI18N
         editar.setText("Editar          ");
@@ -371,8 +383,16 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         });
         jPopupMenu1.add(agregarFecha);
 
-        eliminarFecha.setText("Eliminar fecga de proyecto");
+        eliminarFecha.setText("Eliminar fecha de proyecto");
         jPopupMenu1.add(eliminarFecha);
+
+        informe.setText("Eliminar fecha de proyecto");
+        informe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                informeActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(informe);
 
         setBorder(null);
 
@@ -988,6 +1008,23 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
         codigo.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
+        if (Tabla1.getSelectedRow() != -1) {
+            informe.setEnabled(true);
+            informe.setText("Ver informe completo de proyecto " + Tabla1.getValueAt(Tabla1.getSelectedRow(), 3));
+        }else {
+            informe.setText("Ver informe completo de proyecto");
+            informe.setEnabled(false);
+        }
+    }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
+
+    private void informeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_informeActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        InformeProyect info = new InformeProyect(f,true);
+        info.txtProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
+        info.setVisible(true);
+    }//GEN-LAST:event_informeActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabla1;
@@ -996,6 +1033,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
     private javax.swing.JMenuItem editar;
     private javax.swing.JMenuItem eliminarFecha;
     private javax.swing.JMenuItem filtrar;
+    private javax.swing.JMenuItem informe;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel12;

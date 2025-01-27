@@ -91,7 +91,7 @@ public class Reclamos extends javax.swing.JDialog implements ActionListener{
             
             java.sql.Date f = new java.sql.Date(sdf.parse(fecha).getTime());
             
-            String sql = "select * from requisiciones where Llego IS NULL and TE IS NOT NULL and OC != 'CANCELADO'order by TE";
+            String sql = "select * from requisiciones where Llego IS NULL and TE IS NOT NULL and OC != 'CANCELADO' order by TE";
             ResultSet rs = st.executeQuery(sql);
             java.sql.Date fec;
             
@@ -116,7 +116,7 @@ public class Reclamos extends javax.swing.JDialog implements ActionListener{
                     datos[7] = rs.getString("Proyecto");
                     datos[8] = rs.getString("CantRecibida");
                     datos[9] = rs.getString("Cantidad");
-                    String sql2 = "select Progreso from requisicion where Id like '"+datos[1]+"'";
+                    String sql2 = "select Progreso, Id from requisicion where Id like '"+datos[1]+"'";
                     Statement st2 = con.createStatement();
                     ResultSet rs2 = st2.executeQuery(sql2);
                     String estado = "";

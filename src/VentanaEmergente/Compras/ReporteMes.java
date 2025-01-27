@@ -116,18 +116,10 @@ public class ReporteMes extends javax.swing.JDialog {
             hoja.setColumnWidth(7, valorFijo * 200);//Requisitor
             hoja.setColumnWidth(8, valorFijo * 50);//UM
             hoja.setColumnWidth(9, valorFijo * 230);//Proveedor
-            hoja.setColumnWidth(10, valorFijo * 80);//precio
-            hoja.setColumnWidth(11, valorFijo * 38);//llego
-            hoja.setColumnWidth(12, valorFijo * 85);//OC
-            hoja.setColumnWidth(13, valorFijo * 95);//FechaRecibo
-            hoja.setColumnWidth(14, valorFijo * 95);//TE
-            hoja.setColumnWidth(15, valorFijo * 55);//Cantidad recibida
-            hoja.setColumnWidth(16, valorFijo * 55);//Ubicacion
-            hoja.setColumnWidth(17, valorFijo * 50);//Cantidad entrega
-            hoja.setColumnWidth(18, valorFijo * 150);//Notas
-            hoja.setColumnWidth(19, valorFijo * 50);//Cantidad stock
-            hoja.setColumnWidth(20, valorFijo * 95);//Fecha Esperada
-            hoja.setColumnWidth(21, valorFijo * 95);//Fecha Esperada
+            hoja.setColumnWidth(10, valorFijo * 150);//Notas
+            hoja.setColumnWidth(11, valorFijo * 50);//Cantidad stock
+            hoja.setColumnWidth(12, valorFijo * 95);//Fecha Esperada
+            hoja.setColumnWidth(13, valorFijo * 95);//Fecha Esperada
 
             Font font1 = book.createFont();
             CellStyle style = book.createCellStyle();
@@ -148,7 +140,7 @@ public class ReporteMes extends javax.swing.JDialog {
             2,
             2,
             2,
-            21
+            13
             ));
 
             Map<String, Object> properties = new HashMap<String, Object>();
@@ -169,9 +161,7 @@ public class ReporteMes extends javax.swing.JDialog {
 
             String[] columnNames = {
                 "Requisicion", "Codigo", "Descripcion", "Proyecto", "Cantidad",
-                "Requisitor", "UM", "Proveedor", "Precio", "Llego",
-                "OC", "Fecha Recibo", "TE", "Cantidad Recibida", "Ubicacion",
-                "Cantidad entregada", "Notas", "Cantidad Stock", "Fecha Esperada", "Fecha Requi"
+                "Requisitor", "UM", "Proveedor", "Notas", "Cantidad Stock", "Fecha Esperada", "Fecha Requi"
             };
 
             
@@ -251,26 +241,17 @@ public class ReporteMes extends javax.swing.JDialog {
                 datos[5] = rs2.getString("Requisitor");
                 datos[6] = rs2.getString("UM");
                 datos[7] = rs2.getString("Proveedor");
-                datos[8] = rs2.getString("Precio");
-                datos[9] = rs2.getString("Llego");
-                datos[10] = rs2.getString("OC");
-                datos[11] = rs2.getString("FechaRecibo");
-                datos[12] = rs2.getString("TE");
-                datos[13] = rs2.getString("CantRecibida");
-                datos[14] = rs2.getString("Ubicacion");
-                datos[15] = rs2.getString("CantidadEntregada");
-                datos[16] = rs2.getString("Notas");
-                datos[17] = rs2.getString("cantidadStock");
-                datos[18] = rs2.getString("FechaEsperada");
-                datos[18] = rs2.getString("FechaEsperada");
+                datos[8] = rs2.getString("Notas");
+                datos[9] = rs2.getString("cantidadStock");
+                datos[10] = rs2.getString("FechaEsperada");
                 if(hash.containsKey(datos[0])){
-                    datos[19] = hash.get(datos[0]);
+                    datos[11] = hash.get(datos[0]);
                 }
                 if(verificarRequi(datos[0])){
                     Row fila10=hoja.createRow(i+7);
-                    for (int j = 0; j < 20; j++) {
+                    for (int j = 0; j < 12; j++) {
                         Cell celda=fila10.createCell(j+2);
-                        if(i == -1 && (j >= 0 && j <=19)){
+                        if(i == -1 && (j >= 0 && j <=11)){
                             CellStyle s = book.createCellStyle();
                             Font f = book.createFont();
                             f.setBold(true);

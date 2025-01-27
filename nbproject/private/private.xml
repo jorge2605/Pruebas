@@ -4,13 +4,15 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Pruebas/src/pruebas/Inicio1.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/Maquinados/CustomDocumentFilter.java</file>
-            <file>file:/C:/Pruebas/src/pruebas/Calendario.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/Costos.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/ProyectoManager/InformeProyect.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Compras/ReporteMes.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/ProyectManager.java</file>
+            <file>file:/C:/Pruebas/src/Modelo/javamail.java</file>
             <file>file:/C:/Pruebas/src/pruebas/InicioSesion.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/Calendario/AgregarFechas.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/Maquinados/ReporteMaquinados.java</file>
+            <file>file:/C:/Pruebas/src/Modelo/EnviarCorreoCambioCompras.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/Compras/Reclamos.java</file>
             <file>file:/C:/Pruebas/src/pruebas/OrdenDeCompra.java</file>
-            <file>file:/C:/Pruebas/src/pruebas/Maquinados.java</file>
         </group>
     </open-files>
 </project-private>

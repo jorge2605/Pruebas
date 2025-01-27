@@ -3,6 +3,8 @@ package VentanaEmergente.Calendario;
 import Conexiones.Conexion;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -105,12 +107,13 @@ public class AgregarFechas extends java.awt.Dialog {
         pst.setString(7, color.getColor().getRed() + "," + color.getColor().getGreen() + "," + color.getColor().getBlue());
         pst.setString(8, txtProyecto.getText());
         pst.setString(9, txtDescripcion.getText());
+        pst.setBoolean(10, habilitar.isSelected());
         
         n += pst.executeUpdate();
         return n;
     }
     
-    public void agregarPanelR(String text, JPanel panel, Color color){
+    public void agregarPanelR(String text, JPanel panel, Color color, String idAgenda){
         scrollPane.PanelRound panelRound3 = new scrollPane.PanelRound();
         panelRound3.setRoundBottomLeft(20);
         panelRound3.setRoundBottomRight(20);
@@ -118,6 +121,30 @@ public class AgregarFechas extends java.awt.Dialog {
         panelRound3.setRoundTopRight(20);
         panelRound3.setToolTipText(text);
         panelRound3.setBackground(color);
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        panelRound3.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                HabilitarCierre hab = new HabilitarCierre(f,true, idAgenda);
+                hab.setVisible(true);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
 
         java.awt.GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridy = 0;
@@ -146,6 +173,7 @@ public class AgregarFechas extends java.awt.Dialog {
             String sql = "select * from agenda where Proyecto like '" + proyecto + "'";
             ResultSet rs = st.executeQuery(sql);
             while(rs.next()){
+                String idAgenda = rs.getString("idAgenda");
                 String depa = rs.getString("Departamento");
                 String fechaInicio = rs.getString("FechaInicio");
                 String fechaFin = rs.getString("FechaInicio");
@@ -154,7 +182,7 @@ public class AgregarFechas extends java.awt.Dialog {
                 int r = Integer.parseInt(col[0]);
                 int g = Integer.parseInt(col[1]);
                 int b = Integer.parseInt(col[2]);
-                agregarPanelR("Desde: " + fechaInicio + " Hasta: " + fechaFin, getPanel(depa), new Color(r,g,b));
+                agregarPanelR("Desde: " + fechaInicio + " Hasta: " + fechaFin, getPanel(depa), new Color(r,g,b), idAgenda);
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
@@ -214,6 +242,7 @@ public class AgregarFechas extends java.awt.Dialog {
         lblHastaC = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         jLabel25 = new javax.swing.JLabel();
+        habilitar = new javax.swing.JCheckBox();
 
         setPreferredSize(new java.awt.Dimension(759, 800));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -234,7 +263,7 @@ public class AgregarFechas extends java.awt.Dialog {
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
         java.awt.GridBagLayout jPanel2Layout = new java.awt.GridBagLayout();
         jPanel2Layout.columnWeights = new double[] {0.0, 1.0, 0.0, 1.0};
-        jPanel2Layout.rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+        jPanel2Layout.rowWeights = new double[] {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0};
         jPanel2.setLayout(jPanel2Layout);
 
         jLabel7.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
@@ -329,7 +358,7 @@ public class AgregarFechas extends java.awt.Dialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.ipadx = 20;
         gridBagConstraints.ipady = 5;
@@ -590,7 +619,7 @@ public class AgregarFechas extends java.awt.Dialog {
         btnCompras.setBackground(new java.awt.Color(255, 102, 102));
         btnCompras.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         btnCompras.setForeground(new java.awt.Color(255, 255, 255));
-        btnCompras.setText("Comrpras");
+        btnCompras.setText("Compras");
         btnCompras.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 btnComprasMouseClicked(evt);
@@ -648,6 +677,17 @@ public class AgregarFechas extends java.awt.Dialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         jPanel2.add(panelRound1, gridBagConstraints);
 
+        habilitar.setBackground(new java.awt.Color(255, 255, 255));
+        habilitar.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        habilitar.setForeground(new java.awt.Color(51, 51, 51));
+        habilitar.setText("Habilitar fecha de cierre para usuario");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.insets = new java.awt.Insets(8, 0, 8, 0);
+        jPanel2.add(habilitar, gridBagConstraints);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -674,8 +714,7 @@ public class AgregarFechas extends java.awt.Dialog {
                 Connection con;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String sql = "insert into agenda(FechaInicio, FechaFin, Estatus, Departamento, Creador, Fecha, Color, Proyecto, Descripcion) values(?,?,?,?,?,?,?,?,?)";
+                String sql = "insert into agenda(FechaInicio, FechaFin, Estatus, Departamento, Creador, Fecha, Color, Proyecto, Descripcion, HabilitarCierre) values(?,?,?,?,?,?,?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
 
                 int n = 0;
@@ -750,6 +789,7 @@ public class AgregarFechas extends java.awt.Dialog {
     private javax.swing.JButton btnIntegracion;
     private javax.swing.JComboBox<String> cmbEstatus;
     private javax.swing.JColorChooser color;
+    private javax.swing.JCheckBox habilitar;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

@@ -82,11 +82,11 @@ public class javamail {
             // Crear el archivo adjunto
             BodyPart attachmentBodyPart = null;
             if(PO != null){
-            attachmentBodyPart = new MimeBodyPart();
-            String archivoAdjunto = PO; // Ruta completa del archivo a adjuntar
-            DataSource fuenteDatos = new FileDataSource(archivoAdjunto);
-            attachmentBodyPart.setDataHandler(new DataHandler(fuenteDatos));
-            attachmentBodyPart.setFileName(fuenteDatos.getName());
+                attachmentBodyPart = new MimeBodyPart();
+                String archivoAdjunto = PO; // Ruta completa del archivo a adjuntar
+                DataSource fuenteDatos = new FileDataSource(archivoAdjunto);
+                attachmentBodyPart.setDataHandler(new DataHandler(fuenteDatos));
+                attachmentBodyPart.setFileName(fuenteDatos.getName());
             }
             BodyPart attachmentBodyPart2 = new MimeBodyPart();
             String archivoAdjunto2 = Cotizacion; // Ruta completa del archivo a adjuntar
