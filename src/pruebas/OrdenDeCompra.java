@@ -1941,13 +1941,10 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
 
                                     pst31.executeUpdate();
 
-                                    String idd = "";
-                                    String num = "";
-                                    int cont = 0;
+                                    String codigo;
                                     while (rs4.next()) {
-                                        idd = rs4.getString("Id");
-                                        num = rs4.getString("Codigo");
-                                        if (num.equals(Tabla2.getValueAt(i, 2).toString())) {
+                                        codigo = rs4.getString("Codigo");
+                                        if (codigo.equals(Tabla2.getValueAt(i, 2).toString())) {
                                             pst30.setString(1, cadena);
                                             pst30.setString(2, Tabla2.getValueAt(k, 2).toString());
 
