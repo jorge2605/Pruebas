@@ -1020,7 +1020,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
 
     private void informeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_informeActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        InformeProyect info = new InformeProyect(f,true);
+        InformeProyect info = new InformeProyect(f,true, Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
         info.txtProyecto.setText(Tabla1.getValueAt(Tabla1.getSelectedRow(), 3).toString());
         info.setVisible(true);
     }//GEN-LAST:event_informeActionPerformed

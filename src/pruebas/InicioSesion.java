@@ -43,7 +43,7 @@ public class InicioSesion extends javax.swing.JFrame  {
                 espera.setSize(870, 477);
                 espera.setLocationRelativeTo(null);
                 espera.setVisible(true);
-                Connection con = null;
+                Connection con;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
                 Statement st = con.createStatement();
@@ -535,14 +535,15 @@ public class InicioSesion extends javax.swing.JFrame  {
         lblVersion.setBackground(new java.awt.Color(204, 204, 204));
         lblVersion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         lblVersion.setForeground(new java.awt.Color(204, 204, 204));
-        lblVersion.setText("2.5.5");
+        lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblVersion.setText("2.5.5.1");
         lblVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         lblVersion.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 lblVersionMouseClicked(evt);
             }
         });
-        panelP.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 420, -1, -1));
+        panelP.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(797, 420, 50, -1));
 
         jLabel6.setFont(new java.awt.Font("Roboto Medium", 0, 30)); // NOI18N
         jLabel6.setText("INICIAR SESION");

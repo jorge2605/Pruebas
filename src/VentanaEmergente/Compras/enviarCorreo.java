@@ -48,7 +48,7 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
     public boolean BD;
     
     public String getProveedor(String prov){
-        String correo =  null;
+        String correoProv =  null;
         try{
             Connection con;
             Conexion con1 = new Conexion();
@@ -56,13 +56,20 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
             String sql = "select * from registroprov_compras where Nombre like '"+prov+"'";
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
+            correoCopia = "";
             while(rs.next()){
-                correo = rs.getString("Correo");
+                correoProv = rs.getString("Correo");
+                correoCopia = rs.getString("CorreoCopia");
+            }
+            if(correoCopia == null){
+                correoCopia = "";
+            } else {
+                correoCopia = "," + correoCopia;
             }
         }catch(SQLException e){
             JOptionPane.showMessageDialog(this, "Error: "+e,"error",JOptionPane.ERROR_MESSAGE);
         }
-        return correo;
+        return correoProv;
     }
     
     public void BD(){
@@ -283,6 +290,38 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
         }
     }
     
+    public String getRequisitor(String orden){
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from requisiciones where oc like '" + orden + "'";
+            ResultSet rs = st.executeQuery(sql);
+            String requi = "";
+            while (rs.next()) {
+                requi = rs.getString("NumRequisicion");
+            }
+            String sql2 = "select * from requisicion where id = '" + requi +"'";
+            Statement st2 = con.createStatement();
+            ResultSet rs2 = st2.executeQuery(sql2);
+            String numEmpleado = "";
+            while (rs2.next()) {
+                numEmpleado = rs2.getString("NumeroEmpleado");
+            }
+            String sql3 = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "'";
+            Statement st3 = con.createStatement();
+            ResultSet rs3 = st3.executeQuery(sql3);
+            while (rs3.next()) {
+                String co = rs3.getString("Correo");
+                return (co == null) ? "" : "," + co;
+            }
+        } catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return "";
+    }
+    
     public enviarCorreo(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -444,9 +483,10 @@ public class enviarCorreo extends javax.swing.JDialog implements ActionListener,
             try{
                 if(transaccion.equals("orden")){
                     String ruta = "\\\\192.168.100.40\\bd\\OC\\Orden_de_compra\\"+numRequi+".pdf";
-                    mail.sendOC(nota, asunto, getProveedor(pil.get(i)), correo, contra, ruta,ordenReal,correoCopia);
+                    System.out.println(correoCopia);
+                    mail.sendOC(nota, asunto, getProveedor(pil.get(i)), correo, contra, ruta,ordenReal,correoCopia + getRequisitor(ordenReal));
                 }else{
-                    mail.jorge(material, nota, tabla,asunto,getProveedor(pil.get(i)),correo,contra);
+                    mail.jorge(material, nota, tabla,asunto,getProveedor(pil.get(i)),correo,contra, correoCopia);
                 }
             }catch(Exception e){
                 JOptionPane.showMessageDialog(this, "No se envio el correo a "+ pil.get(i) + e,"Error",JOptionPane.ERROR_MESSAGE);

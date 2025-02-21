@@ -257,7 +257,7 @@ public class javamail {
         }
     }
     
-    public void jorge(Stack<String> material, String notas, JTable tabla, String asunto, String to, String from, String pass){
+    public void jorge(Stack<String> material, String notas, JTable tabla, String asunto, String to, String from, String pass, String copia){
         Properties props = new Properties();
         props.put("mail.smtp.host", "mail.si3i.com");
         props.put("mail.smtp.port", "587");
@@ -278,7 +278,7 @@ public class javamail {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse("compras01@si3i.com"));
+            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse("compras01@si3i.com" + copia));
             message.setSubject(asunto);
             
             String mat = "";
@@ -382,7 +382,7 @@ public class javamail {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse("compras01@si3i.com,"+copia));
+            message.setRecipients(Message.RecipientType.CC, InternetAddress.parse("compras01@si3i.com" + copia));
             message.setSubject(asunto);
             
             

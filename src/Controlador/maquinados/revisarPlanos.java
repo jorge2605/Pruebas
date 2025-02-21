@@ -23,11 +23,13 @@ public class revisarPlanos {
     public String ACABADOS = "acabados";
     public String CALIDAD = "calidad";
     public String TRATAMIENTO = "trata";
+    public String MAQUINADOS = "maquinados";
     public String TERMINADO_TRATAMIENTO = "trata";
     public String TERMINADO_CALIDAD = "calidad";
     public String LIBERACION = "";
     
     public String seleccion;
+    public boolean retrabajo = false;
     
     public Stack checarRevisionPlano(String plano){
         Stack<String> revision = new Stack<>();
@@ -90,11 +92,9 @@ public class revisarPlanos {
         return band;
     }
     
-    public String buscar(String plano) {
+    public String buscar(String plano, Connection con) throws SQLException {
         String datos[] = new String[1000];
         datos[3] = null;
-        try {
-            Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
@@ -105,6 +105,7 @@ public class revisarPlanos {
             Statement st5 = con.createStatement();
             Statement st6 = con.createStatement();
             Statement st7 = con.createStatement();
+            Statement st8 = con.createStatement();
 
             String sql = "select * from Planos where Plano like '" + plano + "'";
             ResultSet rs = st.executeQuery(sql);
@@ -120,6 +121,7 @@ public class revisarPlanos {
                 String cortes[] = new String[10];
                 String torno[] = new String[10];
                 String trata[] = new String[10];
+                String maqui[] = new String[10];
                 String id = datos[1];
 
                 String sq = "select * from Calidad where Proyecto like '" + datos[1] + "'";
@@ -136,6 +138,8 @@ public class revisarPlanos {
                 ResultSet rs4 = st6.executeQuery(sql4);
                 String sql6 = "select * from Trata where Proyecto like '" + datos[1] + "'";
                 ResultSet rs6 = st7.executeQuery(sql6);
+                String sql7 = "select * from maquinados where Proyecto like '" + datos[1] + "'";
+                ResultSet rs7 = st8.executeQuery(sql7);
                 while (r.next()) {
                     calidad[0] = r.getString("Id");
                     calidad[1] = r.getString("Proyecto");
@@ -194,9 +198,19 @@ public class revisarPlanos {
                     trata[5] = rs6.getString("Prioridad");
                     trata[6] = rs6.getString("Revision");
                 }
+                while (rs7.next()) {
+                    maqui[0] = rs7.getString("idmaquinados");
+                    maqui[1] = rs7.getString("Proyecto");
+                    maqui[2] = rs7.getString("Plano");
+                    maqui[3] = rs7.getString("Terminado");
+                    maqui[5] = rs7.getString("Prioridad");
+                    maqui[6] = rs7.getString("Revision");
+                }
 
                 if (id.equals(cortes[1]) && cortes[3].equals("NO")) {
                     datos[3] = "CORTES";
+                } else if (id.equals(maqui[1]) && maqui[3].equals("NO")) {
+                    datos[3] = "MAQUINADOS";
                 } else if (id.equals(cnc[1]) && cnc[3].equals("NO")) {
                     datos[3] = "CNC";
                 } else if (id.equals(fresa[1]) && fresa[3].equals("NO")) {
@@ -212,7 +226,7 @@ public class revisarPlanos {
                 } else if (id.equals(calidad[1]) && calidad[3].equals("NO")) {
                     datos[3] = "CALIDAD";
                 } else if (id.equals(calidad[1]) && calidad[3].equals("SI") && "NO".equals(calidad[4])) {
-                    datos[3] = "TERMINADO CALIDAD";
+                    datos[3] = "TERMINADO";
                 } else {
                     datos[3] = "LIBERACION";
                 }
@@ -224,10 +238,6 @@ public class revisarPlanos {
 //                return buscar(plano);
                 return null;
             }
-        } catch (SQLException e) {
-            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
-            JOptionPane.showMessageDialog(null, "NO SE PUEDEN MOSTRAR LOS DATOS" + " " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
         return datos[3];
     }
     
@@ -386,10 +396,8 @@ public class revisarPlanos {
             while(rs.next()){
                 String plano = rs.getString("Proyecto");
                 String rev = rs.getString("Revision");
-                System.out.println(bd);
                     if(rev != null){
                     String sql3 = "select Plano, Revision from Planos where Plano like '"+plano+"'";
-                    System.out.println("Plano: "+plano+"  =====   BD: "+bd);
                     Statement st2 = con.createStatement();
                     ResultSet rs2 = st2.executeQuery(sql3);
                     String revision = "";
@@ -416,8 +424,14 @@ public class revisarPlanos {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            Statement st = con.createStatement();
             razon razon = new razon(null,true,this);
+            if (retrabajo) {
+                razon.jRadioButton1.setText("Retrabajo");
+                razon.jRadioButton1.setSelected(true);
+                razon.jRadioButton2.setVisible(false);
+                razon.jRadioButton3.setVisible(false);
+                razon.jRadioButton4.setVisible(false);
+            }
             String raz = razon.getRazon();
             //                                   1          2           3       4       5       6           7
             String sql = "insert into scrap (Proyecto, NumeroEmpleado, Fecha, Plano, Razon, Comentarios,Desde, Revision) values(?,?,?,?,?,?,?,?)";
@@ -473,6 +487,8 @@ public class revisarPlanos {
                     return CORTES;
                 case "FRESADORA":
                     return FRESADORA;
+                case "MAQUINADOS":
+                    return MAQUINADOS;
                 case "CNC":
                     return CNC;
                 case "TORNO":
@@ -503,6 +519,7 @@ public class revisarPlanos {
             con = con1.getConnection();
             estacion = convertirStringToEstacion(estacion);
             if(estacion != null){
+                System.err.println("entra");
                 String sql = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ?, Empleado = ? where Proyecto = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
 
@@ -520,10 +537,12 @@ public class revisarPlanos {
 
                 if(n > 0){
                     JOptionPane.showMessageDialog(null, "Datos Actualizados");
+                } else {
+                    JOptionPane.showMessageDialog(null, "Datos sin actualizar");
                 }
             }
         }catch(SQLException e){
-            JOptionPane.showMessageDialog(null,"Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,"Error al terminar plano en estacion: " + e,"Error",JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -578,6 +597,54 @@ public class revisarPlanos {
         }
     }
     
+    public void sendToEstacion(String plano, String proyecto, String empleado, String estacion){
+        try{
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from " + estacion + " where Proyecto like '" + plano + "'";
+            ResultSet rs = st.executeQuery(sql);
+            if(rs.next()){
+                //Si existe plano en calidad
+                String sql2 = "update " + estacion +" set Terminado = ?, FechaInicio = ?, FechaFinal = ? where Proyecto = ?";
+                PreparedStatement pst = con.prepareStatement(sql2);
+                
+                pst.setString(1, "NO");
+                pst.setString(2, "");
+                pst.setString(3, "");
+                pst.setString(4, plano);
+                
+                int n = pst.executeUpdate();
+                
+                if(n > 0){
+                    JOptionPane.showMessageDialog(null, "Datos enviados a " + estacion);
+                }
+                
+            }else{
+                //Si no existe plano en calidad
+                String sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Cronometro, Prioridad, Empleado) values(?,?,?,?,?,?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql2);
+                
+                pst.setString(1, "NO");
+                pst.setString(2, "");
+                pst.setString(3, "");
+                pst.setString(4, plano);
+                pst.setString(5, proyecto);
+                pst.setString(6, "00:00");
+                pst.setString(7, "60");
+                pst.setString(8, empleado);
+                
+                int n = pst.executeUpdate();
+                
+                if(n > 0){
+                    JOptionPane.showMessageDialog(null, "Datos enviados a " + estacion);
+                }
+            }
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(null, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
     
     public void terminarPlano(String plano, String proyecto, String empleado, String tiempo, String estacion){
         try{
@@ -593,13 +660,21 @@ public class revisarPlanos {
             if(rs.next()){
                 //Si existe plano en calidad
                 String sql2 = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ?, Cronometro = ? where Proyecto = ?";
+                if (tiempo == null) {
+                    sql2 = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ? where Proyecto = ?";
+                }
                 PreparedStatement pst = con.prepareStatement(sql2);
                 
                 pst.setString(1, "SI");
                 pst.setString(2, fecha);
                 pst.setString(3, fecha);
-                pst.setString(4, tiempo);
-                pst.setString(5, plano);
+                if (tiempo == null) {
+                    pst.setString(4, tiempo);
+                    pst.setString(5, plano);
+                } else {
+                    pst.setString(4, plano);
+                }
+                
                 
                 int n = pst.executeUpdate();
                 
@@ -609,7 +684,10 @@ public class revisarPlanos {
                 
             }else{
                 //Si no existe plano en calidad
-                String sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Cronometro, Prioridad, Empleado) values(?,?,?,?,?,?,?,?)";
+                String sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Prioridad, Empleado) values(?,?,?,?,?,?,?)";
+                if (tiempo == null) {
+                    sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Prioridad, Empleado, Cronometro) values(?,?,?,?,?,?,?,?)";
+                }
                 PreparedStatement pst = con.prepareStatement(sql2);
                 
                 pst.setString(1, "SI");
@@ -617,9 +695,11 @@ public class revisarPlanos {
                 pst.setString(3, fecha);
                 pst.setString(4, plano);
                 pst.setString(5, proyecto);
-                pst.setString(6, tiempo);
-                pst.setString(7, "10");
-                pst.setString(8, empleado);
+                pst.setString(6, "10");
+                pst.setString(7, empleado);
+                if (tiempo == null) {
+                    pst.setString(8, tiempo);
+                }
                 
                 int n = pst.executeUpdate();
                 
@@ -628,7 +708,7 @@ public class revisarPlanos {
                 }
             }
         }catch(SQLException e){
-            JOptionPane.showMessageDialog(null, "Error: "+e,"Error",JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Error al terminar plano: "+e,"Error",JOptionPane.ERROR_MESSAGE);
         }
     }
 }

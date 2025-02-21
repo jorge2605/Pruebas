@@ -1621,7 +1621,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         ResultSet rs1 = st.executeQuery(prov);
                         String datos1[] = new String[15];
                         String isr = null;
-                        String correoCopia = null;
+                        String correoCopia = "";
                         while (rs1.next()) {
                             datos1[0] = rs1.getString("Nombre");
                             datos1[1] = rs1.getString("Contacto");

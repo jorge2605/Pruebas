@@ -492,7 +492,7 @@
                                     <Column editable="false" title="Electromecanico" type="java.lang.Object"/>
                                     <Column editable="false" title="Mano de obra" type="java.lang.Object"/>
                                     <Column editable="false" title="Gasto Indirecto" type="java.lang.Object"/>
-                                    <Column editable="false" title="Costo MP" type="java.lang.Object"/>
+                                    <Column editable="false" title="Materia prima" type="java.lang.Object"/>
                                     <Column editable="false" title="Total" type="java.lang.Object"/>
                                     <Column editable="false" title="Precio proyecto" type="java.lang.Object"/>
                                     <Column editable="false" title="Ganancia o perdida" type="java.lang.Object"/>

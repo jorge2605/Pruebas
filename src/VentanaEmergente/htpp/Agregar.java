@@ -48,7 +48,7 @@ public class Agregar extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         lblID = new javax.swing.JLabel();
-        btnHoras = new RSMaterialComponent.RSTextFieldMaterial();
+        btnHoras = new javax.swing.JFormattedTextField();
         btnProyecto = new RSMaterialComponent.RSTextFieldMaterial();
         btnComentarios = new RSMaterialComponent.RSTextFieldMaterial();
 
@@ -99,18 +99,18 @@ public class Agregar extends javax.swing.JDialog {
         lblID.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jPanel2.add(lblID);
 
-        btnHoras.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        btnHoras.setPlaceholder("Horas");
-        btnHoras.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                btnHorasFocusLost(evt);
-            }
-        });
-        btnHoras.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                btnHorasKeyTyped(evt);
-            }
-        });
+        btnHoras.setBackground(new java.awt.Color(255, 255, 255));
+        btnHoras.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(0, 102, 255)));
+        btnHoras.setForeground(new java.awt.Color(51, 153, 255));
+        try {
+            btnHoras.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##:##")));
+        } catch (java.text.ParseException ex) {
+            ex.printStackTrace();
+        }
+        btnHoras.setHorizontalAlignment(javax.swing.JTextField.LEFT);
+        btnHoras.setText("3000");
+        btnHoras.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        btnHoras.setPreferredSize(new java.awt.Dimension(250, 42));
         jPanel2.add(btnHoras);
 
         btnProyecto.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
@@ -150,15 +150,6 @@ public class Agregar extends javax.swing.JDialog {
         int yy = evt.getYOnScreen();
         this.setLocation(xx - (x), yy - y);
     }//GEN-LAST:event_jPanel4MouseDragged
-
-    private void btnHorasKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_btnHorasKeyTyped
-        char c = evt.getKeyChar();
-        if(c<'0'||c>'9') evt.consume();
-    }//GEN-LAST:event_btnHorasKeyTyped
-
-    private void btnHorasFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_btnHorasFocusLost
-        
-    }//GEN-LAST:event_btnHorasFocusLost
 
     /**
      * @param args the command line arguments
@@ -204,7 +195,7 @@ public class Agregar extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public RSMaterialComponent.RSTextFieldMaterial btnComentarios;
-    public RSMaterialComponent.RSTextFieldMaterial btnHoras;
+    public javax.swing.JFormattedTextField btnHoras;
     public RSMaterialComponent.RSTextFieldMaterial btnProyecto;
     private javax.swing.JPanel btnSalir;
     private javax.swing.JLabel jLabel1;

@@ -266,10 +266,12 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             
             if(fec == null){
                 precioDolar precio = new precioDolar();
+                if(precio.getPrecio() != 0){
                     pst.setString(1, String.valueOf(precio.getPrecio()));
-                pst.setString(2, fecha);
+                    pst.setString(2, fecha);
 
-                pst.executeUpdate();
+                    pst.executeUpdate();
+                }
             }
             
         }catch(SQLException e){

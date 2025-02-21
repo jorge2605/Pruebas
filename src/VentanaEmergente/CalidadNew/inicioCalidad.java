@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JInternalFrame;
 import pruebas.Calidad;
+import pruebas.CalidadDebug;
 import pruebas.CalidadNew;
 import pruebas.Inicio1;
 
@@ -18,6 +19,7 @@ public class inicioCalidad extends javax.swing.JInternalFrame {
     public void setWhite(){
         panel3i.setColorBackground(Color.white);
         panel3i1.setColorBackground(Color.white);
+        panel3i2.setColorBackground(Color.white);
     }
     
     public void entrar(JInternalFrame c){
@@ -57,6 +59,8 @@ public class inicioCalidad extends javax.swing.JInternalFrame {
         lbl3i = new javax.swing.JButton();
         panel3i1 = new rojeru_san.rspanel.RSPanelRound();
         lbl3i1 = new javax.swing.JButton();
+        panel3i2 = new rojeru_san.rspanel.RSPanelRound();
+        lbl3i2 = new javax.swing.JButton();
 
         setBorder(null);
 
@@ -168,6 +172,39 @@ public class inicioCalidad extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(30, 45, 30, 45);
         jPanel2.add(panel3i1, gridBagConstraints);
 
+        panel3i2.setColorBackground(new java.awt.Color(255, 255, 255));
+        panel3i2.setColorBorde(new java.awt.Color(255, 255, 255));
+        panel3i2.setPreferredSize(new java.awt.Dimension(180, 180));
+        panel3i2.setLayout(new java.awt.BorderLayout());
+
+        lbl3i2.setFont(new java.awt.Font("Roboto", 1, 36)); // NOI18N
+        lbl3i2.setForeground(new java.awt.Color(0, 102, 204));
+        lbl3i2.setText("Debug");
+        lbl3i2.setBorder(null);
+        lbl3i2.setContentAreaFilled(false);
+        lbl3i2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lbl3i2.setFocusPainted(false);
+        lbl3i2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        lbl3i2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        lbl3i2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lbl3i2MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lbl3i2MouseExited(evt);
+            }
+        });
+        lbl3i2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                lbl3i2ActionPerformed(evt);
+            }
+        });
+        panel3i2.add(lbl3i2, java.awt.BorderLayout.CENTER);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(30, 45, 30, 45);
+        jPanel2.add(panel3i2, gridBagConstraints);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -215,6 +252,19 @@ public class inicioCalidad extends javax.swing.JInternalFrame {
         entrar(new Calidad());
     }//GEN-LAST:event_lbl3i1ActionPerformed
 
+    private void lbl3i2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl3i2MouseEntered
+        setWhite();
+        panel3i2.setColorBackground(new Color(57,255,40));
+    }//GEN-LAST:event_lbl3i2MouseEntered
+
+    private void lbl3i2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lbl3i2MouseExited
+        setWhite();
+    }//GEN-LAST:event_lbl3i2MouseExited
+
+    private void lbl3i2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_lbl3i2ActionPerformed
+        entrar(new CalidadDebug(nombre, numero));
+    }//GEN-LAST:event_lbl3i2ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel btnSalir;
@@ -226,7 +276,9 @@ public class inicioCalidad extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel2;
     public javax.swing.JButton lbl3i;
     public javax.swing.JButton lbl3i1;
+    public javax.swing.JButton lbl3i2;
     private rojeru_san.rspanel.RSPanelRound panel3i;
     private rojeru_san.rspanel.RSPanelRound panel3i1;
+    private rojeru_san.rspanel.RSPanelRound panel3i2;
     // End of variables declaration//GEN-END:variables
 }

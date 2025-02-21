@@ -240,7 +240,7 @@ public final class Costos extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Gasto Indirecto", "Costo MP", "Total", "Precio proyecto", "Ganancia o perdida", "Margen Beneficio"
+                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Gasto Indirecto", "Materia prima", "Total", "Precio proyecto", "Ganancia o perdida", "Margen Beneficio"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -1065,6 +1065,7 @@ public final class Costos extends javax.swing.JInternalFrame {
     
     public void almacen(String tipo){
         limpiarTablaAlmacen();
+        DecimalFormat df = new DecimalFormat("#,###.##");
         try{
             DefaultTableModel miModelo = (DefaultTableModel) TablaAlmacen.getModel();
             Connection con ;
@@ -1143,13 +1144,12 @@ public final class Costos extends javax.swing.JInternalFrame {
                 d[2] = datos[2];//PROYECTO
                 d[3] = datos[3];//REQUISITOR
                 totalMxn += precioMxn + (precioUsd * Double.parseDouble(lblPrecioDolar.getText()));
-                d[6] = String.valueOf(precioMxn);//TOTAL MXN
-                d[7] = String.valueOf(precioUsd);//TOTAL USD
+                d[6] = df.format(precioMxn);//TOTAL MXN
+                d[7] = df.format(precioUsd);//TOTAL USD
                 d[8] = datos[8];//TOTAL USD
                 miModelo.addRow(d);
             }
             double total = 0;
-            DecimalFormat df = new DecimalFormat("#,###.##");
             double precioDolar = Double.parseDouble(lblPrecioDolar.getText());
             for (int i = 0; i < TablaAlmacen.getRowCount(); i++) {
                 try{total += Double.parseDouble(TablaAlmacen.getValueAt(i, 6).toString().replace(",", ""));}catch(Exception e){System.out.println("error");}
@@ -1339,7 +1339,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                         TablaPrincipal.setValueAt(formato.format(total), i, 7);
                         TablaPrincipal.setValueAt(formato.format(precioProyecto), i, 8);
                         TablaPrincipal.setValueAt(formato.format(precioProyecto - total), i, 9);
-                        TablaPrincipal.setValueAt(formato.format((precioProyecto - total) / precioProyecto), i, 10);
+                        TablaPrincipal.setValueAt(formato.format(((precioProyecto - total) / precioProyecto) * 100) + "%", i, 10);
                     }
                 }
             }
@@ -1874,7 +1874,7 @@ public final class Costos extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Gasto Indirecto", "Costo MP", "Total", "Precio proyecto", "Ganancia o perdida", "Margen Beneficio"
+                "Proyecto", "Diseño", "Herramentista", "Electromecanico", "Mano de obra", "Gasto Indirecto", "Materia prima", "Total", "Precio proyecto", "Ganancia o perdida", "Margen Beneficio"
             }
         ) {
             boolean[] canEdit = new boolean [] {

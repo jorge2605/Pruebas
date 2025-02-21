@@ -1,10 +1,12 @@
 package pruebas;
 
 import Conexiones.Conexion;
+import Controlador.maquinados.revisarPlanos;
 import VentanaEmergente.CambiarEstado.InformacionProyectos;
 import VentanaEmergente.CambiarEstado.TerminarProyecto;
 import VentanaEmergente.CambiarEstado.TerminarTodo;
 import VentanaEmergente.Inicio1.Espera;
+import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
@@ -59,16 +61,35 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class CambiarEstado extends InternalFrameImagen implements ActionListener {
-private TableRowSorter<TableModel> modeloOrdenado;
+
+    private TableRowSorter<TableModel> modeloOrdenado;
 
     JFileChooser seleccionar = new JFileChooser();
     Espera espera = new Espera();
     String numEmpleado;
     TerminarProyecto terminar;
+    TextAutoCompleter autoCompleter;
     
-    public static void exportar(){
-    Workbook book = new XSSFWorkbook(); 
-    Sheet sheet = book.createSheet("Estado Planos");
+    public final void agregarProyectos() {
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select proyecto from proyectos";
+            ResultSet rs = st.executeQuery(sql);
+            autoCompleter = new TextAutoCompleter(txtBuscar);
+            while (rs.next()) {
+                autoCompleter.addItem(rs.getString("proyecto"));
+            }
+        } catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public static void exportar() {
+        Workbook book = new XSSFWorkbook();
+        Sheet sheet = book.createSheet("Estado Planos");
         try {
             FileOutputStream fileout = new FileOutputStream("Excel.xlsx");
             book.write(fileout);
@@ -79,179 +100,178 @@ private TableRowSorter<TableModel> modeloOrdenado;
             Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void buscar(){
+
+    public void buscar() {
         DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
-        
-        try{
-        int fila = Tabla1.getSelectedRow();
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        Statement st1 = con.createStatement();
-        Statement st2 = con.createStatement();
-        Statement st3 = con.createStatement();
-        Statement st4 = con.createStatement();
-        Statement st5 = con.createStatement();
-        Statement st6 = con.createStatement();
-        Statement st7 = con.createStatement();
-        String datos[] = new String[1000];
-        String sql = "select Prioridad,Plano,Proyecto, Cantidad from Planos where Proyecto like '"+(Tabla1.getValueAt(fila, 2).toString())+"' order by Plano asc";
-        ResultSet rs = st.executeQuery(sql);
-        while(rs.next())
-        {
-        int cont = 0;
-        datos[0] = rs.getString("Plano");
-        datos[1] = rs.getString("Proyecto");
-        datos[3] = rs.getString("Cantidad");
-        String acabados[] = new String[10];
-            String calidad[] = new String[10];
-            String cnc[] = new String [10];
-            String fresa[] = new String [10];
-            String cortes[] = new String [10];
-            String torno[] = new String [10];
-            String trata[] = new String [10];
-            String id = datos[0];
-            
-            String sq = "select * from Calidad where Proyecto like '%"+datos[0]+"%'";
-            ResultSet r = st1.executeQuery(sq);
-            String sql1 = "select * from Acabados where Proyecto like '%"+datos[0]+"%'";
-            ResultSet rs1 = st2.executeQuery(sql1);
-            String sql2 = "select * from CNC where Proyecto like '%"+datos[0]+"%'";
-            ResultSet rs2 = st3.executeQuery(sql2);
-            String sql3 = "select * from Fresadora where Proyecto like '%"+datos[0]+"%'";
-            ResultSet rs3 = st4.executeQuery(sql3);
-            String sql5 = "select * from Torno where Proyecto like '%"+datos[0]+"%'";
-            ResultSet rs5 = st5.executeQuery(sql5);
-            String sql4 = "select * from Datos where Proyecto like '%"+datos[0]+"%'";
-            ResultSet rs4 = st6.executeQuery(sql4);
-            String sql6 = "select * from Trata where Proyecto like '%"+datos[0]+"%'";
-            ResultSet rs6 = st7.executeQuery(sql6);
-            while(r.next()){
-                calidad[0] = r.getString("Id");
-                calidad[1] = r.getString("Proyecto");
-                calidad[2] = r.getString("Plano");
-                calidad[3] = r.getString("Terminado");
-                calidad[4] = r.getString("Tratamiento");
-                calidad[5] = r.getString("Prioridad");
+
+        try {
+            int fila = Tabla1.getSelectedRow();
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            Statement st1 = con.createStatement();
+            Statement st2 = con.createStatement();
+            Statement st3 = con.createStatement();
+            Statement st4 = con.createStatement();
+            Statement st5 = con.createStatement();
+            Statement st6 = con.createStatement();
+            Statement st7 = con.createStatement();
+            String datos[] = new String[1000];
+            String sql = "select Prioridad,Plano,Proyecto, Cantidad from Planos where Proyecto like '" + (Tabla1.getValueAt(fila, 2).toString()) + "' order by Plano asc";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                int cont = 0;
+                datos[0] = rs.getString("Plano");
+                datos[1] = rs.getString("Proyecto");
+                datos[3] = rs.getString("Cantidad");
+                String acabados[] = new String[10];
+                String calidad[] = new String[10];
+                String cnc[] = new String[10];
+                String fresa[] = new String[10];
+                String cortes[] = new String[10];
+                String torno[] = new String[10];
+                String trata[] = new String[10];
+                String id = datos[0];
+
+                String sq = "select * from Calidad where Proyecto like '%" + datos[0] + "%'";
+                ResultSet r = st1.executeQuery(sq);
+                String sql1 = "select * from Acabados where Proyecto like '%" + datos[0] + "%'";
+                ResultSet rs1 = st2.executeQuery(sql1);
+                String sql2 = "select * from CNC where Proyecto like '%" + datos[0] + "%'";
+                ResultSet rs2 = st3.executeQuery(sql2);
+                String sql3 = "select * from Fresadora where Proyecto like '%" + datos[0] + "%'";
+                ResultSet rs3 = st4.executeQuery(sql3);
+                String sql5 = "select * from Torno where Proyecto like '%" + datos[0] + "%'";
+                ResultSet rs5 = st5.executeQuery(sql5);
+                String sql4 = "select * from Datos where Proyecto like '%" + datos[0] + "%'";
+                ResultSet rs4 = st6.executeQuery(sql4);
+                String sql6 = "select * from Trata where Proyecto like '%" + datos[0] + "%'";
+                ResultSet rs6 = st7.executeQuery(sql6);
+                while (r.next()) {
+                    calidad[0] = r.getString("Id");
+                    calidad[1] = r.getString("Proyecto");
+                    calidad[2] = r.getString("Plano");
+                    calidad[3] = r.getString("Terminado");
+                    calidad[4] = r.getString("Tratamiento");
+                    calidad[5] = r.getString("Prioridad");
+                }
+
+                while (rs1.next()) {
+                    acabados[1] = rs1.getString("Proyecto");
+                    acabados[3] = rs1.getString("Terminado");
+                    acabados[5] = rs1.getString("Prioridad");
+                }
+                while (rs2.next()) {
+                    cnc[0] = rs2.getString("Id");
+                    cnc[1] = rs2.getString("Proyecto");
+                    cnc[2] = rs2.getString("Plano");
+                    cnc[3] = rs2.getString("Terminado");
+                    cnc[5] = rs2.getString("Prioridad");
+                }
+                while (rs3.next()) {
+                    fresa[0] = rs3.getString("Id");
+                    fresa[1] = rs3.getString("Proyecto");
+                    fresa[2] = rs3.getString("Plano");
+                    fresa[3] = rs3.getString("Terminado");
+                    fresa[5] = rs3.getString("Prioridad");
+                }
+                while (rs4.next()) {
+                    cortes[0] = rs4.getString("Id");
+                    cortes[1] = rs4.getString("Proyecto");
+                    cortes[2] = rs4.getString("Plano");
+                    cortes[3] = rs4.getString("Terminado");
+                    cortes[5] = rs4.getString("Prioridad");
+                    cortes[6] = rs4.getString("Estado");
+                }
+                while (rs5.next()) {
+                    torno[0] = rs5.getString("Id");
+                    torno[1] = rs5.getString("Proyecto");
+                    torno[2] = rs5.getString("Plano");
+                    torno[3] = rs5.getString("Terminado");
+                    torno[5] = rs5.getString("Prioridad");
+                }
+                while (rs6.next()) {
+                    trata[0] = rs6.getString("Id");
+                    trata[1] = rs6.getString("Proyecto");
+                    trata[2] = rs6.getString("Plano");
+                    trata[3] = rs6.getString("Terminado");
+                    trata[5] = rs6.getString("Prioridad");
+                }
+
+                if (id.equals(cortes[1]) && cortes[3].equals("NO")) {
+                    String estado = "";
+                    if (cortes[6] == null) {
+                        estado = "";
+                    } else {
+                        estado = cortes[6];
+                    }
+                    if (estado.equals("SIN MATERIAL")) {
+                        datos[2] = "SIN MATERIAL";
+                    } else {
+                        datos[2] = "CORTES";
+                    }
+                } else if (id.equals(cnc[1]) && cnc[3].equals("NO")) {
+                    datos[2] = "CNC";
+                } else if (id.equals(fresa[1]) && fresa[3].equals("NO")) {
+                    datos[2] = "FRESADORA";
+                } else if (id.equals(torno[1]) && torno[3].equals("NO")) {
+                    datos[2] = "TORNO";
+                } else if (id.equals(acabados[1]) && acabados[3].equals("NO")) {
+                    datos[2] = "ACABADOS";
+                } else if (id.equals(trata[1]) && trata[3].equals("NO")) {
+                    datos[2] = "TRATAMIENTO";
+                } else if (id.equals(trata[1]) && trata[3].equals("TERMINADO")) {
+                    datos[2] = "TERMINADO";
+                } else if (id.equals(calidad[1]) && calidad[3].equals("NO")) {
+                    datos[2] = "CALIDAD";
+                } else if (id.equals(calidad[1]) && calidad[3].equals("SI") && "NO".equals(calidad[4])) {
+                    datos[2] = "TERMINADO";
+                } else {
+                    datos[2] = "LIBERACION";
+                }
+
+                if (datos[2].equals("LIBERACION")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("CORTES") || datos[2].equals("SIN MATERIAL")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("TORNO")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("FRESADORA")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("CNC")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("ACABADOS")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("CALIDAD")) {
+                    miModelo.addRow(datos);
+                } else if (datos[2].equals("TERMINADO")) {
+                    miModelo.addRow(datos);
+                }
+                cont = cont + 1;
             }
 
-            while(rs1.next()){ 
-                acabados[1] = rs1.getString("Proyecto");
-                acabados[3] = rs1.getString("Terminado");
-                acabados[5] = rs1.getString("Prioridad");
-            }
-            while(rs2.next()){
-                cnc[0] = rs2.getString("Id");
-                cnc[1] = rs2.getString("Proyecto");
-                cnc[2] = rs2.getString("Plano");
-                cnc[3] = rs2.getString("Terminado");
-                cnc[5] = rs2.getString("Prioridad");
-            }
-            while(rs3.next()){
-                fresa[0] = rs3.getString("Id");
-                fresa[1] = rs3.getString("Proyecto");
-                fresa[2] = rs3.getString("Plano");
-                fresa[3] = rs3.getString("Terminado");
-                fresa[5] = rs3.getString("Prioridad");
-            }
-            while(rs4.next()){
-                cortes[0] = rs4.getString("Id");
-                cortes[1] = rs4.getString("Proyecto");
-                cortes[2] = rs4.getString("Plano");
-                cortes[3] = rs4.getString("Terminado");
-                cortes[5] = rs4.getString("Prioridad");
-                cortes[6] = rs4.getString("Estado");
-            }
-            while(rs5.next()){
-                torno[0] = rs5.getString("Id");
-                torno[1] = rs5.getString("Proyecto");
-                torno[2] = rs5.getString("Plano");
-                torno[3] = rs5.getString("Terminado");
-                torno[5] = rs5.getString("Prioridad");
-            }
-            while(rs6.next()){
-                trata[0] = rs6.getString("Id");
-                trata[1] = rs6.getString("Proyecto");
-                trata[2] = rs6.getString("Plano");
-                trata[3] = rs6.getString("Terminado");
-                trata[5] = rs6.getString("Prioridad");
-            }
-            
-            if(id.equals(cortes[1]) && cortes[3].equals("NO")){
-                String estado = "";
-                if(cortes[6] == null){
-                    estado = "";
-                }else{
-                    estado = cortes[6];
-                }
-                if(estado.equals("SIN MATERIAL")){
-                    datos[2] = "SIN MATERIAL";
-                }else{
-                datos[2] = "CORTES";
-                }
-            }else if(id.equals(cnc[1]) && cnc[3].equals("NO")){
-                datos[2] = "CNC";
-            }else if(id.equals(fresa[1]) && fresa[3].equals("NO")){
-                datos[2] = "FRESADORA";
-            }else if(id.equals(torno[1]) && torno[3].equals("NO")){
-                datos[2] = "TORNO";
-            }else if(id.equals(acabados[1]) && acabados[3].equals("NO")){
-                datos[2] = "ACABADOS";
-            }else if(id.equals(trata[1]) && trata[3].equals("NO")){
-               datos[2] = "TRATAMIENTO";
-            }else if(id.equals(trata[1]) && trata[3].equals("TERMINADO")){
-                datos[2] = "TERMINADO";
-            }else if(id.equals(calidad[1]) && calidad[3].equals("NO")){
-                datos[2] = "CALIDAD";
-            }else if(id.equals(calidad[1]) && calidad[3].equals("SI") &&"NO".equals(calidad[4])){
-                datos[2] = "TERMINADO";
-            }else{
-                datos[2] = "LIBERACION";
-            }
-            
-            if(datos[2].equals("LIBERACION")){
-            miModelo.addRow(datos);
-                }else if(datos[2].equals("CORTES") || datos[2].equals("SIN MATERIAL")){
-                miModelo.addRow(datos);
-                }else if(datos[2].equals("TORNO")){
-                miModelo.addRow(datos);
-                    }else if(datos[2].equals("FRESADORA")){
-                    miModelo.addRow(datos);
-                        }else if(datos[2].equals("CNC")){
-                            miModelo.addRow(datos);
-                            }else if(datos[2].equals("ACABADOS")){
-                                miModelo.addRow(datos);
-                                }else if(datos[2].equals("CALIDAD")){
-                                    miModelo.addRow(datos);
-                                    }else if(datos[2].equals("TERMINADO")){
-                                        miModelo.addRow(datos);
-                                        }
-        cont = cont+1;
-        }
-        
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS"+" "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        espera.setVisible(false);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS" + " " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+            espera.setVisible(false);
         }
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(miModelo);
         TablaDeDatos1.setRowSorter(elQueOrdena);
     }
-    
-    public void limpiarTabla(){
-    TablaDeDatos1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-            },
-            new String [] {
-                "PLANO", "PROYECTO", "UBICACION", "CANTIDAD"
-            }
+
+    public void limpiarTabla() {
+        TablaDeDatos1.setModel(new javax.swing.table.DefaultTableModel(
+                new Object[][]{},
+                new String[]{
+                    "PLANO", "PROYECTO", "UBICACION", "CANTIDAD"
+                }
         ) {
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean[]{
                 false, false, false, false
             };
+
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
         TablaDeDatos1.setColumnSelectionAllowed(true);
@@ -260,61 +280,60 @@ private TableRowSorter<TableModel> modeloOrdenado;
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(Modelo);
         TablaDeDatos1.setRowSorter(elQueOrdena);
     }
-    
-    public void limpiarTabla1(){
-    
+
+    public void limpiarTabla1() {
+
         DefaultTableModel Modelo = (DefaultTableModel) TablaDeDatos1.getModel();
-        String titulos[] = {"CLIENTE","DESCRIPCION","PROYECTO"};
-        Modelo = new DefaultTableModel(null,titulos);
+        String titulos[] = {"CLIENTE", "DESCRIPCION", "PROYECTO"};
+        Modelo = new DefaultTableModel(null, titulos);
         Tabla1.setModel(Modelo);
-    
+
     }
-    
-    public void verDatos2(){
-        try{
+
+    public void verDatos2() {
+        try {
             DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             String datos1[] = new String[6];
-            String sl = "select Prioridad,Plano,Proyecto from Planos where Proyecto like '"+txtProyecto.getText()+"'";
+            String sl = "select Prioridad,Plano,Proyecto from Planos where Proyecto like '" + txtProyecto.getText() + "'";
             ResultSet r1 = st.executeQuery(sl);
-            while(r1.next())
-            {
+            while (r1.next()) {
                 datos1[0] = r1.getString("Plano");
                 datos1[1] = r1.getString("Proyecto");
                 miModelo.addRow(datos1);
             }
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, e);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e);
         }
     }
-    
-    public final void verDatos(){
+
+    public final void verDatos() {
         DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-    try{
-        
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        String datos[] = new String[5];
-        String sql = "select Planta,Descripcion,Proyecto from Proyectos where Mostrar like 'SI' order by iD desc";
-        ResultSet rs = st.executeQuery(sql);
-        while(rs.next()){
-            datos[0] = rs.getString("Planta");
-            datos[1] = rs.getString("Descripcion");
-            datos[2] = rs.getString("Proyecto");
-            miModelo.addRow(datos);
+        try {
+
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String datos[] = new String[5];
+            String sql = "select Planta,Descripcion,Proyecto from Proyectos where Mostrar like 'SI' order by iD desc";
+            ResultSet rs = st.executeQuery(sql);
+            while (rs.next()) {
+                datos[0] = rs.getString("Planta");
+                datos[1] = rs.getString("Descripcion");
+                datos[2] = rs.getString("Proyecto");
+                miModelo.addRow(datos);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
     }
-    }
-    
-    public void terminarProyecto(String proyecto){
-        try{
+
+    public void terminarProyecto(String proyecto) {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
@@ -325,8 +344,8 @@ private TableRowSorter<TableModel> modeloOrdenado;
             Statement st9 = con.createStatement();
             Statement st11 = con.createStatement();
             Statement st13 = con.createStatement();
-            
-            String sql = "select Plano, Proyecto, Terminado from datos where Plano like '"+proyecto+"' and Terminado like 'NO'";
+
+            String sql = "select Plano, Proyecto, Terminado from datos where Plano like '" + proyecto + "' and Terminado like 'NO'";
             ResultSet rs = st.executeQuery(sql);
             String plano;
             String sql2 = "update datos set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
@@ -335,39 +354,39 @@ private TableRowSorter<TableModel> modeloOrdenado;
             SimpleDateFormat sdf = new SimpleDateFormat();
             String fecha = sdf.format(d);
             int n = 0;
-            while(rs.next()){
+            while (rs.next()) {
                 plano = rs.getString("Proyecto");
                 pst.setString(1, fecha);
                 pst.setString(2, fecha);
                 pst.setString(3, "SI");
                 pst.setString(4, numEmpleado + "," + numEmpleado);
                 pst.setString(5, plano);
-                
+
                 n = pst.executeUpdate();
             }
-            
-            String sql3 = "select Plano, Proyecto, Terminado from acabados where Plano like '"+proyecto+"' and Terminado like 'NO'";
+
+            String sql3 = "select Plano, Proyecto, Terminado from acabados where Plano like '" + proyecto + "' and Terminado like 'NO'";
             ResultSet rs3 = st3.executeQuery(sql3);
             String sql4 = "update acabados set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
             PreparedStatement pst4 = con.prepareStatement(sql4);
             int n1 = 0;
-            while(rs3.next()){
+            while (rs3.next()) {
                 plano = rs3.getString("Proyecto");
                 pst4.setString(1, fecha);
                 pst4.setString(2, fecha);
                 pst4.setString(3, "SI");
                 pst4.setString(4, numEmpleado + "," + numEmpleado);
                 pst4.setString(5, plano);
-                
+
                 n1 = pst4.executeUpdate();
             }
-            
-            String sql5 = "select Plano, Proyecto, Terminado from calidad where Plano like '"+proyecto+"' and Terminado like 'NO'";
+
+            String sql5 = "select Plano, Proyecto, Terminado from calidad where Plano like '" + proyecto + "' and Terminado like 'NO'";
             ResultSet rs5 = st5.executeQuery(sql5);
             String sql6 = "update calidad set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ?, Tratamiento = ? where Proyecto = ?";
             PreparedStatement pst6 = con.prepareStatement(sql6);
             int n2 = 0;
-            while(rs5.next()){
+            while (rs5.next()) {
                 plano = rs5.getString("Proyecto");
                 pst6.setString(1, fecha);
                 pst6.setString(2, fecha);
@@ -375,59 +394,59 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 pst6.setString(4, numEmpleado + "," + numEmpleado);
                 pst6.setString(5, "NO");
                 pst6.setString(6, plano);
-                
+
                 n2 = pst6.executeUpdate();
             }
-            
-            String sql7 = "select Plano, Proyecto, Terminado from cnc where Plano like '"+proyecto+"' and Terminado like 'NO'";
+
+            String sql7 = "select Plano, Proyecto, Terminado from cnc where Plano like '" + proyecto + "' and Terminado like 'NO'";
             ResultSet rs7 = st7.executeQuery(sql7);
             String sql8 = "update cnc set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
             PreparedStatement pst8 = con.prepareStatement(sql8);
             int n3 = 0;
-            while(rs7.next()){
+            while (rs7.next()) {
                 plano = rs7.getString("Proyecto");
                 pst8.setString(1, fecha);
                 pst8.setString(2, fecha);
                 pst8.setString(3, "SI");
                 pst8.setString(4, numEmpleado + "," + numEmpleado);
                 pst8.setString(5, plano);
-                
+
                 n3 = pst8.executeUpdate();
             }
-            
-            String sql9 = "select Plano, Proyecto, Terminado from fresadora where Plano like '"+proyecto+"' and Terminado like 'NO'";
+
+            String sql9 = "select Plano, Proyecto, Terminado from fresadora where Plano like '" + proyecto + "' and Terminado like 'NO'";
             ResultSet rs9 = st9.executeQuery(sql9);
             String sql10 = "update fresadora set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
             PreparedStatement pst10 = con.prepareStatement(sql10);
             int n4 = 0;
-            while(rs9.next()){
+            while (rs9.next()) {
                 plano = rs9.getString("Proyecto");
                 pst10.setString(1, fecha);
                 pst10.setString(2, fecha);
                 pst10.setString(3, "SI");
                 pst10.setString(4, numEmpleado + "," + numEmpleado);
                 pst10.setString(5, plano);
-                
+
                 n4 = pst10.executeUpdate();
             }
-            
-            String sql11 = "select Plano, Proyecto, Terminado from torno where Plano like '"+proyecto+"' and Terminado like 'NO'";
+
+            String sql11 = "select Plano, Proyecto, Terminado from torno where Plano like '" + proyecto + "' and Terminado like 'NO'";
             ResultSet rs11 = st11.executeQuery(sql11);
             String sql12 = "update torno set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
             PreparedStatement pst12 = con.prepareStatement(sql12);
             int n5 = 0;
-            while(rs11.next()){
+            while (rs11.next()) {
                 plano = rs11.getString("Proyecto");
                 pst12.setString(1, fecha);
                 pst12.setString(2, fecha);
                 pst12.setString(3, "SI");
                 pst12.setString(4, numEmpleado + "," + numEmpleado);
                 pst12.setString(5, plano);
-                
+
                 n5 = pst12.executeUpdate();
             }
-            
-            String sql13 = "select Plano, Proyecto, Prioridad from planos where Proyecto like '"+proyecto+"'";
+
+            String sql13 = "select Plano, Proyecto, Prioridad from planos where Proyecto like '" + proyecto + "'";
             ResultSet rs13 = st13.executeQuery(sql13);
             String sql14 = "insert into calidad (Proyecto, Plano, FechaInicio, FechaFinal, Terminado,"
                     + "Estado, Tratamiento, Cronometro, Prioridad, Empleado) values(?,?,?,?,?,?,?,?,?,?)";
@@ -436,18 +455,18 @@ private TableRowSorter<TableModel> modeloOrdenado;
             String pr = null;
             String pri = null;
             int n6 = 0;
-            while(rs13.next()){
+            while (rs13.next()) {
                 pl = rs13.getString("Plano");
                 pr = rs13.getString("Proyecto");
                 pri = rs13.getString("Prioridad");
-                String sql15 = "select Proyecto from calidad where Proyecto like '"+pl+"'";
+                String sql15 = "select Proyecto from calidad where Proyecto like '" + pl + "'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql15);
                 String exis = null;
-                while(rs2.next()){
+                while (rs2.next()) {
                     exis = rs2.getString("Proyecto");
                 }
-                if(exis == null){
+                if (exis == null) {
                     pst14.setString(1, pl);
                     pst14.setString(2, pr);
                     pst14.setString(3, fecha);
@@ -458,76 +477,59 @@ private TableRowSorter<TableModel> modeloOrdenado;
                     pst14.setString(8, "00:00");
                     pst14.setString(9, pri);
                     pst14.setString(10, numEmpleado + "," + numEmpleado);
-                    
+
                     n6 = pst14.executeUpdate();
                 }
             }
-            
-            if(n > 0 && n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0){
+
+            if (n > 0 && n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0) {
                 JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
-            }else{
-                if(n6 > 0){
+            } else {
+                if (n6 > 0) {
                     String faltantes = "";
-                    if(n < 1){
+                    if (n < 1) {
                         faltantes += "\nCortes";
                     }
-                    if(n1 < 1){
+                    if (n1 < 1) {
                         faltantes += "\nAcabados";
                     }
-                    if(n2 < 1){
+                    if (n2 < 1) {
                         faltantes += "\nCalidad";
                     }
-                    if(n3 < 1){
+                    if (n3 < 1) {
                         faltantes += "\nCnc";
                     }
-                    if(n4 < 1){
+                    if (n4 < 1) {
                         faltantes += "\nFresadora";
                     }
-                    if(n5 < 1){
+                    if (n5 < 1) {
                         faltantes += "\nTorno";
                     }
 
                     JOptionPane.showMessageDialog(this, "DATOS GUARDADOS, SIN CAMBIOS EN: "
                             + faltantes);
-                }else{
+                } else {
                     JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
                 }
             }
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: " + e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, e);
         }
     }
-    
-    public void conteo(){
+
+    public void conteo() {
         int terminados = 0;
-        int cortes = 0;
-        int fresa = 0;
-        int cnc = 0;
-        int torno = 0;
-        int acabados = 0;
+        int maqui = 0;
         int calidad = 0;
         int total = TablaDeDatos1.getRowCount();
-        int sm = 0;
         int liberacion = 0;
         int trata = 0;
         for (int i = 0; i < TablaDeDatos1.getRowCount(); i++) {
-            switch(TablaDeDatos1.getValueAt(i, 3).toString()){
-                case "CORTES":
-                    cortes++;
-                    break;
-                case "CNC":
-                    cnc++;
-                    break;
-                case "FRESADORA":
-                    fresa++;
-                    break;
-                case "TORNO":
-                    torno++;
-                    break;
-                case "ACABADOS":
-                    acabados++;
+            switch (TablaDeDatos1.getValueAt(i, 2).toString()) {
+                case "MAQUINADOS":
+                    maqui++;
                     break;
                 case "TRATAMIENTO":
                     trata++;
@@ -538,9 +540,6 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 case "LIBERACION":
                     liberacion++;
                     break;
-                case "SIN MATERIAL":
-                    sm++;
-                    break;
                 case "CALIDAD":
                     calidad++;
                     break;
@@ -548,47 +547,154 @@ private TableRowSorter<TableModel> modeloOrdenado;
         }
         lblConteo.setText("<html>"
                 + "<div>"
-                + "<p style='padding:3px;'> Liberacion: "+liberacion+"</p>"
-                + "<p style='padding:3px;'> Cortes: "+cortes+"</p>"
-                + "<p style='padding:3px;'> Fresadora: "+fresa+"</p>"
-                + "<p style='padding:3px;'> Torno: "+torno+"</p>"
-                + "<p style='padding:3px;'> Cnc: "+cnc+"</p>"
-                + "<p style='padding:3px;'> Acabados: "+acabados+"</p>"
-                + "<p style='padding:3px;'> Tratamiento: "+trata+"</p>"
-                + "<p style='padding:3px;'> Calidad: "+calidad+"</p>"
-                + "<p style='padding:3px;'> Terminados: "+terminados+"</p>"
-                + "<p style='padding:3px;'> Sin Material: "+sm+"</p>"
-                + "<p style='padding:3px;'> Total: "+total+"</p>"
+                + "<p style='padding:3px;'> Liberacion: " + liberacion + "</p>"
+                + "<p style='padding:3px;'> Maquinados: " + maqui + "</p>"
+                + "<p style='padding:3px;'> Tratamiento: " + trata + "</p>"
+                + "<p style='padding:3px;'> Calidad: " + calidad + "</p>"
+                + "<p style='padding:3px;'> Terminados: " + terminados + "</p>"
+                + "<p style='padding:3px;'> Total: " + total + "</p>"
                 + "</div>"
                 + "</html>");
+    }
+
+    public void buscarProyecto(String proyecto) {
+        if (proyecto == null) {
+
+            } else {
+                Thread hilo = new Thread() {
+                    public void run() {
+                        Informacion.setText("Informacion de planos " + proyecto + "                         ");
+                        espera.activar();
+                        espera.setVisible(true);
+                        limpiarTabla();
+                        revisarPlanos rev = new revisarPlanos();
+                        
+                        btnLiberar.setEnabled(false);
+                        int fila = Tabla1.getSelectedRow();
+                        txtProyecto.setText((String) proyecto);
+                        txtPlano.setText("TODOS");
+                        btnExportarD.setEnabled(true);
+                        btnPrioridad.setEnabled(true);
+                        btnVer.setEnabled(false);
+                        
+                        DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
+                        try {
+                            Connection con;
+                            Conexion con1 = new Conexion();
+                            con = con1.getConnection();
+                            Statement st = con.createStatement();
+
+                            String sql2 = "select Prioridad,Plano,Proyecto, Cantidad from Planos where Proyecto like '" + proyecto + "' order by Plano asc";
+                            Statement st2 = con.createStatement();
+                            ResultSet rs2 = st2.executeQuery(sql2);
+                            String dat[] = new String[10];
+                            while (rs2.next()) {
+                                dat[0] = rs2.getString("Plano");
+                                dat[1] = rs2.getString("Proyecto");
+                                dat[2] = rev.buscar(dat[0], con);
+                                dat[3] = rs2.getString("Cantidad");
+                                conteo();
+                                miModelo.addRow(dat);
+                            }
+
+                            String sql = "select Proyecto, Liberado from Proyectos where Proyecto like '" + proyecto + "'";
+                            ResultSet rs = st.executeQuery(sql);
+                            String datos[] = new String[10];
+                            int cont = 0, v = 0, f = 0;
+                            while (rs.next()) {
+                                cont++;
+                                datos[0] = rs.getString("Liberado");
+                                if (datos[0].equals("SI")) {
+                                    v++;
+                                }
+                                if (datos[0].equals("NO")) {
+                                    f++;
+                                }
+                            }
+                            if ((cont == v)) {
+                                btnLiberar.setEnabled(false);
+                                txtLiberado.setText("SI");
+                            } else if (cont == f) {
+                                btnLiberar.setEnabled(true);
+                                txtLiberado.setText("NO");
+                            } else {
+                                btnLiberar.setEnabled(true);
+                                txtLiberado.setText("INCOMPLETO");
+                            }
+                        } catch (SQLException e) {
+                            espera.band = false;
+                            espera.dispose();
+                            JOptionPane.showMessageDialog(null, "ERROR AL ENVIAR A CORTES: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                        }
+
+                        int total = TablaDeDatos1.getRowCount();
+                        int v = 0;
+                        for (int i = 0; i < total; i++) {
+                            if (TablaDeDatos1.getValueAt(i, 2).toString().equals("TERMINADO")) {
+                                v++;
+                            }
+                        }
+                        if (v == total) {
+                            int opc = JOptionPane.showConfirmDialog(null, "PROYECTO TOTALMENTE TERMINADO, ¿DESEAS CERRARLO?");
+                            if (opc == 0) {
+                                try {
+                                    Connection con = null;
+                                    Conexion con1 = new Conexion();
+                                    con = con1.getConnection();
+                                    String sql = "update Proyectos set Mostrar = ? where Proyecto = ?";
+                                    PreparedStatement pst = con.prepareStatement(sql);
+
+                                    pst.setString(1, "NO");
+                                    pst.setString(2, proyecto);
+
+                                    int n = pst.executeUpdate();
+                                    if (n > 0) {
+                                        limpiarTabla1();
+                                        buscar();
+                                        limpiarTabla();
+                                        JOptionPane.showMessageDialog(null, "DATOS GUARDADOS");
+                                    }
+                                } catch (SQLException e) {
+                                    espera.band = false;
+                                    espera.dispose();
+                                    JOptionPane.showMessageDialog(null, "ERROR AL GUARDAR DATOS", "ERROR", JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                        }
+                        espera.band = false;
+                        espera.dispose();
+                    }
+                };
+                hilo.start();
+            }
     }
     
     public CambiarEstado(String numEmpleado) {
         initComponents();
-        
+
         verDatos();
-        
+
         Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
         Tabla1.getTableHeader().setOpaque(false);
         Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
         Tabla1.getTableHeader().setForeground(Color.white);
         Tabla1.setRowHeight(25);
         Tabla1.setShowGrid(false);
-        
+
         TablaDeDatos1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
         TablaDeDatos1.getTableHeader().setOpaque(false);
         TablaDeDatos1.getTableHeader().setBackground(new Color(0, 78, 171));
         TablaDeDatos1.getTableHeader().setForeground(Color.white);
         TablaDeDatos1.setRowHeight(25);
-        
+
         jScrollPane1.getViewport().setBackground(Color.white);
         jScrollPane2.getViewport().setBackground(Color.white);
         this.numEmpleado = numEmpleado;
+        agregarProyectos();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-        
+
     }
 
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -604,6 +710,10 @@ private TableRowSorter<TableModel> modeloOrdenado;
         jPanel7 = new javax.swing.JPanel();
         btnSalir = new javax.swing.JPanel();
         lblX = new javax.swing.JLabel();
+        jPanel10 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jPanel11 = new javax.swing.JPanel();
+        txtBuscar = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel8 = new javax.swing.JPanel();
@@ -697,6 +807,33 @@ private TableRowSorter<TableModel> modeloOrdenado;
         jPanel7.add(btnSalir);
 
         jPanel5.add(jPanel7, java.awt.BorderLayout.EAST);
+
+        jPanel10.setBackground(new java.awt.Color(248, 248, 248));
+        jPanel10.setLayout(new java.awt.BorderLayout());
+
+        jLabel3.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Buscar por proyecto:");
+        jPanel10.add(jLabel3, java.awt.BorderLayout.NORTH);
+
+        jPanel11.setBackground(new java.awt.Color(248, 248, 248));
+
+        txtBuscar.setBackground(new java.awt.Color(248, 248, 248));
+        txtBuscar.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        txtBuscar.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtBuscar.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        txtBuscar.setPreferredSize(new java.awt.Dimension(300, 25));
+        txtBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBuscarActionPerformed(evt);
+            }
+        });
+        jPanel11.add(txtBuscar);
+
+        jPanel10.add(jPanel11, java.awt.BorderLayout.PAGE_END);
+
+        jPanel5.add(jPanel10, java.awt.BorderLayout.SOUTH);
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
 
@@ -922,7 +1059,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
         lblConteo.setFont(new java.awt.Font("Roboto Light", 1, 14)); // NOI18N
         lblConteo.setForeground(new java.awt.Color(0, 102, 102));
-        lblConteo.setText("<html>\n <div>\n<p style='padding:3px;'> Liberacion: </p>\n<p style='padding:3px;'> Cortes: </p>\n<p style='padding:3px;'> Fresadora:</p>\n<p style='padding:3px;'> Torno:</p>\n<p style='padding:3px;'> Cnc: </p>\n<p style='padding:3px;'> Acabados: </p>\n<p style='padding:3px;'> Tratamiento: </p>\n<p style='padding:3px;'> Calidad: </p>\n<p style='padding:3px;'> Terminados: </p>\n<p style='padding:3px;'> Sin Material: </p>\n<p style='padding:3px;'> Total: </p>\n</div>\n</html>");
+        lblConteo.setText("<html>\n <div>\n<p style='padding:3px;'> Liberacion: </p>\n<p style='padding:3px;'> Cortes: </p>\n<p style='padding:3px;'> Tratamiento: </p>\n<p style='padding:3px;'> Calidad: </p>\n<p style='padding:3px;'> Terminados: </p>\n<p style='padding:3px;'> Total: </p>\n</div>\n</html>");
         lblConteo.setBorder(new javax.swing.border.MatteBorder(null));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -1035,248 +1172,148 @@ private TableRowSorter<TableModel> modeloOrdenado;
     }// </editor-fold>//GEN-END:initComponents
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-        if(evt.getClickCount() == 2){
+        if (evt.getClickCount() == 2) {
             String proyecto = TablaDeDatos1.getValueAt(Tabla1.getSelectedRow(), 2).toString();
-            int opc = JOptionPane.showConfirmDialog(this,"¿Estas seguro de marcar como terminado el proyecto "+proyecto+" ?");
-            if(opc == 0){
+            int opc = JOptionPane.showConfirmDialog(this, "¿Estas seguro de marcar como terminado el proyecto " + proyecto + " ?");
+            if (opc == 0) {
                 terminarProyecto(proyecto);
             }
-        }else{
-            if(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2) == null){
-
-            }else{
-                Thread hilo = new Thread() {
-                   public void run(){
-                        Informacion.setText("Informacion de planos " + Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString() + "                         ");
-                        espera.activar();
-                        espera.setVisible(true);
-                        limpiarTabla();
-                        buscar();
-                        conteo();
-                        btnLiberar.setEnabled(false);
-                        int fila = Tabla1.getSelectedRow();
-                        txtProyecto.setText((String) Tabla1.getValueAt(fila, 2));
-                        txtPlano.setText("TODOS");
-                        btnExportarD.setEnabled(true);
-                        btnPrioridad.setEnabled(true);
-                        btnVer.setEnabled(false);
-                        try{
-                            Connection con;
-                            Conexion con1 = new Conexion();
-                            con = con1.getConnection();
-                            Statement st = con.createStatement();
-
-                            String sql = "select Proyecto, Liberado from Proyectos where Proyecto like '"+Tabla1.getValueAt(fila, 2).toString()+"'";
-                            ResultSet rs = st.executeQuery(sql);
-                            String datos[] = new String[10];
-                            int cont = 0, v = 0, f = 0;
-                            while(rs.next()){
-                                cont++;
-                                datos[0] = rs.getString("Liberado");
-                                if(datos[0].equals("SI")){
-                                    v++;
-                                }
-                                if(datos[0].equals("NO")){
-                                    f++;
-                                }
-                            }
-                            if((cont == v)){
-                                btnLiberar.setEnabled(false);
-                                txtLiberado.setText("SI");
-                            }else if(cont == f){
-                                btnLiberar.setEnabled(true);
-                                txtLiberado.setText("NO");
-                            }else{
-                                btnLiberar.setEnabled(true);
-                                txtLiberado.setText("INCOMPLETO");
-                            }
-                        }catch(SQLException e){
-                            espera.band = false;
-                            espera.dispose();
-                            JOptionPane.showMessageDialog(null, "ERROR AL ENVIAR A CORTES: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-                        }
-
-                        int total = TablaDeDatos1.getRowCount();
-                        int v = 0;
-                        for (int i = 0; i < total; i++) {
-                            if(TablaDeDatos1.getValueAt(i, 2).toString().equals("TERMINADO")){
-                                v++;
-                            }
-                        }
-                        if(v == total){
-                            int opc = JOptionPane.showConfirmDialog(null,"PROYECTO TOTALMENTE TERMINADO, ¿DESEAS CERRARLO?");
-                            if(opc == 0){
-                                try{
-                                    Connection con = null;
-                                    Conexion con1 = new Conexion();
-                                    con = con1.getConnection();
-                                    String sql = "update Proyectos set Mostrar = ? where Proyecto = ?";
-                                    PreparedStatement pst = con.prepareStatement(sql);
-
-                                    int f = Tabla1.getSelectedRow();
-                                    pst.setString(1, "NO");
-                                    pst.setString(2, Tabla1.getValueAt(f, 2).toString());
-
-                                    int n = pst.executeUpdate();
-                                    if(n > 0){
-                                        limpiarTabla1();
-                                        buscar();
-                                        limpiarTabla();
-                                        JOptionPane.showMessageDialog(null, "DATOS GUARDADOS");
-                                    }
-                                }catch(SQLException e){
-                                    espera.band = false;
-                                    espera.dispose();
-                                    JOptionPane.showMessageDialog(null, "ERROR AL GUARDAR DATOS","ERROR",JOptionPane.ERROR_MESSAGE);
-                                }
-                            }
-                        }
-                        espera.band = false;
-                        espera.dispose();
-                   }
-                };
-                hilo.start();
-            }
+        } else {
+            buscarProyecto(Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
         }
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void Tabla1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MousePressed
-        
+
     }//GEN-LAST:event_Tabla1MousePressed
 
     private void TablaDeDatos1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDeDatos1MouseClicked
         txtPlano.setText("");
         txtProyecto.setText("");
         int fila = TablaDeDatos1.getSelectedRow();
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        String datos[] = new String[5];
-        Statement st = con.createStatement();
-        String sql = "select * from Planos";
-        txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
-        txtPlano.setText(TablaDeDatos1.getValueAt(fila, 0).toString());
-        btnVer.setEnabled(true);
-        } catch(SQLException e){
-        JOptionPane.showMessageDialog(this, e);
+        try {
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            String datos[] = new String[5];
+            Statement st = con.createStatement();
+            String sql = "select * from Planos";
+            txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
+            txtPlano.setText(TablaDeDatos1.getValueAt(fila, 0).toString());
+            btnVer.setEnabled(true);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e);
         }
-        
+
     }//GEN-LAST:event_TablaDeDatos1MouseClicked
 
     private void btnExportarDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarDActionPerformed
         Workbook book;
         try {
-        JFileChooser fc = new JFileChooser();
-        File archivo = null;
-        fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
-        int n = fc.showSaveDialog(this);
-           
-        if(n == JFileChooser.APPROVE_OPTION){
-        archivo = fc.getSelectedFile();
-        }
-        String a = ""+archivo;
-        if(a.endsWith("xls")){
-        book = new  HSSFWorkbook();
-        }else {
-        book = new XSSFWorkbook();
-        a = archivo + ".xlsx";
-        }
-        
-        Sheet hoja = book.createSheet("REPORTE DE PROYECTO " +txtProyecto.getText());
-        Row fila = hoja.createRow(2);
-        Cell col = fila.createCell(2);
-        
-        Row fila1 = hoja.createRow(4);
-        Cell col1 = fila1.createCell(2);
-        
-        //-------------------------------ESTILOS
-        Font font = book.createFont();
-        CellStyle estilo1 = book.createCellStyle();
-        
-        Font font3 = book.createFont();
-        CellStyle estilo3 = book.createCellStyle();
-        
-        
-        font.setBold(true);
-        font.setColor(IndexedColors.BLACK.getIndex());
-        font.setFontHeightInPoints((short)12);
-        estilo1.setFont(font);
-        
-        estilo1.setAlignment(HorizontalAlignment.LEFT);
-        
-        font3.setBold(false);
-        font3.setColor(IndexedColors.BLACK.getIndex());
-        font3.setFontHeightInPoints((short)15);
-        estilo3.setFont(font3);
-        
-        estilo3.setAlignment(HorizontalAlignment.CENTER);
-        estilo3.setWrapText(true);
-        
-        //--------------------------------------
+            JFileChooser fc = new JFileChooser();
+            File archivo = null;
+            fc.setFileFilter(new FileNameExtensionFilter("EXCEL (*.xlsx)", "xlsx"));
+            int n = fc.showSaveDialog(this);
+
+            if (n == JFileChooser.APPROVE_OPTION) {
+                archivo = fc.getSelectedFile();
+            }
+            String a = "" + archivo;
+            if (a.endsWith("xls")) {
+                book = new HSSFWorkbook();
+            } else {
+                book = new XSSFWorkbook();
+                a = archivo + ".xlsx";
+            }
+
+            Sheet hoja = book.createSheet("REPORTE DE PROYECTO " + txtProyecto.getText());
+            Row fila = hoja.createRow(2);
+            Cell col = fila.createCell(2);
+
+            Row fila1 = hoja.createRow(4);
+            Cell col1 = fila1.createCell(2);
+
+            //-------------------------------ESTILOS
+            Font font = book.createFont();
+            CellStyle estilo1 = book.createCellStyle();
+
+            Font font3 = book.createFont();
+            CellStyle estilo3 = book.createCellStyle();
+
+            font.setBold(true);
+            font.setColor(IndexedColors.BLACK.getIndex());
+            font.setFontHeightInPoints((short) 12);
+            estilo1.setFont(font);
+
+            estilo1.setAlignment(HorizontalAlignment.LEFT);
+
+            font3.setBold(false);
+            font3.setColor(IndexedColors.BLACK.getIndex());
+            font3.setFontHeightInPoints((short) 15);
+            estilo3.setFont(font3);
+
+            estilo3.setAlignment(HorizontalAlignment.CENTER);
+            estilo3.setWrapText(true);
+
+            //--------------------------------------
 //        hoja.setColumnWidth(2, 5000);
-        //---------------------------------------
-        
-        hoja.setColumnWidth(2, 4000);
-        hoja.setColumnWidth(3, 6500);
-        hoja.setColumnWidth(4, 6500); 
-        hoja.setColumnWidth(5, 8200); 
-        
-        Font font1 = book.createFont();
-        CellStyle style = book.createCellStyle();
-        
-        font1.setBold(true);
-        font1.setColor(IndexedColors.WHITE.getIndex());
-        font1.setFontHeightInPoints((short)16);
-        style.setFont(font1);
-        
-        style.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        style.setFillPattern(SOLID_FOREGROUND);
-        style.setVerticalAlignment(VerticalAlignment.BOTTOM);
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setWrapText(true);
-        
-        hoja.addMergedRegion(new CellRangeAddress (
-        2,
-        2,
-        2,
-        5
-        ));
-        
-        hoja.addMergedRegion(new CellRangeAddress (
-        4,
-        4,
-        2,
-        4
-        ));
-        
-        Map<String, Object> properties = new HashMap<String, Object>();
-        properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
-        properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
-        properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
-        properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
-        
-        properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-        properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-        properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
-        properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());  
-        
-        
-        
-        col.setCellStyle(style);
-        col.setCellValue("ESTADO DE PROYECTOS");
-        
-        col1.setCellStyle(estilo1);
-        col1.setCellValue("PROYECTO: " + txtProyecto.getText());
-        
-        
-        
-        for (int i = -1; i < TablaDeDatos1.getRowCount(); i++) {
-                Row fila10=hoja.createRow(i+7);
+            //---------------------------------------
+            hoja.setColumnWidth(2, 4000);
+            hoja.setColumnWidth(3, 6500);
+            hoja.setColumnWidth(4, 6500);
+            hoja.setColumnWidth(5, 8200);
+
+            Font font1 = book.createFont();
+            CellStyle style = book.createCellStyle();
+
+            font1.setBold(true);
+            font1.setColor(IndexedColors.WHITE.getIndex());
+            font1.setFontHeightInPoints((short) 16);
+            style.setFont(font1);
+
+            style.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            style.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+            style.setFillPattern(SOLID_FOREGROUND);
+            style.setVerticalAlignment(VerticalAlignment.BOTTOM);
+            style.setAlignment(HorizontalAlignment.CENTER);
+            style.setWrapText(true);
+
+            hoja.addMergedRegion(new CellRangeAddress(
+                    2,
+                    2,
+                    2,
+                    5
+            ));
+
+            hoja.addMergedRegion(new CellRangeAddress(
+                    4,
+                    4,
+                    2,
+                    4
+            ));
+
+            Map<String, Object> properties = new HashMap<String, Object>();
+            properties.put(CellUtil.BORDER_TOP, BorderStyle.MEDIUM);
+            properties.put(CellUtil.BORDER_BOTTOM, BorderStyle.MEDIUM);
+            properties.put(CellUtil.BORDER_LEFT, BorderStyle.MEDIUM);
+            properties.put(CellUtil.BORDER_RIGHT, BorderStyle.MEDIUM);
+
+            properties.put(CellUtil.TOP_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+            properties.put(CellUtil.BOTTOM_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+            properties.put(CellUtil.LEFT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+            properties.put(CellUtil.RIGHT_BORDER_COLOR, IndexedColors.BLACK.getIndex());
+
+            col.setCellStyle(style);
+            col.setCellValue("ESTADO DE PROYECTOS");
+
+            col1.setCellStyle(estilo1);
+            col1.setCellValue("PROYECTO: " + txtProyecto.getText());
+
+            for (int i = -1; i < TablaDeDatos1.getRowCount(); i++) {
+                Row fila10 = hoja.createRow(i + 7);
                 for (int j = 0; j < 5; j++) {
-                    Cell celda=fila10.createCell(j+2);
-                    if(i == -1 && (j >= 0 && j <=5)){
+                    Cell celda = fila10.createCell(j + 2);
+                    if (i == -1 && (j >= 0 && j <= 5)) {
                         CellStyle s = book.createCellStyle();
                         Font f = book.createFont();
                         f.setBold(true);
@@ -1286,211 +1323,206 @@ private TableRowSorter<TableModel> modeloOrdenado;
                         s.setFillPattern(SOLID_FOREGROUND);
                         celda.setCellStyle(s);
                     }
-                    if(i > -1 && (j > -1 && j <= 5) && (i%2 == 0)){
+                    if (i > -1 && (j > -1 && j <= 5) && (i % 2 == 0)) {
                         CellStyle s = book.createCellStyle();
                         s.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
                         s.setFillPattern(SOLID_FOREGROUND);
                         celda.setCellStyle(s);
                     }
-                    
-                    if(i==-1){
+
+                    if (i == -1) {
                         celda.setCellValue(String.valueOf(TablaDeDatos1.getColumnName(j)));
 //                        CellUtil.setCellStyleProperties(celda, properties);
-                    }else{
-                        if(j == 3){
-                        CellStyle ss = book.createCellStyle();
-                        ss.setWrapText(true);
-                        
-                            if(i%2 == 0){
-                            ss.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-                            ss.setFillPattern(SOLID_FOREGROUND);
+                    } else {
+                        if (j == 3) {
+                            CellStyle ss = book.createCellStyle();
+                            ss.setWrapText(true);
+
+                            if (i % 2 == 0) {
+                                ss.setFillForegroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+                                ss.setFillPattern(SOLID_FOREGROUND);
 
                             }
                             celda.setCellStyle(ss);
                         }
                         celda.setCellValue(String.valueOf(TablaDeDatos1.getValueAt(i, j)));
 //                        CellUtil.setCellStyleProperties(celda, properties);
-                        
-                        
-                       
+
                     }
                     File ad = new File(a);
-                    book.write(new FileOutputStream(a));                
+                    book.write(new FileOutputStream(a));
                 }
             }
-            
-        
-    
-        
-        book.close();
-    } catch (FileNotFoundException ex) {
-        Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-    } catch (IOException ex) {
-        Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
-    }
+
+            book.close();
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }//GEN-LAST:event_btnExportarDActionPerformed
 
     private void btnPrioridadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrioridadActionPerformed
-        try{
-        String a = JOptionPane.showInputDialog("INGRESA EL % DE PRIORIDAD");
-        int p = Integer.parseInt(a);
-        DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
-        try{
-            btnVer.setEnabled(false);
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st7 = con.createStatement();
-            Statement st8 = con.createStatement();
-            Statement st9 = con.createStatement();
-            Statement st10 = con.createStatement();
-            Statement st11 = con.createStatement();
-            Statement st12 = con.createStatement();
-            Statement st13 = con.createStatement();
-            String datos[] = new String[10];
-            String acabados[] = new String[10];
-            String cortes[] = new String[10];
-            String fresa[] = new String[10];
-            String cnc[] = new String[10];
-            String torno[] = new String[10];
-            String calidad[] = new String[10];
-            String act = "update Planos set Prioridad = ? where Plano = ?";
-            String act1 = "update Datos set Prioridad = ? where Proyecto = ?";
-            String act2 = "update Fresadora set Prioridad = ? where Proyecto = ?";
-            String act3 = "update CNC set Prioridad = ? where Proyecto = ?";
-            String act4 = "update Torno set Prioridad = ? where Proyecto = ?";
-            String act5 = "update Acabados set Prioridad = ? where Proyecto = ?";
-            String act6 = "update Calidad set Prioridad = ? where Proyecto = ?";
+        try {
+            String a = JOptionPane.showInputDialog("INGRESA EL % DE PRIORIDAD");
+            int p = Integer.parseInt(a);
+            DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
+            try {
+                btnVer.setEnabled(false);
+                Connection con = null;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                Statement st7 = con.createStatement();
+                Statement st8 = con.createStatement();
+                Statement st9 = con.createStatement();
+                Statement st10 = con.createStatement();
+                Statement st11 = con.createStatement();
+                Statement st12 = con.createStatement();
+                Statement st13 = con.createStatement();
+                String datos[] = new String[10];
+                String acabados[] = new String[10];
+                String cortes[] = new String[10];
+                String fresa[] = new String[10];
+                String cnc[] = new String[10];
+                String torno[] = new String[10];
+                String calidad[] = new String[10];
+                String act = "update Planos set Prioridad = ? where Plano = ?";
+                String act1 = "update Datos set Prioridad = ? where Proyecto = ?";
+                String act2 = "update Fresadora set Prioridad = ? where Proyecto = ?";
+                String act3 = "update CNC set Prioridad = ? where Proyecto = ?";
+                String act4 = "update Torno set Prioridad = ? where Proyecto = ?";
+                String act5 = "update Acabados set Prioridad = ? where Proyecto = ?";
+                String act6 = "update Calidad set Prioridad = ? where Proyecto = ?";
 
-            String verPl = "select Plano,Proyecto from Planos where Proyecto like '"+txtProyecto.getText()+"%'";
-            String verCo = "select Proyecto from Datos where Plano like '"+txtProyecto.getText()+"%' and Terminado like 'NO'";
-            String verFr = "select Proyecto from Fresadora where Plano like '"+txtProyecto.getText()+"%' and Terminado like 'NO'";
-            String verCn = "select Proyecto from CNC where Plano like '"+txtProyecto.getText()+"%' and Terminado like 'NO'";
-            String verTo = "select Proyecto from Torno where Plano like '"+txtProyecto.getText()+"%' and Terminado like 'NO'";
-            String verAc = "select Proyecto from Acabados where Plano like '"+txtProyecto.getText()+"%' and Terminado like 'NO'";
-            String verCa = "select Proyecto from Calidad where Plano like '"+txtProyecto.getText()+"%' and Terminado like 'NO'";
+                String verPl = "select Plano,Proyecto from Planos where Proyecto like '" + txtProyecto.getText() + "%'";
+                String verCo = "select Proyecto from Datos where Plano like '" + txtProyecto.getText() + "%' and Terminado like 'NO'";
+                String verFr = "select Proyecto from Fresadora where Plano like '" + txtProyecto.getText() + "%' and Terminado like 'NO'";
+                String verCn = "select Proyecto from CNC where Plano like '" + txtProyecto.getText() + "%' and Terminado like 'NO'";
+                String verTo = "select Proyecto from Torno where Plano like '" + txtProyecto.getText() + "%' and Terminado like 'NO'";
+                String verAc = "select Proyecto from Acabados where Plano like '" + txtProyecto.getText() + "%' and Terminado like 'NO'";
+                String verCa = "select Proyecto from Calidad where Plano like '" + txtProyecto.getText() + "%' and Terminado like 'NO'";
 
-            ResultSet r = st7.executeQuery(verPl);
-            ResultSet r1 = st8.executeQuery(verCo);
-            ResultSet r2 = st9.executeQuery(verFr);
-            ResultSet r3 = st10.executeQuery(verCn);
-            ResultSet r4 = st11.executeQuery(verTo);
-            ResultSet r5 = st12.executeQuery(verAc);
-            ResultSet r6 = st13.executeQuery(verCa);
+                ResultSet r = st7.executeQuery(verPl);
+                ResultSet r1 = st8.executeQuery(verCo);
+                ResultSet r2 = st9.executeQuery(verFr);
+                ResultSet r3 = st10.executeQuery(verCn);
+                ResultSet r4 = st11.executeQuery(verTo);
+                ResultSet r5 = st12.executeQuery(verAc);
+                ResultSet r6 = st13.executeQuery(verCa);
 
-            PreparedStatement pst = con.prepareStatement(act);
-            PreparedStatement pst1 = con.prepareStatement(act1);
-            PreparedStatement pst2 = con.prepareStatement(act2);
-            PreparedStatement pst3 = con.prepareStatement(act3);
-            PreparedStatement pst4 = con.prepareStatement(act4);
-            PreparedStatement pst5 = con.prepareStatement(act5);
-            PreparedStatement pst6 = con.prepareStatement(act6);
-            if(txtPlano.getText().equals("TODOS")){
-                int n = 0,n1 = 0,n2 = 0,n3 = 0,n4 = 0,n5 = 0,n6 = 0;
-                int cont = 0;
-                while(r.next()){
-                    datos[2] = r.getString("Plano");
-                    pst.setString(1, ""+p);
-                    pst.setString(2, datos[2]);
-                    
-                    n = pst.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
+                PreparedStatement pst = con.prepareStatement(act);
+                PreparedStatement pst1 = con.prepareStatement(act1);
+                PreparedStatement pst2 = con.prepareStatement(act2);
+                PreparedStatement pst3 = con.prepareStatement(act3);
+                PreparedStatement pst4 = con.prepareStatement(act4);
+                PreparedStatement pst5 = con.prepareStatement(act5);
+                PreparedStatement pst6 = con.prepareStatement(act6);
+                if (txtPlano.getText().equals("TODOS")) {
+                    int n = 0, n1 = 0, n2 = 0, n3 = 0, n4 = 0, n5 = 0, n6 = 0;
+                    int cont = 0;
+                    while (r.next()) {
+                        datos[2] = r.getString("Plano");
+                        pst.setString(1, "" + p);
+                        pst.setString(2, datos[2]);
+
+                        n = pst.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    while (r1.next()) {
+                        cortes[1] = r1.getString("Proyecto");
+                        pst1.setString(1, "" + p);
+                        pst1.setString(2, cortes[1]);
+                        n1 = pst1.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    while (r2.next()) {
+                        fresa[1] = r2.getString("Proyecto");
+                        pst2.setString(1, "" + p);
+                        pst2.setString(2, fresa[1]);
+                        n2 = pst2.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    while (r3.next()) {
+                        cnc[1] = r3.getString("Proyecto");
+                        pst3.setString(1, "" + p);
+                        pst3.setString(2, cnc[1]);
+                        n3 = pst3.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    while (r4.next()) {
+                        torno[1] = r4.getString("Proyecto");
+                        pst4.setString(1, "" + p);
+                        pst4.setString(2, torno[1]);
+                        n4 = pst4.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    while (r5.next()) {
+                        acabados[1] = r5.getString("Proyecto");
+                        pst5.setString(1, "" + p);
+                        pst5.setString(2, acabados[1]);
+                        n5 = pst5.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    while (r6.next()) {
+                        calidad[1] = r6.getString("Proyecto");
+                        pst6.setString(1, "" + p);
+                        pst6.setString(2, calidad[1]);
+                        n6 = pst6.executeUpdate();
+                        System.out.println(cont);
+                        cont++;
+                    }
+
+                    limpiarTabla();
+                    buscar();
+                } else {
+                    pst.setString(1, "" + p);
+                    pst.setString(2, txtPlano.getText());
+
+                    pst1.setString(1, "" + p);
+                    pst1.setString(2, txtPlano.getText());
+
+                    pst2.setString(1, "" + p);
+                    pst2.setString(2, txtPlano.getText());
+
+                    pst3.setString(1, "" + p);
+                    pst3.setString(2, txtPlano.getText());
+
+                    pst4.setString(1, "" + p);
+                    pst4.setString(2, txtPlano.getText());
+
+                    pst5.setString(1, "" + p);
+                    pst5.setString(2, txtPlano.getText());
+
+                    pst6.setString(1, "" + p);
+                    pst6.setString(2, txtPlano.getText());
+
+                    int n = pst.executeUpdate();
+                    int n1 = pst1.executeUpdate();
+                    int n2 = pst2.executeUpdate();
+                    int n3 = pst3.executeUpdate();
+                    int n4 = pst4.executeUpdate();
+                    int n5 = pst5.executeUpdate();
+                    int n6 = pst6.executeUpdate();
+                    limpiarTabla();
+                    buscar();
                 }
-
-                while(r1.next()){
-                    cortes[1] = r1.getString("Proyecto");
-                    pst1.setString(1, ""+p);
-                    pst1.setString(2, cortes[1]);
-                    n1 = pst1.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
-                }
-
-                while(r2.next()){
-                    fresa[1] = r2.getString("Proyecto");
-                    pst2.setString(1, ""+p);
-                    pst2.setString(2, fresa[1]);
-                    n2 = pst2.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
-                }
-
-                while(r3.next()){
-                    cnc[1] = r3.getString("Proyecto");
-                    pst3.setString(1, ""+p);
-                    pst3.setString(2, cnc[1]);
-                    n3 = pst3.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
-                }
-
-                while(r4.next()){
-                    torno[1] = r4.getString("Proyecto");
-                    pst4.setString(1, ""+p);
-                    pst4.setString(2, torno[1]);
-                    n4 = pst4.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
-                }
-
-                while(r5.next()){
-                    acabados[1] = r5.getString("Proyecto");
-                    pst5.setString(1, ""+p);
-                    pst5.setString(2, acabados[1]);
-                    n5 = pst5.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
-                }
-
-                while(r6.next()){
-                    calidad[1] = r6.getString("Proyecto");
-                    pst6.setString(1, ""+p);
-                    pst6.setString(2, calidad[1]);
-                    n6 = pst6.executeUpdate();
-                    System.out.println(cont);
-                    cont++;
-                }
-
-                limpiarTabla();
-                buscar();
-            }else {
-                pst.setString(1, ""+p);
-                pst.setString(2, txtPlano.getText());
-
-                pst1.setString(1, ""+p);
-                pst1.setString(2, txtPlano.getText());
-
-                pst2.setString(1, ""+p);
-                pst2.setString(2, txtPlano.getText());
-
-                pst3.setString(1, ""+p);
-                pst3.setString(2, txtPlano.getText());
-
-                pst4.setString(1, ""+p);
-                pst4.setString(2, txtPlano.getText());
-
-                pst5.setString(1, ""+p);
-                pst5.setString(2, txtPlano.getText());
-
-                pst6.setString(1, ""+p);
-                pst6.setString(2, txtPlano.getText());
-
-                int n = pst.executeUpdate();
-                int n1 = pst1.executeUpdate();
-                int n2 = pst2.executeUpdate();
-                int n3 = pst3.executeUpdate();
-                int n4 = pst4.executeUpdate();
-                int n5 = pst5.executeUpdate();
-                int n6 = pst6.executeUpdate();
-                limpiarTabla();
-                buscar();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "NO SE ACTUALIZO" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "NO SE ACTUALIZO"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
-        }catch(Exception e){
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "DEBES INGRESAR UNA CANTIDAD CORRECTA");
         }
     }//GEN-LAST:event_btnPrioridadActionPerformed
@@ -1555,37 +1587,34 @@ private TableRowSorter<TableModel> modeloOrdenado;
     }//GEN-LAST:event_btnLiberarActionPerformed
 
     private void btnVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerActionPerformed
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             int fila = TablaDeDatos1.getSelectedRow();
-            String sql = "select Pdf,Plano from pdfplanos where Plano like '"+TablaDeDatos1.getValueAt(fila, 0).toString()+"'";
+            String sql = "select Pdf,Plano from pdfplanos where Plano like '" + TablaDeDatos1.getValueAt(fila, 0).toString() + "'";
             ResultSet rs = st.executeQuery(sql);
             byte[] b = null;
-            while(rs.next()){
+            while (rs.next()) {
                 b = rs.getBytes("Pdf");
             }
-            
-                InputStream bos = new ByteArrayInputStream(b);
-                int tamInput = bos.available();
-                byte[] datosPdf = new byte[tamInput];
-                bos.read(datosPdf, 0, tamInput);
-                
-                OutputStream out = new FileOutputStream("new.pdf");
-                out.write(datosPdf);
-                
-                
-                out.close();
-                bos.close();
-            
-            
-             Desktop.getDesktop().open(new File("new.pdf"));
-                    
-            
-        }catch(SQLException | NumberFormatException  |IOException e){
-            JOptionPane.showMessageDialog(this,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+            InputStream bos = new ByteArrayInputStream(b);
+            int tamInput = bos.available();
+            byte[] datosPdf = new byte[tamInput];
+            bos.read(datosPdf, 0, tamInput);
+
+            OutputStream out = new FileOutputStream("new.pdf");
+            out.write(datosPdf);
+
+            out.close();
+            bos.close();
+
+            Desktop.getDesktop().open(new File("new.pdf"));
+
+        } catch (SQLException | NumberFormatException | IOException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnVerActionPerformed
 
@@ -1594,61 +1623,61 @@ private TableRowSorter<TableModel> modeloOrdenado;
         SimpleDateFormat fecha = new SimpleDateFormat("dd/MM/yyyy");
         String fec;
         fec = fecha.format(dato);
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        int n1 = 0,n2 = 0,n3 = 0,n4 = 0,n5 = 0,n6 = 0,n7 = 0,n8 = 0,n9 = 0;
-        if(txtPlano.equals("TODOS")){
-            String a = JOptionPane.showInputDialog("CONTRSASEÑA: ..........");
-            if(a.equals(fec+"1234")){
-            for (int i = 0; i < TablaDeDatos1.getRowCount(); i++) {
-                String sql1 = "delete from planos where Plano = ?";
-                String sql2 = "delete from proyectos where Plano = ?";
-                String sql3 = "delete from datos where Plano = ?";
-                String sql4 = "delete from cnc where Plano = ?";
-                String sql5 = "delete from fresadora where Plano = ?";
-                String sql6 = "delete from torno where Plano like = ?";
-                String sql7 = "delete from acabados where Plano = ?";
-                String sql8 = "delete from calidad where Plano = ?";
-                String sql9 = "delete from tratamiento where Plano = ?";
-                PreparedStatement pst1 = con.prepareStatement(sql1);
-                PreparedStatement pst2 = con.prepareStatement(sql2);
-                PreparedStatement pst3 = con.prepareStatement(sql3);
-                PreparedStatement pst4 = con.prepareStatement(sql4);
-                PreparedStatement pst5 = con.prepareStatement(sql5);
-                PreparedStatement pst6 = con.prepareStatement(sql6);
-                PreparedStatement pst7 = con.prepareStatement(sql7);
-                PreparedStatement pst8 = con.prepareStatement(sql8);
-                PreparedStatement pst9 = con.prepareStatement(sql9);
-                
-                pst1.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst2.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst3.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst4.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst5.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst6.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst7.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst8.setString(1, Tabla1.getValueAt(i, 1).toString());
-                pst9.setString(1, Tabla1.getValueAt(i, 1).toString());
-                
-                n1 = pst1.executeUpdate();
-                n2 = pst2.executeUpdate();
-                n3 = pst3.executeUpdate();
-                n4 = pst4.executeUpdate();
-                n5 = pst5.executeUpdate();
-                n6 = pst6.executeUpdate();
-                n7 = pst7.executeUpdate();
-                n8 = pst8.executeUpdate();
-                n9 = pst9.executeUpdate();
-            }
-            if(n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0 && n6 > 0 && n7 > 0 && n8 > 0 && n9 > 0){
-            JOptionPane.showMessageDialog(this,"DATOS BORRADOS CORRECTAMENTE");
-            }
-            }
-            
-        }else {
+        try {
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            int n1 = 0, n2 = 0, n3 = 0, n4 = 0, n5 = 0, n6 = 0, n7 = 0, n8 = 0, n9 = 0;
+            if (txtPlano.equals("TODOS")) {
+                String a = JOptionPane.showInputDialog("CONTRSASEÑA: ..........");
+                if (a.equals(fec + "1234")) {
+                    for (int i = 0; i < TablaDeDatos1.getRowCount(); i++) {
+                        String sql1 = "delete from planos where Plano = ?";
+                        String sql2 = "delete from proyectos where Plano = ?";
+                        String sql3 = "delete from datos where Plano = ?";
+                        String sql4 = "delete from cnc where Plano = ?";
+                        String sql5 = "delete from fresadora where Plano = ?";
+                        String sql6 = "delete from torno where Plano like = ?";
+                        String sql7 = "delete from acabados where Plano = ?";
+                        String sql8 = "delete from calidad where Plano = ?";
+                        String sql9 = "delete from tratamiento where Plano = ?";
+                        PreparedStatement pst1 = con.prepareStatement(sql1);
+                        PreparedStatement pst2 = con.prepareStatement(sql2);
+                        PreparedStatement pst3 = con.prepareStatement(sql3);
+                        PreparedStatement pst4 = con.prepareStatement(sql4);
+                        PreparedStatement pst5 = con.prepareStatement(sql5);
+                        PreparedStatement pst6 = con.prepareStatement(sql6);
+                        PreparedStatement pst7 = con.prepareStatement(sql7);
+                        PreparedStatement pst8 = con.prepareStatement(sql8);
+                        PreparedStatement pst9 = con.prepareStatement(sql9);
+
+                        pst1.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst2.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst3.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst4.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst5.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst6.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst7.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst8.setString(1, Tabla1.getValueAt(i, 1).toString());
+                        pst9.setString(1, Tabla1.getValueAt(i, 1).toString());
+
+                        n1 = pst1.executeUpdate();
+                        n2 = pst2.executeUpdate();
+                        n3 = pst3.executeUpdate();
+                        n4 = pst4.executeUpdate();
+                        n5 = pst5.executeUpdate();
+                        n6 = pst6.executeUpdate();
+                        n7 = pst7.executeUpdate();
+                        n8 = pst8.executeUpdate();
+                        n9 = pst9.executeUpdate();
+                    }
+                    if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0 && n6 > 0 && n7 > 0 && n8 > 0 && n9 > 0) {
+                        JOptionPane.showMessageDialog(this, "DATOS BORRADOS CORRECTAMENTE");
+                    }
+                }
+
+            } else {
                 String sql1 = "delete from planos where Plano = ?";
                 String sql2 = "delete from proyectos where Plano = ?";
                 String sql3 = "delete from datos where Plano = ?";
@@ -1667,7 +1696,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 PreparedStatement pst7 = con.prepareStatement(sql7);
                 PreparedStatement pst8 = con.prepareStatement(sql8);
                 PreparedStatement pst9 = con.prepareStatement(sql9);
-                
+
                 pst1.setString(1, txtPlano.getText());
                 pst2.setString(1, txtPlano.getText());
                 pst3.setString(1, txtPlano.getText());
@@ -1677,7 +1706,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 pst7.setString(1, txtPlano.getText());
                 pst8.setString(1, txtPlano.getText());
                 pst9.setString(1, txtPlano.getText());
-                
+
                 n1 = pst1.executeUpdate();
                 n2 = pst2.executeUpdate();
                 n3 = pst3.executeUpdate();
@@ -1688,38 +1717,38 @@ private TableRowSorter<TableModel> modeloOrdenado;
                 n8 = pst8.executeUpdate();
                 n9 = pst9.executeUpdate();
             }
-            if(n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0 && n6 > 0 && n7 > 0 && n8 > 0 && n9 > 0){
-            JOptionPane.showMessageDialog(this,"DATOS BORRADOS CORRECTAMENTE");
-            
-        }
-        
-        }catch(SQLException e){
-        JOptionPane.showMessageDialog(this, "ERROR AL BORRAR " + e);
+            if (n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0 && n6 > 0 && n7 > 0 && n8 > 0 && n9 > 0) {
+                JOptionPane.showMessageDialog(this, "DATOS BORRADOS CORRECTAMENTE");
+
+            }
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR AL BORRAR " + e);
         }
     }//GEN-LAST:event_btnBorrarActionPerformed
 
     private void btnPrioridad2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrioridad2ActionPerformed
-        try{
+        try {
             Connection con = null;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "update proyectos set Liberado = ? where Proyecto = ?";
             PreparedStatement pst = con.prepareStatement(sql);
-            
+
             int p = Tabla1.getSelectedRow();
             pst.setString(1, "NO");
             pst.setString(2, txtProyecto.getText());
-            
+
             int n = pst.executeUpdate();
-            
-            if(n > 0){
+
+            if (n > 0) {
                 JOptionPane.showMessageDialog(this, "PROYECTO LIBERADO");
                 btnLiberar.setEnabled(true);
             }
-            
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnPrioridad2ActionPerformed
 
@@ -1743,14 +1772,14 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        terminar = new TerminarProyecto(f,true);
+        terminar = new TerminarProyecto(f, true);
         terminar.btnGuardar.addActionListener(this);
         terminar.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        TerminarTodo terminarT = new TerminarTodo(f,true);
+        TerminarTodo terminarT = new TerminarTodo(f, true);
         terminarT.setVisible(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
@@ -1760,10 +1789,14 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
     private void InformacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InformacionActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        InformacionProyectos info = new InformacionProyectos(f,true, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+        InformacionProyectos info = new InformacionProyectos(f, true, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
         info.setLocationRelativeTo(f);
         info.setVisible(true);
     }//GEN-LAST:event_InformacionActionPerformed
+
+    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
+        buscarProyecto(txtBuscar.getText());
+    }//GEN-LAST:event_txtBuscarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1780,6 +1813,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
@@ -1790,6 +1824,8 @@ private TableRowSorter<TableModel> modeloOrdenado;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
@@ -1804,6 +1840,7 @@ private TableRowSorter<TableModel> modeloOrdenado;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JLabel lblConteo;
     private javax.swing.JLabel lblX;
+    private javax.swing.JTextField txtBuscar;
     private javax.swing.JLabel txtLiberado;
     private javax.swing.JLabel txtPlano;
     private javax.swing.JLabel txtProyecto;
@@ -1811,11 +1848,11 @@ private TableRowSorter<TableModel> modeloOrdenado;
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(terminar != null){
-            if(e.getSource() == terminar.btnGuardar){
+        if (terminar != null) {
+            if (e.getSource() == terminar.btnGuardar) {
                 int opc = JOptionPane.showConfirmDialog(this, "¿Estas seguro de terminar el proyecto "
-                        +terminar.txtProyecto.getText()+"");
-                if(opc == 0){
+                        + terminar.txtProyecto.getText() + "");
+                if (opc == 0) {
                     terminarProyecto(terminar.txtProyecto.getText());
                 }
             }

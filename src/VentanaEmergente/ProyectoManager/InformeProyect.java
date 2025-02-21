@@ -10,14 +10,59 @@ import javax.swing.JOptionPane;
 
 public class InformeProyect extends java.awt.Dialog {
 
-    public void setAgenda (String fechaInicio, String fechaFin, String estatus, String creador, String fecha, String depa, String descripcion, 
+    public void setAgenda(String fechaInicio, String fechaFin, String estatus, String creador, String fecha, String depa, String descripcion,
             String comentarios, String empleadoFin, String fechaTermino) {
-        if (depa.equals("DISEÑO")) {
-            
+        switch (depa) {
+            case "DISEÑO":
+                txtInicioD.setText(fechaInicio);
+                txtFinD.setText(fechaFin);
+                txtEstatusD.setText(estatus);
+                txtCreadorD.setText(creador);
+                txtCreacionD.setText(fecha);
+                txtDescripcionD.setText(descripcion);
+                txtComentariosD.setText(comentarios);
+                txtFinD.setText(empleadoFin);
+                txtTerminoD.setText(fechaTermino);
+                break;
+            case "HERRAMENTISTA":
+                txtInicioM.setText(fechaInicio);
+                txtFinM.setText(fechaFin);
+                txtEstatusM.setText(estatus);
+                txtCreadorM.setText(creador);
+                txtCreacionM.setText(fecha);
+                txtDescripcionM.setText(descripcion);
+                txtComentariosM.setText(comentarios);
+                txtFinM.setText(empleadoFin);
+                txtTerminoM.setText(fechaTermino);
+                break;
+            case "INTEGRACION":
+                txtInicioI.setText(fechaInicio);
+                txtFinI.setText(fechaFin);
+                txtEstatusI.setText(estatus);
+                txtCreadorI.setText(creador);
+                txtCreacionI.setText(fecha);
+                txtDescripcionI.setText(descripcion);
+                txtComentariosI.setText(comentarios);
+                txtFinI.setText(empleadoFin);
+                txtTerminoI.setText(fechaTermino);
+                break;
+            case "COMPRAS":
+                txtInicioC.setText(fechaInicio);
+                txtFinC.setText(fechaFin);
+                txtEstatusC.setText(estatus);
+                txtCreadorC.setText(creador);
+                txtCreacionC.setText(fecha);
+                txtDescripcionC.setText(descripcion);
+                txtComentariosC.setText(comentarios);
+                txtFinC.setText(empleadoFin);
+                txtTerminoC.setText(fechaTermino);
+                break;
+            default:
+                break;
         }
     }
-    
-    public void setInformacionAgenda (String proyecto){
+
+    public final void setInformacionAgenda(String proyecto) {
         try {
             Connection con;
             Conexion con1 = new Conexion();
@@ -25,7 +70,7 @@ public class InformeProyect extends java.awt.Dialog {
             Statement st = con.createStatement();
             String sql = "select * from agenda where Proyecto like '" + proyecto + "'";
             ResultSet rs = st.executeQuery(sql);
-            while(rs.next()){
+            while (rs.next()) {
                 String fechaInicio = rs.getString("FechaInicio");
                 String fechaFin = rs.getString("FechaFin");
                 String estatus = rs.getString("Estatus");
@@ -36,18 +81,20 @@ public class InformeProyect extends java.awt.Dialog {
                 String comentarios = rs.getString("Comentarios");
                 String empleadoFin = rs.getString("EmpleadoFin");
                 String fechaTermino = rs.getString("FechaTermino");
+                setAgenda(fechaInicio, fechaFin, estatus, creador, fecha, depa, descripcion, comentarios, empleadoFin, fechaTermino);
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
-    public InformeProyect(java.awt.Frame parent, boolean modal) {
+
+    public InformeProyect(java.awt.Frame parent, boolean modal, String proyecto) {
         super(parent, modal);
         initComponents();
         this.setLocationRelativeTo(parent);
-        this.setBackground(new Color(0,0,0,0));
+        this.setBackground(new Color(0, 0, 0, 0));
         jScrollPane3.getVerticalScrollBar().setUnitIncrement(15);
+        setInformacionAgenda(proyecto);
     }
 
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -206,11 +253,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel3.setText("Fecha Inicio");
         panelRound1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 100, 70, -1));
 
+        txtInicioD.setEditable(false);
         txtInicioD.setBackground(new java.awt.Color(255, 255, 255));
         txtInicioD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtInicioD.setForeground(new java.awt.Color(51, 51, 51));
         txtInicioD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInicioD.setText("2025-12-30");
         txtInicioD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtInicioD, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 120, 70, 30));
 
@@ -220,11 +267,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel4.setText("Fecha Fin");
         panelRound1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 100, 70, -1));
 
+        txtFinD.setEditable(false);
         txtFinD.setBackground(new java.awt.Color(255, 255, 255));
         txtFinD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinD.setForeground(new java.awt.Color(51, 51, 51));
         txtFinD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinD.setText("2025-12-30");
         txtFinD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinD, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 120, 70, 30));
 
@@ -234,11 +281,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel5.setText("Estatus");
         panelRound1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 100, 70, -1));
 
+        txtEstatusD.setEditable(false);
         txtEstatusD.setBackground(new java.awt.Color(255, 255, 255));
         txtEstatusD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtEstatusD.setForeground(new java.awt.Color(51, 51, 51));
         txtEstatusD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtEstatusD.setText("Cancelado");
         txtEstatusD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtEstatusD, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 120, 70, 30));
 
@@ -248,11 +295,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel6.setText("Creador");
         panelRound1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 100, 180, -1));
 
+        txtCreadorD.setEditable(false);
         txtCreadorD.setBackground(new java.awt.Color(255, 255, 255));
         txtCreadorD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreadorD.setForeground(new java.awt.Color(51, 51, 51));
         txtCreadorD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreadorD.setText("Jorge Leonel Santacruz");
         txtCreadorD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreadorD, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 120, 180, 30));
 
@@ -262,11 +309,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel7.setText("Comentarios");
         panelRound1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 100, 210, -1));
 
+        txtCreacionD.setEditable(false);
         txtCreacionD.setBackground(new java.awt.Color(255, 255, 255));
         txtCreacionD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreacionD.setForeground(new java.awt.Color(51, 51, 51));
         txtCreacionD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreacionD.setText("2025-12-30");
         txtCreacionD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreacionD, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 120, 90, 30));
 
@@ -278,6 +325,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtComentariosD.setEditable(false);
         txtComentariosD.setBackground(new java.awt.Color(255, 255, 255));
         txtComentariosD.setColumns(17);
         txtComentariosD.setRows(5);
@@ -293,6 +341,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtDescripcionD.setEditable(false);
         txtDescripcionD.setBackground(new java.awt.Color(255, 255, 255));
         txtDescripcionD.setColumns(17);
         txtDescripcionD.setRows(5);
@@ -306,11 +355,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel10.setText("Empleado Final");
         panelRound1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 160, 180, -1));
 
+        txtFinalD.setEditable(false);
         txtFinalD.setBackground(new java.awt.Color(255, 255, 255));
         txtFinalD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinalD.setForeground(new java.awt.Color(51, 51, 51));
         txtFinalD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinalD.setText("Jorge Leonel Santacruz");
         txtFinalD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinalD, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 180, 180, 30));
 
@@ -320,11 +369,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel11.setText("Fecha Termino");
         panelRound1.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 160, 90, -1));
 
+        txtTerminoD.setEditable(false);
         txtTerminoD.setBackground(new java.awt.Color(255, 255, 255));
         txtTerminoD.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtTerminoD.setForeground(new java.awt.Color(51, 51, 51));
         txtTerminoD.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTerminoD.setText("2025-12-30");
         txtTerminoD.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtTerminoD, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 180, 90, 30));
 
@@ -351,16 +400,17 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel15.setText("Fecha Termino");
         panelRound1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 290, 90, -1));
 
+        txtTerminoC.setEditable(false);
         txtTerminoC.setBackground(new java.awt.Color(255, 255, 255));
         txtTerminoC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtTerminoC.setForeground(new java.awt.Color(51, 51, 51));
         txtTerminoC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTerminoC.setText("2025-12-30");
         txtTerminoC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtTerminoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 310, 90, 30));
 
         jScrollPane3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtComentariosC.setEditable(false);
         txtComentariosC.setBackground(new java.awt.Color(255, 255, 255));
         txtComentariosC.setColumns(17);
         txtComentariosC.setRows(5);
@@ -374,11 +424,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel16.setText("Empleado Final");
         panelRound1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 290, 180, -1));
 
+        txtInicioC.setEditable(false);
         txtInicioC.setBackground(new java.awt.Color(255, 255, 255));
         txtInicioC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtInicioC.setForeground(new java.awt.Color(51, 51, 51));
         txtInicioC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInicioC.setText("2025-12-30");
         txtInicioC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtInicioC, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 250, 70, 30));
 
@@ -396,6 +446,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane4.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtDescripcionC.setEditable(false);
         txtDescripcionC.setBackground(new java.awt.Color(255, 255, 255));
         txtDescripcionC.setColumns(17);
         txtDescripcionC.setRows(5);
@@ -409,19 +460,19 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel19.setText("Estatus");
         panelRound1.add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 230, 70, -1));
 
+        txtCreacionC.setEditable(false);
         txtCreacionC.setBackground(new java.awt.Color(255, 255, 255));
         txtCreacionC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreacionC.setForeground(new java.awt.Color(51, 51, 51));
         txtCreacionC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreacionC.setText("2025-12-30");
         txtCreacionC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreacionC, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 250, 90, 30));
 
+        txtCreadorC.setEditable(false);
         txtCreadorC.setBackground(new java.awt.Color(255, 255, 255));
         txtCreadorC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreadorC.setForeground(new java.awt.Color(51, 51, 51));
         txtCreadorC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreadorC.setText("Jorge Leonel Santacruz");
         txtCreadorC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreadorC, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 250, 180, 30));
 
@@ -431,27 +482,27 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel20.setText("Fecha Creacion");
         panelRound1.add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 230, 90, -1));
 
+        txtFinC.setEditable(false);
         txtFinC.setBackground(new java.awt.Color(255, 255, 255));
         txtFinC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinC.setForeground(new java.awt.Color(51, 51, 51));
         txtFinC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinC.setText("2025-12-30");
         txtFinC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinC, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 250, 70, 30));
 
+        txtFinalC.setEditable(false);
         txtFinalC.setBackground(new java.awt.Color(255, 255, 255));
         txtFinalC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinalC.setForeground(new java.awt.Color(51, 51, 51));
         txtFinalC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinalC.setText("Jorge Leonel Santacruz");
         txtFinalC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinalC, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 310, 180, 30));
 
+        txtEstatusC.setEditable(false);
         txtEstatusC.setBackground(new java.awt.Color(255, 255, 255));
         txtEstatusC.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtEstatusC.setForeground(new java.awt.Color(51, 51, 51));
         txtEstatusC.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtEstatusC.setText("Cancelado");
         txtEstatusC.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtEstatusC, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 250, 70, 30));
 
@@ -478,19 +529,19 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel25.setText("Creador");
         panelRound1.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 360, 180, -1));
 
+        txtFinM.setEditable(false);
         txtFinM.setBackground(new java.awt.Color(255, 255, 255));
         txtFinM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinM.setForeground(new java.awt.Color(51, 51, 51));
         txtFinM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinM.setText("2025-12-30");
         txtFinM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinM, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 380, 70, 30));
 
+        txtCreadorM.setEditable(false);
         txtCreadorM.setBackground(new java.awt.Color(255, 255, 255));
         txtCreadorM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreadorM.setForeground(new java.awt.Color(51, 51, 51));
         txtCreadorM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreadorM.setText("Jorge Leonel Santacruz");
         txtCreadorM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreadorM, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 380, 180, 30));
 
@@ -514,6 +565,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane5.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtComentariosM.setEditable(false);
         txtComentariosM.setBackground(new java.awt.Color(255, 255, 255));
         txtComentariosM.setColumns(17);
         txtComentariosM.setRows(5);
@@ -523,6 +575,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane6.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtDescripcionM.setEditable(false);
         txtDescripcionM.setBackground(new java.awt.Color(255, 255, 255));
         txtDescripcionM.setColumns(17);
         txtDescripcionM.setRows(5);
@@ -530,27 +583,27 @@ public class InformeProyect extends java.awt.Dialog {
 
         panelRound1.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 380, 210, 90));
 
+        txtEstatusM.setEditable(false);
         txtEstatusM.setBackground(new java.awt.Color(255, 255, 255));
         txtEstatusM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtEstatusM.setForeground(new java.awt.Color(51, 51, 51));
         txtEstatusM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtEstatusM.setText("Cancelado");
         txtEstatusM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtEstatusM, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 380, 70, 30));
 
+        txtFinalM.setEditable(false);
         txtFinalM.setBackground(new java.awt.Color(255, 255, 255));
         txtFinalM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinalM.setForeground(new java.awt.Color(51, 51, 51));
         txtFinalM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinalM.setText("Jorge Leonel Santacruz");
         txtFinalM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinalM, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 440, 180, 30));
 
+        txtCreacionM.setEditable(false);
         txtCreacionM.setBackground(new java.awt.Color(255, 255, 255));
         txtCreacionM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreacionM.setForeground(new java.awt.Color(51, 51, 51));
         txtCreacionM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreacionM.setText("2025-12-30");
         txtCreacionM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreacionM, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 380, 90, 30));
 
@@ -572,19 +625,19 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel32.setText("Fecha Termino");
         panelRound1.add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 420, 90, -1));
 
+        txtInicioM.setEditable(false);
         txtInicioM.setBackground(new java.awt.Color(255, 255, 255));
         txtInicioM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtInicioM.setForeground(new java.awt.Color(51, 51, 51));
         txtInicioM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInicioM.setText("2025-12-30");
         txtInicioM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtInicioM, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 380, 70, 30));
 
+        txtTerminoM.setEditable(false);
         txtTerminoM.setBackground(new java.awt.Color(255, 255, 255));
         txtTerminoM.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtTerminoM.setForeground(new java.awt.Color(51, 51, 51));
         txtTerminoM.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTerminoM.setText("2025-12-30");
         txtTerminoM.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtTerminoM, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 440, 90, 30));
 
@@ -611,11 +664,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel36.setText("Fecha Fin");
         panelRound1.add(jLabel36, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 490, 70, -1));
 
+        txtEstatusI.setEditable(false);
         txtEstatusI.setBackground(new java.awt.Color(255, 255, 255));
         txtEstatusI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtEstatusI.setForeground(new java.awt.Color(51, 51, 51));
         txtEstatusI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtEstatusI.setText("Cancelado");
         txtEstatusI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtEstatusI, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 510, 70, 30));
 
@@ -627,6 +680,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane7.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtDescripcionI.setEditable(false);
         txtDescripcionI.setBackground(new java.awt.Color(255, 255, 255));
         txtDescripcionI.setColumns(17);
         txtDescripcionI.setRows(5);
@@ -640,11 +694,11 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel38.setText("Estatus");
         panelRound1.add(jLabel38, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 490, 70, -1));
 
+        txtInicioI.setEditable(false);
         txtInicioI.setBackground(new java.awt.Color(255, 255, 255));
         txtInicioI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtInicioI.setForeground(new java.awt.Color(51, 51, 51));
         txtInicioI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtInicioI.setText("2025-12-30");
         txtInicioI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtInicioI, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 510, 70, 30));
 
@@ -654,19 +708,19 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel39.setText("Fecha Creacion");
         panelRound1.add(jLabel39, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 490, 90, -1));
 
+        txtCreadorI.setEditable(false);
         txtCreadorI.setBackground(new java.awt.Color(255, 255, 255));
         txtCreadorI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreadorI.setForeground(new java.awt.Color(51, 51, 51));
         txtCreadorI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreadorI.setText("Jorge Leonel Santacruz");
         txtCreadorI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtCreadorI, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 510, 180, 30));
 
+        txtFinI.setEditable(false);
         txtFinI.setBackground(new java.awt.Color(255, 255, 255));
         txtFinI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinI.setForeground(new java.awt.Color(51, 51, 51));
         txtFinI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinI.setText("2025-12-30");
         txtFinI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinI, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 510, 70, 30));
 
@@ -682,19 +736,19 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel42.setText("Comentarios");
         panelRound1.add(jLabel42, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 490, 210, -1));
 
+        txtTerminoI.setEditable(false);
         txtTerminoI.setBackground(new java.awt.Color(255, 255, 255));
         txtTerminoI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtTerminoI.setForeground(new java.awt.Color(51, 51, 51));
         txtTerminoI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTerminoI.setText("2025-12-30");
         txtTerminoI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtTerminoI, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 570, 90, 30));
 
+        txtFinalI.setEditable(false);
         txtFinalI.setBackground(new java.awt.Color(255, 255, 255));
         txtFinalI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtFinalI.setForeground(new java.awt.Color(51, 51, 51));
         txtFinalI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtFinalI.setText("Jorge Leonel Santacruz");
         txtFinalI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
         panelRound1.add(txtFinalI, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 570, 180, 30));
 
@@ -706,6 +760,7 @@ public class InformeProyect extends java.awt.Dialog {
 
         jScrollPane8.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
 
+        txtComentariosI.setEditable(false);
         txtComentariosI.setBackground(new java.awt.Color(255, 255, 255));
         txtComentariosI.setColumns(17);
         txtComentariosI.setRows(5);
@@ -719,13 +774,13 @@ public class InformeProyect extends java.awt.Dialog {
         jLabel44.setText("Creador");
         panelRound1.add(jLabel44, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 490, 180, -1));
 
+        txtCreacionI.setEditable(false);
         txtCreacionI.setBackground(new java.awt.Color(255, 255, 255));
         txtCreacionI.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         txtCreacionI.setForeground(new java.awt.Color(51, 51, 51));
         txtCreacionI.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCreacionI.setText("2025-12-30");
         txtCreacionI.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
-        panelRound1.add(txtCreacionI, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 510, 90, 30));
+        panelRound1.add(txtCreacionI, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 510, 90, 30));
 
         add(panelRound1, java.awt.BorderLayout.CENTER);
 
@@ -754,7 +809,7 @@ public class InformeProyect extends java.awt.Dialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                InformeProyect dialog = new InformeProyect(new java.awt.Frame(), true);
+                InformeProyect dialog = new InformeProyect(new java.awt.Frame(), true, "");
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

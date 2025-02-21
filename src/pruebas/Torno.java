@@ -566,7 +566,7 @@ public final class Torno extends JInternalFrame {
                                 contReporte = 0;
                             }else {
                                 revisarPlanos report = new revisarPlanos();
-                                String b = report.buscar(plano);
+                                String b = report.buscar(plano, con);
                                 if(b== (null)){
                                     JOptionPane.showMessageDialog(this, "NO SE A ENCONTRADO ESTE PLANO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
                                     contReporte++;

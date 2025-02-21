@@ -10,7 +10,6 @@ public class razon extends javax.swing.JDialog {
     int x,y;
     
     public String getRazon(){
-        initComponents();
         this.setVisible(true);
         revisar.seleccion = botonSeleccionado;
         return this.razon;
@@ -18,6 +17,7 @@ public class razon extends javax.swing.JDialog {
     
     public razon(java.awt.Frame parent, boolean modal, revisarPlanos revisar) {
         super(parent, modal);
+        initComponents();
         this.revisar = revisar;
     }
 
@@ -29,7 +29,7 @@ public class razon extends javax.swing.JDialog {
         grupo1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -68,10 +68,10 @@ public class razon extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        jLabel1.setForeground(new java.awt.Color(153, 0, 0));
-        jLabel1.setText("Razon de envio a cortes");
-        jPanel2.add(jLabel1);
+        lblTitulo.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(153, 0, 0));
+        lblTitulo.setText("Razon de envio a cortes");
+        jPanel2.add(lblTitulo);
 
         jPanel1.add(jPanel2, java.awt.BorderLayout.PAGE_START);
 
@@ -280,7 +280,6 @@ public class razon extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private RSMaterialComponent.RSButtonMaterialRipple btnEnviar;
     private javax.swing.ButtonGroup grupo1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -293,11 +292,12 @@ public class razon extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
-    private javax.swing.JRadioButton jRadioButton3;
-    private javax.swing.JRadioButton jRadioButton4;
+    public javax.swing.JRadioButton jRadioButton1;
+    public javax.swing.JRadioButton jRadioButton2;
+    public javax.swing.JRadioButton jRadioButton3;
+    public javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JLabel lblTitulo;
     private javax.swing.JTextArea txtRazon;
     // End of variables declaration//GEN-END:variables
 }

@@ -1238,7 +1238,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                 manager.focusNextComponent();
                 revisarPlanos revisar = new revisarPlanos();
                 Stack<String> botones = extraerBotones();
-                String estacion = revisar.buscar(txtPlano2.getText());
+                String estacion = revisar.buscar(txtPlano2.getText(), con);
                 revisar.terminarPlanoEnEstacion(estacion, txtPlano2.getText(), numEmpleado);
                 for (int i = 0; i < botones.size(); i++) {
                     String hora = "";
