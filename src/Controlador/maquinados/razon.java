@@ -4,21 +4,33 @@ import javax.swing.JOptionPane;
 
 public class razon extends javax.swing.JDialog {
 
-    public String razon = "";
+    public String razon[];
     public String botonSeleccionado = "";
-    revisarPlanos revisar;
     int x,y;
     
-    public String getRazon(){
+    public String[] getRazon(){
+        razon = new String[2];
         this.setVisible(true);
-        revisar.seleccion = botonSeleccionado;
         return this.razon;
+    }
+    
+    public String seleccionado() {
+        if (jRadioButton1.isSelected()) {
+            return jRadioButton1.getText();
+        } else if (jRadioButton2.isSelected()) {
+            return jRadioButton2.getText();
+        } else if (jRadioButton3.isSelected()) {
+            return jRadioButton3.getText();
+        } else if (jRadioButton4.isSelected()) {
+            return jRadioButton4.getText();
+        } else {
+            return null;
+        }
     }
     
     public razon(java.awt.Frame parent, boolean modal, revisarPlanos revisar) {
         super(parent, modal);
         initComponents();
-        this.revisar = revisar;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,11 +124,6 @@ public class razon extends javax.swing.JDialog {
         grupo1.add(jRadioButton1);
         jRadioButton1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jRadioButton1.setText("Mal diseño");
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
         jPanel6.add(jRadioButton1, gridBagConstraints);
@@ -124,11 +131,6 @@ public class razon extends javax.swing.JDialog {
         grupo1.add(jRadioButton2);
         jRadioButton2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jRadioButton2.setText("Mal manejo");
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -138,11 +140,6 @@ public class razon extends javax.swing.JDialog {
         grupo1.add(jRadioButton3);
         jRadioButton3.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jRadioButton3.setText("Pieza mal cortada");
-        jRadioButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton3ActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -152,11 +149,6 @@ public class razon extends javax.swing.JDialog {
         grupo1.add(jRadioButton4);
         jRadioButton4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jRadioButton4.setText("Pieza defectuosa");
-        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton4ActionPerformed(evt);
-            }
-        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -206,26 +198,15 @@ public class razon extends javax.swing.JDialog {
         if(txtRazon.getText().equals("")){
             JOptionPane.showMessageDialog(this, "Debes llenar tu reporte","Advertencia",JOptionPane.WARNING_MESSAGE);
         }else{
-            razon = txtRazon.getText();
-            dispose();
+            razon[0] = txtRazon.getText();
+            razon[1] = seleccionado();
+            if (razon[1] == null) {
+                JOptionPane.showMessageDialog(this, "Debes seleccionar una opcion", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else {
+                dispose();
+            }
         }
     }//GEN-LAST:event_btnEnviarActionPerformed
-
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        botonSeleccionado = jRadioButton1.getText();
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
-
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
-        botonSeleccionado = jRadioButton1.getText();
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
-
-    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
-        botonSeleccionado = jRadioButton1.getText();
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
-
-    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        botonSeleccionado = jRadioButton1.getText();
-    }//GEN-LAST:event_jRadioButton4ActionPerformed
 
     private void jPanel2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel2MousePressed
         x = evt.getX();
@@ -239,30 +220,6 @@ public class razon extends javax.swing.JDialog {
     }//GEN-LAST:event_jPanel2MouseDragged
 
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(razon.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(razon.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(razon.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(razon.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 razon dialog = new razon(new javax.swing.JFrame(), true,null);

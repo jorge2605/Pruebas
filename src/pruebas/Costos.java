@@ -1482,6 +1482,7 @@ public final class Costos extends javax.swing.JInternalFrame {
                     dat[2] = "";
                     while(rs3.next()){
                         dat[1] = rs3.getString("Nombre");
+                        dat[1] = "*";
                         dat[2] = rs3.getString("Departamento");
                     }
                     dat[3] = rs.getString("HS1");

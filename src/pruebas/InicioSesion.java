@@ -185,29 +185,29 @@ public class InicioSesion extends javax.swing.JFrame  {
                     i.btnCorte.setEnabled(false);
                 }
 
-                if(datos[9].equals("1")){
-                    i.btnFresa.setEnabled(true);
-                }else{
-                    i.btnFresa.setEnabled(false);
-                }
+//                if(datos[9].equals("1")){
+//                    i.btnFresa.setEnabled(true);
+//                }else{
+//                    i.btnFresa.setEnabled(false);
+//                }
 
-                if(datos[10].equals("1")){
-                    i.btnCnc.setEnabled(true);
-                }else{
-                    i.btnCnc.setEnabled(false);
-                }
-
-                if(datos[11].equals("1")){
-                    i.btnTorno.setEnabled(true);
-                }else{
-                    i.btnTorno.setEnabled(false);
-                }
-
-                if(datos[12].equals("1")){
-                    i.btnAcabados.setEnabled(true);
-                }else{
-                    i.btnAcabados.setEnabled(false);
-                }
+//                if(datos[10].equals("1")){
+//                    i.btnCnc.setEnabled(true);
+//                }else{
+//                    i.btnCnc.setEnabled(false);
+//                }
+//
+//                if(datos[11].equals("1")){
+//                    i.btnTorno.setEnabled(true);
+//                }else{
+//                    i.btnTorno.setEnabled(false);
+//                }
+//
+//                if(datos[12].equals("1")){
+//                    i.btnAcabados.setEnabled(true);
+//                }else{
+//                    i.btnAcabados.setEnabled(false);
+//                }
 
                 if(datos[13].equals("1")){
                     i.btnCalidad.setEnabled(true);

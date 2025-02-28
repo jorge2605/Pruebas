@@ -24,11 +24,11 @@ public class revisarPlanos {
     public String CALIDAD = "calidad";
     public String TRATAMIENTO = "trata";
     public String MAQUINADOS = "maquinados";
+    public String INTEGRACION = "integracion";
     public String TERMINADO_TRATAMIENTO = "trata";
     public String TERMINADO_CALIDAD = "calidad";
     public String LIBERACION = "";
     
-    public String seleccion;
     public boolean retrabajo = false;
     
     public Stack checarRevisionPlano(String plano){
@@ -106,6 +106,7 @@ public class revisarPlanos {
             Statement st6 = con.createStatement();
             Statement st7 = con.createStatement();
             Statement st8 = con.createStatement();
+            Statement st9 = con.createStatement();
 
             String sql = "select * from Planos where Plano like '" + plano + "'";
             ResultSet rs = st.executeQuery(sql);
@@ -122,6 +123,7 @@ public class revisarPlanos {
                 String torno[] = new String[10];
                 String trata[] = new String[10];
                 String maqui[] = new String[10];
+                String integracion[] = new String[10];
                 String id = datos[1];
 
                 String sq = "select * from Calidad where Proyecto like '" + datos[1] + "'";
@@ -140,6 +142,8 @@ public class revisarPlanos {
                 ResultSet rs6 = st7.executeQuery(sql6);
                 String sql7 = "select * from maquinados where Proyecto like '" + datos[1] + "'";
                 ResultSet rs7 = st8.executeQuery(sql7);
+                String sql8 = "select * from integracion where Proyecto like '" + datos[1] + "'";
+                ResultSet rs8 = st9.executeQuery(sql8);
                 while (r.next()) {
                     calidad[0] = r.getString("Id");
                     calidad[1] = r.getString("Proyecto");
@@ -206,6 +210,14 @@ public class revisarPlanos {
                     maqui[5] = rs7.getString("Prioridad");
                     maqui[6] = rs7.getString("Revision");
                 }
+                while (rs8.next()) {
+                    integracion[0] = rs8.getString("Id");
+                    integracion[1] = rs8.getString("Proyecto");
+                    integracion[2] = rs8.getString("Plano");
+                    integracion[3] = rs8.getString("Terminado");
+                    integracion[5] = rs8.getString("Prioridad");
+                    integracion[6] = rs8.getString("Revision");
+                }
 
                 if (id.equals(cortes[1]) && cortes[3].equals("NO")) {
                     datos[3] = "CORTES";
@@ -227,6 +239,9 @@ public class revisarPlanos {
                     datos[3] = "CALIDAD";
                 } else if (id.equals(calidad[1]) && calidad[3].equals("SI") && "NO".equals(calidad[4])) {
                     datos[3] = "TERMINADO";
+                    if (id.equals(integracion[1]) && integracion[3].equals("NO")) {
+                    datos[3] = "INTEGRACION";
+                }
                 } else {
                     datos[3] = "LIBERACION";
                 }
@@ -432,7 +447,7 @@ public class revisarPlanos {
                 razon.jRadioButton3.setVisible(false);
                 razon.jRadioButton4.setVisible(false);
             }
-            String raz = razon.getRazon();
+            String raz[] = razon.getRazon();
             //                                   1          2           3       4       5       6           7
             String sql = "insert into scrap (Proyecto, NumeroEmpleado, Fecha, Plano, Razon, Comentarios,Desde, Revision) values(?,?,?,?,?,?,?,?)";
             PreparedStatement pst = con.prepareStatement(sql);
@@ -445,8 +460,8 @@ public class revisarPlanos {
             pst.setString(2, numEmpleado);
             pst.setString(3, fecha);
             pst.setString(4, proyecto);
-            pst.setString(5, seleccion);
-            pst.setString(6, raz);
+            pst.setString(5, raz[1]);
+            pst.setString(6, raz[0]);
             pst.setString(7, bd);
             pst.setString(8, revision);
             
@@ -505,6 +520,8 @@ public class revisarPlanos {
                     return TERMINADO_CALIDAD;
                 case "LIBERACION":
                     return LIBERACION;
+                case "INTEGRACION":
+                    return INTEGRACION;
                 default:
                     break;
             }
@@ -668,7 +685,7 @@ public class revisarPlanos {
                 pst.setString(1, "SI");
                 pst.setString(2, fecha);
                 pst.setString(3, fecha);
-                if (tiempo == null) {
+                if (tiempo != null) {
                     pst.setString(4, tiempo);
                     pst.setString(5, plano);
                 } else {

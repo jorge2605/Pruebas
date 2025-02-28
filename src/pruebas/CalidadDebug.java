@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import Controlador.maquinados.revisarPlanos;
+import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.ByteArrayInputStream;
@@ -14,13 +15,30 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class CalidadDebug extends javax.swing.JInternalFrame {
 
     String numEmpleado = ""; 
+    TextAutoCompleter au;
+    
+    public final void verProyectos() {
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select proyecto from proyectos";
+            ResultSet rs = st.executeQuery(sql);
+            au = new TextAutoCompleter(jTextField1);
+            while (rs.next()) {
+                au.addItem(rs.getString("proyecto"));
+            }
+        } catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al ver proyectos: " + e,"Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     
     public void limpiarFormulario() {
         txtCantidad.setText("");
@@ -96,8 +114,50 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         }
     }
     
+    public void limpiarTabla() {
+        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Plano", "Fecha ingreso"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+    }
+    
+    public final void verDatos(String sql) {
+        try {
+            limpiarTabla();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            String datos[] = new String[10];
+            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+            int cont = 0;
+            while(rs.next()) {
+                datos[0] = rs.getString("Proyecto");
+                datos[1] = rs.getString("FechaInicio");
+                miModelo.addRow(datos);
+                cont++;
+            }
+            lblConteo.setText("Cantidad de Planos: " + cont);
+        } catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al ver datos calidad: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public CalidadDebug(String nombre, String numero) {
         initComponents();
+        verProyectos();
+        verDatos("select * from calidad where Terminado like 'NO' order by id desc");
         btnPdf.setVisible(false);
         numEmpleado = numero;
         lblAvisoPlano.setVisible(false);
@@ -127,6 +187,13 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         txtCantidad = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtMaterial = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Tabla1 = new javax.swing.JTable();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        lblConteo = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         cmbEnviar = new javax.swing.JComboBox<>();
@@ -312,6 +379,76 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 40);
         jPanel2.add(txtMaterial, gridBagConstraints);
 
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+
+        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Plano", "Fecha ingreso"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        Tabla1.setShowGrid(true);
+        jScrollPane1.setViewportView(Tabla1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
+        gridBagConstraints.insets = new java.awt.Insets(0, 19, 0, 19);
+        jPanel2.add(jScrollPane1, gridBagConstraints);
+
+        jPanel4.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel4.setLayout(new java.awt.BorderLayout());
+
+        jLabel6.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("Ver por proyecto");
+        jPanel4.add(jLabel6, java.awt.BorderLayout.CENTER);
+
+        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
+        jTextField1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        jTextField1.setForeground(new java.awt.Color(51, 51, 51));
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel4.add(jTextField1, java.awt.BorderLayout.SOUTH);
+
+        jLabel7.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setText("Planos en estacion de Calidad");
+        jPanel4.add(jLabel7, java.awt.BorderLayout.NORTH);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(7, 0, 7, 0);
+        jPanel2.add(jPanel4, gridBagConstraints);
+
+        lblConteo.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblConteo.setForeground(new java.awt.Color(51, 51, 51));
+        lblConteo.setText("Cantidad de Planos: ");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
+        jPanel2.add(lblConteo, gridBagConstraints);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel3.setBackground(new java.awt.Color(235, 235, 235));
@@ -443,6 +580,8 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             switch (cmbEnviar.getSelectedIndex()) {
                 case 1: 
                     estacion = "maquinados";
+                    rev.retrabajo = true;
+                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
                     rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad");
                     rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
                     break;
@@ -498,8 +637,17 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnEnviarActionPerformed
 
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        if (jTextField1.getText().equals("")) {
+            verDatos("select * from calidad where Terminado like 'NO' order by id desc");
+        } else {
+            verDatos("select * from calidad where Terminado like 'NO' and Plano like '" + jTextField1.getText() + "' order by id desc");
+        }
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTable Tabla1;
     private javax.swing.JButton btnEnviar;
     private javax.swing.JButton btnPdf;
     private javax.swing.JPanel btnSalir;
@@ -511,12 +659,18 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblAvisoPlano;
+    private javax.swing.JLabel lblConteo;
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtIngresarPlano;
     private javax.swing.JTextField txtMaterial;

@@ -1735,7 +1735,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         Paragraph p10 = new Paragraph("Si usted tiene alguna pregunta sobre esta orden de compra, por favor, pongase en contacto con", fuente2);
                         p10.setAlignment(Element.ALIGN_CENTER);
 
-                        Paragraph p11 = new Paragraph("Kenia Rueda: Tel: 656-791-1365 E-mail: compras01@si3i.com", fuente2);
+                        Paragraph p11 = new Paragraph("Daniela Castro: Tel: 656-791-1365 E-mail: compras01@si3i.com", fuente2);
                         p11.setAlignment(Element.ALIGN_CENTER);
 
                         Paragraph p12 = new Paragraph("NR: " + lblRequi.getText(), fuente);
@@ -2373,7 +2373,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         Paragraph p10 = new Paragraph("Si usted tiene alguna pregunta sobre esta orden de compra, por favor, pongase en contacto con", fuente2);
                         p10.setAlignment(Element.ALIGN_CENTER);
 
-                        Paragraph p11 = new Paragraph("Kenia Rueda: Tel: 656-791-1365 E-mail: compras01@si3i.com", fuente2);
+                        Paragraph p11 = new Paragraph("Daniela Castro: Tel: 656-791-1365 E-mail: compras01@si3i.com", fuente2);
                         p11.setAlignment(Element.ALIGN_CENTER);
 
                         String sql1 = "select * from ordencompra where OrdenNo like '" + lblRequi.getText() + "'";
