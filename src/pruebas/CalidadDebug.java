@@ -45,6 +45,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         txtMaterial.setText("");
         txtPlano.setText("");
         txtProyecto.setText("");
+        btnPdf.setVisible(false);
     }
 
     public String getDirectorio(String proyecto) {
@@ -115,7 +116,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     }
     
     public void limpiarTabla() {
-        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+        TablaPlan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
             },
             new String [] {
@@ -140,7 +141,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             Statement st = con.createStatement();
             ResultSet rs = st.executeQuery(sql);
             String datos[] = new String[10];
-            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+            DefaultTableModel miModelo = (DefaultTableModel) TablaPlan.getModel();
             int cont = 0;
             while(rs.next()) {
                 datos[0] = rs.getString("Proyecto");
@@ -169,6 +170,8 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
@@ -187,8 +190,8 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         txtCantidad = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         txtMaterial = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        Tabla1 = new javax.swing.JTable();
+        scrollPlan = new javax.swing.JScrollPane();
+        TablaPlan = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -198,6 +201,26 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         jLabel5 = new javax.swing.JLabel();
         cmbEnviar = new javax.swing.JComboBox<>();
         btnEnviar = new javax.swing.JButton();
+
+        jPopupMenu1.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                jPopupMenu1PopupMenuWillBecomeVisible(evt);
+            }
+        });
+
+        jMenuItem1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/entrega-rapida.png"))); // NOI18N
+        jMenuItem1.setText("Enviar datos a: ");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(jMenuItem1);
 
         setBorder(null);
 
@@ -379,26 +402,27 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 40);
         jPanel2.add(txtMaterial, gridBagConstraints);
 
-        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
+        scrollPlan.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255)));
 
-        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+        TablaPlan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Plano", "Fecha ingreso"
+                "Plano"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false
+                false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
-        Tabla1.setShowGrid(true);
-        jScrollPane1.setViewportView(Tabla1);
+        TablaPlan.setComponentPopupMenu(jPopupMenu1);
+        TablaPlan.setShowGrid(true);
+        scrollPlan.setViewportView(TablaPlan);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
@@ -406,7 +430,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         gridBagConstraints.gridheight = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 19, 0, 19);
-        jPanel2.add(jScrollPane1, gridBagConstraints);
+        jPanel2.add(scrollPlan, gridBagConstraints);
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
         jPanel4.setLayout(new java.awt.BorderLayout());
@@ -645,9 +669,28 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jTextField1ActionPerformed
 
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            for (int i = 0; i < TablaPlan.getSelectedRows().length; i++) {
+                int fila = TablaPlan.getSelectedRows()[i];
+                System.out.println(TablaPlan.getValueAt(fila, 0).toString());
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
+        
+    }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable Tabla1;
+    private javax.swing.JTable TablaPlan;
     private javax.swing.JButton btnEnviar;
     private javax.swing.JButton btnPdf;
     private javax.swing.JPanel btnSalir;
@@ -661,16 +704,18 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblAvisoPlano;
     private javax.swing.JLabel lblConteo;
+    private javax.swing.JScrollPane scrollPlan;
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtIngresarPlano;
     private javax.swing.JTextField txtMaterial;

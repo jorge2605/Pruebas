@@ -56,6 +56,7 @@ import javax.swing.table.DefaultTableModel;
 public final class Inicio1 extends javax.swing.JFrame implements Observer,ActionListener{
 
     String num;
+    String depa;
     Pedidos c;
     boolean pedido = true;
     InicioAlmacen inicioAlmacen;
@@ -407,7 +408,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         cla.setVisible(true);
     }
     
-    public Inicio1(String numero, String nombre) {
+    public Inicio1(String numero, String nombre, String depa) {
         try {
             UIManager.setLookAndFeel(new FlatMacLightLaf());
         } catch (Exception e) {
@@ -415,6 +416,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         }
         initComponents();
         lblId.setText(numero);
+        this.depa = depa;
         num = numero;
         if(num.equals("61")){
             errores.setVisible(true);
@@ -3142,7 +3144,16 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     }//GEN-LAST:event_btnIntegracion1MouseExited
 
     private void btnIntegracion1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIntegracion1ActionPerformed
-        // TODO add your handling code here:
+        KPI c = new KPI(lblId.getText(), depa);
+        jDesktopPane1.add(c);
+        c.toFront();
+        c.setLocation(jDesktopPane1.getWidth() / 2 - c.getWidth() / 2, jDesktopPane1.getHeight() / 2 - c.getHeight() / 2);
+        try{
+            c.setMaximum(true);
+        }catch(PropertyVetoException e){
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+        }
+        c.setVisible(true);
     }//GEN-LAST:event_btnIntegracion1ActionPerformed
 
     
@@ -3275,10 +3286,10 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JLabel lblCont;
-    public static javax.swing.JLabel lblId;
+    public javax.swing.JLabel lblId;
     private javax.swing.JLabel lblId1;
     private javax.swing.JLabel lblId2;
-    public static javax.swing.JLabel lblNombre;
+    public javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblNotiCostos;
     private javax.swing.JLabel lblNotiRequis;
     private javax.swing.JMenuItem miReporte;

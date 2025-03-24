@@ -168,10 +168,15 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
             IngresarTiempo ingresar = new IngresarTiempo(f, true);
             ingresar.setLocationRelativeTo(f);
             String tiempo = ingresar.getTiempo();
-            if(!tiempo.equals(":")){
-                label.setText(tiempo);
-            }else{
+            if(tiempo == null) {
+                JOptionPane.showMessageDialog(this, "Debes ingresar tiempo mayor a 00:00", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 color = Color.white;
+            } else {
+                if(!tiempo.equals(":")){
+                    label.setText(tiempo);
+                }else{
+                    color = Color.white;
+                }
             }
         }else{
             color = (Color.white);
@@ -447,6 +452,31 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         }
     }
     
+    public int verificarDimensiones() {
+        int cont = 0;
+        if(txtDim1.isVisible()) {
+            if(!txtDim1.getText().equals("")){
+                cont++;
+            }
+        }
+        if(txtDim2.isVisible()) {
+            if(!txtDim2.getText().equals("")){
+                cont++;
+            }
+        }
+        if(txtDim3.isVisible()) {
+            if(!txtDim3.getText().equals("")){
+                cont++;
+            }
+        }
+        if(txtDim4.isVisible()) {
+            if(!txtDim4.getText().equals("")){
+                cont++;
+            }
+        }
+        return cont;
+    }
+    
     public void terminarPlano(boolean calidad) {
         if(txtPlano2.getText().equals("")){
             JOptionPane.showMessageDialog(this, "Debes llenar el campo de plano","Advertencia",JOptionPane.WARNING_MESSAGE);
@@ -454,8 +484,12 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
             JOptionPane.showMessageDialog(this, "Debes llenar el campo de proyecto","Advertencia",JOptionPane.WARNING_MESSAGE);
         } else if(txtCantidad.getText().equals("")){
             JOptionPane.showMessageDialog(this, "Debes llenar el campo de cantidad","Advertencia",JOptionPane.WARNING_MESSAGE);
+        }  else if(txtMaterial.getText().equals("")){
+            JOptionPane.showMessageDialog(this, "Debes llenar el campo de material","Advertencia",JOptionPane.WARNING_MESSAGE);
         } else if(extraerBotones().toString().equals("[]")){
             JOptionPane.showMessageDialog(this, "Debes seleccionar por lo menos una maquina","Advertencia",JOptionPane.WARNING_MESSAGE);
+        } else if(verificarDimensiones() < 2){
+            JOptionPane.showMessageDialog(this, "Debes ingresar por lo menos 2 dimensiones","Advertencia",JOptionPane.WARNING_MESSAGE);
         }else{
             try{
                 Connection con;
@@ -597,6 +631,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         txtDim3 = new javax.swing.JTextField();
         lblX3 = new javax.swing.JLabel();
         txtDim4 = new javax.swing.JTextField();
+        jLabel17 = new javax.swing.JLabel();
 
         setBorder(null);
 
@@ -823,7 +858,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         jLabel14.setText("*");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 5;
         jPanel11.add(jLabel14, gridBagConstraints);
 
         jLabel15.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
@@ -1282,6 +1317,14 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         jPanel11.add(jPanel6, gridBagConstraints);
 
+        jLabel17.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(102, 0, 0));
+        jLabel17.setText("*");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        jPanel11.add(jLabel17, gridBagConstraints);
+
         jPanel9.add(jPanel11, java.awt.BorderLayout.CENTER);
 
         jPanel2.add(jPanel9, java.awt.BorderLayout.CENTER);
@@ -1547,6 +1590,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

@@ -50,8 +50,9 @@ public class InicioSesion extends javax.swing.JFrame  {
                 String datos[] = new String[50];
                 String sql = "select AES_DECRYPT(Contraseña,'mi_llave'),NumEmpleado,Nombre,Diseño,Cambio,Reportes,Carga,Ventas,Cortes,Fresa,"
                         + "Cnc,Torno,Acabados,Calidad,Tratamiento,Electrico,CrearEmpleado,VerEmpleado,Inventario,Ensamble,InventarioPlanos,"
-                        + "Requisiciones,Orden,Aprobacion,Recibo,Prestamo,Cotizacion,VerRequisiciones,Cotizar,Apellido,ProyectMan, Remisiones, Checador from registroEmpleados where NumEmpleado like '"+Usuario.getText()+"'";
+                        + "Requisiciones,Orden,Aprobacion,Recibo,Prestamo,Cotizacion,VerRequisiciones,Cotizar,Apellido,ProyectMan, Remisiones, Checador, Puesto from registroEmpleados where NumEmpleado like '"+Usuario.getText()+"'";
                 ResultSet rs = st.executeQuery(sql);
+                String puesto = "";
                 while(rs.next()){
                 datos[0] = rs.getString("NumEmpleado");
                 datos[1] = rs.getString("Nombre");
@@ -86,6 +87,7 @@ public class InicioSesion extends javax.swing.JFrame  {
                 datos[30] = rs.getString("ProyectMan");
                 datos[31] = rs.getString("Remisiones");
                 datos[32] = rs.getString("Checador");
+                puesto = rs.getString("Puesto");
                 }
                      System.out.println(datos[7]);
                 if(Usuario.getText().equals(datos[0]) && Contra.getText().equals(datos[7])){
@@ -120,7 +122,7 @@ public class InicioSesion extends javax.swing.JFrame  {
 
                  espera.band = false;
                  espera.dispose();
-                    Inicio1 i = new Inicio1(datos[0],datos[1]+" "+datos[29]);
+                    Inicio1 i = new Inicio1(datos[0],datos[1]+" "+datos[29], puesto);
 
                     try{
                     i.iniciarServidor();

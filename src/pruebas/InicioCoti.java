@@ -133,10 +133,10 @@ public class InicioCoti extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNuevaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaActionPerformed
-        Inicio1 a = new Inicio1("","");
+        Inicio1 a = new Inicio1("","","");
         a.dispose();
         Cotizacion i = new Cotizacion();
-        Inicio1 c = new Inicio1("","");
+        Inicio1 c = new Inicio1("","","");
         c.setVisible(true);
         c.jDesktopPane1.add(i);
         i.toFront();

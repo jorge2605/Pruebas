@@ -38,7 +38,12 @@ public class IngresarTiempo extends javax.swing.JDialog {
     public String getTiempo(){
         setVisible(true);
         validar();
-        return txtHoras.getText() + ":" + txtSegundos.getText();
+        String horas = txtHoras.getText() + ":" + txtSegundos.getText();
+        if(horas.equals("00:00")) {
+            return null;
+        } else {
+            return horas;
+        }
     }
     
     public IngresarTiempo(java.awt.Frame parent, boolean modal) {

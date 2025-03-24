@@ -2,6 +2,7 @@ package pruebas;
 
 import Conexiones.Conexion;
 import Controlador.FileTransferHandler;
+import Controlador.maquinados.revisarPlanos;
 import VO.ArchivosVO;
 import VentanaEmergente.Diseño.DatosHoras;
 import VentanaEmergente.Diseño.InicioDiseño;
@@ -584,6 +585,11 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                 
                 if(n > 0){
                     JOptionPane.showMessageDialog(this, "PLANO ACTUALIZADO");
+                    int opc = JOptionPane.showConfirmDialog(this, "¿Deseas enviar el plano a inicio de operacion?");
+                    if (opc == 0) {
+                        revisarPlanos rev = new revisarPlanos();
+                        rev.enviarCortes("Diseño", l.getText(), inicio.lblId.getText(), txtProyecto.getText(), revision);
+                    }
                 }
                 
                 if(n1 < 1){

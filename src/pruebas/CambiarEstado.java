@@ -70,6 +70,22 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
     TerminarProyecto terminar;
     TextAutoCompleter autoCompleter;
     
+    public String getDirectorio(String proyecto) {
+        String path = "\\\\serverdell\\03 Project\\04 DISENO\\" + proyecto;
+        File direccion = new File(path);
+
+        if (!direccion.isDirectory()) {
+            boolean res = direccion.mkdirs();
+            if (res) {
+                return path;
+            } else {
+                return path;
+            }
+        } else {
+            return path;
+        }
+    }
+    
     public final void agregarProyectos() {
         try {
             Connection con;
@@ -370,6 +386,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         int liberacion = 0;
         int trata = 0;
         int inte = 0;
+        int fin = 0;
         for (int i = 0; i < TablaDeDatos1.getRowCount(); i++) {
             switch (TablaDeDatos1.getValueAt(i, 2).toString()) {
                 case "MAQUINADOS":
@@ -393,6 +410,9 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                 case "INTEGRACION":
                     inte++;
                     break;
+                case "PROYECTO FINALIZADO":
+                    fin++;
+                    break;
             }
         }
         lblConteo.setText("<html>"
@@ -404,6 +424,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                 + "<p style='padding:3px;'> Calidad: " + calidad + "</p>"
                 + "<p style='padding:3px;'> Integracion: " + inte + "</p>"
                 + "<p style='padding:3px;'> Terminados: " + terminados + "</p>"
+                + "<p style='padding:3px;'> Finalizado: " + fin + "</p>"
                 + "<p style='padding:3px;'> Total: " + total + "</p>"
                 + "</div>"
                 + "</html>");
@@ -561,14 +582,13 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         txtLiberado = new javax.swing.JLabel();
         btnVer = new javax.swing.JButton();
         btnBorrar = new javax.swing.JButton();
-        btnPrioridad2 = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         lblConteo = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         jMenuItem4.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
@@ -864,23 +884,6 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
             }
         });
 
-        btnPrioridad2.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        btnPrioridad2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/actualizar_48.png"))); // NOI18N
-        btnPrioridad2.setBorder(null);
-        btnPrioridad2.setContentAreaFilled(false);
-        btnPrioridad2.setFocusPainted(false);
-        btnPrioridad2.setHorizontalAlignment(javax.swing.SwingConstants.LEADING);
-        btnPrioridad2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnPrioridad2.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/actualizar_48.png"))); // NOI18N
-        btnPrioridad2.setRolloverIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/actualizar_64.png"))); // NOI18N
-        btnPrioridad2.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-        btnPrioridad2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        btnPrioridad2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrioridad2ActionPerformed(evt);
-            }
-        });
-
         jLabel9.setFont(new java.awt.Font("Roboto Light", 1, 14)); // NOI18N
         jLabel9.setText("Conteo");
 
@@ -905,12 +908,9 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                             .addComponent(btnExportarD, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnLiberar, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(btnPrioridad, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnVer, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(btnPrioridad2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnPrioridad, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnVer, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(txtLiberado, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
@@ -939,7 +939,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblConteo)
+                .addComponent(lblConteo, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -947,9 +947,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                             .addComponent(btnExportarD, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(btnPrioridad, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnLiberar, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnPrioridad2, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnLiberar, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnVer, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnBorrar, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -969,7 +967,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
 
         jMenuItem1.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circulo rojo.png"))); // NOI18N
-        jMenuItem1.setText("    Terminar proyecto");
+        jMenuItem1.setText("    Terminar proyecto(s)                                                         ");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -978,15 +976,15 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         jMenu1.add(jMenuItem1);
         jMenu1.add(jSeparator1);
 
-        jMenuItem2.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
-        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/circulo.png"))); // NOI18N
-        jMenuItem2.setText("Terminar todos los proyectos excepto...                              ");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItem3.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/editarEmpleado_16.png"))); // NOI18N
+        jMenuItem3.setText("Liberar Proyecto");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                jMenuItem3ActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem2);
+        jMenu1.add(jMenuItem3);
 
         jMenuBar1.add(jMenu1);
 
@@ -1355,93 +1353,41 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
     }//GEN-LAST:event_btnPrioridadActionPerformed
 
     private void btnLiberarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLiberarActionPerformed
-//        if(txtLiberado.getText().equals("NO")){
-//            int ar = Integer.parseInt(TablaDeDatos1.getValueAt(0, 0).toString());
-//            if(ar == 0){
-//                JOptionPane.showMessageDialog(this, "DEBES PONER PRIORIDAD AL PROYECTO");
-//            }else{
-//            try{
-//            btnVer.setEnabled(false);
-//            Connection con = null;
-//            Conexion con1 = new Conexion();
-//            con = con1.getConnection();
-//            String sql = "insert into Datos (Proyecto,Plano,FechaInicio,FechaFinal,Terminado,Estado,Cronometro,Prioridad,Empleado) values(?,?,?,?,?,?,?,?,?)";
-//            PreparedStatement pst = con.prepareStatement(sql);
-//            int n= 0;
-//                for (int i = 0; i < TablaDeDatos1.getRowCount(); i++) {
-//                    
-//                    if(TablaDeDatos1.getValueAt(i, 3).toString().equals("LIBERACION")){
-//                        
-//                    pst.setString(1, TablaDeDatos1.getValueAt(i, 1).toString());
-//                    pst.setString(2, TablaDeDatos1.getValueAt(i, 2).toString());
-//                    pst.setString(3, "");
-//                    pst.setString(4, "");
-//                    pst.setString(5, "NO");
-//                    pst.setString(6, "");
-//                    pst.setString(7, "00:00");
-//                    pst.setString(8, TablaDeDatos1.getValueAt(i, 0).toString());
-//                    pst.setString(9, "");
-//                    
-//                    n = pst.executeUpdate();
-//                }
-//                }
-//            
-//            if(n > 0){
-//            JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE");
-//            txtLiberado.setText("SI");
-//            btnLiberar.setEnabled(false);
-//            
-//            String sql1 = "update Proyectos set Liberado = ? where Proyecto = ?";
-//            PreparedStatement pst1 = con.prepareStatement(sql1);
-//            
-//            pst1.setString(1, "SI");
-//            pst1.setString(2, txtProyecto.getText());
-//            
-//            int e = pst1.executeUpdate();
-//            if(e > 0){
-//            
-//            }
-//            }
-//            
-//            }catch(SQLException e){
-//            JOptionPane.showMessageDialog(this, "ERROR AL LIBERAR PROYECTO: "+e,"ERORR",JOptionPane.ERROR_MESSAGE);
-//            }
-//            }
-//        }
-//        DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
-//        TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(miModelo);
-//        TablaDeDatos1.setRowSorter(elQueOrdena);
+
     }//GEN-LAST:event_btnLiberarActionPerformed
 
     private void btnVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerActionPerformed
         try {
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            int fila = TablaDeDatos1.getSelectedRow();
-            String sql = "select Pdf,Plano from pdfplanos where Plano like '" + TablaDeDatos1.getValueAt(fila, 0).toString() + "'";
-            ResultSet rs = st.executeQuery(sql);
-            byte[] b = null;
-            while (rs.next()) {
-                b = rs.getBytes("Pdf");
+            Desktop.getDesktop().open(new File("\\\\192.168.100.40\\03 Project\\04 DISENO\\" + txtProyecto.getText() + "\\" + txtPlano.getText() + ".pdf"));
+        } catch (Exception ex) {
+            String dir = getDirectorio(txtProyecto.getText()) + "\\" + txtPlano.getText() + ".pdf";
+            try {
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                Statement st = con.createStatement();
+                String sql = "select Pdf,Plano from pdfplanos where Plano like '" + txtPlano.getText() + "'";
+                ResultSet rs = st.executeQuery(sql);
+                byte[] b = null;
+                while (rs.next()) {
+                    b = rs.getBytes("Pdf");
+                }
+
+                InputStream bos = new ByteArrayInputStream(b);
+                int tamInput = bos.available();
+                byte[] datosPdf = new byte[tamInput];
+                bos.read(datosPdf, 0, tamInput);
+
+                OutputStream out = new FileOutputStream(dir);
+                out.write(datosPdf);
+
+                out.close();
+                bos.close();
+
+                Desktop.getDesktop().open(new File(dir));
+            } catch (SQLException | NumberFormatException | IOException e) {
+                JOptionPane.showMessageDialog(this, "Error al descargar: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
-
-            InputStream bos = new ByteArrayInputStream(b);
-            int tamInput = bos.available();
-            byte[] datosPdf = new byte[tamInput];
-            bos.read(datosPdf, 0, tamInput);
-
-            OutputStream out = new FileOutputStream("new.pdf");
-            out.write(datosPdf);
-
-            out.close();
-            bos.close();
-
-            Desktop.getDesktop().open(new File("new.pdf"));
-
-        } catch (SQLException | NumberFormatException | IOException e) {
-            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnVerActionPerformed
 
@@ -1554,7 +1500,46 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         }
     }//GEN-LAST:event_btnBorrarActionPerformed
 
-    private void btnPrioridad2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrioridad2ActionPerformed
+    private void Tabla1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_Tabla1MouseEntered
+
+    private void lblXMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseClicked
+        dispose();
+    }//GEN-LAST:event_lblXMouseClicked
+
+    private void lblXMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseEntered
+        btnSalir.setBackground(Color.red);
+        lblX.setForeground(Color.white);
+    }//GEN-LAST:event_lblXMouseEntered
+
+    private void lblXMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseExited
+        btnSalir.setBackground(Color.white);
+        lblX.setForeground(Color.black);
+    }//GEN-LAST:event_lblXMouseExited
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        terminar = new TerminarProyecto(f, true, numEmpleado);
+        terminar.setVisible(true);
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
+    private void InformacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InformacionActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        InformacionProyectos info = new InformacionProyectos(f, true, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+        info.setLocationRelativeTo(f);
+        info.setVisible(true);
+    }//GEN-LAST:event_InformacionActionPerformed
+
+    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
+        buscarProyecto(txtBuscar.getText());
+    }//GEN-LAST:event_txtBuscarActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         try {
             Connection con = null;
             Conexion con1 = new Conexion();
@@ -1577,53 +1562,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnPrioridad2ActionPerformed
-
-    private void Tabla1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_Tabla1MouseEntered
-
-    private void lblXMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseClicked
-        dispose();
-    }//GEN-LAST:event_lblXMouseClicked
-
-    private void lblXMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseEntered
-        btnSalir.setBackground(Color.red);
-        lblX.setForeground(Color.white);
-    }//GEN-LAST:event_lblXMouseEntered
-
-    private void lblXMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblXMouseExited
-        btnSalir.setBackground(Color.white);
-        lblX.setForeground(Color.black);
-    }//GEN-LAST:event_lblXMouseExited
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        terminar = new TerminarProyecto(f, true);
-        terminar.btnGuardar.addActionListener(this);
-        terminar.setVisible(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        TerminarTodo terminarT = new TerminarTodo(f, true);
-        terminarT.setVisible(true);
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
-
-    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem4ActionPerformed
-
-    private void InformacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InformacionActionPerformed
-        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        InformacionProyectos info = new InformacionProyectos(f, true, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
-        info.setLocationRelativeTo(f);
-        info.setVisible(true);
-    }//GEN-LAST:event_InformacionActionPerformed
-
-    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
-        buscarProyecto(txtBuscar.getText());
-    }//GEN-LAST:event_txtBuscarActionPerformed
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1634,7 +1573,6 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
     public javax.swing.JButton btnExportarD;
     public javax.swing.JButton btnLiberar;
     public javax.swing.JButton btnPrioridad;
-    public javax.swing.JButton btnPrioridad2;
     private javax.swing.JPanel btnSalir;
     public javax.swing.JButton btnVer;
     private javax.swing.ButtonGroup buttonGroup1;
@@ -1648,7 +1586,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -1675,14 +1613,5 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (terminar != null) {
-            if (e.getSource() == terminar.btnGuardar) {
-                int opc = JOptionPane.showConfirmDialog(this, "¿Estas seguro de terminar el proyecto "
-                        + terminar.txtProyecto.getText() + "");
-                if (opc == 0) {
-                    terminarProyecto(terminar.txtProyecto.getText());
-                }
-            }
-        }
     }
 }

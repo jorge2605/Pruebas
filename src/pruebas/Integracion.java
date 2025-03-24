@@ -452,7 +452,7 @@ public class Integracion extends javax.swing.JInternalFrame {
         jPanel3.add(jLabel5);
 
         cmbEnviar.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
-        cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Rediseño (Scrap)" }));
+        cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Rediseño (Scrap)", "Retrabajo" }));
         cmbEnviar.setPreferredSize(new java.awt.Dimension(300, 30));
         jPanel3.add(cmbEnviar);
 
@@ -565,14 +565,21 @@ public class Integracion extends javax.swing.JInternalFrame {
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
         revisarPlanos rev = new revisarPlanos();
+        String estacion;
+        String plano = txtPlano.getText();
+        String proyecto = txtProyecto.getText();
         if (lblAvisoPlano.isVisible()) {
-            String estacion;
-            String plano = txtPlano.getText();
-            String proyecto = txtProyecto.getText();
             switch (cmbEnviar.getSelectedIndex()) {
                 case 1:
                     estacion = "datos";
                     rev.enviarCortes("integracion", plano, numEmpleado, proyecto, "00");
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
+                    break;
+                case 2:
+                    estacion = "maquinados";
+                    rev.retrabajo = true;
+                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
                     rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
                     rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
                     break;
@@ -584,15 +591,29 @@ public class Integracion extends javax.swing.JInternalFrame {
                 Connection con;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
-                String estacion = rev.buscar(txtPlano.getText(), con);
+                estacion = rev.buscar(txtPlano.getText(), con);
                 String estacionSeleccionada  = obtenerDepartamento();
                 if (estacion.equals("LIBERACION")) {
                     rev.enviarCortes("integracion", txtPlano.getText(), numEmpleado, txtProyecto.getText(), "00");
                     rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacionSeleccionada);
                 } else {
-                    rev.enviarCortes("integracion", txtPlano.getText(), numEmpleado, txtProyecto.getText(), "00");
-                    rev.terminarPlanoEnEstacion(estacion, txtPlano.getText(), numEmpleado);
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacionSeleccionada);
+                    switch (cmbEnviar.getSelectedIndex()) {
+                        case 1:
+                            estacion = "datos";
+                            rev.enviarCortes("integracion", plano, numEmpleado, proyecto, "00");
+                            rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                            rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
+                            break;
+                        case 2:
+                            estacion = "maquinados";
+                            rev.retrabajo = true;
+                            rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                            rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                            rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
+                            break;
+                        default:
+                            JOptionPane.showMessageDialog(this, "Debes seleccionar una opcion", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                    }
                 }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
