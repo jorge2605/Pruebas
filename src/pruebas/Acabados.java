@@ -3,8 +3,10 @@ import Conexiones.Conexion;
 import Controlador.maquinados.reportarPlano;
 import Controlador.maquinados.revisarPlanos;
 import VentanaEmergente.Maquinados.elegirRevision;
+import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +16,8 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -29,6 +33,8 @@ public class Acabados extends javax.swing.JInternalFrame {
     public String fechaInicio;
     public String pl;
     int contReporte;
+    public TextAutoCompleter au;
+    public String numEmpleado;
     
     elegirRevision elegirRevision;
     
@@ -169,9 +175,9 @@ public class Acabados extends javax.swing.JInternalFrame {
         limpiarTabla();
         verDatos();
         activar();
-        txtProyecto.setText(plano);
+        txtPlano.setText(plano);
         txtCodigo.setText("");
-        txtFecha.setText(fec);
+        txtProyecto.setText(fec);
         lblEstado.setText("EN CURSO");
         lblEstado.setForeground(Color.green);
     }
@@ -227,45 +233,44 @@ public class Acabados extends javax.swing.JInternalFrame {
     return fin;
     }
    
-    public void limpiarTabla(){
-        Tabla1 = new ColorRojo();
+    public void limpiarTabla() {
+        Tabla1 = new javax.swing.JTable();
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-            },
-            new String [] {
-                "PRIORIDAD", "NUMERO DE PLANO", "PROYECTO"
-            }
+                new Object[][]{},
+                new String[]{
+                    "Numero de plano", "Proyecto"
+                }
         ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false
+            boolean[] canEdit = new boolean[]{
+                false, false
             };
+
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
-        Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 16));
+        Tabla1.setComponentPopupMenu(jPopupMenu1);
+        Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14));
+        Tabla1.setFont(new java.awt.Font("Roboto", Font.PLAIN, 12));
         Tabla1.getTableHeader().setOpaque(false);
-        Tabla1.getTableHeader().setBackground(new Color(254,254,254));
+        Tabla1.getTableHeader().setBackground(new Color(254, 254, 254));
         Tabla1.getTableHeader().setForeground(new Color(0, 78, 171));
         Tabla1.setRowHeight(25);
         Tabla1.setShowGrid(false);
-        
+
         jScrollPane1.getViewport().setBackground(Color.white);
         jScrollPane1.setForeground(Color.white);
         jScrollPane1.getViewport().setForeground(Color.white);
         jScrollPane1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(254, 254, 254)));
         jScrollPane1.setBackground(Color.white);
-        Tabla1.setRowHeight(25);
-        Tabla1.setShowGrid(false);
         jScrollPane1.setViewportView(Tabla1);
         if (Tabla1.getColumnModel().getColumnCount() > 0) {
             Tabla1.getColumnModel().getColumn(0).setResizable(false);
             Tabla1.getColumnModel().getColumn(1).setResizable(false);
-            Tabla1.getColumnModel().getColumn(2).setResizable(false);
         }
     }
 
-    public void verDatos(){
+    public final void verDatos(){
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
             try{
             Connection con = null;
@@ -280,9 +285,8 @@ public class Acabados extends javax.swing.JInternalFrame {
             ResultSet rs = st.executeQuery(sql);
 
                 while(rs.next()){
-                datos[0] = rs.getString("Prioridad");
-                datos[1] = rs.getString("Proyecto");
-                datos[2] = rs.getString("Plano");
+                datos[0] = rs.getString("Proyecto");
+                datos[1] = rs.getString("Plano");
 
                  miModelo.addRow(datos);
                 }
@@ -309,29 +313,60 @@ public class Acabados extends javax.swing.JInternalFrame {
     SimpleDateFormat nuevo = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
        String fec = nuevo.format(fe);
 
-       txtFecha.setText(fec);
+       txtProyecto.setText(fec);
 
     }
     
     public void tabla(){
         JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE");
         fecha();
-        txtFecha.setText(""); 
+        txtProyecto.setText(""); 
         limpiarTabla();
         verDatos();
         panelPiezas.setVisible(false);
+        txtPlano.setText("");
         txtProyecto.setText("");
-        txtFecha.setText("");
     }
     
     public void borrar(){
-
+            txtPlano.setText("");
             txtProyecto.setText("");
-            txtFecha.setText("");
             lblEstado.setText("SIN SELECCIONAR");
             lblEstado.setForeground(Color.red);
 
         }
+    
+    public void verPlanoNew(String plano) {
+        try{
+            com.mysql.jdbc.Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String plan = plano;
+            if(plano.contains("/")){
+                plan = plan.substring(0,plan.indexOf("/"));
+            }
+            String sql = "select Plano, Proyecto, Cantidad, Material from planos where Plano like '" + plan + "'";
+            ResultSet rs = st.executeQuery(sql);
+//            String plano = null;
+//            while(rs.next()){
+//                plan = rs.getString("Plano");
+//                txtPlano.setText(plano);
+//                txtProyecto.setText(rs.getString("Proyecto"));
+//                txtCantidad.setText(rs.getString("Cantidad"));
+//                txtMaterial.setText(rs.getString("Material"));
+//            }
+//            KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+//            manager.focusNextComponent();
+//            if(plano == null){
+//                plano = verificarNomenclatura(plan,PLANO );
+//                verPlano(plano);
+//            }
+//            txtPlano.setText("");
+        }catch(SQLException e){
+            JOptionPane.showMessageDialog(this, "Error: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        }
+    }
     
     public void verPlano(){
         if(txtNombre.getText().equals("")){
@@ -400,7 +435,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         }
 
                         if(plano.equals(datos[1]) && datos[5].equals("NO")){
-                            txtProyecto.setText(plano);
+                            txtPlano.setText(plano);
                             txtCodigo.setText("");
 
                             String as;
@@ -410,7 +445,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 as = datos[8]+","+txtNumero.getText();
                                 }
                             if(datos[3].equals("") || datos[3] == null){
-                                pst.setString(1, txtProyecto.getText());
+                                pst.setString(1, txtPlano.getText());
                                 pst.setString(2, datos[2]);
                                 pst.setString(3, fec);
                                 pst.setString(4, "");
@@ -419,7 +454,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 pst.setString(7, datos[6]);
                                 pst.setString(8, datos[7]);
                                 pst.setString(9, as);
-                                pst.setString(10, txtProyecto.getText());
+                                pst.setString(10, txtPlano.getText());
                                 pst.setString(11, noRevision);
                                 int n1 = pst.executeUpdate();
                                 if (n1 > 0){
@@ -427,11 +462,11 @@ public class Acabados extends javax.swing.JInternalFrame {
                                     verDatos();
                                     lblEstado.setText("EN CURSO");
                                     lblEstado.setForeground(Color.green);
-                                    txtFecha.setText(fec);
+                                    txtProyecto.setText(fec);
                                     activar();
                                 }
                             }else if(datos[3] != (null) && datos[5].equals("NO")){
-                                txtFecha.setText(datos[3]);
+                                txtProyecto.setText(datos[3]);
                                 txtCodigo.setText("");
                                 lblEstado.setText("EN CURSO");
                                 lblEstado.setForeground(Color.green);
@@ -622,7 +657,7 @@ public class Acabados extends javax.swing.JInternalFrame {
             con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "UPDATE acabados SET Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? WHERE Proyecto = ?";
-            String ver = "select * from acabados where Proyecto like '"+txtProyecto.getText()+"'";
+            String ver = "select * from acabados where Proyecto like '"+txtPlano.getText()+"'";
             PreparedStatement pst = con.prepareStatement(sql);
             ResultSet rs = st.executeQuery(ver);
             String datos[] = new String[10];
@@ -639,7 +674,7 @@ public class Acabados extends javax.swing.JInternalFrame {
             if(datos[1] != null){
 
                 if(datos[7] != null){
-                    String fecha1 = txtFecha.getText();
+                    String fecha1 = txtProyecto.getText();
                     String fecha2 = fec;
 
                     int hora1,hora2,minuto1,minuto2;
@@ -716,7 +751,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         f = (sumaH)+":"+"0"+(sumaM);
                     }
                 }
-                pst.setString(1, txtProyecto.getText());
+                pst.setString(1, txtPlano.getText());
                 pst.setString(2, datos[2]);
                 pst.setString(3, "");
                 pst.setString(4, "");
@@ -724,7 +759,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                 pst.setString(6, datos[6]);
                 pst.setString(7, f);
                 pst.setString(8, datos[8]);
-                pst.setString(9, txtProyecto.getText());
+                pst.setString(9, txtPlano.getText());
 
                 int n = pst.executeUpdate();
 
@@ -732,8 +767,8 @@ public class Acabados extends javax.swing.JInternalFrame {
                     limpiarTabla();
                     verDatos();
                     estado = false;
-                    txtFecha.setText("");
                     txtProyecto.setText("");
+                    txtPlano.setText("");
                     panelPiezas.setVisible(false);
                     JOptionPane.showMessageDialog(this, "PLANO PAUSADO","EXITO",JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -749,7 +784,7 @@ public class Acabados extends javax.swing.JInternalFrame {
         String fec = fec1.format(fecha);
         if(txtNumero.getText().equals("")){
             JOptionPane.showMessageDialog(this, "DEBES LLENAR EL NUMERO DE EMPLEADO","ERROR",JOptionPane.ERROR_MESSAGE);
-        }else if(txtProyecto.getText().equals("")){
+        }else if(txtPlano.getText().equals("")){
             JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN PROYECTO","ERROR",JOptionPane.ERROR_MESSAGE);
         }else{
             try{
@@ -776,11 +811,11 @@ public class Acabados extends javax.swing.JInternalFrame {
                 PreparedStatement pst5 = con.prepareStatement(sql5);
                 PreparedStatement pst6 = con.prepareStatement(sql6);
 
-                String ver = "select * from cnc where Proyecto like '"+txtProyecto.getText()+"' and Revision like '"+revision+"'";
-                String ver1 = "select * from datos where Proyecto like '"+txtProyecto.getText()+"' and Revision like '"+revision+"'";
-                String ver2 = "select * from torno where Proyecto like '"+txtProyecto.getText()+"' and Revision like '"+revision+"'";
-                String ver3 = "select * from fresadora where Proyecto like '"+txtProyecto.getText()+"' and Revision like '"+revision+"'";
-                String ver4 = "select * from calidad where Proyecto like '"+txtProyecto.getText()+"' and Revision like '"+revision+"'";
+                String ver = "select * from cnc where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
+                String ver1 = "select * from datos where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
+                String ver2 = "select * from torno where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
+                String ver3 = "select * from fresadora where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
+                String ver4 = "select * from calidad where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
 
                 ResultSet rs = st.executeQuery(ver);
                 ResultSet rs1 = st1.executeQuery(ver1);
@@ -799,7 +834,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                 PreparedStatement act3 = con.prepareStatement(ac3);
                 PreparedStatement act4 = con.prepareStatement(ac4);
 
-                String ecnc = "select * from acabados where Proyecto like '"+txtProyecto.getText()+"'and Revision like '"+revision+"'";
+                String ecnc = "select * from acabados where Proyecto like '"+txtPlano.getText()+"'and Revision like '"+revision+"'";
                 ResultSet eC = st5.executeQuery(ecnc);
                 String cnc[] = new String[10];
                 String acabados[] = new String[10];
@@ -851,7 +886,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                 }
 
                 if(acabados[4] != "00:00"){
-                    String fecha1 = txtFecha.getText();
+                    String fecha1 = txtProyecto.getText();
                     String fecha2 = fec;
 
                     int hora1,hora2,minuto1,minuto2;
@@ -936,30 +971,30 @@ public class Acabados extends javax.swing.JInternalFrame {
                     as = acabados[7]+","+txtNumero.getText();
                     }
                     
-                    pst.setString(1, txtProyecto.getText());
+                    pst.setString(1, txtPlano.getText());
                     pst.setString(2, acabados[5]);
-                    pst.setString(3, txtFecha.getText());
+                    pst.setString(3, txtProyecto.getText());
                     pst.setString(4, fec);
                     pst.setString(5, "SI");
                     pst.setString(6, acabados[1]);
                     pst.setString(7, f);
                     pst.setString(8, acabados[6]);
                     pst.setString(9, as);
-                    pst.setString(10, txtProyecto.getText());
+                    pst.setString(10, txtPlano.getText());
                     pst.setString(11, revision);
 
                 }else{
                     String as = acabados[8]+","+txtNumero.getText();
-                    pst.setString(1, txtProyecto.getText());
+                    pst.setString(1, txtPlano.getText());
                     pst.setString(2, acabados[5]);
-                    pst.setString(3, txtFecha.getText());
+                    pst.setString(3, txtProyecto.getText());
                     pst.setString(4, fec);
                     pst.setString(5, "SI");
                     pst.setString(6, acabados[1]);
-                    pst.setString(7, cronometro(txtFecha.getText(),fec));
+                    pst.setString(7, cronometro(txtProyecto.getText(),fec));
                     pst.setString(8, acabados[6]);
                     pst.setString(9, as);
-                    pst.setString(10, txtProyecto.getText());
+                    pst.setString(10, txtPlano.getText());
                     pst.setString(11, revision);
                 }
 
@@ -969,7 +1004,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         break;
                     case 1:
                         if(fresa[1] == (null)){
-                            pst5.setString(1, txtProyecto.getText());
+                            pst5.setString(1, txtPlano.getText());
                             pst5.setString(2, acabados[5]);
                             pst5.setString(3, "");
                             pst5.setString(4, "");
@@ -986,7 +1021,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 borrar();
                             }
                         }else{
-                            act3.setString(1, txtProyecto.getText());
+                            act3.setString(1, txtPlano.getText());
                             act3.setString(2, acabados[5]);
                             act3.setString(3, "");
                             act3.setString(4, "");
@@ -994,7 +1029,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                             act3.setString(6, acabados[1]);
                             act3.setString(7, fresa[3]);
                             act3.setString(8, acabados[6]);
-                            act3.setString(9, txtProyecto.getText());
+                            act3.setString(9, txtPlano.getText());
                             act3.setString(10, revision);
                             int n = act3.executeUpdate();
                             int n1 = pst.executeUpdate();
@@ -1006,7 +1041,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         }   break;
                     case 2:
                         if(cnc[1] == (null)){
-                            pst1.setString(1, txtProyecto.getText());
+                            pst1.setString(1, txtPlano.getText());
                             pst1.setString(2, acabados[5]);
                             pst1.setString(3, "");
                             pst1.setString(4, "");
@@ -1023,7 +1058,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 borrar();
                             }
                         }else{
-                            act.setString(1, txtProyecto.getText());
+                            act.setString(1, txtPlano.getText());
                             act.setString(2, acabados[5]);
                             act.setString(3, "");
                             act.setString(4, "");
@@ -1031,7 +1066,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                             act.setString(6, acabados[1]);
                             act.setString(7, cnc[3]);
                             act.setString(8, acabados[6]);
-                            act.setString(9, txtProyecto.getText());
+                            act.setString(9, txtPlano.getText());
                             act.setString(10, revision);
                             int n = act.executeUpdate();
                             int n1 = pst.executeUpdate();
@@ -1042,7 +1077,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         break;
                     case 3:
                         if(torno[1] == (null)){
-                            pst4.setString(1, txtProyecto.getText());
+                            pst4.setString(1, txtPlano.getText());
                             pst4.setString(2, acabados[5]);
                             pst4.setString(3, "");
                             pst4.setString(4, "");
@@ -1059,7 +1094,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 borrar();
                             }
                         }else{
-                            act2.setString(1, txtProyecto.getText());
+                            act2.setString(1, txtPlano.getText());
                             act2.setString(2, acabados[5]);
                             act2.setString(3, "");
                             act2.setString(4, "");
@@ -1067,7 +1102,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                             act2.setString(6, acabados[1]);
                             act2.setString(7, torno[3]);
                             act2.setString(8, acabados[6]);
-                            act2.setString(9, txtProyecto.getText());
+                            act2.setString(9, txtPlano.getText());
                             act2.setString(10, revision);
                             int n = act2.executeUpdate();
                             int n1 = pst.executeUpdate();
@@ -1079,7 +1114,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         break;
                     case 4:
                         if(calidad[1] == (null)){
-                            pst6.setString(1, txtProyecto.getText());
+                            pst6.setString(1, txtPlano.getText());
                             pst6.setString(2, acabados[5]);
                             pst6.setString(3, "");
                             pst6.setString(4, "");
@@ -1098,7 +1133,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 borrar();
                             }
                         }else{
-                            act4.setString(1, txtProyecto.getText());
+                            act4.setString(1, txtPlano.getText());
                             act4.setString(2, acabados[5]);
                             act4.setString(3, "");
                             act4.setString(4, "");
@@ -1107,7 +1142,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                             act4.setString(7, "NO");
                             act4.setString(8, cortes[3]);
                             act4.setString(9, acabados[6]);
-                            act4.setString(10, txtProyecto.getText());
+                            act4.setString(10, txtPlano.getText());
                             act4.setString(11, revision);
                             int n = act4.executeUpdate();
                             int n1 = pst.executeUpdate();
@@ -1119,7 +1154,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                         break;
                     case 5:
                         if(cortes[1] == (null)){
-                            pst2.setString(1, txtProyecto.getText());
+                            pst2.setString(1, txtPlano.getText());
                             pst2.setString(2, acabados[5]);
                             pst2.setString(3, "");
                             pst2.setString(4, "");
@@ -1136,7 +1171,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                                 borrar();
                             }
                         }else{
-                            act1.setString(1, txtProyecto.getText());
+                            act1.setString(1, txtPlano.getText());
                             act1.setString(2, acabados[5]);
                             act1.setString(3, "");
                             act1.setString(4, "");
@@ -1144,7 +1179,7 @@ public class Acabados extends javax.swing.JInternalFrame {
                             act1.setString(6, acabados[1]);
                             act1.setString(7, cortes[3]);
                             act1.setString(8, acabados[6]);
-                            act1.setString(9, txtProyecto.getText());
+                            act1.setString(9, txtPlano.getText());
                             act1.setString(10, revision);
                             int n = act1.executeUpdate();
                             int n1 = pst.executeUpdate();
@@ -1165,11 +1200,145 @@ public class Acabados extends javax.swing.JInternalFrame {
             }
     }
     
-    public Acabados() {
+    public String obtenerDepartamento() {
+        switch (cmbEnviar.getSelectedIndex()) {
+            case 1:
+                return "maquinados";
+            case 2:
+                return "calidad";
+            case 3:
+                return "datos";
+            default:
+                return null;
+        }
+    }
+
+    public void enviarPlano(String plano, String proyecto) {
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            revisarPlanos rev = new revisarPlanos();
+            String estacion = rev.buscar(plano, con);
+            String estacionSeleccionada = obtenerDepartamento();
+            if (estacion.equals("LIBERACION")) {
+                rev.terminarPlano(plano, proyecto, numEmpleado, null, "acabados", con);
+                rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+            } else {
+                if (cmbEnviar.getSelectedIndex() == 1 || cmbEnviar.getSelectedIndex() == 3){
+                    if (cmbEnviar.getSelectedIndex() == 1) {
+                        rev.retrabajo = true;
+                    }
+                    rev.enviarCortes("acabados", plano, numEmpleado, proyecto, "00");
+                } else {
+                    rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public final void verDatos(String sql) {
+        try {
+            limpiarTabla();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            String datos[] = new String[10];
+            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+            int cont = 0;
+            while (rs.next()) {
+                datos[0] = rs.getString("Proyecto");
+                datos[1] = rs.getString("Plano");
+                miModelo.addRow(datos);
+                cont++;
+            }
+            lblConteo.setText("Cantidad de Planos: " + cont);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al ver datos calidad: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public String getProyecto(String plano, Connection con) throws SQLException {
+        Statement st = con.createStatement();
+        String sql = "select proyecto from proyectos where proyecto like '" + plano + "%'";
+        ResultSet rs = st.executeQuery(sql);
+        while (rs.next()) {
+            return rs.getString("Proyecto");
+        }
+        return null;
+    }
+
+    public final void verProyectos() {
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select proyecto from proyectos";
+            ResultSet rs = st.executeQuery(sql);
+            au = new TextAutoCompleter(jTextField1);
+            while (rs.next()) {
+                au.addItem(rs.getString("proyecto"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al ver proyectos: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public String obtenerCaracter(String plano) {
+        String texto = plano;
+        
+        Pattern pattern = Pattern.compile("[^0-9a-zA-Z ]");
+        Matcher matcher = pattern.matcher(texto);
+
+        while (matcher.find()) {
+            return  matcher.group();
+        }
+        return null;
+    }
+    
+    public String formatear(String plano, Connection con) throws SQLException {
+        String caracter = obtenerCaracter(plano);
+        String spl[] = plano.split(" ");
+        if (caracter != null && plano.contains(caracter)) {
+            return plano.substring(0, plano.indexOf(caracter));
+        } else if (spl.length == 3) {
+            return plano;
+        } else if (spl.length == 2) {
+            return getProyecto(spl[0], con) + " " + spl[1];
+        } else {
+            return null;
+        }
+    }
+    
+    public String validarPlano(Connection con, String proyecto) throws SQLException{
+        Statement st = con.createStatement();
+        String sql = "select proyecto from proyectos where proyecto like '" + proyecto + "%'";
+        ResultSet rs = st.executeQuery(sql);
+        String proyectoRet = null;
+        while (rs.next()) {
+            proyectoRet = rs.getString("proyecto");
+        }
+        return proyectoRet;
+    }
+    
+    public void limpiarFormulario() {
+        txtPlano.setText("");
+        txtProyecto.setText("");
+    }
+    
+    public Acabados(String numEmpleado) {
         initComponents();
+        this.numEmpleado = numEmpleado;
         fechaFinal();
         limpiarTabla();
         verDatos();
+        verProyectos();
         
         txtNumero.setEnabled(false);
         txtNombre.setEnabled(false);
@@ -1186,9 +1355,9 @@ public class Acabados extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        terminarPlanos = new javax.swing.JMenuItem();
         jPanel16 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        Tabla1 = new ColorRojo();
         PanelNorth = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
         jPanel19 = new javax.swing.JPanel();
@@ -1205,9 +1374,9 @@ public class Acabados extends javax.swing.JInternalFrame {
         jPanel2 = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        txtProyecto = new javax.swing.JLabel();
+        txtPlano = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        txtFecha = new javax.swing.JLabel();
+        txtProyecto = new javax.swing.JLabel();
         rSPanelRound1 = new rojeru_san.rspanel.RSPanelRound();
         jLabel20 = new javax.swing.JLabel();
         panelTipo = new rojeru_san.rspanel.RSPanelRound();
@@ -1251,10 +1420,31 @@ public class Acabados extends javax.swing.JInternalFrame {
         btnGuardar = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
+        jPanel22 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        Tabla1 = new ColorRojo();
+        jPanel25 = new javax.swing.JPanel();
+        jLabel23 = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
+        jPanel26 = new javax.swing.JPanel();
+        jLabel24 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        lblConteo = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
         jLabel18 = new javax.swing.JLabel();
         jPanel17 = new javax.swing.JPanel();
         jLabel19 = new javax.swing.JLabel();
+
+        terminarPlanos.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        terminarPlanos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/entrega-rapida.png"))); // NOI18N
+        terminarPlanos.setText("Seleccionar estacion                          ");
+        terminarPlanos.setEnabled(false);
+        terminarPlanos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                terminarPlanosActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(terminarPlanos);
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(null);
@@ -1262,36 +1452,6 @@ public class Acabados extends javax.swing.JInternalFrame {
 
         jPanel16.setBackground(new java.awt.Color(255, 255, 255));
         jPanel16.setLayout(new java.awt.BorderLayout());
-
-        Tabla1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "PRIORIDAD", "NUMERO DE PLANO", "PROYECTO"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        Tabla1.setFocusable(false);
-        Tabla1.setRowHeight(25);
-        Tabla1.setSelectionBackground(new java.awt.Color(110, 201, 255));
-        Tabla1.getTableHeader().setReorderingAllowed(false);
-        Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                Tabla1MouseClicked(evt);
-            }
-        });
-        jScrollPane1.setViewportView(Tabla1);
-
-        jPanel16.add(jScrollPane1, java.awt.BorderLayout.WEST);
 
         PanelNorth.setBackground(new java.awt.Color(255, 255, 255));
         PanelNorth.setLayout(new java.awt.BorderLayout());
@@ -1385,23 +1545,23 @@ public class Acabados extends javax.swing.JInternalFrame {
 
         jLabel2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel2.setText("NUMERO DE PLANO:   ");
+        jLabel2.setText("Numero de plano:");
         jPanel21.add(jLabel2);
+
+        txtPlano.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        txtPlano.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        txtPlano.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
+        jPanel21.add(txtPlano);
+
+        jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel4.setText("Proyecto:");
+        jPanel21.add(jLabel4);
 
         txtProyecto.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         txtProyecto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
         jPanel21.add(txtProyecto);
-
-        jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel4.setText("FECHA INICIO:   ");
-        jPanel21.add(jLabel4);
-
-        txtFecha.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        txtFecha.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        txtFecha.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(204, 204, 204)));
-        jPanel21.add(txtFecha);
 
         rSPanelRound1.setColorBackground(new java.awt.Color(0, 102, 204));
         rSPanelRound1.setColorBorde(new java.awt.Color(0, 102, 204));
@@ -1568,7 +1728,12 @@ public class Acabados extends javax.swing.JInternalFrame {
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
 
-        cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SELECCIONAR", "CNC", "FRESADORA", "TORNO", "CALIDAD", "CORTES" }));
+        cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Seleccionar", "Maquinados", "Calidad", "Cortes" }));
+        cmbEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbEnviarActionPerformed(evt);
+            }
+        });
         jPanel9.add(cmbEnviar);
 
         jPanel14.add(jPanel9);
@@ -1647,6 +1812,87 @@ public class Acabados extends javax.swing.JInternalFrame {
 
         jPanel16.add(jPanel12, java.awt.BorderLayout.EAST);
 
+        jPanel22.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel22.setLayout(new java.awt.BorderLayout());
+
+        Tabla1.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
+        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "PRIORIDAD", "NUMERO DE PLANO", "PROYECTO"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        Tabla1.setComponentPopupMenu(jPopupMenu1);
+        Tabla1.setFocusable(false);
+        Tabla1.setRowHeight(25);
+        Tabla1.setSelectionBackground(new java.awt.Color(110, 201, 255));
+        Tabla1.getTableHeader().setReorderingAllowed(false);
+        Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Tabla1MouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(Tabla1);
+
+        jPanel22.add(jScrollPane1, java.awt.BorderLayout.WEST);
+
+        jPanel25.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel25.setLayout(new java.awt.BorderLayout(0, 10));
+
+        jLabel23.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        jLabel23.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel23.setText("Planos en estacion de acabados");
+        jPanel25.add(jLabel23, java.awt.BorderLayout.NORTH);
+
+        lblTitulo.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitulo.setText("PLANOS CON MATERIAL");
+        jPanel25.add(lblTitulo, java.awt.BorderLayout.SOUTH);
+
+        jPanel26.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel26.setLayout(new java.awt.BorderLayout());
+
+        jLabel24.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jLabel24.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel24.setText("Ver por proyecto");
+        jPanel26.add(jLabel24, java.awt.BorderLayout.CENTER);
+
+        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
+        jTextField1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        jTextField1.setForeground(new java.awt.Color(51, 51, 51));
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel26.add(jTextField1, java.awt.BorderLayout.SOUTH);
+
+        jPanel25.add(jPanel26, java.awt.BorderLayout.CENTER);
+
+        jPanel22.add(jPanel25, java.awt.BorderLayout.NORTH);
+
+        lblConteo.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblConteo.setForeground(new java.awt.Color(51, 51, 51));
+        lblConteo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblConteo.setText("Cantidad de Planos: ");
+        jPanel22.add(lblConteo, java.awt.BorderLayout.PAGE_END);
+
+        jPanel16.add(jPanel22, java.awt.BorderLayout.WEST);
+
         getContentPane().add(jPanel16, java.awt.BorderLayout.CENTER);
 
         jPanel18.setBackground(new java.awt.Color(255, 255, 255));
@@ -1711,7 +1957,6 @@ public class Acabados extends javax.swing.JInternalFrame {
             }
 
             if(txtEmpleado.getText().equals(datos[0])){
-
                 txtNumero.setText(datos[0]);
                 txtNombre.setText(datos[1]);
                 txtPuesto.setText(datos[5]);
@@ -1726,7 +1971,36 @@ public class Acabados extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_txtEmpleadoActionPerformed
 
     private void txtCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoActionPerformed
-        verPlano();
+//        verPlano();
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String form = formatear(txtCodigo.getText(), con);
+            String sql = "select Proyecto, Plano, Cantidad, Material from planos where Plano like '" + form + "'";
+            ResultSet rs = st.executeQuery(sql);
+            String plano = null;
+            limpiarFormulario();
+            while (rs.next()) {
+                plano = rs.getString("Plano");
+                txtPlano.setText(plano);
+                txtProyecto.setText(rs.getString("Proyecto"));
+            }
+            txtCodigo.setText("");
+            if (plano == null) {
+                int prim = form.indexOf(" ");
+                String proyecto = validarPlano(con, form.substring(0, prim));
+                if (proyecto != null) {
+                    txtPlano.setText(form);
+                    txtProyecto.setText(proyecto);
+                } else {
+                    JOptionPane.showMessageDialog(this, "El plano que ingresaste no existe", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_txtCodigoActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -1739,8 +2013,32 @@ public class Acabados extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnPausaActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        guardar(lblRevision.getText());
+        enviarPlano(txtPlano.getText(), title);
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void terminarPlanosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminarPlanosActionPerformed
+        for (int i = 0; i < Tabla1.getSelectedRows().length; i++) {
+            int fila = Tabla1.getSelectedRows()[i];
+            enviarPlano(Tabla1.getValueAt(fila, 0).toString(), Tabla1.getValueAt(fila, 1).toString());
+        }
+    }//GEN-LAST:event_terminarPlanosActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        if (jTextField1.getText().equals("")) {
+            verDatos("select * from acabados where Terminado like 'NO' order by id desc");
+        } else {
+            verDatos("select * from acabados where Terminado like 'NO' and Plano like '" + jTextField1.getText() + "' order by id desc");
+        }
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void cmbEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbEnviarActionPerformed
+        if (cmbEnviar.getSelectedIndex() == 0) {
+            terminarPlanos.setEnabled(false);
+        } else {
+            terminarPlanos.setEnabled(true);
+            terminarPlanos.setText("Enviar planos a: " + cmbEnviar.getSelectedItem().toString() + "                          ");
+        }
+    }//GEN-LAST:event_cmbEnviarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1766,6 +2064,8 @@ public class Acabados extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1787,6 +2087,9 @@ public class Acabados extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel20;
     private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -1794,23 +2097,28 @@ public class Acabados extends javax.swing.JInternalFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblConteo;
     private javax.swing.JLabel lblCrono;
     private javax.swing.JLabel lblCrono1;
     private javax.swing.JLabel lblEstado;
     private javax.swing.JLabel lblPiezas;
     private javax.swing.JLabel lblRevision;
     private javax.swing.JLabel lblTipo;
+    private javax.swing.JLabel lblTitulo;
     private javax.swing.JPanel panelCentral;
     private javax.swing.JPanel panelEste;
     private rojeru_san.rspanel.RSPanelRound panelPiezas;
     private rojeru_san.rspanel.RSPanelRound panelTipo;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound1;
+    private javax.swing.JMenuItem terminarPlanos;
     private javax.swing.JTextField txtCodigo;
     private javax.swing.JTextField txtEmpleado;
-    private javax.swing.JLabel txtFecha;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtNumero;
+    private javax.swing.JLabel txtPlano;
     private javax.swing.JLabel txtProyecto;
     private javax.swing.JTextField txtPuesto;
     // End of variables declaration//GEN-END:variables

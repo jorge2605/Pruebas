@@ -3,18 +3,21 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Pruebas/src/pruebas/CambiarEstado.java</file>
             <file>file:/C:/Pruebas/src/pruebas/Inicio1.java</file>
             <file>file:/C:/Pruebas/src/Controlador/maquinados/revisarPlanos.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/Acabados.java</file>
             <file>file:/C:/Pruebas/src/VentanaEmergente/KPI/ComprasKPI.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/Cortes.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/PedirMaterial.java</file>
             <file>file:/C:/Pruebas/src/pruebas/InicioSesion.java</file>
-            <file>file:/C:/Pruebas/src/pruebas/KPI.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/Maquinados/IngresarTiempo.java</file>
             <file>file:/C:/Pruebas/src/VentanaEmergente/KPI/InsertarKPI.java</file>
-            <file>file:/C:/Pruebas/src/VentanaEmergente/KPI/Semanas.java</file>
             <file>file:/C:/Pruebas/src/pruebas/Disenio1.java</file>
             <file>file:/C:/Pruebas/src/pruebas/CalidadDebug.java</file>
             <file>file:/C:/Pruebas/src/pruebas/Maquinados.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/CambiarEstado.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/KPI.java</file>
+            <file>file:/C:/Pruebas/src/VentanaEmergente/KPI/Semanas.java</file>
+            <file>file:/C:/Pruebas/src/pruebas/requisicionDeCompra.java</file>
         </group>
     </open-files>
 </project-private>

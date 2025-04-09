@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 public class revisarPlanos {
 
     public String CORTES = "datos";
+    public String SIN_MATERIAL = "datos";
     public String FRESADORA = "fresadora";
     public String CNC = "cnc";
     public String TORNO = "torno";
@@ -182,7 +183,7 @@ public class revisarPlanos {
                 cortes[2] = rs4.getString("Plano");
                 cortes[3] = rs4.getString("Terminado");
                 cortes[5] = rs4.getString("Prioridad");
-                cortes[6] = rs4.getString("Revision");
+                cortes[6] = rs4.getString("Estado");
             }
             while (rs5.next()) {
                 torno[0] = rs5.getString("Id");
@@ -219,6 +220,9 @@ public class revisarPlanos {
 
             if (id.equals(cortes[1]) && cortes[3].equals("NO")) {
                 datos[3] = "CORTES";
+                if(cortes[6].equals("SIN MATERIAL")) {
+                    datos[3] = "SIN MATERIAL";
+                }
             } else if (id.equals(maqui[1]) && maqui[3].equals("NO")) {
                 datos[3] = "MAQUINADOS";
             } else if (id.equals(cnc[1]) && cnc[3].equals("NO")) {
@@ -242,10 +246,13 @@ public class revisarPlanos {
                 } else if (id.equals(integracion[1]) && integracion[3].equals("SI")) {
                     datos[3] = "PROYECTO FINALIZADO";
                 }
+            } else if (id.equals(integracion[1]) && integracion[3].equals("NO")) {
+                datos[3] = "INTEGRACION";
+            } else if (id.equals(integracion[1]) && integracion[3].equals("SI")) {
+                datos[3] = "PROYECTO FINALIZADO";
             } else {
                 datos[3] = "LIBERACION";
             }
-
             cont += 1;
         }
         if (datos[3] == null) {
@@ -498,6 +505,8 @@ public class revisarPlanos {
             switch (estacion) {
                 case "CORTES":
                     return CORTES;
+                case "SIN MATERIAL":
+                    return CORTES;
                 case "FRESADORA":
                     return FRESADORA;
                 case "MAQUINADOS":
@@ -662,14 +671,11 @@ public class revisarPlanos {
         }
     }
 
-    public void terminarPlano(String plano, String proyecto, String empleado, String tiempo, String estacion) {
+    public void terminarPlano(String plano, String proyecto, String empleado, String tiempo, String estacion, Connection con) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
             Date d = new Date();
             String fecha = sdf.format(d);
-            Connection con;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "select * from " + estacion + " where Proyecto like '" + plano + "'";
             ResultSet rs = st.executeQuery(sql);
@@ -700,7 +706,7 @@ public class revisarPlanos {
             } else {
                 //Si no existe plano en calidad
                 String sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Prioridad, Empleado) values(?,?,?,?,?,?,?)";
-                if (tiempo == null) {
+                if (tiempo != null) {
                     sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Prioridad, Empleado, Cronometro) values(?,?,?,?,?,?,?,?)";
                 }
                 PreparedStatement pst = con.prepareStatement(sql2);
@@ -712,7 +718,7 @@ public class revisarPlanos {
                 pst.setString(5, proyecto);
                 pst.setString(6, "10");
                 pst.setString(7, empleado);
-                if (tiempo == null) {
+                if (tiempo != null) {
                     pst.setString(8, tiempo);
                 }
 

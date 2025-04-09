@@ -247,7 +247,13 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                 }
                 int pg = plano.indexOf(signo);
                 int sg = plano.indexOf(signo,pg+1);
-                numeroPlano = numeroPlano + plano.substring(sg, plano.length()).replace("-", " ");
+                String partes[] = plano.split("-");
+                if (partes.length == 4) {
+                    numeroPlano = numeroPlano + " " + partes[1] + " " + partes[2] + " " + partes[3];
+                } else if(partes.length == 3) {
+                    numeroPlano = numeroPlano + " " + partes[1] + " " + partes[2];
+                }
+//                numeroPlano = numeroPlano + plano.substring(sg, plano.length()).replace("-", " ");
                 
                 BufferedImage barcodeImage = generateBarcode(numeroPlano);
                 try (FileOutputStream out = new FileOutputStream("barcode.png")) {

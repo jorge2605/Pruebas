@@ -242,7 +242,6 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             try{datos[12] = proyectos.get(getProyecto(datos[3], "DISEÑO")).getFecha();}catch(Exception e){datos[12] = "";}
             try{datos[15] = proyectos.get(getProyecto(datos[3], "INTEGRACION")).getFecha();}catch(Exception e){datos[15] = "";}
             try{datos[13] = proyectos.get(getProyecto(datos[3], "COMPRAS")).getFecha();}catch(Exception e){datos[13] = "";}
-            datos[16] = rs.getString("FechaCierre");
             miModelo.addRow(datos);
             }
         }catch(SQLException e){

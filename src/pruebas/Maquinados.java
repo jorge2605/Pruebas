@@ -34,6 +34,8 @@ import java.util.Date;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -154,6 +156,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         emp = new empleado(f,true);
         emp.btnX.addActionListener(this);
+        emp.setLocationRelativeTo(f);
         empleado = emp.getEmpleado();
         numEmpleado = empleado;
         setEmpleado();
@@ -185,9 +188,23 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         return color;
     }
     
+    public String obtenerCaracter(String plano) {
+        String texto = plano;
+        
+        Pattern pattern = Pattern.compile("[^0-9a-zA-Z]");
+        Matcher matcher = pattern.matcher(texto);
+
+        while (matcher.find()) {
+            return  matcher.group();
+        }
+        return null;
+    }
+    
     public String verificarNomenclatura(String plano, int seleccion){
-        String proyecto = plano.substring(0, plano.indexOf(" "));
-        String plano3 = plano.substring(plano.indexOf(" "),plano.length());
+        String caracter = obtenerCaracter(plano);
+        String partes[] = plano.split(caracter);
+        String proyecto = plano.substring(0, plano.indexOf(caracter));
+        String plano3 = plano.substring(plano.indexOf(caracter),plano.length());
         if(proyecto.length() >= 3){
             try{
                 Connection con;
@@ -205,6 +222,9 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                     if(seleccion == PROYECTO){
                         return proyecto;
                     }else{
+                        if (partes.length >= 3) {
+                            return plano;
+                        }
                         return proyecto + plano3;
                     }
                 }
@@ -522,7 +542,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                         default:
                             break;
                     }
-                    revisar.terminarPlano(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, hora, botones.get(i));
+                    revisar.terminarPlano(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, hora, botones.get(i), con);
                 }
                 if (calidad) {
                     revisar.sendToCalidad(txtPlano2.getText(), txtProyecto.getText(), numEmpleado);

@@ -511,6 +511,11 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         rSPanelRound32 = new rojeru_san.rspanel.RSPanelRound();
         btnElec = new javax.swing.JButton();
         jLabel31 = new javax.swing.JLabel();
+        jPanel23 = new javax.swing.JPanel();
+        panel28 = new javax.swing.JPanel();
+        rSPanelRound38 = new rojeru_san.rspanel.RSPanelRound();
+        btnCalidad1 = new javax.swing.JButton();
+        jLabel37 = new javax.swing.JLabel();
         panel26 = new javax.swing.JPanel();
         rSPanelRound14 = new rojeru_san.rspanel.RSPanelRound();
         btnCalidad = new javax.swing.JButton();
@@ -527,7 +532,6 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         rSPanelRound37 = new rojeru_san.rspanel.RSPanelRound();
         btnIntegracion1 = new javax.swing.JButton();
         jLabel36 = new javax.swing.JLabel();
-        jPanel23 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         panel31 = new javax.swing.JPanel();
         rSPanelRound16 = new rojeru_san.rspanel.RSPanelRound();
@@ -1300,6 +1304,57 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
 
         jPanel6.add(jPanel20);
 
+        jPanel23.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel23.setLayout(new java.awt.GridBagLayout());
+
+        panel28.setBackground(new java.awt.Color(255, 255, 255));
+        panel28.setLayout(new java.awt.GridBagLayout());
+
+        rSPanelRound38.setBackground(new java.awt.Color(235, 235, 235));
+        rSPanelRound38.setColorBackground(new java.awt.Color(245, 245, 245));
+        rSPanelRound38.setColorBorde(new java.awt.Color(245, 245, 245));
+        rSPanelRound38.setPreferredSize(new java.awt.Dimension(90, 90));
+        rSPanelRound38.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 10, 10));
+
+        btnCalidad1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        btnCalidad1.setForeground(new java.awt.Color(0, 153, 255));
+        btnCalidad1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/Acabados_64.png"))); // NOI18N
+        btnCalidad1.setBorder(null);
+        btnCalidad1.setContentAreaFilled(false);
+        btnCalidad1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnCalidad1.setFocusPainted(false);
+        btnCalidad1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnCalidad1.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        btnCalidad1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnCalidad1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                btnCalidad1MouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                btnCalidad1MouseExited(evt);
+            }
+        });
+        btnCalidad1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCalidad1ActionPerformed(evt);
+            }
+        });
+        rSPanelRound38.add(btnCalidad1);
+
+        panel28.add(rSPanelRound38, new java.awt.GridBagConstraints());
+
+        jLabel37.setFont(new java.awt.Font("Roboto Medium", 0, 14)); // NOI18N
+        jLabel37.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel37.setText("Acabados");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panel28.add(jLabel37, gridBagConstraints);
+
+        jPanel23.add(panel28, new java.awt.GridBagConstraints());
+
+        jPanel6.add(jPanel23);
+
         panel26.setBackground(new java.awt.Color(255, 255, 255));
         panel26.setLayout(new java.awt.GridBagLayout());
 
@@ -1483,10 +1538,6 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         jPanel22.add(jLabel36, gridBagConstraints);
 
         jPanel6.add(jPanel22);
-
-        jPanel23.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel23.setLayout(new java.awt.GridBagLayout());
-        jPanel6.add(jPanel23);
 
         jPanel3.add(jPanel6);
 
@@ -3156,6 +3207,27 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         c.setVisible(true);
     }//GEN-LAST:event_btnIntegracion1ActionPerformed
 
+    private void btnCalidad1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCalidad1MouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCalidad1MouseEntered
+
+    private void btnCalidad1MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCalidad1MouseExited
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnCalidad1MouseExited
+
+    private void btnCalidad1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalidad1ActionPerformed
+        Acabados c = new Acabados(lblId.getText());
+        jDesktopPane1.add(c);
+        c.toFront();
+        c.setLocation(jDesktopPane1.getWidth() / 2 - c.getWidth() / 2, jDesktopPane1.getHeight() / 2 - c.getHeight() / 2);
+        try{
+            c.setMaximum(true);
+        }catch(PropertyVetoException e){
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+        }
+        c.setVisible(true);
+    }//GEN-LAST:event_btnCalidad1ActionPerformed
+
     
     
     public static void main(String args[]) {
@@ -3199,6 +3271,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     public javax.swing.JButton btnActualizar;
     public javax.swing.JButton btnCalendario;
     public javax.swing.JButton btnCalidad;
+    public javax.swing.JButton btnCalidad1;
     public javax.swing.JButton btnChecador;
     public javax.swing.JButton btnCorte;
     public javax.swing.JButton btnCostos;
@@ -3264,6 +3337,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JLabel jLabel34;
     private javax.swing.JLabel jLabel35;
     private javax.swing.JLabel jLabel36;
+    private javax.swing.JLabel jLabel37;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -3303,6 +3377,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private javax.swing.JPanel panel21;
     private javax.swing.JPanel panel26;
     private javax.swing.JPanel panel27;
+    private javax.swing.JPanel panel28;
     private javax.swing.JPanel panel31;
     private javax.swing.JPanel panel32;
     private javax.swing.JPanel panel33;
@@ -3346,6 +3421,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     private rojeru_san.rspanel.RSPanelRound rSPanelRound35;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound36;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound37;
+    private rojeru_san.rspanel.RSPanelRound rSPanelRound38;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound4;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound5;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound6;

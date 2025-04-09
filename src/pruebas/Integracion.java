@@ -568,19 +568,22 @@ public class Integracion extends javax.swing.JInternalFrame {
         String estacion;
         String plano = txtPlano.getText();
         String proyecto = txtProyecto.getText();
+        Connection con;
+        Conexion con1 = new Conexion();
+        con = con1.getConnection();
         if (lblAvisoPlano.isVisible()) {
             switch (cmbEnviar.getSelectedIndex()) {
                 case 1:
                     estacion = "datos";
                     rev.enviarCortes("integracion", plano, numEmpleado, proyecto, "00");
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion", con);
                     rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
                     break;
                 case 2:
                     estacion = "maquinados";
                     rev.retrabajo = true;
                     rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion", con);
                     rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
                     break;
                 default:
@@ -588,9 +591,6 @@ public class Integracion extends javax.swing.JInternalFrame {
             }
         } else {
             try {
-                Connection con;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
                 estacion = rev.buscar(txtPlano.getText(), con);
                 String estacionSeleccionada  = obtenerDepartamento();
                 if (estacion.equals("LIBERACION")) {
@@ -601,14 +601,14 @@ public class Integracion extends javax.swing.JInternalFrame {
                         case 1:
                             estacion = "datos";
                             rev.enviarCortes("integracion", plano, numEmpleado, proyecto, "00");
-                            rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                            rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion", con);
                             rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
                             break;
                         case 2:
                             estacion = "maquinados";
                             rev.retrabajo = true;
                             rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                            rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion");
+                            rev.terminarPlano(plano, proyecto, numEmpleado, null, "integracion", con);
                             rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
                             break;
                         default:

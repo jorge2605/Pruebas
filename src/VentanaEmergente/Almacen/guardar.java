@@ -1,13 +1,8 @@
 package VentanaEmergente.Almacen;
 
 import Conexiones.Conexion;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class guardar extends javax.swing.JDialog implements MouseListener{
+public class guardar extends javax.swing.JDialog {
 
     public JLabel lblCodigo[];
     public Stack<String> id;
@@ -42,7 +37,6 @@ public class guardar extends javax.swing.JDialog implements MouseListener{
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
-        txtFormato[i].addMouseListener(this);
         txtFormato[i].setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtFormato[i].setFont(new java.awt.Font("Lexend", 0, 12)); // NOI18N
         panel.add(txtFormato[i]);
@@ -206,14 +200,13 @@ public class guardar extends javax.swing.JDialog implements MouseListener{
                 Connection con;
                 Conexion con1 = new Conexion();
                 con = con1.getConnection();
-                String sql = "update requisiciones set Ubicacion = ? where Codigo = ? and Id = ?";
+                String sql = "update requisiciones set Ubicacion = ? where Id = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
                 
                 int n = 0;
                 for (int i = 0; i < txtFormato.length; i++) {
                     pst.setString(1, txtFormato[i].getText());
-                    pst.setString(2, lblCodigo[i].getText());
-                    pst.setString(3, id.get(i));
+                    pst.setString(2, id.get(i));
 
                     n += pst.executeLargeUpdate();
                 }
@@ -300,32 +293,4 @@ public class guardar extends javax.swing.JDialog implements MouseListener{
     // End of variables declaration//GEN-END:variables
 
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        for (int i = 0; i < txtFormato.length; i++) {
-            if(e.getSource() == txtFormato[i]){
-                System.out.println(txtFormato[i].getText());
-            }
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        
-    }
 }

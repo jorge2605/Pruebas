@@ -1521,6 +1521,7 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         terminar = new TerminarProyecto(f, true, numEmpleado);
+        terminar.setLocationRelativeTo(f);
         terminar.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 

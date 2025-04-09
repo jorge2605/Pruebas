@@ -147,7 +147,7 @@ public class TerminarProyecto extends javax.swing.JDialog {
             while (rs13.next()) {
                 String pl = rs13.getString("Plano");
                 String pr = rs13.getString("Proyecto");
-                rev.terminarPlano(pl, pr, numEmpleado, null, "integracion");
+                rev.terminarPlano(pl, pr, numEmpleado, null, "integracion", con);
             }
 
             if (n > 0 && n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0) {
@@ -218,6 +218,15 @@ public class TerminarProyecto extends javax.swing.JDialog {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "ERROR AL AUTOCOMPLETAR" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    public final boolean buscarEnTabla() {
+        for (int i = 0; i < Tabla1.getRowCount(); i++) {
+            if (Tabla1.getValueAt(i, 0).toString().equals(txtProyecto.getText())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public TerminarProyecto(java.awt.Frame parent, boolean modal, String numEmpleado) {
@@ -323,6 +332,11 @@ public class TerminarProyecto extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
+        Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Tabla1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(Tabla1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -353,15 +367,27 @@ public class TerminarProyecto extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void txtProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProyectoActionPerformed
-        if (!ac1.itemExists(txtProyecto.getText())) {
-            JOptionPane.showMessageDialog(this, "Debes ingresar un proyecto valido","Error", JOptionPane.ERROR);
+        if (buscarEnTabla()) {
+            JOptionPane.showMessageDialog(this, "Este proyecto ya esta incluida en la tabla", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-            String dat[] = {txtProyecto.getText()};
-            miModelo.addRow(dat);
+            if (!ac1.itemExists(txtProyecto.getText())) {
+                JOptionPane.showMessageDialog(this, "Debes ingresar un proyecto valido","Error", JOptionPane.ERROR);
+            } else {
+                DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+                String dat[] = {txtProyecto.getText()};
+                miModelo.addRow(dat);
+            }
         }
         txtProyecto.setText("");
     }//GEN-LAST:event_txtProyectoActionPerformed
+
+    private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
+        int opc = JOptionPane.showConfirmDialog(this, "Estas segura de eliminar este proyecto?");
+        if (opc == 0) {
+            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+            miModelo.removeRow(Tabla1.getSelectedRow());
+        }
+    }//GEN-LAST:event_Tabla1MouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

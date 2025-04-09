@@ -4,6 +4,7 @@ import Conexiones.Conexion;
 import Controlador.maquinados.reportarPlano;
 import Controlador.maquinados.revisarPlanos;
 import VentanaEmergente.Maquinados.elegirRevision;
+import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Font;
@@ -24,6 +25,8 @@ import java.util.Date;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -31,7 +34,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-public final class Cortes extends  JInternalFrame {
+public final class Cortes extends JInternalFrame {
 
     int mili = 0;
     int segundos;
@@ -44,44 +47,45 @@ public final class Cortes extends  JInternalFrame {
     TableRowSorter<TableModel> elQueOrdena;
     String numEmpleado;
     int contReporte;
-    
+    private TextAutoCompleter au;
+
     elegirRevision elegirRevision;
-    
+
     public void activar() {
         estado = true;
         String datos[] = new String[10];
-        try{
-        Connection con = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
-        Statement st = con.createStatement();
-        String sql = "select * from datos where Proyecto like '"+pl+"'";
-        ResultSet rs = st.executeQuery(sql);
-        
-        while(rs.next()){
-        datos[1] = rs.getString("FechaInicio");
-        datos[2] = rs.getString("FechaFinal");
-        datos[3] = rs.getString("Cronometro");
+        try {
+            Connection con = null;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from datos where Proyecto like '" + pl + "'";
+            ResultSet rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                datos[1] = rs.getString("FechaInicio");
+                datos[2] = rs.getString("FechaFinal");
+                datos[3] = rs.getString("Cronometro");
+            }
+        } catch (SQLException E) {
+            JOptionPane.showMessageDialog(this, "ERROR" + E);
         }
-        }catch(SQLException E){
-        JOptionPane.showMessageDialog(this, "ERROR"+E);
-        }
-        int hora1, hora2, minuto1, minuto2, dia1, dia2,seg1,seg2,dia = 0;
-        int fecha9 = 0, fecha10 = 0,cr1,cr2;
-        String d1, d2, f1, f2, f4, f5,f6,f7, fin = "";
-        String c1,c2;
-        if(datos[2] == null || datos[2].equals("")){
-        Date fe = new Date();
-        SimpleDateFormat nuevo = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String fec = nuevo.format(fe);
-        datos[2] = fec;
+        int hora1, hora2, minuto1, minuto2, dia1, dia2, seg1, seg2, dia = 0;
+        int fecha9 = 0, fecha10 = 0, cr1, cr2;
+        String d1, d2, f1, f2, f4, f5, f6, f7, fin = "";
+        String c1, c2;
+        if (datos[2] == null || datos[2].equals("")) {
+            Date fe = new Date();
+            SimpleDateFormat nuevo = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            String fec = nuevo.format(fe);
+            datos[2] = fec;
         }
         f1 = datos[1].substring(11, 13);
         f2 = datos[1].substring(14, 16);
         f4 = datos[2].substring(11, 13);
         f5 = datos[2].substring(14, 16);
-        f6 = datos[1].substring(17,19);
-        f7 = datos[2].substring(17,19);
+        f6 = datos[1].substring(17, 19);
+        f7 = datos[2].substring(17, 19);
         d1 = datos[1].substring(0, 2);
         d2 = datos[2].substring(0, 2);
 
@@ -93,36 +97,36 @@ public final class Cortes extends  JInternalFrame {
         dia2 = Integer.parseInt(d2);
         seg1 = Integer.parseInt(f6);
         seg2 = Integer.parseInt(f7);
-        
-        if(dia2 > dia1){
-        dia = (dia2 - dia1);
+
+        if (dia2 > dia1) {
+            dia = (dia2 - dia1);
         }
         hora2 = (dia * 24) + hora2;
-        horas = hora2 - hora1; 
-        
-        if(minuto2 < minuto1){
-        minutos = (60 + minuto2) - minuto1;
-        horas --;
-        }else{
-        minutos = minuto2 - minuto1;
+        horas = hora2 - hora1;
+
+        if (minuto2 < minuto1) {
+            minutos = (60 + minuto2) - minuto1;
+            horas--;
+        } else {
+            minutos = minuto2 - minuto1;
         }
-        
-        if(seg2 < seg1){
-        segundos = (seg2 + 60) - seg1;
-        minutos--;
-        }else{
-        segundos = seg2 - seg1;
+
+        if (seg2 < seg1) {
+            segundos = (seg2 + 60) - seg1;
+            minutos--;
+        } else {
+            segundos = seg2 - seg1;
         }
-        
-        c1 = datos[3].substring(0,2);
-        c2 = datos[3].substring(3,5);
-        if(c1 != "00" || c2 != "00"){
-        cr1 = Integer.parseInt(c1);
-        cr2 = Integer.parseInt(c2);
-        horas = horas + cr1;
-        minutos = minutos + cr2;
+
+        c1 = datos[3].substring(0, 2);
+        c2 = datos[3].substring(3, 5);
+        if (c1 != "00" || c2 != "00") {
+            cr1 = Integer.parseInt(c1);
+            cr2 = Integer.parseInt(c2);
+            horas = horas + cr1;
+            minutos = minutos + cr2;
         }
-        
+
         Thread hilo = new Thread() {
             public void run() {
                 for (;;) {
@@ -144,25 +148,25 @@ public final class Cortes extends  JInternalFrame {
                                 minutos = 0;
                                 horas++;
                             }
-                            String ho="",mi="",se="";
-                            if(horas < 10){
-                            ho = "0"+horas;
-                            }else{
-                            ho = ""+horas;
+                            String ho = "", mi = "", se = "";
+                            if (horas < 10) {
+                                ho = "0" + horas;
+                            } else {
+                                ho = "" + horas;
                             }
-                            if(minutos < 10){
-                            mi = "0"+minutos;
-                            }else{
-                            mi = ""+minutos;
+                            if (minutos < 10) {
+                                mi = "0" + minutos;
+                            } else {
+                                mi = "" + minutos;
                             }
-                            if(segundos < 10){
-                            se = "0"+segundos;
-                            }else{
-                            se = ""+segundos;
+                            if (segundos < 10) {
+                                se = "0" + segundos;
+                            } else {
+                                se = "" + segundos;
                             }
-                            
-                            lblCrono.setText(ho+":"+mi+":"+se);
-                            lblCrono1.setText(""+mili);
+
+                            lblCrono.setText(ho + ":" + mi + ":" + se);
+                            lblCrono1.setText("" + mili);
                             mili++;
                         } catch (Exception e) {
                             JOptionPane.showMessageDialog(null, "ERROR EN CRONOMETRO");
@@ -183,12 +187,12 @@ public final class Cortes extends  JInternalFrame {
         JOptionPane.showMessageDialog(this, "PLANO EMPEZADO");
         limpiarTabla();
         verDatos();
-        txtProyecto.setText(plano);
+        txtPlano.setText(plano);
         txtCodigo.setText("");
         txtFecha.setText(fec);
         lblEstado.setText("EN CURSO");
         lblEstado.setForeground(Color.green);
-        
+
     }
 
     public String cronometro(String fecha1, String fecha2) {
@@ -254,41 +258,39 @@ public final class Cortes extends  JInternalFrame {
     }
 
     public void limpiarTabla() {
-        Tabla1 = new ColorRojo();
+        Tabla1 = new javax.swing.JTable();
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-            },
-            new String [] {
-                "PRIORIDAD", "NUMERO DE PLANO", "PROYECTO"
-            }
+                new Object[][]{},
+                new String[]{
+                    "Numero de plano", "Proyecto"
+                }
         ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false
+            boolean[] canEdit = new boolean[]{
+                false, false
             };
+
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
+                return canEdit[columnIndex];
             }
         });
-        Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 16));
-        Tabla1.setFont(new java.awt.Font("Tahoma", 0, 16));
+        Tabla1.setComponentPopupMenu(jPopupMenu1);
+        Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14));
+        Tabla1.setFont(new java.awt.Font("Roboto", Font.PLAIN, 12));
         Tabla1.getTableHeader().setOpaque(false);
-        Tabla1.getTableHeader().setBackground(new Color(254,254,254));
+        Tabla1.getTableHeader().setBackground(new Color(254, 254, 254));
         Tabla1.getTableHeader().setForeground(new Color(0, 78, 171));
         Tabla1.setRowHeight(25);
         Tabla1.setShowGrid(false);
-        
+
         jScrollPane1.getViewport().setBackground(Color.white);
         jScrollPane1.setForeground(Color.white);
         jScrollPane1.getViewport().setForeground(Color.white);
         jScrollPane1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(254, 254, 254)));
         jScrollPane1.setBackground(Color.white);
-        Tabla1.setRowHeight(25);
-        Tabla1.setShowGrid(false);
         jScrollPane1.setViewportView(Tabla1);
         if (Tabla1.getColumnModel().getColumnCount() > 0) {
             Tabla1.getColumnModel().getColumn(0).setResizable(false);
             Tabla1.getColumnModel().getColumn(1).setResizable(false);
-            Tabla1.getColumnModel().getColumn(2).setResizable(false);
         }
     }
 
@@ -307,9 +309,8 @@ public final class Cortes extends  JInternalFrame {
             ResultSet rs = st.executeQuery(sql);
 
             while (rs.next()) {
-                datos[0] = rs.getString("Prioridad");
-                datos[1] = rs.getString("Proyecto");
-                datos[2] = rs.getString("Plano");
+                datos[0] = rs.getString("Proyecto");
+                datos[1] = rs.getString("Plano");
                 miModelo.addRow(datos);
             }
 
@@ -345,24 +346,24 @@ public final class Cortes extends  JInternalFrame {
         limpiarTabla();
         verDatos();
         panelPiezas.setVisible(false);
-        txtProyecto.setText("");
+        txtPlano.setText("");
         txtFecha.setText("");
     }
 
-    public void borrar(){
-        txtProyecto.setText("");
+    public void borrar() {
+        txtPlano.setText("");
         txtFecha.setText("");
         lblEstado.setText("SIN SELECCIONAR");
         lblEstado.setForeground(Color.red);
     }
 
-    public void guardar(String revision){
+    public void guardar(String revision) {
         Date fecha = new Date();
         SimpleDateFormat fec1 = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String fec = fec1.format(fecha);
         if (txtNumero.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "DEBES LLENAR EL NUMERO DE EMPLEADO", "ERROR", JOptionPane.ERROR_MESSAGE);
-        } else if (txtProyecto.getText().equals("")) {
+        } else if (txtPlano.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN PLANO", "ERROR", JOptionPane.ERROR_MESSAGE);
         } else {
             try {
@@ -375,7 +376,7 @@ public final class Cortes extends  JInternalFrame {
                 Statement st2 = con.createStatement();
                 Statement st3 = con.createStatement();
                 Statement st4 = con.createStatement();
-                
+
                 String sql = "UPDATE Datos SET Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ?, Empleado = ? WHERE Proyecto = ? and Revision = ?";
                 String sql1 = "insert into Fresadora (Proyecto,Plano,FechaInicio,FechaFinal,Terminado,Estado,Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?)";
                 String sql2 = "insert into CNC (Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?)";
@@ -387,34 +388,34 @@ public final class Cortes extends  JInternalFrame {
                 PreparedStatement pst4 = con.prepareStatement(sql4);
                 PreparedStatement pst6 = con.prepareStatement(sql6);
 
-                String ver = "select * from Fresadora where Proyecto like '" + txtProyecto.getText() + "' and Revision like '"+revision+"'";
-                String ver1 = "select * from CNC where Proyecto like '" + txtProyecto.getText() + "' and Revision like '"+revision+"'";
-                String ver2 = "select * from Torno where Proyecto like '" + txtProyecto.getText() + "' and Revision like '"+revision+"'";
-                String ver4 = "select * from calidad where Proyecto like '"+txtProyecto.getText()+"' and Revision like '"+revision+"'";
-                
+                String ver = "select * from Fresadora where Proyecto like '" + txtPlano.getText() + "' and Revision like '" + revision + "'";
+                String ver1 = "select * from CNC where Proyecto like '" + txtPlano.getText() + "' and Revision like '" + revision + "'";
+                String ver2 = "select * from Torno where Proyecto like '" + txtPlano.getText() + "' and Revision like '" + revision + "'";
+                String ver4 = "select * from calidad where Proyecto like '" + txtPlano.getText() + "' and Revision like '" + revision + "'";
+
                 ResultSet rs = st.executeQuery(ver);
                 ResultSet rs1 = st1.executeQuery(ver1);
                 ResultSet rs2 = st2.executeQuery(ver2);
                 ResultSet rs4 = st4.executeQuery(ver4);
-                
+
                 String ac = "update Fresadora set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
                 String ac1 = "update CNC set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
                 String ac2 = "update Torno set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
                 String ac4 = "update calidad set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Tratamiento = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
-                
+
                 PreparedStatement act = con.prepareStatement(ac);
                 PreparedStatement act1 = con.prepareStatement(ac1);
                 PreparedStatement act2 = con.prepareStatement(ac2);
                 PreparedStatement act4 = con.prepareStatement(ac4);
-                
-                String eCortes = "select * from Datos where Proyecto like '" + txtProyecto.getText() + "' and Revision like '"+revision+"'";
+
+                String eCortes = "select * from Datos where Proyecto like '" + txtPlano.getText() + "' and Revision like '" + revision + "'";
                 ResultSet eC = st3.executeQuery(eCortes);
                 String fresa[] = new String[10];
                 String cnc[] = new String[10];
                 String torno[] = new String[10];
                 String cortes[] = new String[10];
                 String calidad[] = new String[10];
-                
+
                 while (eC.next()) {
                     cortes[1] = eC.getString("Estado");
                     cortes[2] = eC.getString("FechaInicio");
@@ -440,14 +441,14 @@ public final class Cortes extends  JInternalFrame {
                     torno[3] = rs2.getString("Cronometro");
                     torno[5] = rs2.getString("Plano");
                 }
-                
-                while(rs1.next()){
+
+                while (rs1.next()) {
                     calidad[1] = rs4.getString("Proyecto");
                     calidad[3] = rs4.getString("Cronometro");
                     calidad[5] = rs4.getString("Plano");
                     calidad[6] = rs4.getString("Prioridad");
                 }
-                
+
                 if (cortes[4] != null) {
                     String fecha1 = txtFecha.getText();
                     String fecha2 = fec;
@@ -526,16 +527,16 @@ public final class Cortes extends  JInternalFrame {
                     } else if ((sumaM) < 10) {
                         f = (sumaH) + ":" + "0" + (sumaM);
                     }
-                    
+
                     String as;
-                    if(cortes[7] == null || cortes[7].equals("")){
-                    as = txtNumero.getText();
-                    }else{
-                    as = cortes[7]+","+txtNumero.getText();
+                    if (cortes[7] == null || cortes[7].equals("")) {
+                        as = txtNumero.getText();
+                    } else {
+                        as = cortes[7] + "," + txtNumero.getText();
                     }
                     //  1           2               3               4               5           6           7                   8           9                   10              11
 //                    Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ?, Empleado = ? WHERE Proyecto = ? and Revision = ?
-                    pst.setString(1, txtProyecto.getText());
+                    pst.setString(1, txtPlano.getText());
                     pst.setString(2, cortes[5]);
                     pst.setString(3, txtFecha.getText());
                     pst.setString(4, fec);
@@ -544,17 +545,17 @@ public final class Cortes extends  JInternalFrame {
                     pst.setString(7, f);
                     pst.setString(8, cortes[6]);
                     pst.setString(9, as);
-                    pst.setString(10, txtProyecto.getText());
+                    pst.setString(10, txtPlano.getText());
                     pst.setString(11, revision);
 
                 } else {
                     String as;
-                    if(cortes[7] == null || cortes[7].equals("")){
-                    as = txtNumero.getText();
-                    }else{
-                    as = cortes[7]+","+txtNumero.getText();
+                    if (cortes[7] == null || cortes[7].equals("")) {
+                        as = txtNumero.getText();
+                    } else {
+                        as = cortes[7] + "," + txtNumero.getText();
                     }
-                    pst.setString(1, txtProyecto.getText());
+                    pst.setString(1, txtPlano.getText());
                     pst.setString(2, cortes[5]);
                     pst.setString(3, txtFecha.getText());
                     pst.setString(4, fec);
@@ -563,7 +564,7 @@ public final class Cortes extends  JInternalFrame {
                     pst.setString(7, cronometro(cortes[2], fec));
                     pst.setString(8, cortes[6]);
                     pst.setString(9, as);
-                    pst.setString(10, txtProyecto.getText());
+                    pst.setString(10, txtPlano.getText());
                     pst.setString(11, revision);
                 }
 
@@ -571,7 +572,7 @@ public final class Cortes extends  JInternalFrame {
                     JOptionPane.showMessageDialog(this, "DEBE ESCOGER UNA OPCION", "", JOptionPane.ERROR_MESSAGE);
                 } else if (cmbEnviar.getSelectedIndex() == 1) {
                     if (cnc[1] == (null)) {
-                        pst2.setString(1, txtProyecto.getText());
+                        pst2.setString(1, txtPlano.getText());
                         pst2.setString(2, cortes[5]);
                         pst2.setString(3, "");
                         pst2.setString(4, "");
@@ -589,7 +590,7 @@ public final class Cortes extends  JInternalFrame {
                             borrar();
                         }
                     } else {
-                        act1.setString(1, txtProyecto.getText());
+                        act1.setString(1, txtPlano.getText());
                         act1.setString(2, cortes[5]);
                         act1.setString(3, "");
                         act1.setString(4, "");
@@ -597,7 +598,7 @@ public final class Cortes extends  JInternalFrame {
                         act1.setString(6, cortes[1]);
                         act1.setString(7, cnc[3]);
                         act1.setString(8, cortes[6]);
-                        act1.setString(9, txtProyecto.getText());
+                        act1.setString(9, txtPlano.getText());
                         act1.setString(10, revision);
                         int n = act1.executeUpdate();
                         int n1 = pst.executeUpdate();
@@ -609,7 +610,7 @@ public final class Cortes extends  JInternalFrame {
                     }
                 } else if (cmbEnviar.getSelectedIndex() == 2) {
                     if (fresa[1] == (null)) {
-                        pst1.setString(1, txtProyecto.getText());
+                        pst1.setString(1, txtPlano.getText());
                         pst1.setString(2, cortes[5]);
                         pst1.setString(3, "");
                         pst1.setString(4, "");
@@ -625,7 +626,7 @@ public final class Cortes extends  JInternalFrame {
                             borrar();
                         }
                     } else {
-                        act.setString(1, txtProyecto.getText());
+                        act.setString(1, txtPlano.getText());
                         act.setString(2, cortes[5]);
                         act.setString(3, "");
                         act.setString(4, "");
@@ -633,7 +634,7 @@ public final class Cortes extends  JInternalFrame {
                         act.setString(6, cortes[1]);
                         act.setString(7, fresa[3]);
                         act.setString(8, cortes[6]);
-                        act.setString(9, txtProyecto.getText());
+                        act.setString(9, txtPlano.getText());
                         act.setString(10, revision);
                         int n = act.executeUpdate();
                         int n1 = pst.executeUpdate();
@@ -645,7 +646,7 @@ public final class Cortes extends  JInternalFrame {
 
                 } else if (cmbEnviar.getSelectedIndex() == 3) {
                     if (torno[1] == (null)) {
-                        pst4.setString(1, txtProyecto.getText());
+                        pst4.setString(1, txtPlano.getText());
                         pst4.setString(2, cortes[5]);
                         pst4.setString(3, "");
                         pst4.setString(4, "");
@@ -662,7 +663,7 @@ public final class Cortes extends  JInternalFrame {
                             borrar();
                         }
                     } else {
-                        act2.setString(1, txtProyecto.getText());
+                        act2.setString(1, txtPlano.getText());
                         act2.setString(2, cortes[5]);
                         act2.setString(3, "");
                         act2.setString(4, "");
@@ -670,7 +671,7 @@ public final class Cortes extends  JInternalFrame {
                         act2.setString(6, cortes[1]);
                         act2.setString(7, torno[3]);
                         act2.setString(8, cortes[6]);
-                        act2.setString(9, txtProyecto.getText());
+                        act2.setString(9, txtPlano.getText());
                         act2.setString(10, revision);
                         int n = act2.executeUpdate();
                         int n1 = pst.executeUpdate();
@@ -679,58 +680,57 @@ public final class Cortes extends  JInternalFrame {
                             borrar();
                         }
                     }
-                }else if(cmbEnviar.getSelectedIndex() == 4){
-                        if(calidad[1] == (null)){
-                            
-                            //Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Tratamiento, Cronometro,Prioridad
-                            pst6.setString(1, txtProyecto.getText());
-                            pst6.setString(2, cortes[5]);
-                            pst6.setString(3, "");
-                            pst6.setString(4, "");
-                            pst6.setString(5, "SI");
-                            pst6.setString(6, cortes[1]);
-                            pst6.setString(7, "NO");
-                            pst6.setString(8, "00:00");
-                            pst6.setString(9, cortes[6]);
-                            pst6.setString(10, lblRevision.getText());
-                            
-                            int n = pst6.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0)
-                            {
-                                tabla();
-                                borrar();
-                            }
-                        }else{
-                            act4.setString(1, txtProyecto.getText());
-                            act4.setString(2, cortes[5]);
-                            act4.setString(3, "");
-                            act4.setString(4, "");
-                            act4.setString(5, "SI");
-                            act4.setString(6, cortes[1]);
-                            act4.setString(7, "NO");
-                            act4.setString(8, cortes[3]);
-                            act4.setString(9, cortes[6]);
-                            act4.setString(10, txtProyecto.getText());
-                            act4.setString(11, revision);
-                            int n = act4.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0){
-                                tabla();
-                                borrar();
-                            }
+                } else if (cmbEnviar.getSelectedIndex() == 4) {
+                    if (calidad[1] == (null)) {
+
+                        //Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Tratamiento, Cronometro,Prioridad
+                        pst6.setString(1, txtPlano.getText());
+                        pst6.setString(2, cortes[5]);
+                        pst6.setString(3, "");
+                        pst6.setString(4, "");
+                        pst6.setString(5, "SI");
+                        pst6.setString(6, cortes[1]);
+                        pst6.setString(7, "NO");
+                        pst6.setString(8, "00:00");
+                        pst6.setString(9, cortes[6]);
+                        pst6.setString(10, lblRevision.getText());
+
+                        int n = pst6.executeUpdate();
+                        int n1 = pst.executeUpdate();
+                        if (n1 > 0 && n > 0) {
+                            tabla();
+                            borrar();
+                        }
+                    } else {
+                        act4.setString(1, txtPlano.getText());
+                        act4.setString(2, cortes[5]);
+                        act4.setString(3, "");
+                        act4.setString(4, "");
+                        act4.setString(5, "SI");
+                        act4.setString(6, cortes[1]);
+                        act4.setString(7, "NO");
+                        act4.setString(8, cortes[3]);
+                        act4.setString(9, cortes[6]);
+                        act4.setString(10, txtPlano.getText());
+                        act4.setString(11, revision);
+                        int n = act4.executeUpdate();
+                        int n1 = pst.executeUpdate();
+                        if (n1 > 0 && n > 0) {
+                            tabla();
+                            borrar();
                         }
                     }
+                }
 
             } catch (SQLException e) {
-                Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+                Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
                 JOptionPane.showMessageDialog(null, "NO SE PUEDE ENVIAR INFORMACION" + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
-    
-    public void actualizarRevision(){
-        try{
+
+    public void actualizarRevision() {
+        try {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
@@ -739,27 +739,166 @@ public final class Cortes extends  JInternalFrame {
             ResultSet rs = st.executeQuery(sql);
             String sql2 = "update datos set Revision = ? where Proyecto = ?";
             PreparedStatement pst = con.prepareStatement(sql2);
-            while(rs.next()){
+            while (rs.next()) {
                 String plano = rs.getString("Proyecto");
-                String sql3 = "select Plano, Revision from Planos where Plano like '"+plano+"'";
+                String sql3 = "select Plano, Revision from Planos where Plano like '" + plano + "'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql3);
                 String revision = "";
-                while(rs2.next()){
+                while (rs2.next()) {
                     revision = rs2.getString("Revision");
                 }
-                
+
                 pst.setString(1, revision);
                 pst.setString(2, plano);
                 int n = pst.executeUpdate();
-                
-                if(n < 1){
-                    JOptionPane.showMessageDialog(this, "Datos no actualizados: Revision - Plano: " + plano,"Error",JOptionPane.ERROR_MESSAGE);
+
+                if (n < 1) {
+                    JOptionPane.showMessageDialog(this, "Datos no actualizados: Revision - Plano: " + plano, "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    public String obtenerDepartamento() {
+        switch (cmbEnviar.getSelectedIndex()) {
+            case 1:
+                return "maquinados";
+            case 2:
+                return "calidad";
+            case 3:
+                return "integracion";
+            case 4:
+                return "datos";
+            default:
+                return null;
+        }
+    }
+
+    public void enviarPlano(String plano, String proyecto) {
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            revisarPlanos rev = new revisarPlanos();
+            String estacion = rev.buscar(plano, con);
+            String estacionSeleccionada = obtenerDepartamento();
+            if (estacion.equals("LIBERACION")) {
+                rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+            } else {
+                if (cmbEnviar.getSelectedIndex() == 4) {
+                    //Plano sin material
+                    String sql4 = "update datos set Estado = ? where Proyecto = ?";
+                    PreparedStatement pst4 = con.prepareStatement(sql4);
+                    int n4;
+                    pst4.setString(1, "SIN MATERIAL");
+                    pst4.setString(2, plano);
+                    n4 = pst4.executeUpdate();
+                    if (n4 > 0) {
+                        JOptionPane.showMessageDialog(this, "Datos guardados");
+                    }
+                } else {
+                    rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+                }
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public final void verDatos(String sql) {
+        try {
+            limpiarTabla();
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            String datos[] = new String[10];
+            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+            int cont = 0;
+            while (rs.next()) {
+                datos[0] = rs.getString("Proyecto");
+                datos[1] = rs.getString("Plano");
+                miModelo.addRow(datos);
+                cont++;
+            }
+            lblConteo.setText("Cantidad de Planos: " + cont);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al ver datos calidad: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public final void verProyectos() {
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String sql = "select proyecto from proyectos";
+            ResultSet rs = st.executeQuery(sql);
+            au = new TextAutoCompleter(jTextField1);
+            while (rs.next()) {
+                au.addItem(rs.getString("proyecto"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al ver proyectos: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public String getProyecto(String plano, Connection con) throws SQLException {
+        Statement st = con.createStatement();
+        String sql = "select proyecto from proyectos where proyecto like '" + plano + "%'";
+        ResultSet rs = st.executeQuery(sql);
+        while (rs.next()) {
+            return rs.getString("Proyecto");
+        }
+        return null;
+    }
+    
+    public String obtenerCaracter(String plano) {
+        String texto = plano;
+        
+        Pattern pattern = Pattern.compile("[^0-9a-zA-Z ]");
+        Matcher matcher = pattern.matcher(texto);
+
+        while (matcher.find()) {
+            return  matcher.group();
+        }
+        return null;
+    }
+    
+    public String formatear(String plano, Connection con) throws SQLException {
+        String caracter = obtenerCaracter(plano);
+        String spl[] = plano.split(" ");
+        if (caracter != null && plano.contains(caracter)) {
+            return plano.substring(0, plano.indexOf(caracter));
+        } else if (spl.length == 3) {
+            return plano;
+        } else if (spl.length == 2) {
+            return getProyecto(spl[0], con) + " " + spl[1];
+        } else {
+            return null;
+        }
+    }
+    
+    public String validarPlano(Connection con, String proyecto) throws SQLException{
+        Statement st = con.createStatement();
+        String sql = "select proyecto from proyectos where proyecto like '" + proyecto + "%'";
+        ResultSet rs = st.executeQuery(sql);
+        String proyectoRet = null;
+        while (rs.next()) {
+            proyectoRet = rs.getString("proyecto");
+        }
+        return proyectoRet;
+    }
+    
+    public void limpiarFormulario() {
+        txtPlano.setText("");
+        txtFecha.setText("");
     }
     
     public Cortes(String numEmpleado) {
@@ -767,17 +906,18 @@ public final class Cortes extends  JInternalFrame {
         fechaFinal();
         limpiarTabla();
         verDatos();
+        verProyectos();
         actualizarRevision();
         DefaultTableModel Modelo = (DefaultTableModel) Tabla1.getModel();
         elQueOrdena = new TableRowSorter<TableModel>(Modelo);
         Tabla1.setRowSorter(elQueOrdena);
-        
+
         txtNumero.setEnabled(false);
         txtNombre.setEnabled(false);
         txtPuesto.setEnabled(false);
         lblEstado.setText("SIN SELECCIONAR");
         lblEstado.setForeground(Color.red);
-        
+
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         txtEmpleado.setOpaque(false);
         txtCodigo.setOpaque(false);
@@ -792,6 +932,8 @@ public final class Cortes extends  JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        terminarPlanos = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         panelCentral = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -803,7 +945,7 @@ public final class Cortes extends  JInternalFrame {
         jPanel4 = new javax.swing.JPanel();
         jPanel24 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        txtProyecto = new javax.swing.JLabel();
+        txtPlano = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         txtFecha = new javax.swing.JLabel();
         rSPanelRound1 = new rojeru_san.rspanel.RSPanelRound();
@@ -848,14 +990,20 @@ public final class Cortes extends  JInternalFrame {
         jLabel11 = new javax.swing.JLabel();
         lblEstado = new javax.swing.JLabel();
         jPanel12 = new javax.swing.JPanel();
-        lblTitulo = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        Tabla1 = new ColorRojo();
+        Tabla1 = new javax.swing.JTable();
         jPanel13 = new javax.swing.JPanel();
         btnPedir = new javax.swing.JButton();
         jPanel14 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jPanel15 = new javax.swing.JPanel();
+        jPanel25 = new javax.swing.JPanel();
+        jLabel22 = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
+        jPanel26 = new javax.swing.JPanel();
+        jLabel21 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        lblConteo = new javax.swing.JLabel();
         jPanel17 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jPanel18 = new javax.swing.JPanel();
@@ -866,11 +1014,22 @@ public final class Cortes extends  JInternalFrame {
         btnSalir = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
 
+        terminarPlanos.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        terminarPlanos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/entrega-rapida.png"))); // NOI18N
+        terminarPlanos.setText("Seleccionar estacion                          ");
+        terminarPlanos.setEnabled(false);
+        terminarPlanos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                terminarPlanosActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(terminarPlanos);
+
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(null);
         setFrameIcon(null);
         setVisible(true);
-        getContentPane().setLayout(new java.awt.BorderLayout(20, 20));
+        getContentPane().setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setLayout(new java.awt.BorderLayout(20, 0));
@@ -933,9 +1092,9 @@ public final class Cortes extends  JInternalFrame {
         jLabel2.setText("NUMERO DE PLANO:  ");
         jPanel24.add(jLabel2);
 
-        txtProyecto.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        txtProyecto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jPanel24.add(txtProyecto);
+        txtPlano.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        txtPlano.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jPanel24.add(txtPlano);
 
         jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
@@ -1094,7 +1253,12 @@ public final class Cortes extends  JInternalFrame {
 
         jPanel9.setBackground(new java.awt.Color(255, 255, 255));
 
-        cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SELECCIONAR", "CNC", "FRESADORA", "TORNO", "ENSAMBLE" }));
+        cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "SELECCIONAR", "MAQUINADOS", "CALIDAD", "INTEGRACION", "SIN MATERIAL" }));
+        cmbEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbEnviarActionPerformed(evt);
+            }
+        });
         jPanel9.add(cmbEnviar);
 
         middle.add(jPanel9);
@@ -1194,12 +1358,7 @@ public final class Cortes extends  JInternalFrame {
         jPanel1.add(panelEste, java.awt.BorderLayout.EAST);
 
         jPanel12.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel12.setLayout(new java.awt.BorderLayout(20, 20));
-
-        lblTitulo.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitulo.setText("PLANOS CON MATERIAL");
-        jPanel12.add(lblTitulo, java.awt.BorderLayout.PAGE_START);
+        jPanel12.setLayout(new java.awt.BorderLayout(20, 5));
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setBorder(null);
@@ -1222,6 +1381,7 @@ public final class Cortes extends  JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
+        Tabla1.setComponentPopupMenu(jPopupMenu1);
         Tabla1.setFocusable(false);
         Tabla1.setRowHeight(25);
         Tabla1.setSelectionBackground(new java.awt.Color(110, 201, 255));
@@ -1292,7 +1452,7 @@ public final class Cortes extends  JInternalFrame {
         );
         jPanel15Layout.setVerticalGroup(
             jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 581, Short.MAX_VALUE)
+            .addGap(0, 517, Short.MAX_VALUE)
         );
 
         jPanel14.add(jPanel15, java.awt.BorderLayout.CENTER);
@@ -1300,6 +1460,51 @@ public final class Cortes extends  JInternalFrame {
         jPanel13.add(jPanel14, java.awt.BorderLayout.LINE_END);
 
         jPanel12.add(jPanel13, java.awt.BorderLayout.LINE_END);
+
+        jPanel25.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel25.setLayout(new java.awt.BorderLayout(0, 10));
+
+        jLabel22.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        jLabel22.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel22.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel22.setText("Planos en estacion de cortes");
+        jPanel25.add(jLabel22, java.awt.BorderLayout.NORTH);
+
+        lblTitulo.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitulo.setText("PLANOS CON MATERIAL");
+        jPanel25.add(lblTitulo, java.awt.BorderLayout.SOUTH);
+
+        jPanel26.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel26.setLayout(new java.awt.BorderLayout());
+
+        jLabel21.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jLabel21.setForeground(new java.awt.Color(0, 102, 204));
+        jLabel21.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel21.setText("Ver por proyecto");
+        jPanel26.add(jLabel21, java.awt.BorderLayout.CENTER);
+
+        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
+        jTextField1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        jTextField1.setForeground(new java.awt.Color(51, 51, 51));
+        jTextField1.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField1.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        jPanel26.add(jTextField1, java.awt.BorderLayout.SOUTH);
+
+        jPanel25.add(jPanel26, java.awt.BorderLayout.CENTER);
+
+        jPanel12.add(jPanel25, java.awt.BorderLayout.NORTH);
+
+        lblConteo.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        lblConteo.setForeground(new java.awt.Color(51, 51, 51));
+        lblConteo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblConteo.setText("Cantidad de Planos: ");
+        jPanel12.add(lblConteo, java.awt.BorderLayout.PAGE_END);
 
         jPanel1.add(jPanel12, java.awt.BorderLayout.WEST);
 
@@ -1359,38 +1564,7 @@ public final class Cortes extends  JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void Tabla1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_Tabla1MouseClicked
-        System.out.println("help");
-        try{
-            System.out.println("help");
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            int fila = Tabla1.getSelectedRow();
-            String sql = "select Pdf,Plano from pdfplanos where Plano like '"+Tabla1.getValueAt(fila, 1).toString()+"'";
-            ResultSet rs = st.executeQuery(sql);
-            byte[] b = null;
-            while(rs.next()){
-                b = rs.getBytes("Pdf");
-            }
-            JOptionPane.showMessageDialog(this, b);
-                InputStream bos = new ByteArrayInputStream(b);
-                int tamInput = bos.available();
-                byte[] datosPdf = new byte[tamInput];
-                bos.read(datosPdf, 0, tamInput);
-                
-                OutputStream out = new FileOutputStream("new.pdf");
-                out.write(datosPdf);
-                
-                out.close();
-                bos.close();
-            
-             Desktop.getDesktop().open(new File("new.pdf"));
-                    
-            
-        }catch(SQLException | NumberFormatException  |IOException e){
-            JOptionPane.showMessageDialog(this,"ERROR: "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
+
     }//GEN-LAST:event_Tabla1MouseClicked
 
     private void txtEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEmpleadoActionPerformed
@@ -1428,284 +1602,39 @@ public final class Cortes extends  JInternalFrame {
     }//GEN-LAST:event_txtEmpleadoActionPerformed
 
     private void txtCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCodigoActionPerformed
-        if(txtNombre.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES INGRESAR TU NUMERO DE EMPLEADO","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
-        }else{
-            revisarPlanos revisar = new revisarPlanos();
-            Stack<String> revision = revisar.checarRevisionPlano(txtCodigo.getText());
-            String noRevision = "";
-            
-            if(revision == null){
-                txtCodigo.setText("");
-            }else{
-                if(revision.size() > 1){
-                    JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-                    elegirRevision = new elegirRevision(f,true);
-                    noRevision = elegirRevision.showDialog(revision);
-                }else{
-                    noRevision = revision.firstElement();
-                }
-                String plano;
-                if(txtCodigo.getText().contains("/")){
-                    plano = txtCodigo.getText().substring(0, txtCodigo.getText().lastIndexOf("/"));
-                }else{
-                    plano = txtCodigo.getText();
-                }
-                int intentos = revisar.intentosRealizadorPorPieza(plano,noRevision);
-                if(intentos > 1){
-                    panelPiezas.setVisible(true);
-                    lblPiezas.setText("Pieza realizada "+intentos+" veces");
-                }
-                if(!noRevision.equals("")){
-                    lblRevision.setText(noRevision);
-                    Date fe = new Date();
-                    pl = plano;
-                    SimpleDateFormat nuevo = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-                    String fec = nuevo.format(fe);
-                    String datos[] = new String[10];
-                    try {
-                        
-                        Connection con = null;
-                        Conexion con1 = new Conexion();
-                        con = con1.getConnection();
-                        Statement st = con.createStatement();
-                        Statement st1 = con.createStatement();
-                        Statement st2 = con.createStatement();
-                        //Cambiar para que se actualice conforme al plano y a su revision
-                        String sql = "UPDATE Datos SET Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?,Cronometro = ?, Prioridad = ?,Empleado = ? WHERE Proyecto = ? and Revision = ?";
-                        //Seleccionar el plano pero que coincida con su revision
-                        String sql1 = "select * from Datos where Proyecto like '" + plano + "' and Revision like '" + noRevision + "'";
-                        PreparedStatement pst = con.prepareStatement(sql);
-                        ResultSet rs = st.executeQuery(sql1);
-                        while (rs.next()) {
-                            datos[0] = rs.getString("Estado");
-                            datos[1] = rs.getString("Proyecto");
-                            datos[2] = rs.getString("Plano");
-                            datos[3] = rs.getString("FechaInicio");
-                            datos[4] = rs.getString("FechaFinal");
-                            datos[5] = rs.getString("Terminado");
-                            datos[6] = rs.getString("Cronometro");
-                            datos[7] = rs.getString("Prioridad");
-                        }
-                        String a;
-                        
-                        if (plano.equals(datos[1]) && datos[5].equals("NO")) {
-                            txtProyecto.setText(plano);
-                            txtCodigo.setText("");
-                            if(datos[7] == null || datos[7].equals("")){
-                            a = txtNumero.getText();
-                            }else{
-                            a = datos[7]+","+txtNumero.getText();
-                            }
-
-                            if (datos[3].equals("")) {
-                                pst.setString(1, txtProyecto.getText());
-                                pst.setString(2, datos[2]);
-                                pst.setString(3, fec);
-                                pst.setString(4, "");
-                                pst.setString(5, "NO");
-                                pst.setString(6, datos[0]);
-                                pst.setString(7, datos[6]);
-                                pst.setString(8, datos[7]);
-                                pst.setString(9, a);
-                                pst.setString(10, txtProyecto.getText());
-                                pst.setString(11, noRevision);
-                                
-                                int n1 = pst.executeUpdate();
-                                if (n1 > 0) {
-                                    limpiarTabla();
-                                    verDatos();
-                                    lblEstado.setText("EN CURSO");
-                                    lblEstado.setForeground(Color.green);
-                                    txtFecha.setText(fec);
-                                    activar();
-                                }
-                            } else if (datos[3] != (null) && datos[5].equals("NO")) {
-
-                                txtFecha.setText(datos[3]);
-                                txtCodigo.setText("");
-                                lblEstado.setText("EN CURSO");
-                                lblEstado.setForeground(Color.green);
-                                activar();
-                            }
-                            contReporte = 0;
-                        } else {
-                            //Verificar para buscar el plano y su revision
-                            revisarPlanos report = new revisarPlanos();
-                            String b = report.buscar(plano, noRevision);
-                            if (b == (null)) {
-                                JOptionPane.showMessageDialog(this, "NO SE A ENCONTRADO ESTE PLANO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-
-                                contReporte++;
-                                if(contReporte == 2){
-                                    reportarPlano rep = new reportarPlano();
-                                    rep.enviarPlano("Cortes", txtNombre.getText(), plano, "");
-                                    contReporte = 0;
-                                }
-                                txtCodigo.setText("");
-                            }else if (b.equals("LIBERACION")) {
-                                JOptionPane.showMessageDialog(this, "EL PLANO ESTA EN LIBERACION FAVOR DE DECIRLE AL ENCARGADO PARA LIBERAR PLANOS", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-                                txtCodigo.setText("");
-                            } else {
-                                contReporte = 0;
-                                int opc = JOptionPane.showConfirmDialog(this, "EL PLANO " + plano + " ESTA EN " + b + ", DESEAS TRAERLO A CORTES?", "INFO", JOptionPane.YES_NO_OPTION);
-                                if (opc == 0) {
-                                    //cambiar todas estas para que se actualicen igual con su revision
-                                    String acCnc = "update cnc set Terminado = ? where Proyecto = ? and Revision = ?";
-                                    String acC = "update datos set Terminado = ?,FechaInicio = ?,FechaFinal = ? where Proyecto = ? and Revision = ?";
-                                    String acFresa = "update Fresadora set Terminado = ? where Proyecto = ? and Revision = ?";
-                                    String acTorno = "update Torno set Terminado = ? where Proyecto = ? and Revision = ?";
-                                    String acAcabados = "update Acabados set Terminado = ? where Proyecto = ? and Revision = ?";
-                                    String acTrata = "update Trata set Terminado = ? where Proyecto = ? and Revision = ?";
-                                    String acCalidad = "update Calidad set Terminado = ?, Tratamiento = ? where Proyecto = ? and Revision = ?";
-                                    String insertar = "insert into Datos (Proyecto, Plano, FechaInicio,FechaFinal,Terminado,Estado,Cronometro,Prioridad,Empleado,Revision) values (?,?,?,?,?,?,?,?,?,?)";
-                                    PreparedStatement pst1 = con.prepareStatement(acCnc);
-                                    PreparedStatement pst2 = con.prepareStatement(acC);
-                                    PreparedStatement pst3 = con.prepareStatement(acFresa);
-                                    PreparedStatement pst4 = con.prepareStatement(acTorno);
-                                    PreparedStatement pst5 = con.prepareStatement(acAcabados);
-                                    PreparedStatement pst6 = con.prepareStatement(acTrata);
-                                    PreparedStatement pst7 = con.prepareStatement(acCalidad);
-                                    PreparedStatement pst8 = con.prepareCall(insertar);
-
-                                    //seleccionar por su revision
-                                    String ver1 = "select * from Datos where Proyecto like '" + plano + "' and Revision like '"+noRevision+"'";
-                                    String ver2 = "select * from Planos where Plano like '" + plano + "' and Revision like '"+noRevision+"'";
-                                    ResultSet rs1 = st1.executeQuery(ver1);
-                                    ResultSet rs2 = st2.executeQuery(ver2);
-                                    String da1[] = new String[10];
-                                    String da2[] = new String[10];
-                                    while (rs1.next()) {
-                                        da1[0] = rs1.getString("Proyecto");
-                                        da1[1] = rs1.getString("Plano");
-                                        da1[2] = rs1.getString("Cronometro");
-                                        da1[3] = rs1.getString("Prioridad");
-                                    }
-                                    while (rs2.next()) {
-                                        da2[0] = rs2.getString("Plano");
-                                        da2[1] = rs2.getString("Proyecto");
-                                        da2[2] = rs2.getString("Prioridad");
-                                    }
-                                    int n;
-                                    if (plano.equals(da1[0])) {
-                                        pst2.setString(1, "NO");
-                                        pst2.setString(2, fec);
-                                        pst2.setString(3, "");
-                                        pst2.setString(4, plano); 
-                                        pst2.setString(5, noRevision); 
-                                        n = pst2.executeUpdate();
-                                    } else {
-                                        pst8.setString(1, da2[0]);
-                                        pst8.setString(2, da2[1]);
-                                        pst8.setString(3, fec);
-                                        pst8.setString(4, "");
-                                        pst8.setString(5, "NO");
-                                        pst8.setString(6, "");
-                                        pst8.setString(7, "00:00");
-                                        pst8.setString(8, da2[2]);
-                                        pst8.setString(9, txtNumero.getText());
-                                        pst8.setString(10, noRevision);
-                                        n = pst8.executeUpdate();
-                                    }
-
-                                    if (b.equals("CNC")) {
-                                        pst1.setString(1, "SI");
-                                        pst1.setString(2, plano);
-                                        pst1.setString(3, noRevision);
-
-                                        int m = pst1.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("FRESADORA")) {
-                                        pst3.setString(1, "SI");
-                                        pst3.setString(2, plano);
-                                        pst3.setString(3, noRevision);
-
-                                        int m = pst3.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("TORNO")) {
-                                        pst4.setString(1, "SI");
-                                        pst4.setString(2, plano);
-                                        pst4.setString(3, noRevision);
-
-                                        int m = pst4.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("ACABADOS")) {
-                                        pst5.setString(1, "SI");
-                                        pst5.setString(2, plano);
-                                        pst5.setString(3, noRevision);
-
-                                        int m = pst5.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("TRATAMIENTO")) {
-                                        pst6.setString(1, "SI");
-                                        pst6.setString(2, plano);
-                                        pst6.setString(3, noRevision);
-
-                                        int m = pst6.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("CALIDAD")) {
-                                        pst7.setString(1, "SI");
-                                        pst7.setString(2, "SI");
-                                        pst7.setString(3, plano);
-                                        pst7.setString(4, noRevision);
-
-                                        int m = pst7.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("TERMINADO CALIDAD")) {
-                                        pst7.setString(1, "SI");
-                                        pst7.setString(2, "SI");
-                                        pst7.setString(3, plano);
-                                        pst7.setString(4, noRevision);
-
-                                        int m = pst7.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    } else if (b.equals("TERMINADO TRATAMIENTO")) {
-                                        pst7.setString(1, "SI");
-                                        pst7.setString(2, "SI");
-                                        pst7.setString(3, plano);
-                                        pst7.setString(4, noRevision);
-
-                                        int m = pst7.executeUpdate();
-                                        if (n > 0 && m > 0) {
-                                            datos(plano);
-                                            activar();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } catch (SQLException ex) {
-                        Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,ex);
-                        JOptionPane.showMessageDialog(this, "ERROR AL SELECCIONAR UN EQUIPO : " + ex.getMessage());
-                    }
+        try {
+            Connection con;
+            Conexion con1 = new Conexion();
+            con = con1.getConnection();
+            Statement st = con.createStatement();
+            String form = formatear(txtPlano.getText(), con);
+            String sql = "select Proyecto, Plano, Cantidad, Material from planos where Plano like '" + form + "'";
+            ResultSet rs = st.executeQuery(sql);
+            String plano = null;
+            limpiarFormulario();
+            while (rs.next()) {
+                plano = rs.getString("Plano");
+                txtPlano.setText(plano);
+//                txtPlano.setText(rs.getString("Proyecto"));
+            }
+            txtCodigo.setText("");
+            if (plano == null) {
+                int prim = form.indexOf(" ");
+                String proyecto = validarPlano(con, form.substring(0, prim));
+                if (proyecto != null) {
+                    txtPlano.setText(form);
+                    txtPlano.setText(proyecto);
+                } else {
+                    JOptionPane.showMessageDialog(this, "El plano que ingresaste no existe", "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_txtCodigoActionPerformed
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-       dispose();
+        dispose();
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseEntered
@@ -1734,7 +1663,7 @@ public final class Cortes extends  JInternalFrame {
             con = con1.getConnection();
             Statement st = con.createStatement();
             String sql = "UPDATE Datos SET Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? WHERE Proyecto = ?";
-            String ver = "select * from Datos where Proyecto like '" + txtProyecto.getText() + "'";
+            String ver = "select * from Datos where Proyecto like '" + txtPlano.getText() + "'";
             PreparedStatement pst = con.prepareStatement(sql);
             ResultSet rs = st.executeQuery(ver);
             String datos[] = new String[10];
@@ -1847,7 +1776,7 @@ public final class Cortes extends  JInternalFrame {
                         f = (sumaH) + ":" + "0" + (sumaM);
                     }
                 }
-                pst.setString(1, txtProyecto.getText());
+                pst.setString(1, txtPlano.getText());
                 pst.setString(2, datos[2]);
                 pst.setString(3, "");
                 pst.setString(4, "");
@@ -1855,7 +1784,7 @@ public final class Cortes extends  JInternalFrame {
                 pst.setString(6, datos[6]);
                 pst.setString(7, f);
                 pst.setString(8, datos[8]);
-                pst.setString(9, txtProyecto.getText());
+                pst.setString(9, txtPlano.getText());
 
                 int n = pst.executeUpdate();
 
@@ -1863,14 +1792,14 @@ public final class Cortes extends  JInternalFrame {
                     limpiarTabla();
                     verDatos();
                     txtFecha.setText("");
-                    txtProyecto.setText("");
+                    txtPlano.setText("");
                     panelPiezas.setVisible(false);
                     JOptionPane.showMessageDialog(this, "PLANO PAUSADO", "INFO", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "ERROR AL PAUSAR " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE,null,e);
+            Logger.getLogger(Inicio1.class.getName()).log(Level.SEVERE, null, e);
         }
     }//GEN-LAST:event_btnPausaActionPerformed
 
@@ -1880,54 +1809,77 @@ public final class Cortes extends  JInternalFrame {
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnPedirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPedirActionPerformed
-        PedirMaterial p = new PedirMaterial(this,true,numEmpleado);
-        if(lblTitulo.getText().equals("PLANOS CON MATERIAL")){
-        p.txtCodigo.setEditable(true);
-        p.txtDescripcion.setEditable(true);
-        p.txtNumeroEmpleado.setEditable(true);
-        p.txtProyecto.setEditable(true);
-        }else{
-        p.txtCodigo.setEditable(false);
-        p.txtDescripcion.setEditable(false);
-        p.txtNumeroEmpleado.setEditable(false);
-        p.txtProyecto.setEditable(false);
+        PedirMaterial p = new PedirMaterial(this, true, numEmpleado);
+        if (lblTitulo.getText().equals("PLANOS CON MATERIAL")) {
+            p.txtCodigo.setEditable(true);
+            p.txtDescripcion.setEditable(true);
+            p.txtNumeroEmpleado.setEditable(true);
+            p.txtProyecto.setEditable(true);
+        } else {
+            p.txtCodigo.setEditable(false);
+            p.txtDescripcion.setEditable(false);
+            p.txtNumeroEmpleado.setEditable(false);
+            p.txtProyecto.setEditable(false);
         }
         p.setVisible(true);
     }//GEN-LAST:event_btnPedirActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if(ver == false){
+        if (ver == false) {
             ver = true;
             lblTitulo.setText("PLANOS SIN MATERIAL");
-            try{
-            
-            limpiarTabla();
-            DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-            
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            String sql = "select * from datos where Estado like 'SIN MATERIAL' and Terminado like 'NO'";
-            ResultSet rs = st.executeQuery(sql);
-            String datos[] = new String[10];
-            while(rs.next()){
-                    datos[0] = rs.getString("Prioridad");
-                    datos[1] = rs.getString("Proyecto");
-                    datos[2] = rs.getString("Plano");
+            try {
+
+                limpiarTabla();
+                DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                Statement st = con.createStatement();
+                String sql = "select * from datos where Estado like 'SIN MATERIAL' and Terminado like 'NO'";
+                ResultSet rs = st.executeQuery(sql);
+                String datos[] = new String[10];
+                while (rs.next()) {
+                    datos[0] = rs.getString("Proyecto");
+                    datos[1] = rs.getString("Plano");
                     miModelo.addRow(datos);
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "ERROR A VER DATOS: " + e);
             }
-            }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR A VER DATOS: "+e);
-            }
-        }else{
+        } else {
             ver = false;
             limpiarTabla();
             verDatos();
             lblTitulo.setText("PLANOS CON MATERIAL");
         }
-        
+
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void terminarPlanosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminarPlanosActionPerformed
+        for (int i = 0; i < Tabla1.getSelectedRows().length; i++) {
+            int fila = Tabla1.getSelectedRows()[i];
+            enviarPlano(Tabla1.getValueAt(fila, 0).toString(), Tabla1.getValueAt(fila, 1).toString());
+        }
+    }//GEN-LAST:event_terminarPlanosActionPerformed
+
+    private void cmbEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbEnviarActionPerformed
+        if (cmbEnviar.getSelectedIndex() == 0) {
+            terminarPlanos.setEnabled(false);
+        } else {
+            terminarPlanos.setEnabled(true);
+            terminarPlanos.setText("Enviar planos a: " + cmbEnviar.getSelectedItem().toString() + "                          ");
+        }
+    }//GEN-LAST:event_cmbEnviarActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        if (jTextField1.getText().equals("")) {
+            verDatos("select * from datos where Terminado like 'NO' order by id desc");
+        } else {
+            verDatos("select * from datos where Terminado like 'NO' and Plano like '" + jTextField1.getText() + "' order by id desc");
+        }
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1952,6 +1904,8 @@ public final class Cortes extends  JInternalFrame {
     private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel21;
+    private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -1976,6 +1930,8 @@ public final class Cortes extends  JInternalFrame {
     private javax.swing.JPanel jPanel22;
     private javax.swing.JPanel jPanel23;
     private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
@@ -1983,7 +1939,10 @@ public final class Cortes extends  JInternalFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblConteo;
     private javax.swing.JLabel lblCrono;
     private javax.swing.JLabel lblCrono1;
     private javax.swing.JLabel lblEstado;
@@ -1997,12 +1956,13 @@ public final class Cortes extends  JInternalFrame {
     private rojeru_san.rspanel.RSPanelRound panelPiezas;
     private rojeru_san.rspanel.RSPanelRound panelTipo;
     private rojeru_san.rspanel.RSPanelRound rSPanelRound1;
+    private javax.swing.JMenuItem terminarPlanos;
     private javax.swing.JTextField txtCodigo;
     private javax.swing.JTextField txtEmpleado;
     private javax.swing.JLabel txtFecha;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtNumero;
-    private javax.swing.JLabel txtProyecto;
+    private javax.swing.JLabel txtPlano;
     private javax.swing.JTextField txtPuesto;
     // End of variables declaration//GEN-END:variables
 }

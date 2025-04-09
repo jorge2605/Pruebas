@@ -68,8 +68,8 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             String fecha = sdf.format(d);
             for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                String planos = Tabla1.getValueAt(i, 7).toString();
-                String codigo = Tabla1.getValueAt(i, 2).toString();
+                String planos = (Tabla1.getValueAt(i, 7) == null) ? "" : (Tabla1.getValueAt(i, 7).toString());
+                String codigo = (Tabla1.getValueAt(i, 2) == null) ? "" : (Tabla1.getValueAt(i, 2).toString());
                 if (!"".equals(planos)) {
                     pst.setString(1, codigo);
                     pst.setString(2, planos);
@@ -103,7 +103,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     public boolean buscarTornillos() {
         boolean ban = false;
-        String cadenaDondeBuscar = "";
+        String cadenaDondeBuscar;
         String pal = "";
         try {
 
@@ -120,8 +120,6 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                 for (String palabra : palabras) {
                     if (cadenaDondeBuscar.equals(palabra)) {
                         ban = true;
-                        System.out.println(palabra);
-                        System.out.println(cadenaDondeBuscar);
                         pal = cadenaDondeBuscar;
 
                     }
@@ -1503,7 +1501,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                     while (FilaIterator.hasNext()) {
                         IndiceFila++;
                         Row fila = (Row) FilaIterator.next();
-                        if (IndiceFila > 2) {
+                        if (IndiceFila > 0) {
 
                             cont++;
                             Iterator ColumnaIterator = fila.cellIterator();
@@ -1514,7 +1512,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                             while (ColumnaIterator.hasNext()) {
                                 IndiceColumna++;
                                 Cell celda = (Cell) ColumnaIterator.next();
-                                if (IndiceColumna > 1 && IndiceColumna < 6) {
+                                if (IndiceColumna >= 0 && IndiceColumna < 4) {
                                     String a = "";
 
                                     switch (celda.getCellType()) {
@@ -1532,22 +1530,25 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
                                     }
                                     System.out.println(IndiceColumna + ", " + ListaColumna[IndiceColumna]);
                                     switch (IndiceColumna) {
-                                        case 2:
+                                        case 0:
                                             //CODIGO
                                             Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 2);
                                             break;
-                                        case 3:
+                                        case 1:
                                             //DESCRIPCION
                                             Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 3);
                                             break;
-                                        case 4:
+                                        case 2:
                                             //CANTIDAD
                                             Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 1);
                                             break;
-                                        case 5:
+                                        case 4:
                                             //PROVEEDOR
                                             Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 6);
-                                            System.out.println("--------------------------------------------------");
+                                            break;
+                                        case 3:
+                                            //PROVEEDOR
+                                            Tabla1.setValueAt(ListaColumna[IndiceColumna], cont, 5);
                                             break;
                                         default:
                                             break;

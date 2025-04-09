@@ -164,7 +164,7 @@ public class Almacen extends javax.swing.JInternalFrame implements ActionListene
                 datos[1] = rs.getString("Descripcion");
                 datos[2] = rs.getString("Cantidad");
                 datos[3] = rs.getString("Proyecto");
-                datos[4] = rs.getString("Id");
+                datos[6] = rs.getString("Id");
                 String sql2 = "select NumeroDeParte,Ubicacion from inventario where NumeroDeParte like '"+datos[0]+"'";
                 Statement st2 = con.createStatement();
                 ResultSet rs2 = st2.executeQuery(sql2);

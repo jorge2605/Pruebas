@@ -12,9 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
@@ -73,11 +78,24 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         }
         return null;
     }
+    
+    public String obtenerCaracter(String plano) {
+        String texto = plano;
+        
+        Pattern pattern = Pattern.compile("[^0-9a-zA-Z ]");
+        Matcher matcher = pattern.matcher(texto);
+
+        while (matcher.find()) {
+            return  matcher.group();
+        }
+        return null;
+    }
 
     public String formatear(String plano, Connection con) throws SQLException {
+        String caracter = obtenerCaracter(plano);
         String spl[] = plano.split(" ");
-        if (plano.contains("/")) {
-            return plano.substring(0, plano.indexOf("/"));
+        if (caracter != null && plano.contains(caracter)) {
+            return plano.substring(0, plano.indexOf(caracter));
         } else if (spl.length == 3) {
             return plano;
         } else if (spl.length == 2) {
@@ -120,7 +138,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             new Object [][] {
             },
             new String [] {
-                "Plano", "Fecha ingreso"
+                "Plano", "Proyecto"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -145,13 +163,109 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             int cont = 0;
             while(rs.next()) {
                 datos[0] = rs.getString("Proyecto");
-                datos[1] = rs.getString("FechaInicio");
+                datos[1] = rs.getString("Plano");
                 miModelo.addRow(datos);
                 cont++;
             }
             lblConteo.setText("Cantidad de Planos: " + cont);
         } catch(SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al ver datos calidad: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void enviarPlano(String plano, String proyecto) {
+        revisarPlanos rev = new revisarPlanos();
+        boolean enviado = false;
+        Connection con;
+        Conexion con1 = new Conexion();
+        con = con1.getConnection();
+        if (lblAvisoPlano.isVisible()) {
+            String estacion;
+            con = con1.getConnection();
+            switch (cmbEnviar.getSelectedIndex()) {
+                case 1: 
+                    estacion = "maquinados";
+                    rev.retrabajo = true;
+                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
+                    enviado = true;
+                    break;
+                case 2: 
+                    estacion = "trata";
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
+                    enviado = true;
+                    break;
+                case 3: 
+                    estacion = "calidad";
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
+                    enviado = true;
+                    break;
+                case 4: 
+                    estacion = "integracion";
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
+                    enviado = true;
+                    break;
+                case 5: 
+                    estacion = "datos";
+                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
+                    enviado = true;
+                    break;
+            }
+        } else {
+            try {
+                String estacion = rev.buscar(plano, con);
+                String estacionSeleccionada  = obtenerDepartamento();
+                if (estacion.equals("LIBERACION")) {
+                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+                    rev.terminarPlanoEnEstacion("calidad", plano, numEmpleado);
+                } else {
+                    if (cmbEnviar.getSelectedIndex() == 5 || cmbEnviar.getSelectedIndex() == 1) {
+                        if (cmbEnviar.getSelectedIndex() == 1) {
+                            rev.retrabajo = true;
+                        }
+                        enviado = true;
+                        rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                    }
+                    rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
+                    if (cmbEnviar.getSelectedIndex() == 3) {
+                        rev.sendToEstacion(plano, proyecto, numEmpleado, "calidad");
+                        rev.terminarPlanoEnEstacion("calidad", plano, numEmpleado);
+                        enviado = true;
+                    } else {
+                        rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+                        enviado = true;
+                    }
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e);
+            }
+        }
+        try {
+            if (enviado) {
+                String sql = "insert into planos_calidad (plano, fecha, empleado) values(?,?,?)";
+                PreparedStatement pst = con.prepareStatement(sql);
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date d = new Date();
+
+                pst.setString(1, plano);
+                pst.setString(2, sdf.format(d));
+                pst.setString(3, numEmpleado);
+
+                int n = pst.executeUpdate();
+
+                if (n < 1) {
+                    JOptionPane.showMessageDialog(this, "Error al guardar informacion en 'Planos Calidad' favor de reportar", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -171,7 +285,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        terminarPlanos = new javax.swing.JMenuItem();
         jPanel1 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
@@ -197,6 +311,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         jTextField1 = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         lblConteo = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         cmbEnviar = new javax.swing.JComboBox<>();
@@ -212,15 +327,16 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             }
         });
 
-        jMenuItem1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/entrega-rapida.png"))); // NOI18N
-        jMenuItem1.setText("Enviar datos a: ");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        terminarPlanos.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        terminarPlanos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/entrega-rapida.png"))); // NOI18N
+        terminarPlanos.setText("Seleccionar estacion                          ");
+        terminarPlanos.setEnabled(false);
+        terminarPlanos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                terminarPlanosActionPerformed(evt);
             }
         });
-        jPopupMenu1.add(jMenuItem1);
+        jPopupMenu1.add(terminarPlanos);
 
         setBorder(null);
 
@@ -473,6 +589,14 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
         jPanel2.add(lblConteo, gridBagConstraints);
 
+        jButton1.setBackground(new java.awt.Color(255, 153, 0));
+        jButton1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("Ver planos terminados");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        jPanel2.add(jButton1, gridBagConstraints);
+
         jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         jPanel3.setBackground(new java.awt.Color(235, 235, 235));
@@ -486,6 +610,11 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         cmbEnviar.setFont(new java.awt.Font("Roboto", 1, 24)); // NOI18N
         cmbEnviar.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Maquinados (Retrabajo)", "Tratamiento", "Terminado (Calidad)", "Integracion", "Cortes (Scrap)" }));
         cmbEnviar.setPreferredSize(new java.awt.Dimension(300, 30));
+        cmbEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbEnviarActionPerformed(evt);
+            }
+        });
         jPanel3.add(cmbEnviar);
 
         btnEnviar.setBackground(new java.awt.Color(0, 102, 204));
@@ -596,69 +725,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnPdfActionPerformed
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
-        revisarPlanos rev = new revisarPlanos();
-        if (lblAvisoPlano.isVisible()) {
-            String estacion;
-            String plano = txtPlano.getText();
-            String proyecto = txtProyecto.getText();
-            switch (cmbEnviar.getSelectedIndex()) {
-                case 1: 
-                    estacion = "maquinados";
-                    rev.retrabajo = true;
-                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad");
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
-                    break;
-                case 2: 
-                    estacion = "trata";
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad");
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
-                    break;
-                case 3: 
-                    estacion = "calidad";
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad");
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
-                    break;
-                case 4: 
-                    estacion = "integracion";
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad");
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
-                    break;
-                case 5: 
-                    estacion = "datos";
-                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad");
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacion);
-                    break;
-            }
-        } else {
-            try {
-                Connection con;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                String estacion = rev.buscar(txtPlano.getText(), con);
-                String estacionSeleccionada  = obtenerDepartamento();
-                if (estacion.equals("LIBERACION")) {
-                    rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacionSeleccionada);
-                } else {
-                    if (cmbEnviar.getSelectedIndex() == 5 || cmbEnviar.getSelectedIndex() == 1) {
-                        if (cmbEnviar.getSelectedIndex() == 1) {
-                            rev.retrabajo = true;
-                        }
-                        rev.enviarCortes("calidad", txtPlano.getText(), numEmpleado, txtProyecto.getText(), "00");
-                    }
-                    System.out.println(estacion);
-                    rev.terminarPlanoEnEstacion(estacion, txtPlano.getText(), numEmpleado);
-                    if (cmbEnviar.getSelectedIndex() == 3) {
-                        rev.terminarPlanoEnEstacion("calidad", txtPlano.getText(), numEmpleado);
-                    } else {
-                        rev.sendToEstacion(txtPlano.getText(), txtProyecto.getText(), numEmpleado, estacionSeleccionada);
-                    }
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error: " + e);
-            }
-        }
+        enviarPlano(txtPlano.getText(), txtProyecto.getText());
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
@@ -669,7 +736,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jTextField1ActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void terminarPlanosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminarPlanosActionPerformed
         try {
             Connection con;
             Conexion con1 = new Conexion();
@@ -677,16 +744,25 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             Statement st = con.createStatement();
             for (int i = 0; i < TablaPlan.getSelectedRows().length; i++) {
                 int fila = TablaPlan.getSelectedRows()[i];
-                System.out.println(TablaPlan.getValueAt(fila, 0).toString());
+                enviarPlano(TablaPlan.getValueAt(fila, 0).toString(), TablaPlan.getValueAt(fila, 1).toString());
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_terminarPlanosActionPerformed
 
     private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
         
     }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
+
+    private void cmbEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbEnviarActionPerformed
+        if(cmbEnviar.getSelectedIndex() == 0) {
+            terminarPlanos.setEnabled(false);
+        } else {
+            terminarPlanos.setEnabled(true);
+            terminarPlanos.setText("Enviar planos a: " + cmbEnviar.getSelectedItem().toString() + "                          ");
+        }
+    }//GEN-LAST:event_cmbEnviarActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -695,6 +771,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     private javax.swing.JButton btnPdf;
     private javax.swing.JPanel btnSalir;
     private javax.swing.JComboBox<String> cmbEnviar;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel17;
@@ -704,7 +781,6 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel11;
     private javax.swing.JPanel jPanel19;
@@ -716,6 +792,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblAvisoPlano;
     private javax.swing.JLabel lblConteo;
     private javax.swing.JScrollPane scrollPlan;
+    private javax.swing.JMenuItem terminarPlanos;
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtIngresarPlano;
     private javax.swing.JTextField txtMaterial;
