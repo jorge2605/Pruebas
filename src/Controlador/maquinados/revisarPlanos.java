@@ -184,6 +184,9 @@ public class revisarPlanos {
                 cortes[3] = rs4.getString("Terminado");
                 cortes[5] = rs4.getString("Prioridad");
                 cortes[6] = rs4.getString("Estado");
+                if(cortes[6] == null) {
+                    cortes[6] = "";
+                }
             }
             while (rs5.next()) {
                 torno[0] = rs5.getString("Id");

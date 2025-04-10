@@ -2013,7 +2013,7 @@ public class Acabados extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnPausaActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        enviarPlano(txtPlano.getText(), title);
+        enviarPlano(txtPlano.getText(), txtProyecto.getText());
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void terminarPlanosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminarPlanosActionPerformed

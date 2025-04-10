@@ -189,7 +189,7 @@ public final class Cortes extends JInternalFrame {
         verDatos();
         txtPlano.setText(plano);
         txtCodigo.setText("");
-        txtFecha.setText(fec);
+        txtProyecto.setText(fec);
         lblEstado.setText("EN CURSO");
         lblEstado.setForeground(Color.green);
 
@@ -335,24 +335,24 @@ public final class Cortes extends JInternalFrame {
         SimpleDateFormat nuevo = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String fec = nuevo.format(fe);
 
-        txtFecha.setText(fec);
+        txtProyecto.setText(fec);
 
     }
 
     public void tabla() {
         JOptionPane.showMessageDialog(this, "DATOS GUARDADOS CORRECTAMENTE");
         fecha();
-        txtFecha.setText("");
+        txtProyecto.setText("");
         limpiarTabla();
         verDatos();
         panelPiezas.setVisible(false);
         txtPlano.setText("");
-        txtFecha.setText("");
+        txtProyecto.setText("");
     }
 
     public void borrar() {
         txtPlano.setText("");
-        txtFecha.setText("");
+        txtProyecto.setText("");
         lblEstado.setText("SIN SELECCIONAR");
         lblEstado.setForeground(Color.red);
     }
@@ -450,7 +450,7 @@ public final class Cortes extends JInternalFrame {
                 }
 
                 if (cortes[4] != null) {
-                    String fecha1 = txtFecha.getText();
+                    String fecha1 = txtProyecto.getText();
                     String fecha2 = fec;
 
                     int hora1, hora2, minuto1, minuto2;
@@ -538,7 +538,7 @@ public final class Cortes extends JInternalFrame {
 //                    Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ?, Empleado = ? WHERE Proyecto = ? and Revision = ?
                     pst.setString(1, txtPlano.getText());
                     pst.setString(2, cortes[5]);
-                    pst.setString(3, txtFecha.getText());
+                    pst.setString(3, txtProyecto.getText());
                     pst.setString(4, fec);
                     pst.setString(5, "SI");
                     pst.setString(6, cortes[1]);
@@ -557,7 +557,7 @@ public final class Cortes extends JInternalFrame {
                     }
                     pst.setString(1, txtPlano.getText());
                     pst.setString(2, cortes[5]);
-                    pst.setString(3, txtFecha.getText());
+                    pst.setString(3, txtProyecto.getText());
                     pst.setString(4, fec);
                     pst.setString(5, "SI");
                     pst.setString(6, cortes[1]);
@@ -776,6 +776,36 @@ public final class Cortes extends JInternalFrame {
                 return null;
         }
     }
+    
+    public int enviarCortes(Connection con, String plano, String proyecto) throws SQLException {
+        String sql = "insert into datos (Proyecto, Plano, FechaInicio, FechaFinal, Terminado, Estado, Cronometro, Prioridad, Empleado, Revision) values(?,?,?,?,?,?,?,?,?,?)";
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date d = new Date();
+        String fecha = sdf.format(d);
+
+        pst.setString(1, plano);
+        pst.setString(2, proyecto);
+        pst.setString(3, fecha);
+        pst.setString(4, fecha);
+        pst.setString(5, "NO");
+        pst.setString(6, "SIN MATERIAL");
+        pst.setString(7, "00:00");
+        pst.setString(8, "10");
+        pst.setString(9, numEmpleado);
+        pst.setString(10, "");
+
+        int n = pst.executeUpdate();
+        
+        if (n  > 0) {
+            JOptionPane.showMessageDialog(this, "Datos guardados");
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al guardar datos", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        
+        return 0;
+    }
 
     public void enviarPlano(String plano, String proyecto) {
         try {
@@ -786,18 +816,21 @@ public final class Cortes extends JInternalFrame {
             String estacion = rev.buscar(plano, con);
             String estacionSeleccionada = obtenerDepartamento();
             if (estacion.equals("LIBERACION")) {
-                rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+                enviarCortes(con, plano, proyecto);
             } else {
                 if (cmbEnviar.getSelectedIndex() == 4) {
-                    //Plano sin material
-                    String sql4 = "update datos set Estado = ? where Proyecto = ?";
+                    String sql4 = "update datos set Estado = ?, Terminado = ? where Proyecto = ?";
                     PreparedStatement pst4 = con.prepareStatement(sql4);
                     int n4;
+                    rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
                     pst4.setString(1, "SIN MATERIAL");
-                    pst4.setString(2, plano);
+                    pst4.setString(2, "NO");
+                    pst4.setString(3, plano);
                     n4 = pst4.executeUpdate();
                     if (n4 > 0) {
                         JOptionPane.showMessageDialog(this, "Datos guardados");
+                    } else {
+                        enviarCortes(con, plano, proyecto);
                     }
                 } else {
                     rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
@@ -898,7 +931,7 @@ public final class Cortes extends JInternalFrame {
     
     public void limpiarFormulario() {
         txtPlano.setText("");
-        txtFecha.setText("");
+        txtProyecto.setText("");
     }
     
     public Cortes(String numEmpleado) {
@@ -947,7 +980,7 @@ public final class Cortes extends JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         txtPlano = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        txtFecha = new javax.swing.JLabel();
+        txtProyecto = new javax.swing.JLabel();
         rSPanelRound1 = new rojeru_san.rspanel.RSPanelRound();
         jLabel20 = new javax.swing.JLabel();
         panelTipo = new rojeru_san.rspanel.RSPanelRound();
@@ -1098,12 +1131,12 @@ public final class Cortes extends JInternalFrame {
 
         jLabel4.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        jLabel4.setText("FECHA INICIO:  ");
+        jLabel4.setText("Proyecto:");
         jPanel24.add(jLabel4);
 
-        txtFecha.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        txtFecha.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jPanel24.add(txtFecha);
+        txtProyecto.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
+        txtProyecto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jPanel24.add(txtProyecto);
 
         rSPanelRound1.setColorBackground(new java.awt.Color(0, 102, 204));
         rSPanelRound1.setColorBorde(new java.awt.Color(0, 102, 204));
@@ -1607,7 +1640,7 @@ public final class Cortes extends JInternalFrame {
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             Statement st = con.createStatement();
-            String form = formatear(txtPlano.getText(), con);
+            String form = formatear(txtCodigo.getText(), con);
             String sql = "select Proyecto, Plano, Cantidad, Material from planos where Plano like '" + form + "'";
             ResultSet rs = st.executeQuery(sql);
             String plano = null;
@@ -1615,7 +1648,7 @@ public final class Cortes extends JInternalFrame {
             while (rs.next()) {
                 plano = rs.getString("Plano");
                 txtPlano.setText(plano);
-//                txtPlano.setText(rs.getString("Proyecto"));
+                txtProyecto.setText(rs.getString("Proyecto"));
             }
             txtCodigo.setText("");
             if (plano == null) {
@@ -1623,7 +1656,7 @@ public final class Cortes extends JInternalFrame {
                 String proyecto = validarPlano(con, form.substring(0, prim));
                 if (proyecto != null) {
                     txtPlano.setText(form);
-                    txtPlano.setText(proyecto);
+                    txtProyecto.setText(proyecto);
                 } else {
                     JOptionPane.showMessageDialog(this, "El plano que ingresaste no existe", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1648,7 +1681,7 @@ public final class Cortes extends JInternalFrame {
     }//GEN-LAST:event_jLabel1MouseExited
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        guardar(lblRevision.getText());
+        enviarPlano(txtPlano.getText(), txtProyecto.getText());
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnPausaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPausaActionPerformed
@@ -1791,7 +1824,7 @@ public final class Cortes extends JInternalFrame {
                 if (n > 0) {
                     limpiarTabla();
                     verDatos();
-                    txtFecha.setText("");
+                    txtProyecto.setText("");
                     txtPlano.setText("");
                     panelPiezas.setVisible(false);
                     JOptionPane.showMessageDialog(this, "PLANO PAUSADO", "INFO", JOptionPane.INFORMATION_MESSAGE);
@@ -1959,10 +1992,10 @@ public final class Cortes extends JInternalFrame {
     private javax.swing.JMenuItem terminarPlanos;
     private javax.swing.JTextField txtCodigo;
     private javax.swing.JTextField txtEmpleado;
-    private javax.swing.JLabel txtFecha;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtNumero;
     private javax.swing.JLabel txtPlano;
+    private javax.swing.JLabel txtProyecto;
     private javax.swing.JTextField txtPuesto;
     // End of variables declaration//GEN-END:variables
 }

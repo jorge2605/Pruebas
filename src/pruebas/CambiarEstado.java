@@ -463,7 +463,17 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                             while (rs2.next()) {
                                 dat[0] = rs2.getString("Plano");
                                 dat[1] = rs2.getString("Proyecto");
-                                dat[2] = rev.buscar(dat[0], con);
+                                try {
+                                    String part[] = dat[0].split(" ");
+                                    int ultimo = Integer.parseInt(part[2]);
+                                    if(ultimo < 100) {
+                                        dat[2] = "SUB ENSAMBLE";
+                                    } else {
+                                        dat[2] = rev.buscar(dat[0], con);
+                                    }
+                                } catch (Exception e) { 
+                                    dat[2] = rev.buscar(dat[0], con);
+                                }
                                 if (dat[2].equals("TERMINADO")) {
                                     dat[2] = "TERMINADO (CALIDAD)";
                                 }

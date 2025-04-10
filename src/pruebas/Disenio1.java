@@ -600,8 +600,10 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                 
                 if(n1 < 1){
                     JOptionPane.showMessageDialog(this, "EL PDF NO SE SUBIO CORRECTAMENTE","ERROR",JOptionPane.ERROR_MESSAGE);
+                } else {
+                    revisarPlanos rev = new revisarPlanos();
+                    rev.sendToEstacion(l.getText(), txtProyecto.getText(), inicio.lblId.getText(), "datos");
                 }
-
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "ERROR AL GUARDAR DATOS: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
