@@ -1140,5 +1140,20 @@ public class verDocumentos extends java.awt.Dialog implements ActionListener{
             }
         }
         
+        for (int i = 0; i < btnRemision.length; i++) {
+            if(e.getSource() == btnRemision[i]){
+                if(btnRemision[i].getBackground().equals(Color.green)){
+                   btnRemision[i].setBackground(Color.white);
+                }else{
+                    for (JPanel pnlCotizacion1 : pnlRemision) {
+                        if (pnlCotizacion1 != null) {
+                            pnlCotizacion1.setBackground(Color.white);
+                        }
+                    }
+                    pnlRemision[i].setBackground(Color.green);
+                }
+            }
+        }
+        
     }
 }

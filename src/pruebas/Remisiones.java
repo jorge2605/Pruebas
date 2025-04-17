@@ -845,6 +845,9 @@ public class Remisiones extends javax.swing.JInternalFrame implements ActionList
         jLabel15.setText("        ");
         jPanel12.add(jLabel15);
 
+        btnAgregar.setBackground(new java.awt.Color(0, 102, 255));
+        btnAgregar.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
         btnAgregar.setText("AGREGAR");
         btnAgregar.setNextFocusableComponent(txtCantidad);
         btnAgregar.addActionListener(new java.awt.event.ActionListener() {

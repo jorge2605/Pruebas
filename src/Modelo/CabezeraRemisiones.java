@@ -68,10 +68,10 @@ import javax.swing.JOptionPane;
             table.setTotalWidth(527);
             table.setLockedWidth(true);
             table.getDefaultCell().setFixedHeight(20);
-            Image img = Image.getInstance("./BD/3.png");
+            Image img = Image.getInstance("C:/Pruebas/BD/3.png");
             img.setAbsolutePosition(30, 790);
             
-            Image img2 = Image.getInstance("./BD/3.png");
+            Image img2 = Image.getInstance("C:/Pruebas/BD/3.png");
             img2.setAbsolutePosition(510, 790);
             
             System.out.println(img2.getUrl());
