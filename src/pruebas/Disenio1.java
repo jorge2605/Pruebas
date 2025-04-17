@@ -52,7 +52,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Stack;
 import javax.swing.BorderFactory;
@@ -459,11 +461,42 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
         
     }
     
+    public String getDepa(String numEmpleado, Connection con) throws SQLException {
+        String sql = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "' order by id desc";
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(sql);
+        while (rs.next()) {
+            return rs.getString("Puesto");
+        }
+        return null;
+    }
+    
+    public final void cerrarFechaCalendario(String proyecto, Connection con) throws SQLException {
+        String depa = getDepa(inicio.lblId.getText(), con);
+        if (depa != null) {
+            String sql = "update agenda set Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where Proyecto = ? and Departamento = ?";
+            PreparedStatement pst = con.prepareStatement(sql);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String fecha = sdf.format(new Date());
+
+            pst.setString(1, "Terminado");
+            pst.setString(2, inicio.lblId.getText());
+            pst.setString(3, fecha);
+            pst.setString(4, txtProyecto.getText());
+            pst.setString(5, depa);
+
+            int in = pst.executeUpdate();
+
+            if(in < 1){
+                JOptionPane.showMessageDialog(this, "Error al guardar fecha", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
     public void subirPlanos(File archivo){
         try {
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
+            Connection con = new Conexion().getConnection();
             Statement st2 = con.createStatement();
 
             String sql2 = "select Plano,Revision from Planos where Plano like '"+l.getText()+"'";
@@ -613,6 +646,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
     
     public void iniciar(){
         int opc = 0;
+        int cont = 0;
         for (int i = 0; i < botones.length; i++) {
             if(opc == 0){
                 if(!botones[i].getForeground().equals(new Color(210,210,210))){
@@ -651,6 +685,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                         if(opc == 0){
                             botones[i].setForeground(new Color(210,210,210));
                             subirPlanos(archivos[i]);
+                            cont++;
                             c.setText("");
                             d.setText("");
                             this.e.setText("");
@@ -675,6 +710,14 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                             JOptionPane.showMessageDialog(this, "Cantidad erronea","Advertencia",JOptionPane.WARNING_MESSAGE);
                     }
                 }
+            }
+        }
+        if (cont > 0) {
+            try {
+                Connection con = new Conexion().getConnection();
+                cerrarFechaCalendario(txtProyecto.getText(), con);
+            } catch(SQLException e) {
+                JOptionPane.showMessageDialog(this, "Error al subir fecha: " + e,"Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

@@ -21,7 +21,7 @@ public class InformeProyect extends java.awt.Dialog {
                 txtCreacionD.setText(fecha);
                 txtDescripcionD.setText(descripcion);
                 txtComentariosD.setText(comentarios);
-                txtFinD.setText(empleadoFin);
+                txtFinalD.setText(empleadoFin);
                 txtTerminoD.setText(fechaTermino);
                 break;
             case "HERRAMENTISTA":
@@ -32,7 +32,7 @@ public class InformeProyect extends java.awt.Dialog {
                 txtCreacionM.setText(fecha);
                 txtDescripcionM.setText(descripcion);
                 txtComentariosM.setText(comentarios);
-                txtFinM.setText(empleadoFin);
+                txtFinalM.setText(empleadoFin);
                 txtTerminoM.setText(fechaTermino);
                 break;
             case "INTEGRACION":
@@ -43,7 +43,7 @@ public class InformeProyect extends java.awt.Dialog {
                 txtCreacionI.setText(fecha);
                 txtDescripcionI.setText(descripcion);
                 txtComentariosI.setText(comentarios);
-                txtFinI.setText(empleadoFin);
+                txtFinalI.setText(empleadoFin);
                 txtTerminoI.setText(fechaTermino);
                 break;
             case "COMPRAS":
@@ -54,7 +54,7 @@ public class InformeProyect extends java.awt.Dialog {
                 txtCreacionC.setText(fecha);
                 txtDescripcionC.setText(descripcion);
                 txtComentariosC.setText(comentarios);
-                txtFinC.setText(empleadoFin);
+                txtFinalC.setText(empleadoFin);
                 txtTerminoC.setText(fechaTermino);
                 break;
             default:
@@ -218,7 +218,7 @@ public class InformeProyect extends java.awt.Dialog {
         txtProyecto.setForeground(new java.awt.Color(51, 51, 51));
         txtProyecto.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         txtProyecto.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 3, 0, new java.awt.Color(204, 204, 204)));
-        panelRound1.add(txtProyecto, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 60, 1050, 30));
+        panelRound1.add(txtProyecto, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 60, 310, 30));
 
         pnlX.setBackground(new java.awt.Color(255, 255, 255));
         pnlX.setLayout(new java.awt.BorderLayout());
