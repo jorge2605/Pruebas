@@ -816,7 +816,7 @@ public final class Cortes extends JInternalFrame {
             String estacion = rev.buscar(plano, con);
             String estacionSeleccionada = obtenerDepartamento();
             if (estacion.equals("LIBERACION")) {
-                enviarCortes(con, plano, proyecto);
+                rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
             } else {
                 if (cmbEnviar.getSelectedIndex() == 4) {
                     String sql4 = "update datos set Estado = ?, Terminado = ? where Proyecto = ?";

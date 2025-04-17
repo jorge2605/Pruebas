@@ -200,7 +200,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
                 case 3: 
                     estacion = "calidad";
                     rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
+//                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
                     enviado = true;
                     break;
                 case 4: 
@@ -229,16 +229,15 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
                         if (cmbEnviar.getSelectedIndex() == 1) {
                             rev.retrabajo = true;
                         }
-                        enviado = true;
                         rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
                     }
-                    rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
                     if (cmbEnviar.getSelectedIndex() == 3) {
                         rev.sendToEstacion(plano, proyecto, numEmpleado, "calidad");
                         rev.terminarPlanoEnEstacion("calidad", plano, numEmpleado);
                         enviado = true;
                     } else {
                         rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+                        rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
                         enviado = true;
                     }
                 }
@@ -593,6 +592,11 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         jButton1.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Ver planos terminados");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
         jPanel2.add(jButton1, gridBagConstraints);
@@ -763,6 +767,10 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             terminarPlanos.setText("Enviar planos a: " + cmbEnviar.getSelectedItem().toString() + "                          ");
         }
     }//GEN-LAST:event_cmbEnviarActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -545,7 +545,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                     revisar.terminarPlano(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, hora, botones.get(i), con);
                 }
                 if (calidad) {
-                    revisar.sendToCalidad(txtPlano2.getText(), txtProyecto.getText(), numEmpleado);
+                    revisar.sendToEstacion(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, "acabados");
                 } else {
                     revisar.sendToEstacion(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, "maquinados");
                 }
@@ -796,7 +796,7 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
         btnCalidad.setBackground(new java.awt.Color(255, 255, 255));
         btnCalidad.setFont(new java.awt.Font("Lexend", 1, 24)); // NOI18N
         btnCalidad.setForeground(new java.awt.Color(0, 102, 255));
-        btnCalidad.setText("Enviar a calidad");
+        btnCalidad.setText("Enviar a Acabados");
         btnCalidad.setBorder(null);
         btnCalidad.setBorderPainted(false);
         btnCalidad.setContentAreaFilled(false);

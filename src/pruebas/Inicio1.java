@@ -5,6 +5,7 @@ import Modelo.ModeloExcel;
 import VentanaEmergente.CalidadNew.inicioCalidad;
 import VentanaEmergente.Costos.Costeo;
 import VentanaEmergente.Diseño.InicioDiseño;
+import VentanaEmergente.Inicio1.Backups;
 import VentanaEmergente.Inicio1.Configuracion;
 import VentanaEmergente.Inicio1.InicioAlmacen;
 import VentanaEmergente.Inicio1.InicioCostos;
@@ -49,6 +50,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.Dimension;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import javax.swing.table.DefaultTableModel;
@@ -67,6 +69,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     Evaluacion evaluacion;
     public int HOME = 1;
     public int COSTOS = 2;
+    public Backups backup;
     
     public void activar(){
         Thread hilo = new Thread() {
@@ -307,7 +310,6 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            Statement st = con.createStatement();
             Statement st2 = con.createStatement();
             String sql2 = "select * from registroempleados where NumEmpleado like '" + numEmpleado + "'";
             ResultSet rs2 = st2.executeQuery(sql2);
@@ -408,6 +410,15 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         cla.setVisible(true);
     }
     
+    public final void iniciarBackup() {
+        try {
+            backup = new Backups();
+            backup.iniciar();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error " + e);
+        }
+    }
+    
     public Inicio1(String numero, String nombre, String depa) {
         try {
             UIManager.setLookAndFeel(new FlatMacLightLaf());
@@ -425,7 +436,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         }
         lblNombre.setText(nombre);
         setLocationRelativeTo(null);
-        setTitle("SERVICIOS INDUSTRIALES 3i");
+        setTitle("Servicios Industriales 3i");
         this.setIconImage(new ImageIcon(getClass().getResource("/Imagenes/towi_Azul.png")).getImage()); 
         btnCalidad.setComponentPopupMenu(jPopupMenu1);
         pedido = false;
@@ -442,6 +453,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         }else{
             lblNotiRequis.setVisible(false);
         }
+        iniciarBackup();
     }
 
    
@@ -467,6 +479,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         errores = new javax.swing.JButton();
         btnModificar = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        btnModificar1 = new javax.swing.JButton();
         jDesktopPane1 = new javax.swing.JDesktopPane();
         jPanel3 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -779,6 +792,19 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
             }
         });
 
+        btnModificar1.setBackground(new java.awt.Color(255, 255, 255));
+        btnModificar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/subir_16.png"))); // NOI18N
+        btnModificar1.setBorder(null);
+        btnModificar1.setBorderPainted(false);
+        btnModificar1.setContentAreaFilled(false);
+        btnModificar1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnModificar1.setFocusPainted(false);
+        btnModificar1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModificar1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -808,7 +834,9 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
                 .addComponent(errores)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnModificar)
-                .addContainerGap(211, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnModificar1)
+                .addContainerGap(183, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -825,7 +853,8 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
                     .addComponent(jPanel37, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(errores, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnModificar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnModificar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -2433,7 +2462,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 749, Short.MAX_VALUE)
+            .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, 743, Short.MAX_VALUE)
         );
 
         getContentPane().add(jDesktopPane1, java.awt.BorderLayout.CENTER);
@@ -3228,33 +3257,19 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         c.setVisible(true);
     }//GEN-LAST:event_btnCalidad1ActionPerformed
 
+    private void btnModificar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificar1ActionPerformed
+        try {
+            backup.setSize(1112, 691);
+            backup.setLocationRelativeTo(this);
+            backup.setVisible(true);
+        } catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnModificar1ActionPerformed
+
     
     
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Inicio1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Inicio1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Inicio1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Inicio1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new InicioSesion().setVisible(true);
@@ -3293,6 +3308,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     public javax.swing.JButton btnInventario1;
     public javax.swing.JButton btnInventario2;
     private javax.swing.JButton btnModificar;
+    private javax.swing.JButton btnModificar1;
     public javax.swing.JButton btnOrden;
     public javax.swing.JButton btnOrden1;
     public javax.swing.JButton btnPedidos;

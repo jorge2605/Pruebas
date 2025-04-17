@@ -184,7 +184,7 @@ public class revisarPlanos {
                 cortes[3] = rs4.getString("Terminado");
                 cortes[5] = rs4.getString("Prioridad");
                 cortes[6] = rs4.getString("Estado");
-                if(cortes[6] == null) {
+                if (cortes[6] == null) {
                     cortes[6] = "";
                 }
             }
@@ -223,7 +223,7 @@ public class revisarPlanos {
 
             if (id.equals(cortes[1]) && cortes[3].equals("NO")) {
                 datos[3] = "CORTES";
-                if(cortes[6].equals("SIN MATERIAL")) {
+                if (cortes[6].equals("SIN MATERIAL")) {
                     datos[3] = "SIN MATERIAL";
                 }
             } else if (id.equals(maqui[1]) && maqui[3].equals("NO")) {
@@ -257,6 +257,7 @@ public class revisarPlanos {
                 datos[3] = "LIBERACION";
             }
             cont += 1;
+        System.out.println(id);
         }
         if (datos[3] == null) {
             return null;
@@ -546,7 +547,7 @@ public class revisarPlanos {
             Connection con;
             Conexion con1 = new Conexion();
             con = con1.getConnection();
-            estacion = convertirStringToEstacion(estacion);
+            estacion = convertirStringToEstacion(estacion.toUpperCase());
             if (estacion != null) {
                 String sql = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ?, Empleado = ? where Proyecto = ?";
                 PreparedStatement pst = con.prepareStatement(sql);
@@ -634,7 +635,6 @@ public class revisarPlanos {
             String sql = "select * from " + estacion + " where Proyecto like '" + plano + "'";
             ResultSet rs = st.executeQuery(sql);
             if (rs.next()) {
-                //Si existe plano en calidad
                 String sql2 = "update " + estacion + " set Terminado = ?, FechaInicio = ?, FechaFinal = ? where Proyecto = ?";
                 PreparedStatement pst = con.prepareStatement(sql2);
 
@@ -650,7 +650,6 @@ public class revisarPlanos {
                 }
 
             } else {
-                //Si no existe plano en calidad
                 String sql2 = "insert into " + estacion + " (Terminado, FechaInicio, FechaFinal, Proyecto, Plano, Cronometro, Prioridad, Empleado) values(?,?,?,?,?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql2);
 

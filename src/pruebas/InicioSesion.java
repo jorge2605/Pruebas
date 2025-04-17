@@ -423,6 +423,8 @@ public class InicioSesion extends javax.swing.JFrame  {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(InicioSesion.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    revalidate();
+                    repaint();
                 }
             });
             hilo.start();
@@ -667,6 +669,11 @@ public class InicioSesion extends javax.swing.JFrame  {
                 UsuarioActionPerformed(evt);
             }
         });
+        Usuario.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                UsuarioKeyTyped(evt);
+            }
+        });
         panelP.add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 180, 490, 40));
 
         lblContrasena.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
@@ -687,6 +694,11 @@ public class InicioSesion extends javax.swing.JFrame  {
         Contra.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ContraActionPerformed(evt);
+            }
+        });
+        Contra.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                ContraKeyTyped(evt);
             }
         });
         panelP.add(Contra, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 250, 490, 40));
@@ -859,6 +871,16 @@ public class InicioSesion extends javax.swing.JFrame  {
         Color bajo = new Color(255,102,0);
         btnEntrar1.setBackground(bajo);
     }//GEN-LAST:event_lblEntrar1MouseExited
+
+    private void UsuarioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_UsuarioKeyTyped
+        revalidate();
+        repaint();
+    }//GEN-LAST:event_UsuarioKeyTyped
+
+    private void ContraKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ContraKeyTyped
+        revalidate();
+        repaint();
+    }//GEN-LAST:event_ContraKeyTyped
 
    
     public static void main(String args[]) {

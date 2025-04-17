@@ -1425,7 +1425,6 @@ public class Acabados extends javax.swing.JInternalFrame {
         Tabla1 = new ColorRojo();
         jPanel25 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
-        lblTitulo = new javax.swing.JLabel();
         jPanel26 = new javax.swing.JPanel();
         jLabel24 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
@@ -1813,7 +1812,7 @@ public class Acabados extends javax.swing.JInternalFrame {
         jPanel16.add(jPanel12, java.awt.BorderLayout.EAST);
 
         jPanel22.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel22.setLayout(new java.awt.BorderLayout());
+        jPanel22.setLayout(new java.awt.BorderLayout(0, 5));
 
         Tabla1.setFont(new java.awt.Font("Roboto", 0, 14)); // NOI18N
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
@@ -1854,11 +1853,6 @@ public class Acabados extends javax.swing.JInternalFrame {
         jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel23.setText("Planos en estacion de acabados");
         jPanel25.add(jLabel23, java.awt.BorderLayout.NORTH);
-
-        lblTitulo.setFont(new java.awt.Font("Roboto", 1, 18)); // NOI18N
-        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitulo.setText("PLANOS CON MATERIAL");
-        jPanel25.add(lblTitulo, java.awt.BorderLayout.SOUTH);
 
         jPanel26.setBackground(new java.awt.Color(255, 255, 255));
         jPanel26.setLayout(new java.awt.BorderLayout());
@@ -2107,7 +2101,6 @@ public class Acabados extends javax.swing.JInternalFrame {
     private javax.swing.JLabel lblPiezas;
     private javax.swing.JLabel lblRevision;
     private javax.swing.JLabel lblTipo;
-    private javax.swing.JLabel lblTitulo;
     private javax.swing.JPanel panelCentral;
     private javax.swing.JPanel panelEste;
     private rojeru_san.rspanel.RSPanelRound panelPiezas;

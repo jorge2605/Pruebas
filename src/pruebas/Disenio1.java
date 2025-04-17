@@ -390,7 +390,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                                 archivos = archivosNuevos;
                             }
                             for (int i = 0; i < archivos.length; i++) {
-//                                archivos[i] = files.get(i);
+                                archivos[i] = files.get(i);
                                 if (archivos[i].getName().toLowerCase().endsWith(".pdf")) {
                                     // Procesar el archivo PDF aquí
                                     String img = "";
