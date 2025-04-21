@@ -3,6 +3,7 @@ package pruebas;
 import Conexiones.Conexion;
 import Conexiones.ConexionChat;
 import VentanaEmergente.Inicio1.Espera;
+import VentanaEmergente.Reportes.EditarArticuloRequisicion;
 import VentanaEmergente.Requisiciones.Escoger;
 import VentanaEmergente.Requisiciones.IDRequisicion;
 import VentanaEmergente.Requisiciones.Material;
@@ -20,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -265,37 +267,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         }
         return 0;
     }
-
-    public requisicionDeCompra(String numero, String nombre) {
-        initComponents();
-        Date fechaIn = new Date();
-        this.numEmpleado = numero;
-        SimpleDateFormat fec = new SimpleDateFormat("dd/MM/yyyy");
-        String fechaInicio = fec.format(fechaIn);
-        txtFecha.setText(fechaInicio);
-        btnX2.setVisible(false);
-        noSe = "INTERNA";
-        extraer();
-        txtDescripcion.setLineWrap(true);
-        txtDescripcion.setWrapStyleWord(true);
-        ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-
-        empleado(numero);
-        autoCompletarProyecto();
-        autoCompletar();
-
-        limpiarTabla2();
-        Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14));
-        Tabla1.getTableHeader().setOpaque(false);
-        Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
-        Tabla1.getTableHeader().setForeground(Color.white);
-        Tabla1.setRowHeight(25);
-        Tabla1.setShowGrid(false);
-
-        jScrollPane2.getViewport().setBackground(new Color(255, 255, 255));
-        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new Color(0, 165, 255)));
-    }
-
+    
     public void limpiarTabla() {
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
@@ -350,12 +322,53 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         });
     }
 
+    public final void agregarArticulo(JTable tabla, String cantidad, int fila) {
+        int cant = Integer.parseInt(cantidad);
+        int cantTabla = Integer.parseInt(tabla.getValueAt(fila, 1).toString());
+        cant += cantTabla;
+        tabla.setValueAt(cant, fila, 1);
+    }
+    
+    public requisicionDeCompra(String numero, String nombre) {
+        initComponents();
+        Date fechaIn = new Date();
+        this.numEmpleado = numero;
+        SimpleDateFormat fec = new SimpleDateFormat("dd/MM/yyyy");
+        String fechaInicio = fec.format(fechaIn);
+        txtFecha.setText(fechaInicio);
+        btnX2.setVisible(false);
+        noSe = "INTERNA";
+        extraer();
+        txtDescripcion.setLineWrap(true);
+        txtDescripcion.setWrapStyleWord(true);
+        ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
+
+        empleado(numero);
+        autoCompletarProyecto();
+        autoCompletar();
+
+        limpiarTabla2();
+        Tabla1.getTableHeader().setFont(new Font("Roboto", Font.BOLD, 14));
+        Tabla1.getTableHeader().setOpaque(false);
+        Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
+        Tabla1.getTableHeader().setForeground(Color.white);
+        Tabla1.setRowHeight(25);
+        Tabla1.setShowGrid(false);
+
+        jScrollPane2.getViewport().setBackground(new Color(255, 255, 255));
+        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new Color(0, 165, 255)));
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
+        jPopupMenu1 = new javax.swing.JPopupMenu();
+        Editar = new javax.swing.JMenuItem();
+        Eliminar = new javax.swing.JMenuItem();
         jPanel16 = new javax.swing.JPanel();
         panelNorte = new javax.swing.JPanel();
         pan = new javax.swing.JPanel();
@@ -422,19 +435,24 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         jScrollPane2 = new javax.swing.JScrollPane();
         Tabla1 = new javax.swing.JTable();
         jPanel15 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        txtEnviar = new javax.swing.JButton();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jLabel12 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
-        jButton3 = new javax.swing.JButton();
-        jLabel15 = new javax.swing.JLabel();
+        btnGuardar = new javax.swing.JButton();
+        btnLimpiar = new javax.swing.JButton();
+        btnEliminar = new javax.swing.JButton();
+        btnEditar = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         importarExcel = new javax.swing.JMenuItem();
+
+        Editar.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        Editar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/edit.png"))); // NOI18N
+        Editar.setText("Editar                                         ");
+        jPopupMenu1.add(Editar);
+
+        Eliminar.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        Eliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/x.png"))); // NOI18N
+        Eliminar.setText("Eliminar");
+        jPopupMenu1.add(Eliminar);
 
         setBorder(null);
         getContentPane().setLayout(new java.awt.BorderLayout(10, 10));
@@ -900,69 +918,80 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         panelTabla.add(jScrollPane2, java.awt.BorderLayout.CENTER);
 
         jPanel15.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel15.setLayout(new java.awt.GridLayout(3, 3));
+        java.awt.GridBagLayout jPanel15Layout = new java.awt.GridBagLayout();
+        jPanel15Layout.rowWeights = new double[] {1.0, 1.0, 1.0, 1.0};
+        jPanel15.setLayout(jPanel15Layout);
 
-        jLabel3.setText("           ");
-        jPanel15.add(jLabel3);
-
-        txtEnviar.setBackground(new java.awt.Color(255, 255, 255));
-        txtEnviar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        txtEnviar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/guardar_32.png"))); // NOI18N
-        txtEnviar.setBorder(null);
-        txtEnviar.setBorderPainted(false);
-        txtEnviar.setContentAreaFilled(false);
-        txtEnviar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        txtEnviar.addActionListener(new java.awt.event.ActionListener() {
+        btnGuardar.setBackground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/guardar_32.png"))); // NOI18N
+        btnGuardar.setBorder(null);
+        btnGuardar.setBorderPainted(false);
+        btnGuardar.setContentAreaFilled(false);
+        btnGuardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtEnviarActionPerformed(evt);
+                btnGuardarActionPerformed(evt);
             }
         });
-        jPanel15.add(txtEnviar);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 23, 0, 23);
+        jPanel15.add(btnGuardar, gridBagConstraints);
 
-        jLabel5.setText("           ");
-        jPanel15.add(jLabel5);
-
-        jLabel13.setText("           ");
-        jPanel15.add(jLabel13);
-
-        jButton2.setBackground(new java.awt.Color(255, 255, 255));
-        jButton2.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IconoC/cancelar.png"))); // NOI18N
-        jButton2.setToolTipText("Eliminar tabla");
-        jButton2.setBorder(null);
-        jButton2.setBorderPainted(false);
-        jButton2.setContentAreaFilled(false);
-        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnLimpiar.setBackground(new java.awt.Color(255, 255, 255));
+        btnLimpiar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/IconoC/cancelar.png"))); // NOI18N
+        btnLimpiar.setToolTipText("Eliminar tabla");
+        btnLimpiar.setBorder(null);
+        btnLimpiar.setBorderPainted(false);
+        btnLimpiar.setContentAreaFilled(false);
+        btnLimpiar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnLimpiarActionPerformed(evt);
             }
         });
-        jPanel15.add(jButton2);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 23, 0, 23);
+        jPanel15.add(btnLimpiar, gridBagConstraints);
 
-        jLabel12.setText("           ");
-        jPanel15.add(jLabel12);
-
-        jLabel14.setText("           ");
-        jPanel15.add(jLabel14);
-
-        jButton3.setBackground(new java.awt.Color(255, 255, 255));
-        jButton3.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        jButton3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/eliminar_1.png"))); // NOI18N
-        jButton3.setToolTipText("Eliminar articulo");
-        jButton3.setBorder(null);
-        jButton3.setBorderPainted(false);
-        jButton3.setContentAreaFilled(false);
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnEliminar.setBackground(new java.awt.Color(255, 255, 255));
+        btnEliminar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/eliminar_1.png"))); // NOI18N
+        btnEliminar.setToolTipText("Eliminar articulo");
+        btnEliminar.setBorder(null);
+        btnEliminar.setBorderPainted(false);
+        btnEliminar.setContentAreaFilled(false);
+        btnEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnEliminarActionPerformed(evt);
             }
         });
-        jPanel15.add(jButton3);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 23, 0, 23);
+        jPanel15.add(btnEliminar, gridBagConstraints);
 
-        jLabel15.setText("           ");
-        jPanel15.add(jLabel15);
+        btnEditar.setBackground(new java.awt.Color(255, 255, 255));
+        btnEditar.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        btnEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/edit_32.png"))); // NOI18N
+        btnEditar.setToolTipText("Eliminar articulo");
+        btnEditar.setBorder(null);
+        btnEditar.setBorderPainted(false);
+        btnEditar.setContentAreaFilled(false);
+        btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 23, 0, 23);
+        jPanel15.add(btnEditar, gridBagConstraints);
 
         panelTabla.add(jPanel15, java.awt.BorderLayout.EAST);
 
@@ -1041,94 +1070,86 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
 
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
         boolean band = false;
-        String mensaje = "";
         if (buscarTornillos() == false) {
             for (int i = 0; i < TablaReal.getRowCount(); i++) {
                 if (txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())) {
                     band = true;
-                    mensaje = "ESTE NUMERO DE PARTE YA ESTA INCLUIDO";
+                    agregarArticulo(TablaReal, txtCantidad.getText(), i);
                 }
             }
             for (int i = 0; i < Tabla1.getRowCount(); i++) {
-                if (txtCodigo.getText().equals(TablaReal.getValueAt(i, 2).toString())) {
+                if (txtCodigo.getText().equals(Tabla1.getValueAt(i, 2).toString())) {
                     band = true;
-                    mensaje = "ESTE NUMERO DE PARTE YA ESTA INCLUIDO";
+                    agregarArticulo(Tabla1, txtCantidad.getText(), i);
                 }
             }
-            if (!fecha.isVisible()) {
-                band = false;
-            } else {
-                if (fecha.getDatoFecha() == null) {
-                    band = true;
-                    mensaje = "Debes seleccionar la fecha esperada";
-                }
-            }
-
-            if (band == true) {
-                JOptionPane.showMessageDialog(this, mensaje, "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-                txtCodigo.setText("");
-                txtDescripcion.setText("");
-                txtCantidad.setText("");
-            } else if (txtCodigo.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CODIGO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            } else if (txtDescripcion.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE DESCRIPCION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            } else if (!btnX2.isVisible()) {
-                JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE PROYECTYO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            } else if (txtCantidad.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CANTIDAD", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            } else if (txtUM.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE UM", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
-            } else {
-                String datos[] = new String[20];
-                DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
-                DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
-                datos[0] = parte;
-                datos[1] = txtCantidad.getText();
-                datos[2] = txtCodigo.getText();
-                datos[3] = txtDescripcion.getText();
-                datos[4] = txtProyecto.getText();
-                datos[5] = txtUM.getText();
-                datos[6] = proveedor;
-                datos[7] = "";
-                if (fecha.isVisible()) {
-                    datos[8] = sdf.format(fecha.getDatoFecha());
+            
+            if (!band) {
+                if (fecha.isVisible() && fecha.getDatoFecha() == null) {
+                    JOptionPane.showConfirmDialog(this, "Debes seleccionar la fecha esperada", "Error", JOptionPane.ERROR_MESSAGE);
+                } else if (txtCodigo.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CODIGO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                } else if (txtDescripcion.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE DESCRIPCION", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                } else if (!btnX2.isVisible()) {
+                    JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE PROYECTYO", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                } else if (txtCantidad.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CANTIDAD", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
+                } else if (txtUM.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE UM", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    datos[8] = null;
-                }
-                try {
-                    Connection con;
-                    Conexion con1 = new Conexion();
-                    con = con1.getConnection();
-                    Statement st = con.createStatement();
-                    String sql = "select * from inventario where NumeroDeParte like '" + txtCodigo.getText() + "'";
-                    ResultSet rs = st.executeQuery(sql);
-                    String datos1[] = new String[10];
-                    while (rs.next()) {
-                        datos1[1] = rs.getString("NumeroDeParte");
+                    String datos[] = new String[20];
+                    DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
+                    DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+                    datos[0] = parte;
+                    datos[1] = txtCantidad.getText();
+                    datos[2] = txtCodigo.getText();
+                    datos[3] = txtDescripcion.getText();
+                    datos[4] = txtProyecto.getText();
+                    datos[5] = txtUM.getText();
+                    datos[6] = proveedor;
+                    datos[7] = "";
+                    if (fecha.isVisible()) {
+                        datos[8] = sdf.format(fecha.getDatoFecha());
+                    } else {
+                        datos[8] = null;
                     }
-                    if (!txtCodigo.getText().equals(datos1[1])) {
-
-                        String sql1 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad) values (?,?,?)";
-                        PreparedStatement pst = con.prepareStatement(sql1);
-
-                        pst.setString(1, txtCodigo.getText());
-                        pst.setString(2, txtDescripcion.getText());
-                        pst.setString(3, "0");
-
-                        int n = pst.executeUpdate();
-
-                        if (n > 0) {
-                            JOptionPane.showMessageDialog(this, "ESTE NUMERO DE PARTE SE GUARDO EN LA BASE DE DATOS");
+                    try {
+                        Connection con;
+                        Conexion con1 = new Conexion();
+                        con = con1.getConnection();
+                        Statement st = con.createStatement();
+                        String sql = "select * from inventario where NumeroDeParte like '" + txtCodigo.getText() + "'";
+                        ResultSet rs = st.executeQuery(sql);
+                        String datos1[] = new String[10];
+                        while (rs.next()) {
+                            datos1[1] = rs.getString("NumeroDeParte");
                         }
+                        if (!txtCodigo.getText().equals(datos1[1])) {
+
+                            String sql1 = "insert into inventario (NumeroDeParte, Descripcion, Cantidad) values (?,?,?)";
+                            PreparedStatement pst = con.prepareStatement(sql1);
+
+                            pst.setString(1, txtCodigo.getText());
+                            pst.setString(2, txtDescripcion.getText());
+                            pst.setString(3, "0");
+
+                            pst.executeUpdate();
+                        }
+                    } catch (SQLException e) {
+                        JOptionPane.showMessageDialog(this, "ERROR: " + e);
                     }
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "ERROR: " + e);
+                    miModelo.addRow(datos);
+                    Modelo.addRow(datos);
+                    txtCantidad.setText("");
+                    txtDescripcion.setText("");
+                    parte = "";
+                    txtCodigo.setText("");
+                    fecha.setDatoFecha(null);
                 }
-                miModelo.addRow(datos);
-                Modelo.addRow(datos);
+            } else {
                 txtCantidad.setText("");
                 txtDescripcion.setText("");
                 parte = "";
@@ -1138,12 +1159,12 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         }
     }//GEN-LAST:event_btnAgregarActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
         limpiarTabla();
         limpiarTabla2();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnLimpiarActionPerformed
 
-    private void txtEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtEnviarActionPerformed
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         espera.activar();
         espera.setVisible(true);
         String estado = "";
@@ -1400,7 +1421,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             }
         }
 
-    }//GEN-LAST:event_txtEnviarActionPerformed
+    }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void txtProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtProyectoActionPerformed
         try {
@@ -1443,16 +1464,15 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         }
     }//GEN-LAST:event_txtDescripcionKeyTyped
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        int fila;
-        fila = Tabla1.getSelectedRow();
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = Tabla1.getSelectedRow();
         if (fila < 0) {
             JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UNA FILA", "ADVERTENCIA", JOptionPane.WARNING_MESSAGE);
         } else {
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
             DefaultTableModel Modelo = (DefaultTableModel) TablaReal.getModel();
-            miModelo.removeRow(fila);
             String Num = Tabla1.getValueAt(fila, 2).toString();
+            miModelo.removeRow(fila);
             for (int i = TablaReal.getRowCount() - 1; i >= 0; i--) {
                 if (TablaReal.getValueAt(i, 2).toString().equals(Num)) {
                     Modelo.removeRow(i);
@@ -1460,7 +1480,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
             }
 
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnSubirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubirActionPerformed
         seleccionar = new JFileChooser();
@@ -1677,32 +1697,65 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
         }
     }//GEN-LAST:event_rbFechaActionPerformed
 
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        if (Tabla1.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar un articulo de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else {
+            JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+            EditarArticuloRequisicion editar = new EditarArticuloRequisicion(f, true, ac1);
+            editar.setLocationRelativeTo(f);
+            int fila = Tabla1.getSelectedRow();
+            editar.txtCantidad.setText(Tabla1.getValueAt(fila, 1).toString());
+            editar.txtCodigo.setText(Tabla1.getValueAt(fila, 2).toString());
+            editar.txtDescripcion.setText(Tabla1.getValueAt(fila, 3).toString());
+            editar.txtProyecto.setText(Tabla1.getValueAt(fila, 4).toString());
+            editar.txtUM.setText(Tabla1.getValueAt(fila, 5).toString());
+            editar.txtProveedor.setText(Tabla1.getValueAt(fila, 6).toString());
+            if (Tabla1.getValueAt(fila, 8) != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                try {
+                    editar.txtFecha.setDatoFecha(sdf.parse(Tabla1.getValueAt(fila, 8).toString()));
+                } catch (ParseException ex) {
+                    Logger.getLogger(requisicionDeCompra.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            String edit[] = editar.getEdit();
+            if (edit != null) {
+                Tabla1.setValueAt(edit[1], fila, 1);
+                Tabla1.setValueAt(edit[2], fila, 2);
+                Tabla1.setValueAt(edit[3], fila, 3);
+                Tabla1.setValueAt(edit[4], fila, 4);
+                Tabla1.setValueAt(edit[5], fila, 5);
+                Tabla1.setValueAt(edit[6], fila, 6);
+                Tabla1.setValueAt(edit[8], fila, 8);
+            }
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem Editar;
+    private javax.swing.JMenuItem Eliminar;
     private javax.swing.JTable Tabla1;
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnAgregar1;
+    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnSubir;
     private javax.swing.JButton btnX2;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private rojeru_san.rsdate.RSDateChooser fecha;
     private javax.swing.JMenuItem importarExcel;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
-    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -1735,6 +1788,7 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -1754,7 +1808,6 @@ public class requisicionDeCompra extends javax.swing.JInternalFrame implements A
     private javax.swing.JTextField txtCantidad;
     private javax.swing.JTextField txtCodigo;
     private javax.swing.JTextArea txtDescripcion;
-    private javax.swing.JButton txtEnviar;
     private javax.swing.JLabel txtFecha;
     private javax.swing.JTextField txtNumeroEmpleado;
     private javax.swing.JTextField txtProyecto;

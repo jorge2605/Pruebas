@@ -149,6 +149,7 @@ public class revisarPlanos {
                 calidad[2] = r.getString("Plano");
                 calidad[3] = r.getString("Terminado");
                 calidad[4] = r.getString("Tratamiento");
+                calidad[4] = (calidad[4] == null) ? "NO" : calidad[4];
                 calidad[5] = r.getString("Prioridad");
                 calidad[6] = r.getString("Revision");
             }
@@ -257,7 +258,6 @@ public class revisarPlanos {
                 datos[3] = "LIBERACION";
             }
             cont += 1;
-        System.out.println(id);
         }
         if (datos[3] == null) {
             return null;
