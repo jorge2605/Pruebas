@@ -182,63 +182,12 @@ public class Acabados extends javax.swing.JInternalFrame {
         lblEstado.setForeground(Color.green);
     }
 
-    public String cronometro(String fecha1, String fecha2){
-    int hora1,hora2,minuto1,minuto2;
-    int fecha9 = 0,fecha10 = 0;
-    String f1,f2,f4,f5,fin = "";
-
-
-    f1 = fecha1.substring(11,13);
-    f2 = fecha1.substring(14,16);
-    f4 = fecha2.substring(11,13);
-    f5 = fecha2.substring(14,16);
-
-    hora1 = Integer.parseInt(f1);
-    minuto1 = Integer.parseInt(f2);
-    hora2= Integer.parseInt(f4);
-    minuto2 = Integer.parseInt(f5);
-
-    fecha9 = (hora2 - hora1);
-    if(hora2 >= hora1 && minuto2 >= minuto1){
-        if((fecha9) < 10 && (minuto2 - minuto2) < 10){
-        fin = "0"+(fecha9)+":"+"0"+(minuto2-minuto1);
-        }else if((fecha9) < 10){
-        fin = "0"+(fecha9)+":"+(minuto2-minuto1);
-        }else if((minuto2 - minuto1) < 10){
-        fin = (fecha9)+":"+"0"+(minuto2-minuto1);
-        }
-
-    }else{
-    if(minuto2 < minuto1){
-    fecha10 = (60 - minuto1) + minuto2;
-    fecha9 = fecha9-1;
-    if(fecha9 < 10 && (fecha10) < 10){
-        fin = "0"+fecha9+":"+"0"+fecha10;
-        }else if((fecha9) < 10){
-        fin = "0"+(fecha9)+":"+(fecha10);
-        }else if((fecha10) < 10){
-        fin = (fecha9)+":"+"0"+(fecha10);
-        }
-    }else if(minuto2 > minuto1){
-    fecha10 = (minuto2 - minuto1);
-    if(fecha9 < 10 && (fecha10) < 10){
-        fin = "0"+fecha9+":"+"0"+fecha10;
-        }else if((fecha9) < 10){
-        fin = "0"+(fecha9)+":"+(fecha10);
-        }else if((fecha10) < 10){
-        fin = (fecha9)+":"+"0"+(fecha10);
-        }
-    }
-    }
-    return fin;
-    }
-   
     public void limpiarTabla() {
         Tabla1 = new javax.swing.JTable();
         Tabla1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                    "Numero de plano", "Proyecto"
+                    "Plano", "Proyecto"
                 }
         ) {
             boolean[] canEdit = new boolean[]{
@@ -279,21 +228,20 @@ public class Acabados extends javax.swing.JInternalFrame {
             con = con1.getConnection();
 
             String datos[] = new String[6];
-            String sql = "select * from acabados where Terminado like 'NO'";
+            String sql = "select Estado, Proyecto, Plano from planos where Estado like 'ACABADOS%'";
 
             Statement st = con.createStatement(); 
             ResultSet rs = st.executeQuery(sql);
 
                 while(rs.next()){
-                datos[0] = rs.getString("Proyecto");
-                datos[1] = rs.getString("Plano");
+                datos[0] = rs.getString("Plano");
+                datos[1] = rs.getString("Proyecto");
 
                  miModelo.addRow(datos);
                 }
 
             }catch(SQLException e){
-
-                JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS","ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "NO SE PUEDEN MOSTRAR LOS DATOS" + e,"ADVERTENCIA",JOptionPane.WARNING_MESSAGE);
 
             }
             TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(miModelo);
@@ -645,561 +593,6 @@ public class Acabados extends javax.swing.JInternalFrame {
         }
     }
     
-    public void pausar(){
-        Date fecha = new Date();
-        SimpleDateFormat fec1 = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
-        String fec = fec1.format(fecha);
-        String f = "";
-        
-        try{
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            String sql = "UPDATE acabados SET Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? WHERE Proyecto = ?";
-            String ver = "select * from acabados where Proyecto like '"+txtPlano.getText()+"'";
-            PreparedStatement pst = con.prepareStatement(sql);
-            ResultSet rs = st.executeQuery(ver);
-            String datos[] = new String[10];
-            while(rs.next()){
-                datos[1] = rs.getString("Proyecto");
-                datos[2] = rs.getString("Plano");
-                datos[3] = rs.getString("FechaInicio");
-                datos[4] = rs.getString("FechaFinal");
-                datos[5] = rs.getString("Terminado");
-                datos[6] = rs.getString("Estado");
-                datos[7] = rs.getString("Cronometro");
-                datos[8] = rs.getString("Prioridad");
-            }
-            if(datos[1] != null){
-
-                if(datos[7] != null){
-                    String fecha1 = txtProyecto.getText();
-                    String fecha2 = fec;
-
-                    int hora1,hora2,minuto1,minuto2;
-                    int fecha9 = 0,fecha10 = 0;
-                    String f1,f2,f4,f5,fin = "";
-
-                    f1 = fecha1.substring(11,13);
-                    f2 = fecha1.substring(14,16);
-                    f4 = fecha2.substring(11,13);
-                    f5 = fecha2.substring(14,16);
-
-                    hora1 = Integer.parseInt(f1);
-                    minuto1 = Integer.parseInt(f2);
-                    hora2= Integer.parseInt(f4);
-                    minuto2 = Integer.parseInt(f5);
-
-                    fecha9 = (hora2 - hora1);
-                    if(hora2 >= hora1 && minuto2 >= minuto1){
-                        if((fecha9) < 10 && (minuto2 - minuto2) < 10){
-                            fin = "0"+(fecha9)+":"+"0"+(minuto2-minuto1);
-                        }else if((fecha9) < 10){
-                            fin = "0"+(fecha9)+":"+(minuto2-minuto1);
-                        }else if((minuto2 - minuto1) < 10){
-                            fin = (fecha9)+":"+"0"+(minuto2-minuto1);
-                        }
-
-                    }else{
-                        if(minuto2 < minuto1){
-                            fecha10 = (60 - minuto1) + minuto2;
-                            fecha9 = fecha9-1;
-                            if(fecha9 < 10 && (fecha10) < 10){
-                                fin = "0"+fecha9+":"+"0"+fecha10;
-                            }else if((fecha9) < 10){
-                                fin = "0"+(fecha9)+":"+(fecha10);
-                            }else if((fecha10) < 10){
-                                fin = (fecha9)+":"+"0"+(fecha10);
-                            }
-                        }else if(minuto2 > minuto1){
-                            fecha10 = (minuto2 - minuto1);
-                            if(fecha9 < 10 && (fecha10) < 10){
-                                fin = "0"+fecha9+":"+"0"+fecha10;
-                            }else if((fecha9) < 10){
-                                fin = "0"+(fecha9)+":"+(fecha10);
-                            }else if((fecha10) < 10){
-                                fin = (fecha9)+":"+"0"+(fecha10);
-                            }
-                        }
-                    }
-                    String a = datos[7].substring(0,2);
-                    String b = datos[7].substring(3,5);
-                    String c = fin.substring(0,2);
-                    String d = fin.substring(3,5);
-
-                    int h1,m1,h2,m2;
-                    h1 = Integer.parseInt(a);
-                    m1 = Integer.parseInt(b);
-                    h2 = Integer.parseInt(c);
-                    m2 = Integer.parseInt(d);
-
-                    int sumaH,sumaM;
-                    sumaH = h1+h2;
-                    sumaM = m1+m2;
-
-                    if(sumaM >= 60){
-                        sumaM = (sumaM - 60);
-                        sumaH = sumaH + 1;
-                    }
-
-                    if((sumaH) < 10 && (sumaM) < 10){
-                        f = "0"+(sumaH)+":"+"0"+(sumaM);
-                    }else if((sumaH) < 10){
-                        f = "0"+(sumaH)+":"+(sumaM);
-                    } else if((sumaM) < 10){
-                        f = (sumaH)+":"+"0"+(sumaM);
-                    }
-                }
-                pst.setString(1, txtPlano.getText());
-                pst.setString(2, datos[2]);
-                pst.setString(3, "");
-                pst.setString(4, "");
-                pst.setString(5, datos[5]);
-                pst.setString(6, datos[6]);
-                pst.setString(7, f);
-                pst.setString(8, datos[8]);
-                pst.setString(9, txtPlano.getText());
-
-                int n = pst.executeUpdate();
-
-                if(n > 0){
-                    limpiarTabla();
-                    verDatos();
-                    estado = false;
-                    txtProyecto.setText("");
-                    txtPlano.setText("");
-                    panelPiezas.setVisible(false);
-                    JOptionPane.showMessageDialog(this, "PLANO PAUSADO","EXITO",JOptionPane.INFORMATION_MESSAGE);
-                }
-            }
-        }catch(SQLException e){
-            JOptionPane.showMessageDialog(this, "ERROR AL PAUSAR "+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    public void guardar(String revision){
-        Date fecha = new Date();
-        SimpleDateFormat fec1 = new SimpleDateFormat ("dd/MM/yyyy HH:mm:ss");
-        String fec = fec1.format(fecha);
-        if(txtNumero.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES LLENAR EL NUMERO DE EMPLEADO","ERROR",JOptionPane.ERROR_MESSAGE);
-        }else if(txtPlano.getText().equals("")){
-            JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN PROYECTO","ERROR",JOptionPane.ERROR_MESSAGE);
-        }else{
-            try{
-                Connection con = null;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                estado = false;
-                Statement st = con.createStatement();
-                Statement st1 = con.createStatement();
-                Statement st2 = con.createStatement();
-                Statement st3 = con.createStatement();
-                Statement st4 = con.createStatement();
-                Statement st5 = con.createStatement();
-                String sql =  "UPDATE acabados SET Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ?,Empleado = ? WHERE Proyecto = ? and Revision = ?";
-                String sql1 = "insert into cnc (Proyecto,Plano,FechaInicio,FechaFinal,Terminado,Estado,Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?)";
-                String sql2 = "insert into datos (Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?,?)";
-                String sql4 = "insert into torno (Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?)";
-                String sql5 = "insert into fresadora (Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?)";
-                String sql6 = "insert into calidad (Proyecto,Plano,FechaInicio,FechaFinal,Terminado, Estado,Tratamiento, Cronometro,Prioridad,Revision) values(?,?,?,?,?,?,?,?,?,?)";
-                PreparedStatement pst = con.prepareStatement(sql);
-                PreparedStatement pst1 = con.prepareStatement(sql1);
-                PreparedStatement pst2 = con.prepareStatement(sql2);
-                PreparedStatement pst4 = con.prepareStatement(sql4);
-                PreparedStatement pst5 = con.prepareStatement(sql5);
-                PreparedStatement pst6 = con.prepareStatement(sql6);
-
-                String ver = "select * from cnc where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
-                String ver1 = "select * from datos where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
-                String ver2 = "select * from torno where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
-                String ver3 = "select * from fresadora where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
-                String ver4 = "select * from calidad where Proyecto like '"+txtPlano.getText()+"' and Revision like '"+revision+"'";
-
-                ResultSet rs = st.executeQuery(ver);
-                ResultSet rs1 = st1.executeQuery(ver1);
-                ResultSet rs2 = st2.executeQuery(ver2);
-                ResultSet rs3 = st3.executeQuery(ver3);
-                ResultSet rs4 = st4.executeQuery(ver4);
-
-                String ac = "update cnc set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
-                String ac1 = "update datos set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
-                String ac2 = "update torno set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
-                String ac3 = "update fresadora set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
-                String ac4 = "update calidad set Proyecto = ?, Plano = ?, FechaInicio = ?, FechaFinal = ?, Terminado = ?, Estado = ?, Tratamiento = ?, Cronometro = ?, Prioridad = ? where Proyecto = ? and Revision = ?";
-                PreparedStatement act = con.prepareStatement(ac);
-                PreparedStatement act1 = con.prepareStatement(ac1);
-                PreparedStatement act2 = con.prepareStatement(ac2);
-                PreparedStatement act3 = con.prepareStatement(ac3);
-                PreparedStatement act4 = con.prepareStatement(ac4);
-
-                String ecnc = "select * from acabados where Proyecto like '"+txtPlano.getText()+"'and Revision like '"+revision+"'";
-                ResultSet eC = st5.executeQuery(ecnc);
-                String cnc[] = new String[10];
-                String acabados[] = new String[10];
-                String torno[] = new String[10];
-                String fresa[] = new String[10];
-                String cortes[] = new String[10];
-                String calidad[] = new String[10];
-                
-                while(eC.next()){
-                    acabados[1] = eC.getString("Estado");
-                    acabados[2] = eC.getString("FechaInicio");
-                    acabados[3] = eC.getString("FechaFinal");
-                    acabados[4] = eC.getString("Cronometro");
-                    acabados[5] = eC.getString("Plano");
-                    acabados[6] = eC.getString("Prioridad");
-                    acabados[7] = eC.getString("Empleado");
-                }
-                while(rs.next()){
-                    cnc[1] = rs.getString("Proyecto");
-                    cnc[2] = rs.getString("Estado");
-                    cnc[3] = rs.getString("Cronometro");
-                    cnc[5] = rs.getString("Plano");
-                    cnc[6] = rs.getString("Prioridad");
-                }
-                while(rs3.next()){
-                    fresa[1] = rs3.getString("Proyecto");
-                    fresa[3] = rs3.getString("Cronometro");
-                    fresa[3] = rs3.getString("Cronometro");
-                    fresa[5] = rs3.getString("Plano");
-                    fresa[6] = rs3.getString("Prioridad");
-                }
-                while(rs2.next()){
-                    torno[1] = rs2.getString("Proyecto");
-                    torno[3] = rs2.getString("Cronometro");
-                    torno[5] = rs2.getString("Plano");
-                    torno[6] = rs2.getString("Prioridad");
-                }
-                while(rs1.next()){
-                    cortes[1] = rs1.getString("Proyecto");
-                    cortes[3] = rs1.getString("Cronometro");
-                    cortes[5] = rs1.getString("Plano");
-                    cortes[6] = rs1.getString("Prioridad");
-                }
-                while(rs1.next()){
-                    calidad[1] = rs4.getString("Proyecto");
-                    calidad[3] = rs4.getString("Cronometro");
-                    calidad[5] = rs4.getString("Plano");
-                    calidad[6] = rs4.getString("Prioridad");
-                }
-
-                if(acabados[4] != "00:00"){
-                    String fecha1 = txtProyecto.getText();
-                    String fecha2 = fec;
-
-                    int hora1,hora2,minuto1,minuto2;
-                    int fecha9 = 0,fecha10 = 0;
-                    String f1,f2,f4,f5,fin = "";
-
-                    f1 = fecha1.substring(11,13);
-                    f2 = fecha1.substring(14,16);
-                    f4 = fecha2.substring(11,13);
-                    f5 = fecha2.substring(14,16);
-
-                    hora1 = Integer.parseInt(f1);
-                    minuto1 = Integer.parseInt(f2);
-                    hora2= Integer.parseInt(f4);
-                    minuto2 = Integer.parseInt(f5);
-
-                    fecha9 = (hora2 - hora1);
-                    if(hora2 >= hora1 && minuto2 >= minuto1){
-                        if((fecha9) < 10 && (minuto2 - minuto2) < 10){
-                            fin = "0"+(fecha9)+":"+"0"+(minuto2-minuto1);
-                        }else if((fecha9) < 10){
-                            fin = "0"+(fecha9)+":"+(minuto2-minuto1);
-                        }else if((minuto2 - minuto1) < 10){
-                            fin = (fecha9)+":"+"0"+(minuto2-minuto1);
-                        }
-
-                    }else{
-                        if(minuto2 < minuto1){
-                            fecha10 = (60 - minuto1) + minuto2;
-                            fecha9 = fecha9-1;
-                            if(fecha9 < 10 && (fecha10) < 10){
-                                fin = "0"+fecha9+":"+"0"+fecha10;
-                            }else if((fecha9) < 10){
-                                fin = "0"+(fecha9)+":"+(fecha10);
-                            }else if((fecha10) < 10){
-                                fin = (fecha9)+":"+"0"+(fecha10);
-                            }
-                        }else if(minuto2 > minuto1){
-                            fecha10 = (minuto2 - minuto1);
-                            if(fecha9 < 10 && (fecha10) < 10){
-                                fin = "0"+fecha9+":"+"0"+fecha10;
-                            }else if((fecha9) < 10){
-                                fin = "0"+(fecha9)+":"+(fecha10);
-                            }else if((fecha10) < 10){
-                                fin = (fecha9)+":"+"0"+(fecha10);
-                            }
-                        }
-                    }
-                    String a = acabados[4].substring(0,2);
-                    String b = acabados[4].substring(3,5);
-                    String c = fin.substring(0,2);
-                    String d = fin.substring(3,5);
-
-                    int h1,m1,h2,m2;
-                    String f = "";
-                    h1 = Integer.parseInt(a);
-                    m1 = Integer.parseInt(b);
-                    h2 = Integer.parseInt(c);
-                    m2 = Integer.parseInt(d);
-
-                    int sumaH,sumaM;
-                    sumaH = h1+h2;
-                    sumaM = m1+m2;
-
-                    if(sumaM >= 60){
-                        sumaM = (sumaM - 60);
-                        sumaH = sumaH + 1;
-                    }
-
-                    if((sumaH) < 10 && (sumaM) < 10){
-                        f = "0"+(sumaH)+":"+"0"+(sumaM);
-                    }else if((sumaH) < 10){
-                        f = "0"+(sumaH)+":"+(sumaM);
-                    } else if((sumaM) < 10){
-                        f = (sumaH)+":"+"0"+(sumaM);
-                    }
-                    
-                    String as;
-                    if(acabados[7] == null || acabados[7].equals("")){
-                    as = txtNumero.getText();
-                    }else{
-                    as = acabados[7]+","+txtNumero.getText();
-                    }
-                    
-                    pst.setString(1, txtPlano.getText());
-                    pst.setString(2, acabados[5]);
-                    pst.setString(3, txtProyecto.getText());
-                    pst.setString(4, fec);
-                    pst.setString(5, "SI");
-                    pst.setString(6, acabados[1]);
-                    pst.setString(7, f);
-                    pst.setString(8, acabados[6]);
-                    pst.setString(9, as);
-                    pst.setString(10, txtPlano.getText());
-                    pst.setString(11, revision);
-
-                }else{
-                    String as = acabados[8]+","+txtNumero.getText();
-                    pst.setString(1, txtPlano.getText());
-                    pst.setString(2, acabados[5]);
-                    pst.setString(3, txtProyecto.getText());
-                    pst.setString(4, fec);
-                    pst.setString(5, "SI");
-                    pst.setString(6, acabados[1]);
-                    pst.setString(7, cronometro(txtProyecto.getText(),fec));
-                    pst.setString(8, acabados[6]);
-                    pst.setString(9, as);
-                    pst.setString(10, txtPlano.getText());
-                    pst.setString(11, revision);
-                }
-
-                switch (cmbEnviar.getSelectedIndex()) {
-                    case 0:
-                        JOptionPane.showMessageDialog(this, "DEBE ESCOGER UNA OPCION","",JOptionPane.ERROR_MESSAGE);
-                        break;
-                    case 1:
-                        if(fresa[1] == (null)){
-                            pst5.setString(1, txtPlano.getText());
-                            pst5.setString(2, acabados[5]);
-                            pst5.setString(3, "");
-                            pst5.setString(4, "");
-                            pst5.setString(5, "NO");
-                            pst5.setString(6, acabados[1]);
-                            pst5.setString(7, "00:00");
-                            pst5.setString(8, acabados[6]);
-                            pst5.setString(9, revision);
-                            int n = pst5.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0 )
-                            {
-                                tabla();
-                                borrar();
-                            }
-                        }else{
-                            act3.setString(1, txtPlano.getText());
-                            act3.setString(2, acabados[5]);
-                            act3.setString(3, "");
-                            act3.setString(4, "");
-                            act3.setString(5, "NO");
-                            act3.setString(6, acabados[1]);
-                            act3.setString(7, fresa[3]);
-                            act3.setString(8, acabados[6]);
-                            act3.setString(9, txtPlano.getText());
-                            act3.setString(10, revision);
-                            int n = act3.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n > 0 && n1 >0){
-                                tabla();
-                                borrar();
-                            }
-                            
-                        }   break;
-                    case 2:
-                        if(cnc[1] == (null)){
-                            pst1.setString(1, txtPlano.getText());
-                            pst1.setString(2, acabados[5]);
-                            pst1.setString(3, "");
-                            pst1.setString(4, "");
-                            pst1.setString(5, "NO");
-                            pst1.setString(6, acabados[1]);
-                            pst1.setString(7, "00:00");
-                            pst1.setString(8, acabados[6]);
-                            pst1.setString(9, revision);
-                            int n = pst1.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n > 0 && n1 > 0)
-                            {
-                                tabla();
-                                borrar();
-                            }
-                        }else{
-                            act.setString(1, txtPlano.getText());
-                            act.setString(2, acabados[5]);
-                            act.setString(3, "");
-                            act.setString(4, "");
-                            act.setString(5, "NO");
-                            act.setString(6, acabados[1]);
-                            act.setString(7, cnc[3]);
-                            act.setString(8, acabados[6]);
-                            act.setString(9, txtPlano.getText());
-                            act.setString(10, revision);
-                            int n = act.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0){
-                                tabla();
-                                borrar();
-                            }                    }
-                        break;
-                    case 3:
-                        if(torno[1] == (null)){
-                            pst4.setString(1, txtPlano.getText());
-                            pst4.setString(2, acabados[5]);
-                            pst4.setString(3, "");
-                            pst4.setString(4, "");
-                            pst4.setString(5, "NO");
-                            pst4.setString(6, acabados[1]);
-                            pst4.setString(7, "00:00");
-                            pst4.setString(8, acabados[6]);
-                            pst4.setString(9, revision);
-                            int n = pst4.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0)
-                            {
-                                tabla();
-                                borrar();
-                            }
-                        }else{
-                            act2.setString(1, txtPlano.getText());
-                            act2.setString(2, acabados[5]);
-                            act2.setString(3, "");
-                            act2.setString(4, "");
-                            act2.setString(5, "NO");
-                            act2.setString(6, acabados[1]);
-                            act2.setString(7, torno[3]);
-                            act2.setString(8, acabados[6]);
-                            act2.setString(9, txtPlano.getText());
-                            act2.setString(10, revision);
-                            int n = act2.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0){
-                                tabla();
-                                borrar();
-                            }
-                        }
-                        break;
-                    case 4:
-                        if(calidad[1] == (null)){
-                            pst6.setString(1, txtPlano.getText());
-                            pst6.setString(2, acabados[5]);
-                            pst6.setString(3, "");
-                            pst6.setString(4, "");
-                            pst6.setString(5, "NO");
-                            pst6.setString(6, acabados[1]);
-                            pst6.setString(7, "NO");
-                            pst6.setString(8, "00:00");
-                            pst6.setString(9, acabados[6]);
-                            pst6.setString(10, revision);
-                            
-                            int n = pst6.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0)
-                            {
-                                tabla();
-                                borrar();
-                            }
-                        }else{
-                            act4.setString(1, txtPlano.getText());
-                            act4.setString(2, acabados[5]);
-                            act4.setString(3, "");
-                            act4.setString(4, "");
-                            act4.setString(5, "NO");
-                            act4.setString(6, acabados[1]);
-                            act4.setString(7, "NO");
-                            act4.setString(8, cortes[3]);
-                            act4.setString(9, acabados[6]);
-                            act4.setString(10, txtPlano.getText());
-                            act4.setString(11, revision);
-                            int n = act4.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0){
-                                tabla();
-                                borrar();
-                            }
-                        }
-                        break;
-                    case 5:
-                        if(cortes[1] == (null)){
-                            pst2.setString(1, txtPlano.getText());
-                            pst2.setString(2, acabados[5]);
-                            pst2.setString(3, "");
-                            pst2.setString(4, "");
-                            pst2.setString(5, "NO");
-                            pst2.setString(6, acabados[1]);
-                            pst2.setString(7, "00:00");
-                            pst2.setString(8, acabados[6]);
-                            pst2.setString(9, revision);
-                            int n = pst2.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0)
-                            {
-                                tabla();
-                                borrar();
-                            }
-                        }else{
-                            act1.setString(1, txtPlano.getText());
-                            act1.setString(2, acabados[5]);
-                            act1.setString(3, "");
-                            act1.setString(4, "");
-                            act1.setString(5, "NO");
-                            act1.setString(6, acabados[1]);
-                            act1.setString(7, cortes[3]);
-                            act1.setString(8, acabados[6]);
-                            act1.setString(9, txtPlano.getText());
-                            act1.setString(10, revision);
-                            int n = act1.executeUpdate();
-                            int n1 = pst.executeUpdate();
-                            if (n1 > 0 && n > 0){
-                                tabla();
-                                borrar();
-                            }
-                        }
-                        break;
-                    default:
-                        break;
-                }
-
-                }catch(SQLException e){
-
-                    JOptionPane.showMessageDialog(null, "NO SE PUEDE ENVIAR INFORMACION"+e,"ERROR",JOptionPane.ERROR_MESSAGE);
-                }
-            }
-    }
-    
     public String obtenerDepartamento() {
         switch (cmbEnviar.getSelectedIndex()) {
             case 1:
@@ -1219,21 +612,17 @@ public class Acabados extends javax.swing.JInternalFrame {
             Conexion con1 = new Conexion();
             con = con1.getConnection();
             revisarPlanos rev = new revisarPlanos();
-            String estacion = rev.buscar(plano, con);
             String estacionSeleccionada = obtenerDepartamento();
-            if (estacion.equals("LIBERACION")) {
-                rev.terminarPlano(plano, proyecto, numEmpleado, null, "acabados", con);
-                rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
-            } else {
-                if (cmbEnviar.getSelectedIndex() == 1 || cmbEnviar.getSelectedIndex() == 3){
-                    if (cmbEnviar.getSelectedIndex() == 1) {
-                        rev.retrabajo = true;
-                    }
-                    rev.enviarCortes("acabados", plano, numEmpleado, proyecto, "00");
-                } else {
-                    rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
+            if (cmbEnviar.getSelectedIndex() == 1 || cmbEnviar.getSelectedIndex() == 3){
+                if (cmbEnviar.getSelectedIndex() == 1) {
+                    rev.retrabajo = true;
                 }
+                rev.enviarCortes("acabados", plano, numEmpleado, proyecto, "00");
+                rev.actualizarPlanos(con, plano, estacionSeleccionada.toUpperCase());
+                rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", "acabados", numEmpleado, estacionSeleccionada);
+            } else {
+                rev.actualizarPlanos(con, plano, estacionSeleccionada.toUpperCase());
+                rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", "acabados", numEmpleado, estacionSeleccionada);
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
@@ -1252,8 +641,8 @@ public class Acabados extends javax.swing.JInternalFrame {
             DefaultTableModel miModelo = (DefaultTableModel) Tabla1.getModel();
             int cont = 0;
             while (rs.next()) {
-                datos[0] = rs.getString("Proyecto");
-                datos[1] = rs.getString("Plano");
+                datos[0] = rs.getString("Plano");
+                datos[1] = rs.getString("Proyecto");
                 miModelo.addRow(datos);
                 cont++;
             }
@@ -1764,6 +1153,7 @@ public class Acabados extends javax.swing.JInternalFrame {
         btnPausa.setBorderPainted(false);
         btnPausa.setContentAreaFilled(false);
         btnPausa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnPausa.setEnabled(false);
         btnPausa.setFocusPainted(false);
         btnPausa.setPreferredSize(new java.awt.Dimension(70, 70));
         btnPausa.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/ImgAnimacion/pausa_48.png"))); // NOI18N
@@ -1910,7 +1300,7 @@ public class Acabados extends javax.swing.JInternalFrame {
         int fila = Tabla1.getSelectedRow();
         try{
           char comillas = '"';
-          Runtime.getRuntime().exec("cmd /c start \\\\100.100.200.10\\bd\\OC\\PDF_Planos\\"+comillas+Tabla1.getValueAt(fila, 2)+comillas+"\\"+comillas+Tabla1.getValueAt(fila, 1)+".pdf"+comillas);
+          Runtime.getRuntime().exec("cmd /c start \\\\192.168.100.40\\01 Project\\04 DISENO\\PDF_Planos\\"+comillas+Tabla1.getValueAt(fila, 2)+comillas+"\\"+comillas+Tabla1.getValueAt(fila, 1)+".pdf"+comillas);
           
           }catch(IOException  e){
               JOptionPane.showMessageDialog(this, "PDF NO ENCONTRADO");
@@ -2002,10 +1392,6 @@ public class Acabados extends javax.swing.JInternalFrame {
         verDatos();
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void btnPausaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPausaActionPerformed
-        pausar();
-    }//GEN-LAST:event_btnPausaActionPerformed
-
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         enviarPlano(txtPlano.getText(), txtProyecto.getText());
     }//GEN-LAST:event_btnGuardarActionPerformed
@@ -2019,9 +1405,9 @@ public class Acabados extends javax.swing.JInternalFrame {
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
         if (jTextField1.getText().equals("")) {
-            verDatos("select * from acabados where Terminado like 'NO' order by id desc");
+            verDatos("select Estado, id, plano, proyecto from planos where Estado like 'ACABADOS%' order by id desc");
         } else {
-            verDatos("select * from acabados where Terminado like 'NO' and Plano like '" + jTextField1.getText() + "' order by id desc");
+            verDatos("select Estado, id, plano, proyecto from planos where Estado like 'ACABADOS%' and Proyecto like '" + jTextField1.getText() + "%' order by id desc");
         }
     }//GEN-LAST:event_jTextField1ActionPerformed
 
@@ -2033,6 +1419,10 @@ public class Acabados extends javax.swing.JInternalFrame {
             terminarPlanos.setText("Enviar planos a: " + cmbEnviar.getSelectedItem().toString() + "                          ");
         }
     }//GEN-LAST:event_cmbEnviarActionPerformed
+
+    private void btnPausaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPausaActionPerformed
+
+    }//GEN-LAST:event_btnPausaActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
@@ -60,7 +61,7 @@ import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-public class CambiarEstado extends InternalFrameImagen implements ActionListener {
+public class CambiarEstado extends JInternalFrame implements ActionListener {
 
     private TableRowSorter<TableModel> modeloOrdenado;
 
@@ -132,8 +133,12 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                 return canEdit[columnIndex];
             }
         });
-        TablaDeDatos1.setColumnSelectionAllowed(true);
+        TablaDeDatos1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
+        TablaDeDatos1.getTableHeader().setOpaque(false);
+        TablaDeDatos1.getTableHeader().setBackground(new Color(0, 78, 171));
+        TablaDeDatos1.getTableHeader().setForeground(Color.white);
         TablaDeDatos1.setRowHeight(25);
+        TablaDeDatos1.setColumnSelectionAllowed(true);
         DefaultTableModel Modelo = (DefaultTableModel) TablaDeDatos1.getModel();
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(Modelo);
         TablaDeDatos1.setRowSorter(elQueOrdena);
@@ -144,6 +149,12 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         DefaultTableModel Modelo = (DefaultTableModel) TablaDeDatos1.getModel();
         String titulos[] = {"CLIENTE", "DESCRIPCION", "PROYECTO"};
         Modelo = new DefaultTableModel(null, titulos);
+        Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
+        Tabla1.getTableHeader().setOpaque(false);
+        Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
+        Tabla1.getTableHeader().setForeground(Color.white);
+        Tabla1.setRowHeight(25);
+        Tabla1.setShowGrid(false);
         Tabla1.setModel(Modelo);
 
     }
@@ -456,24 +467,21 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                             con = con1.getConnection();
                             Statement st = con.createStatement();
 
-                            String sql2 = "select Prioridad,Plano,Proyecto, Cantidad from Planos where Proyecto like '" + proyecto + "' order by Plano asc";
+                            String sql2 = "select Prioridad, Plano, Proyecto, Estado, Cantidad from Planos where Proyecto like '" + proyecto + "' order by Plano asc";
                             Statement st2 = con.createStatement();
                             ResultSet rs2 = st2.executeQuery(sql2);
                             String dat[] = new String[10];
                             while (rs2.next()) {
                                 dat[0] = rs2.getString("Plano");
                                 dat[1] = rs2.getString("Proyecto");
+                                dat[2] = rs2.getString("Estado");
                                 try {
                                     String part[] = dat[0].split(" ");
                                     int ultimo = Integer.parseInt(part[2]);
                                     if(ultimo < 100) {
                                         dat[2] = "SUB ENSAMBLE";
-                                    } else {
-                                        dat[2] = rev.buscar(dat[0], con);
                                     }
-                                } catch (Exception e) { 
-                                    dat[2] = rev.buscar(dat[0], con);
-                                }
+                                } catch (Exception e) {}
                                 if (dat[2].equals("TERMINADO")) {
                                     dat[2] = "TERMINADO (CALIDAD)";
                                 }
@@ -512,13 +520,6 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
                             JOptionPane.showMessageDialog(null, "ERROR AL ENVIAR A CORTES: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                         }
 
-                        int total = TablaDeDatos1.getRowCount();
-                        int v = 0;
-                        for (int i = 0; i < total; i++) {
-                            if (TablaDeDatos1.getValueAt(i, 2).toString().equals("TERMINADO")) {
-                                v++;
-                            }
-                        }
                         espera.band = false;
                         espera.dispose();
                     }
@@ -529,28 +530,12 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
     
     public CambiarEstado(String numEmpleado) {
         initComponents();
-
         verDatos();
-
-        Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
-        Tabla1.getTableHeader().setOpaque(false);
-        Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
-        Tabla1.getTableHeader().setForeground(Color.white);
-        Tabla1.setRowHeight(25);
-        Tabla1.setShowGrid(false);
-
-        TablaDeDatos1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
-        TablaDeDatos1.getTableHeader().setOpaque(false);
-        TablaDeDatos1.getTableHeader().setBackground(new Color(0, 78, 171));
-        TablaDeDatos1.getTableHeader().setForeground(Color.white);
-        TablaDeDatos1.setRowHeight(25);
-
         jScrollPane1.getViewport().setBackground(Color.white);
         jScrollPane2.getViewport().setBackground(Color.white);
         this.numEmpleado = numEmpleado;
         agregarProyectos();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -1026,19 +1011,9 @@ public class CambiarEstado extends InternalFrameImagen implements ActionListener
         txtPlano.setText("");
         txtProyecto.setText("");
         int fila = TablaDeDatos1.getSelectedRow();
-        try {
-            Connection con = null;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            String datos[] = new String[5];
-            Statement st = con.createStatement();
-            String sql = "select * from Planos";
-            txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
-            txtPlano.setText(TablaDeDatos1.getValueAt(fila, 0).toString());
-            btnVer.setEnabled(true);
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e);
-        }
+        txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
+        txtPlano.setText(TablaDeDatos1.getValueAt(fila, 0).toString());
+        btnVer.setEnabled(true);
 
     }//GEN-LAST:event_TablaDeDatos1MouseClicked
 

@@ -7,10 +7,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.WeekFields;
 import java.util.Arrays;
 import java.util.Date;
@@ -33,6 +35,7 @@ public class ComprasKPI extends javax.swing.JInternalFrame {
 
     public String numEmpleado;
     public String depa;
+    public Stack<Integer> semanas;
     
     public final void limpiarPanel() {
         pnlGraficos = new javax.swing.JPanel();
@@ -50,6 +53,18 @@ public class ComprasKPI extends javax.swing.JInternalFrame {
         panel.setBackground(new java.awt.Color(255, 255, 255));
         panel.setLayout(new java.awt.BorderLayout());
         pnlGraficos.add(panel);
+    }
+    
+    public final int buscarMes(int semana) {
+        for (int i = 0; i < semanas.size() - 1; i++) {
+            int primero = (i ==0) ? semanas.get(i) : (semanas.get(i) + 1);
+            int segundo = semanas.get(i + 1);
+            if (semana >= primero && semana <= segundo) {
+                return i;
+            }
+            System.out.println("Mes: " + (i + 1) + " - " + primero + " - " + segundo);
+        }
+        return -1;
     }
     
     public final void getKPIs() {
@@ -80,16 +95,15 @@ public class ComprasKPI extends javax.swing.JInternalFrame {
                 pila.get(cont).push(datos);
             }
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            Stack<Integer> semanas = new Stack<>();
             for (int i = 0; i < pila.size(); i++) {
                 int meses[] = new int[12];
                 for (int j = 0; j < pila.get(i).size(); j++) {
                     LocalDate fecha = LocalDate.parse(pila.get(i).get(j)[1], formatter);
-
-                    LocalDate lunesSemana = fecha.with(java.time.DayOfWeek.MONDAY);
-                    int semana = fecha.get(ChronoField.ALIGNED_WEEK_OF_YEAR);
-                    semanas.add(semana);
-                    int mesDeLaSemana = lunesSemana.getMonthValue() - 1;
+                    WeekFields weekFields = WeekFields.of(Locale.getDefault());
+                    int numeroSemana = fecha.get(weekFields.weekOfWeekBasedYear());
+                    int mesDeLaSemana = buscarMes(numeroSemana);
+//                    int mesDeLaSemana =1;
+                    System.out.println(numeroSemana + " - Mes: " + mesDeLaSemana);
                     meses[mesDeLaSemana] += Integer.parseInt(pila.get(i).get(j)[2]);
                     meses[mesDeLaSemana] = (j ==0) ? (meses[mesDeLaSemana] /= 1) : (meses[mesDeLaSemana] /= 2);
                 }
@@ -129,6 +143,8 @@ public class ComprasKPI extends javax.swing.JInternalFrame {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy");
         Date d = new Date();
         int year = Integer.parseInt(sdf.format(d)) + 1;
+        semanas = new Stack<>();
+        semanas.add(1);
         lblMeses.setText("<html> <p style='width:900px;'>");
         for (int mes = 1; mes <= 12; mes++) {
             LocalDate inicioMes = LocalDate.of(year, mes, 1);
@@ -138,7 +154,7 @@ public class ComprasKPI extends javax.swing.JInternalFrame {
 
             int semanaInicio = inicioMes.get(weekFields.weekOfWeekBasedYear());
             int semanaFin = finMes.get(weekFields.weekOfWeekBasedYear());
-
+            semanas.add(semanaFin);
             lblMeses.setText(lblMeses.getText() + "(<span style='color: rgb(90,90,90);'>" + Month.of(mes) + "</span>" + " Semanas: " + (semanaInicio + 1) + " -> " + semanaFin + ") ");
         }
         lblMeses.setText(lblMeses.getText() + "</p>");

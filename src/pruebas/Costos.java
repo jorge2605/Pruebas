@@ -58,7 +58,9 @@ import VentanaEmergente.Inicio1.Espera;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.Stack;
 
 public final class Costos extends javax.swing.JInternalFrame {
@@ -134,18 +136,23 @@ public final class Costos extends javax.swing.JInternalFrame {
             cmbAnio.addItem(String.valueOf(i));
         }
         
-        Date d = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM");
-        int mes = Integer.parseInt(sdf.format(d));
-        
-        String[] monthNames = DateFormatSymbols.getInstance(Locale.getDefault()).getMonths();
-        for (int i = monthNames.length - 1; i >= 0; i--) {
-            if (i <= mes) {
-                cmbMes.addItem(monthNames[i]);
-            }
+//        Date d = new Date();
+//        SimpleDateFormat sdf = new SimpleDateFormat("MM");
+//        int mes = Integer.parseInt(sdf.format(d));
+//        
+//        String[] monthNames = DateFormatSymbols.getInstance(Locale.getDefault()).getMonths();
+//        for (int i = monthNames.length - 1; i >= 0; i--) {
+//            if (i <= mes) {
+//                cmbMes.addItem(monthNames[i]);
+//            }
+//        }
+        int mesActual = LocalDate.now().getMonthValue();
+
+        // Insertar los nombres de los meses en inglés hasta el mes actual
+        for (int i = mesActual; i >= 1; i--) {
+            String nombreMes = Month.of(i).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            cmbMes.addItem(nombreMes);
         }
-        
-        cmbMes.removeItemAt(0);
     }
     
     public void limpiarTablaHoras(){

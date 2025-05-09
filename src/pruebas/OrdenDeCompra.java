@@ -68,6 +68,10 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Stack;
@@ -1611,7 +1615,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                         }
 
                         //------------------------------------------------------------------
-                        cadena = datos.substring(3, 7);
+                        cadena = datos.substring(3, datos.length());
                         int suma = Integer.parseInt(cadena);
                         
                         cadena = "OC" + inicial + (suma + 1);
@@ -2214,7 +2218,7 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                                 datos = rs.getString("OrdenNo");
                             }
 
-                            cadena = datos.substring(3, 7);
+                            cadena = datos.substring(3, datos.length());
                             int suma = Integer.parseInt(cadena);
                             cadena = "OC" + inicial + (suma + 1);
                             cadena2 = "OC" + inicial + (suma + 1) + "-" + provedor;
@@ -3542,9 +3546,40 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
         }
     }
     
+    public void verificarKPIs(OrdenDeCompra orden) {
+        Thread hilo = new Thread(){
+           public void run() {
+               try {
+                   Connection con = new Conexion().getConnection();
+                   Statement st = con.createStatement();
+                   LocalDate fecha = LocalDate.now();
+
+                    int numeroSemana = fecha.get(WeekFields.ISO.weekOfWeekBasedYear());
+
+                    LocalDate primerDiaSemana = fecha.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+                    System.out.println("Fecha actual: " + fecha);
+                    System.out.println("Número de semana: " + numeroSemana);
+                    System.out.println("Primer día de la semana: " + primerDiaSemana);
+                    
+                   String sql = "select * from requisicion where FechaNew > Progreso != 'LLEGO, COMPLETO' and Progreso != 'CANCELADO'  and Progreso != 'CANCELADO/COSTOS' and id > 6850";
+                   ResultSet rs = st.executeQuery(sql);
+                   while (rs.next()) {
+                        int id = rs.getInt("id");
+                        String fechaNew = rs.getString("FechaNew");
+                        System.out.println(id + " - " + fechaNew);
+                   }
+               } catch (SQLException e) {
+                   JOptionPane.showMessageDialog(orden, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+               }
+           } 
+        };
+        hilo.start();
+    }
+    
     public OrdenDeCompra(String numEmpleado) {
         initComponents();
-        
+        verificarKPIs(this);
         this.numEmpleado = numEmpleado;
 
         verDatos();

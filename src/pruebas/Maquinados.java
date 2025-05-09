@@ -361,8 +361,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                 n += pst.executeUpdate();
             }
 
-            if (n > 0) {
-                JOptionPane.showMessageDialog(this, "Datos Guardados correctamente");
+            if (n < 1) {
+                JOptionPane.showMessageDialog(this, "Error al guardar datos HTPP", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -520,10 +520,8 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                 
                 KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
                 manager.focusNextComponent();
-                revisarPlanos revisar = new revisarPlanos();
+                revisarPlanos rev = new revisarPlanos();
                 Stack<String> botones = extraerBotones();
-                String estacion = revisar.buscar(txtPlano2.getText(), con);
-                revisar.terminarPlanoEnEstacion(estacion, txtPlano2.getText(), numEmpleado);
                 for (int i = 0; i < botones.size(); i++) {
                     String hora = "";
                     switch (botones.get(i)) {
@@ -542,12 +540,12 @@ public class Maquinados extends javax.swing.JInternalFrame implements ActionList
                         default:
                             break;
                     }
-                    revisar.terminarPlano(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, hora, botones.get(i), con);
+                    rev.transaccionTerminarPlano(con, txtPlano2.getText(), txtProyecto.getText(), hora, botones.get(i).toLowerCase(), numEmpleado, "ACABADOS");
                 }
                 if (calidad) {
-                    revisar.sendToEstacion(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, "acabados");
+                    rev.actualizarPlanos(con, txtPlano2.getText(), "ACABADOS");
                 } else {
-                    revisar.sendToEstacion(txtPlano2.getText(), txtProyecto.getText(), numEmpleado, "maquinados");
+                    rev.actualizarPlanos(con, txtPlano2.getText(), "MAQUINADOS");
                 }
                 limpiarFormulario();
                     

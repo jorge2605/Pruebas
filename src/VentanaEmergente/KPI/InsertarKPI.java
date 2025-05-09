@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.Date;
 import java.util.Locale;
@@ -100,10 +102,20 @@ public class InsertarKPI extends java.awt.Dialog {
         lblMes.setText(s2.format(d));
         dia = Integer.parseInt(fechas[0]);
         LocalDate inicioMes = LocalDate.of(Integer.parseInt(fechas[2]), Integer.parseInt(fechas[1]), Integer.parseInt(fechas[0]));
+        LocalDate lunesSemana = inicioMes.with(java.time.DayOfWeek.MONDAY);
         WeekFields weekFields = WeekFields.of(Locale.getDefault());
-        lblSemana.setText(inicioMes.get(weekFields.weekOfWeekBasedYear()) + "");
+        lblSemana.setText(lunesSemana.get(weekFields.weekOfWeekBasedYear()) + "");
     }
 
+    public LocalDate getFecha(int año, int numSemana) {
+        WeekFields weekFields = WeekFields.of(java.time.DayOfWeek.MONDAY, 1);
+        TemporalField weekOfYear = weekFields.weekOfYear();
+        LocalDate fec = LocalDate.of(año, 1, 1)
+                .with(weekOfYear, numSemana)
+                .with(weekFields.dayOfWeek(), 1);
+        return fec;
+    }
+    
     public boolean validar() {
         int cont = 0;
         for (int i = 0; i < labels.size(); i++) {
@@ -463,8 +475,11 @@ public class InsertarKPI extends java.awt.Dialog {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
         Semanas sem = new Semanas(f, true, numEmpleado, depa, labels.size());
-        
         sem.setVisible(true);
+        if (sem.seleccionado != -1) {
+            Date d = Date.from(getFecha(Integer.parseInt(lblAno.getText()), sem.seleccionado).atStartOfDay(ZoneId.systemDefault()).toInstant());
+            agregarFecha(d);
+        }
     }//GEN-LAST:event_jButton3ActionPerformed
 
     public static void main(String args[]) {

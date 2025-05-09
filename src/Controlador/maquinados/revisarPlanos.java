@@ -94,8 +94,6 @@ public class revisarPlanos {
     public String buscar(String plano, Connection con) throws SQLException {
         String datos[] = new String[1000];
         datos[3] = null;
-        Conexion con1 = new Conexion();
-        con = con1.getConnection();
         Statement st = con.createStatement();
         Statement st1 = con.createStatement();
         Statement st2 = con.createStatement();
@@ -148,6 +146,7 @@ public class revisarPlanos {
                 calidad[1] = r.getString("Proyecto");
                 calidad[2] = r.getString("Plano");
                 calidad[3] = r.getString("Terminado");
+                calidad[3] = (calidad[3] == null) ? "SI" : calidad[3];
                 calidad[4] = r.getString("Tratamiento");
                 calidad[4] = (calidad[4] == null) ? "NO" : calidad[4];
                 calidad[5] = r.getString("Prioridad");
@@ -732,6 +731,42 @@ public class revisarPlanos {
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al terminar plano: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void actualizarPlanos(Connection con, String plano, String estacion) throws SQLException{
+        String sql = "update planos set Estado = ? where Plano = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
+        pst.setString(1, estacion);
+        pst.setString(2, plano);
+        
+        int n = pst.executeUpdate();
+        
+        if (n < 1) {
+            JOptionPane.showMessageDialog(null, "El plano que ingresaste no existe", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public void transaccionTerminarPlano(Connection con, String plano, String proyecto, String cronometro, String estacion,String numEmpleado, String para) throws SQLException {
+        String sql = "insert into " + estacion + " (Proyecto, Plano, FechaInicio, FechaFinal, Cronometro, Empleado, Para, Terminado) values (?,?,?,?,?,?,?,?)";
+        PreparedStatement pst = con.prepareStatement(sql);
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date d = new Date();
+        String fecha = sdf.format(d);
+        
+        pst.setString(1, plano);
+        pst.setString(2, proyecto);
+        pst.setString(3, fecha);
+        pst.setString(4, fecha);
+        pst.setString(5, cronometro);
+        pst.setString(6, numEmpleado);
+        pst.setString(7, para);
+        pst.setString(8, "SI");
+        
+        int n = pst.executeUpdate();
+        if (n > 0) {
+            JOptionPane.showMessageDialog(null, "Transaccion realizada con exito");
         }
     }
 }

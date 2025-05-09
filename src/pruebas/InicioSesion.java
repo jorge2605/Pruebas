@@ -460,7 +460,7 @@ public class InicioSesion extends javax.swing.JFrame  {
     public InicioSesion() {
         initComponents();
         this.setTitle("SERVICIOS INDUSTRIALES 3i");
-        this.setIconImage(new ImageIcon(getClass().getResource("/Imagenes/towi_Azul.png")).getImage());
+        this.setIconImage(new ImageIcon(getClass().getResource("/Img/Icono Towi.png")).getImage());
         this.setBackground(new Color(0,0,0,0));
         Usuario.setBackground(new Color(0,0,0,0));
         Contra.setBackground(new Color(0,0,0,0));
@@ -478,12 +478,12 @@ public class InicioSesion extends javax.swing.JFrame  {
     private void initComponents() {
 
         panelP = new scrollPane.PanelRound();
-        panelVersion = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
         lblVersion1 = new javax.swing.JLabel();
         lblVersion = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        panelVersion = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         btnEntrar = new javax.swing.JPanel();
         lblEntrar = new javax.swing.JLabel();
@@ -508,6 +508,36 @@ public class InicioSesion extends javax.swing.JFrame  {
         panelP.setRoundTopRight(500);
         panelP.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/Recurso 2.png"))); // NOI18N
+        panelP.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 410, -1, -1));
+
+        lblVersion1.setBackground(new java.awt.Color(204, 204, 204));
+        lblVersion1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        lblVersion1.setForeground(new java.awt.Color(204, 204, 204));
+        lblVersion1.setText("V");
+        panelP.add(lblVersion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 420, -1, -1));
+
+        lblVersion.setBackground(new java.awt.Color(204, 204, 204));
+        lblVersion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        lblVersion.setForeground(new java.awt.Color(204, 204, 204));
+        lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblVersion.setText("2.5.5.4");
+        lblVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblVersion.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblVersionMouseClicked(evt);
+            }
+        });
+        panelP.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(797, 420, 50, -1));
+
+        jLabel6.setFont(new java.awt.Font("Roboto Medium", 0, 30)); // NOI18N
+        jLabel6.setText("INICIAR SESION");
+        panelP.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, 290, 40));
+
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Img/Recurso 1.png"))); // NOI18N
+        panelP.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 80, 300, 250));
+
         panelVersion.setBackground(new java.awt.Color(255, 255, 255));
         panelVersion.setBorder(javax.swing.BorderFactory.createMatteBorder(4, 4, 4, 4, new java.awt.Color(102, 0, 0)));
         panelVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -521,47 +551,14 @@ public class InicioSesion extends javax.swing.JFrame  {
         panelVersion.setLayout(panelVersionLayout);
         panelVersionLayout.setHorizontalGroup(
             panelVersionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 42, Short.MAX_VALUE)
+            .addGap(0, 62, Short.MAX_VALUE)
         );
         panelVersionLayout.setVerticalGroup(
             panelVersionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 22, Short.MAX_VALUE)
         );
 
-        panelP.add(panelVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 410, 50, 30));
-
-        lblVersion1.setBackground(new java.awt.Color(204, 204, 204));
-        lblVersion1.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        lblVersion1.setForeground(new java.awt.Color(204, 204, 204));
-        lblVersion1.setText("V");
-        panelP.add(lblVersion1, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 420, -1, -1));
-
-        lblVersion.setBackground(new java.awt.Color(204, 204, 204));
-        lblVersion.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
-        lblVersion.setForeground(new java.awt.Color(204, 204, 204));
-        lblVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblVersion.setText("2.5.5.2");
-        lblVersion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        lblVersion.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lblVersionMouseClicked(evt);
-            }
-        });
-        panelP.add(lblVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(797, 420, 50, -1));
-
-        jLabel6.setFont(new java.awt.Font("Roboto Medium", 0, 30)); // NOI18N
-        jLabel6.setText("INICIAR SESION");
-        panelP.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 70, 290, 40));
-
-        jLabel4.setFont(new java.awt.Font("Roboto Medium", 0, 18)); // NOI18N
-        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("SERVICIOS  INDUSTRIALES 3i");
-        panelP.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 310, 300, -1));
-
-        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/towi_Redondo.png"))); // NOI18N
-        panelP.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 90, 300, 200));
+        panelP.add(panelVersion, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 410, 70, 30));
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/fondo_1.png"))); // NOI18N
         panelP.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(570, 0, 300, 450));
@@ -923,8 +920,8 @@ public class InicioSesion extends javax.swing.JFrame  {
     private javax.swing.JPanel btnEntrar;
     private javax.swing.JPanel btnEntrar1;
     private javax.swing.JPanel btnSalir;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel lblContrasena;

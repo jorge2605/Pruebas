@@ -720,6 +720,7 @@
                               <Border info="null"/>
                             </Property>
                             <Property name="contentAreaFilled" type="boolean" value="false"/>
+                            <Property name="enabled" type="boolean" value="false"/>
                             <Property name="focusPainted" type="boolean" value="false"/>
                             <Property name="horizontalTextPosition" type="int" value="0"/>
                             <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">

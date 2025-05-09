@@ -281,12 +281,13 @@
             <Component class="RSMaterialComponent.RSComboBoxMaterial" name="cmbBuscar">
               <Properties>
                 <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-                  <StringArray count="5">
+                  <StringArray count="6">
                     <StringItem index="0" value="NUMERO DE REQUISICION"/>
                     <StringItem index="1" value="NUMERO DE PARTE"/>
                     <StringItem index="2" value="DESCRIPCION"/>
                     <StringItem index="3" value="PROYECTO"/>
                     <StringItem index="4" value="PROVEEDOR"/>
+                    <StringItem index="5" value="ORDEN DE COMPRA"/>
                   </StringArray>
                 </Property>
               </Properties>

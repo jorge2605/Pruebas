@@ -428,7 +428,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                             dtde.rejectDrop();
                         }
                     } catch (UnsupportedFlavorException | IOException e) {
-                        e.printStackTrace();
+                        JOptionPane.showMessageDialog(null, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
                         dtde.rejectDrop();
                     }
                 }
@@ -472,25 +472,23 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
     }
     
     public final void cerrarFechaCalendario(String proyecto, Connection con) throws SQLException {
-        String depa = getDepa(inicio.lblId.getText(), con);
-        if (depa != null) {
-            String sql = "update agenda set Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where Proyecto = ? and Departamento = ?";
-            PreparedStatement pst = con.prepareStatement(sql);
+        String depa = "DISEÑO";
+        String sql = "update agenda set Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where Proyecto = ? and Departamento = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String fecha = sdf.format(new Date());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fecha = sdf.format(new Date());
 
-            pst.setString(1, "Terminado");
-            pst.setString(2, inicio.lblId.getText());
-            pst.setString(3, fecha);
-            pst.setString(4, txtProyecto.getText());
-            pst.setString(5, depa);
+        pst.setString(1, "Terminado");
+        pst.setString(2, inicio.lblId.getText());
+        pst.setString(3, fecha);
+        pst.setString(4, txtProyecto.getText());
+        pst.setString(5, depa);
 
-            int in = pst.executeUpdate();
+        int in = pst.executeUpdate();
 
-            if(in < 1){
-                JOptionPane.showMessageDialog(this, "Error al guardar fecha", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+        if(in < 1){
+            JOptionPane.showMessageDialog(this, "Error al guardar fecha", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -581,6 +579,8 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
             if(n <= 0){
                 JOptionPane.showMessageDialog(this, "NO SE GUARDARON LOS DATOS");
             }else{
+                revisarPlanos rev = new revisarPlanos();
+                rev.actualizarPlanos(con, l.getText(), "CORTES");
                 JOptionPane.showMessageDialog(this, "SE GUARDARON LOS DATOS");
             }
 
@@ -595,7 +595,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                 
                 pst.setString(1, l.getText());
                 pst.setString(2, txtProyecto.getText());
-                pst.setString(3, "");
+                pst.setString(3, "CORTES");
                 pst.setString(4, s.getText());
                 pst.setString(5, c.getText());
                 pst.setString(6, d.getText());
@@ -627,7 +627,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                     int opc = JOptionPane.showConfirmDialog(this, "¿Deseas enviar el plano a inicio de operacion?");
                     if (opc == 0) {
                         revisarPlanos rev = new revisarPlanos();
-                        rev.enviarCortes("Diseño", l.getText(), inicio.lblId.getText(), txtProyecto.getText(), revision);
+                        rev.actualizarPlanos(con, l.getText(), "CORTES");
                     }
                 }
                 
@@ -635,7 +635,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                     JOptionPane.showMessageDialog(this, "EL PDF NO SE SUBIO CORRECTAMENTE","ERROR",JOptionPane.ERROR_MESSAGE);
                 } else {
                     revisarPlanos rev = new revisarPlanos();
-                    rev.sendToEstacion(l.getText(), txtProyecto.getText(), inicio.lblId.getText(), "datos");
+                    rev.actualizarPlanos(con, l.getText(), "CORTES");
                 }
             }
         } catch (SQLException e) {
@@ -707,7 +707,7 @@ public final class Disenio1 extends InternalFrameImagen implements ActionListene
                         }
                         }catch(Exception e){
                            opc = 1;
-                            JOptionPane.showMessageDialog(this, "Cantidad erronea","Advertencia",JOptionPane.WARNING_MESSAGE);
+                           JOptionPane.showMessageDialog(this, "Cantidad erronea","Advertencia",JOptionPane.WARNING_MESSAGE);
                     }
                 }
             }

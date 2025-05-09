@@ -437,7 +437,7 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
         lblNombre.setText(nombre);
         setLocationRelativeTo(null);
         setTitle("Servicios Industriales 3i");
-        this.setIconImage(new ImageIcon(getClass().getResource("/Imagenes/towi_Azul.png")).getImage()); 
+        this.setIconImage(new ImageIcon(getClass().getResource("/Img/Icono Towi.png")).getImage()); 
         btnCalidad.setComponentPopupMenu(jPopupMenu1);
         pedido = false;
         cargarUbicacionVentana(this);
@@ -3026,7 +3026,6 @@ public final class Inicio1 extends javax.swing.JFrame implements Observer,Action
     }//GEN-LAST:event_btnEstado2MouseEntered
 
     private void btnEstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEstadoActionPerformed
-        ModeloExcel ModeloEX=new ModeloExcel();
         CambiarEstado VistaEXe = new CambiarEstado(lblId.getText());
         jDesktopPane1.add(VistaEXe);
         VistaEXe.toFront();

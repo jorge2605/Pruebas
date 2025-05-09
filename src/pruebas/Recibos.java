@@ -50,6 +50,7 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
     String id, req;
     int fil = 0;
     Material mat;
+    public String numEmpleado;
 
     public void crearNotificacion(String requi, String numEmpleado) {
 
@@ -385,10 +386,46 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
             JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    public final void cerrarFechaCalendario(String proyecto, Connection con) throws SQLException {
+        String depa = "COMPRAS";
+        String sql = "update agenda set Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where Proyecto = ? and Departamento = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
 
-    public Recibos(String numero) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fecha = sdf.format(new Date());
+
+        pst.setString(1, "Terminado");
+        pst.setString(2, numEmpleado);
+        pst.setString(3, fecha);
+        pst.setString(4, proyecto);
+        pst.setString(5, depa);
+
+        pst.executeUpdate();
+    }
+    
+    public final void verificarProyectoParaCierre(Connection con, String proyecto) throws SQLException{
+        Statement st = con.createStatement();
+        String sql = "select * from requisiciones where proyecto like '" + proyecto + "'";
+        ResultSet rs = st.executeQuery(sql);
+        int cont = 0;
+        int total = 0;
+        while (rs.next()) {
+            total++;
+            String llego = rs.getString("llego");
+            if (llego != null) {
+                cont++;
+            }
+        }
+        if (total == cont) {
+            cerrarFechaCalendario(proyecto, con);
+        }
+    }
+
+    public Recibos(String numEmpleado) {
         try {
             initComponents();
+            this.numEmpleado = numEmpleado;
             ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
             txtDescripcion.setLineWrap(true);
             txtDescripcion.setWrapStyleWord(true);
@@ -1148,11 +1185,15 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
                     Stack<String> productosId = new Stack<>();
                     Stack<String> cantidad = new Stack<>();
                     Stack<String> cant = new Stack<>();
+                    Stack<String> proyectos = new Stack<>();
                     javamail mail = new javamail();
                     if (correo == null) {
                         ban = true;
                     } else {
                         for (int i = 0; i < Tabla1.getRowCount(); i++) {
+                            if (proyectos.search(Tabla1.getValueAt(i, 5)) == -1){
+                                proyectos.add(Tabla1.getValueAt(i, 5).toString());
+                            }
                             if (Tabla1.getValueAt(i, 6) != null) {
                                 if (Tabla1.getValueAt(i, 6).equals(true)) {
                                     productos.push(Tabla1.getValueAt(i, 2).toString());
@@ -1197,6 +1238,9 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
 
                         if (k > 0) {
                             JOptionPane.showMessageDialog(this, "REQUISCION COMPLETA");
+                            for (int i = 0; i < proyectos.size(); i++) {
+                                verificarProyectoParaCierre(con, proyectos.get(i));
+                            }
                             limpiarTabla();
                             if (btnV1.isSelected()) {
                                 verDatos();
@@ -1216,7 +1260,7 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
                     } else {
                         String sql2 = "update Requisicion set Progreso = ?, Completado = ? where Id = ?";
                         PreparedStatement pst1 = con.prepareStatement(sql2);
-
+                        
                         pst1.setString(1, "LLEGO, INCOMPETO");
                         pst1.setString(2, "NO");
                         pst1.setString(3, datosp[1]);
@@ -1224,6 +1268,9 @@ public class Recibos extends javax.swing.JInternalFrame implements ActionListene
 
                         if (k > 0) {
                             JOptionPane.showMessageDialog(this, "ARTICULO(S) GUARDADO");
+                            for (int i = 0; i < proyectos.size(); i++) {
+                                verificarProyectoParaCierre(con, proyectos.get(i));
+                            }
                             limpiarTabla();
                             if (btnV1.isSelected()) {
                                 verDatos();

@@ -1,12 +1,14 @@
 package VentanaEmergente.ProyectoManager;
 
 import Conexiones.Conexion;
+import VentanaEmergente.CambiarEstado.TerminarProyecto;
 import java.awt.Color;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
 import pruebas.ProyectManager;
@@ -15,16 +17,37 @@ import scrollPane.ScrollBarCustom;
 public class Editar extends javax.swing.JDialog {
 
     ProyectManager proy;
+    public String numEmpleado;
     
-    public Editar(java.awt.Frame parent, boolean modal, ProyectManager proyect) {
+    public final void cerrarFechaCalendario(String proyecto, Connection con) throws SQLException {
+        String depa = "INTEGRACION";
+        String sql = "update agenda set Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where Proyecto = ? and Departamento = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fecha = sdf.format(new Date());
+
+        pst.setString(1, "Terminado");
+        pst.setString(2, numEmpleado);
+        pst.setString(3, fecha);
+        pst.setString(4, txtProyecto.getText());
+        pst.setString(5, depa);
+
+        int in = pst.executeUpdate();
+
+        if(in < 1){
+            JOptionPane.showMessageDialog(this, "Error al guardar fecha", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public Editar(java.awt.Frame parent, boolean modal, ProyectManager proyect, String numEmpleado) {
         super(parent, modal);
         initComponents();
+        this.numEmpleado = numEmpleado;
         this.setBackground(new Color(0,0,0,0));
         jPanel17.setBackground(new Color(0,0,0,0));
         btnSalir.setBackground(new Color(0,0,0,0));
         proy = proyect;
-//        jScrollPane1.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
-//        jScrollPane2.setVerticalScrollBar(new ScrollBarCustom(new java.awt.Color(0,165,255)));
     }
 
     @SuppressWarnings("unchecked")
@@ -391,6 +414,7 @@ public class Editar extends javax.swing.JDialog {
 
                             pst2.executeUpdate();
                         }
+                        cerrarFechaCalendario(txtProyecto.getText(), con);
                     }
                     proy.limpiarTabla();
                     proy.buscar("select Id,NumCotizacion,OC,Proyecto,Descripcion,FechaCreacion,"
@@ -410,33 +434,10 @@ public class Editar extends javax.swing.JDialog {
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Editar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Editar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Editar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Editar.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
+        
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                Editar dialog = new Editar(new javax.swing.JFrame(), true,null);
+                Editar dialog = new Editar(new javax.swing.JFrame(), true,null,"");
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

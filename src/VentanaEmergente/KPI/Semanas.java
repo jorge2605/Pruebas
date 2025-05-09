@@ -2,6 +2,8 @@ package VentanaEmergente.KPI;
 
 import Conexiones.Conexion;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,6 +34,7 @@ public class Semanas extends java.awt.Dialog {
     private final int PENDIENTE = 2;
     private final int INCOMPLETO = 3;
     private final int ACTUAL = 4;
+    public int seleccionado = -1;
     
     public final void limpiarPanel() throws ParseException {
         jPanel2.removeAll();
@@ -119,6 +122,10 @@ public class Semanas extends java.awt.Dialog {
         JButton boton = new javax.swing.JButton();
         boton.setBackground(new java.awt.Color(255, 255, 255));
         boton.setForeground(new java.awt.Color(51, 51, 51));
+        boton.addActionListener((ActionEvent e) -> {
+            seleccionado = Integer.parseInt(i);
+            dispose();
+        });
         switch (opc) {
             case RETRAZADO:
                 boton.setBackground(new java.awt.Color(180,0,0));

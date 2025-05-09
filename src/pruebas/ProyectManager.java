@@ -584,7 +584,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
             s.setVisible(true);
         }else if(evt.getClickCount() == 2){
             JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-            Editar editar = new Editar(f,true,this);
+            Editar editar = new Editar(f,true,this, numEmpleado);
             int fila = Tabla1.getSelectedRow();
             String re,coti, oc,pro,des,est,fac,com,resp, valor,moneda;
             if(Tabla1.getValueAt(fila, 0) == null){
@@ -854,7 +854,7 @@ public class ProyectManager extends javax.swing.JInternalFrame implements Action
 
     private void editarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editarActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        Editar editar = new Editar(f,true,this);
+        Editar editar = new Editar(f,true,this, numEmpleado);
         int fila = Tabla1.getSelectedRow();
         String re,coti, oc,pro,des,est,fac,com,resp, valor, moneda;
         if(Tabla1.getValueAt(fila, 0) == null){

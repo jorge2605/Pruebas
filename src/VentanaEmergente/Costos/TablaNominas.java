@@ -136,7 +136,7 @@ public class TablaNominas extends javax.swing.JDialog {
                 
                 for (int i = 0; i < rows.length; i++) {
                     String[] values = rows[i].split("\t");
-                    if(values.length != 4){
+                    if(values.length != 4) {
                         JOptionPane.showMessageDialog(this, "Debes Copiar 4 columnas, tus columnas seleccionadas son: " + values.length,"Error",JOptionPane.ERROR_MESSAGE);
                         break;
                     }

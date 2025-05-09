@@ -179,73 +179,64 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
         Connection con;
         Conexion con1 = new Conexion();
         con = con1.getConnection();
-        if (lblAvisoPlano.isVisible()) {
-            String estacion;
-            con = con1.getConnection();
-            switch (cmbEnviar.getSelectedIndex()) {
-                case 1: 
-                    estacion = "maquinados";
-                    rev.retrabajo = true;
-                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
-                    enviado = true;
-                    break;
-                case 2: 
-                    estacion = "trata";
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
-                    enviado = true;
-                    break;
-                case 3: 
-                    estacion = "calidad";
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
-//                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
-                    enviado = true;
-                    break;
-                case 4: 
-                    estacion = "integracion";
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
-                    enviado = true;
-                    break;
-                case 5: 
-                    estacion = "datos";
-                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                    rev.terminarPlano(plano, proyecto, numEmpleado, null, "calidad",con);
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacion);
-                    enviado = true;
-                    break;
-            }
-        } else {
-            try {
-                String estacion = rev.buscar(plano, con);
-                String estacionSeleccionada  = obtenerDepartamento();
-                if (estacion.equals("LIBERACION")) {
-                    rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
-                    rev.terminarPlanoEnEstacion("calidad", plano, numEmpleado);
-                } else {
-                    if (cmbEnviar.getSelectedIndex() == 5 || cmbEnviar.getSelectedIndex() == 1) {
-                        if (cmbEnviar.getSelectedIndex() == 1) {
-                            rev.retrabajo = true;
-                        }
-                        rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
-                    }
-                    if (cmbEnviar.getSelectedIndex() == 3) {
-                        rev.sendToEstacion(plano, proyecto, numEmpleado, "calidad");
-                        rev.terminarPlanoEnEstacion("calidad", plano, numEmpleado);
-                        enviado = true;
-                    } else {
-                        rev.sendToEstacion(plano, proyecto, numEmpleado, estacionSeleccionada);
-                        rev.terminarPlanoEnEstacion(estacion, plano, numEmpleado);
-                        enviado = true;
-                    }
-                }
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error: " + e);
-            }
-        }
         try {
+            if (lblAvisoPlano.isVisible()) {
+                String estacion;
+                con = con1.getConnection();
+                String est = "calidad";
+                switch (cmbEnviar.getSelectedIndex()) {
+                    case 1: 
+                        estacion = "maquinados";
+                        rev.retrabajo = true;
+                        rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                        rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", est, numEmpleado, estacion);
+                        enviado = true;
+                        break;
+                    case 2: 
+                        estacion = "trata";
+                        rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", est, numEmpleado, estacion);
+                        enviado = true;
+                        break;
+                    case 3: 
+                        //calidad
+                        rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", est, numEmpleado, "calidad");
+                        enviado = true;
+                        break;
+                    case 4: 
+                        estacion = "integracion";
+                        rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", est, numEmpleado, estacion);
+                        enviado = true;
+                        break;
+                    case 5: 
+                        estacion = "datos";
+                        rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                        rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", est, numEmpleado, estacion);
+                        enviado = true;
+                        break;
+                }
+            } else {
+                String estacionSeleccionada  = obtenerDepartamento();
+                String est = estacionSeleccionada.toUpperCase();
+                est = (est.equals("TRATA")) ? "TRATAMIENTO" : est;
+                if (cmbEnviar.getSelectedIndex() == 5 || cmbEnviar.getSelectedIndex() == 1) {
+                    est = "cortes";
+                    if (cmbEnviar.getSelectedIndex() == 1) {
+                        est = "maquinados";
+                        rev.retrabajo = true;
+                    }
+                    rev.enviarCortes("calidad", plano, numEmpleado, proyecto, "00");
+                }
+                if (cmbEnviar.getSelectedIndex() == 3) {
+                    rev.actualizarPlanos(con, plano, "TERMINADO (CALIDAD)");
+                    rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", "calidad", numEmpleado, "calidad");
+                    enviado = true;
+                } else {
+                    rev.actualizarPlanos(con, plano, est.toUpperCase());
+                    rev.transaccionTerminarPlano(con, plano, proyecto, "00:00", "calidad", numEmpleado, estacionSeleccionada);
+                    enviado = true;
+                }
+            }
+        
             if (enviado) {
                 String sql = "insert into planos_calidad (plano, fecha, empleado) values(?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
@@ -265,6 +256,49 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
             }
         } catch(SQLException e) {
             JOptionPane.showMessageDialog(this, "Error: " + e,"Error",JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public final void cerrarFechaCalendario(String proyecto, Connection con) throws SQLException {
+        String sql = "update agenda set Estatus = ?, EmpleadoFin = ?, FechaTermino = ? where Proyecto = ? and Departamento = ?";
+        PreparedStatement pst = con.prepareStatement(sql);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String fecha = sdf.format(new Date());
+
+        pst.setString(1, "Terminado");
+        pst.setString(2, numEmpleado);
+        pst.setString(3, fecha);
+        pst.setString(4, txtProyecto.getText());
+        pst.setString(5, "HERRAMENTISTA");
+
+        int in = pst.executeUpdate();
+
+        if(in < 1){
+            JOptionPane.showMessageDialog(this, "Error al guardar fecha", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    public final void verificarProyectosTerminados(String proyecto) {
+        try {
+            Connection con = new Conexion().getConnection();
+            Statement st = con.createStatement();
+            String sql = "select Estado, Plano, Proyecto from planos where proyecto like '" + proyecto + "'";
+            ResultSet rs = st.executeQuery(sql);
+            int cont = 0;
+            int contTerm = 0;
+            while (rs.next()) {
+                cont++;
+                String estado = rs.getString("Estado");
+                if (estado.equals("TERMINADO (CALIDAD)") || estado.equals("INTEGRACION")) {
+                    contTerm++;
+                }
+            }
+            if (contTerm >= cont) {
+                cerrarFechaCalendario(proyecto, con);
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e,"Error", JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -730,6 +764,7 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
         enviarPlano(txtPlano.getText(), txtProyecto.getText());
+        verificarProyectosTerminados(txtProyecto.getText());
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
@@ -741,17 +776,10 @@ public class CalidadDebug extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_jTextField1ActionPerformed
 
     private void terminarPlanosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_terminarPlanosActionPerformed
-        try {
-            Connection con;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            for (int i = 0; i < TablaPlan.getSelectedRows().length; i++) {
-                int fila = TablaPlan.getSelectedRows()[i];
-                enviarPlano(TablaPlan.getValueAt(fila, 0).toString(), TablaPlan.getValueAt(fila, 1).toString());
-            }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        for (int i = 0; i < TablaPlan.getSelectedRows().length; i++) {
+            int fila = TablaPlan.getSelectedRows()[i];
+            enviarPlano(TablaPlan.getValueAt(fila, 0).toString(), TablaPlan.getValueAt(fila, 1).toString());
+            verificarProyectosTerminados(TablaPlan.getValueAt(fila, 1).toString());
         }
     }//GEN-LAST:event_terminarPlanosActionPerformed
 
