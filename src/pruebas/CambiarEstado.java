@@ -6,11 +6,13 @@ import VentanaEmergente.CambiarEstado.InformacionProyectos;
 import VentanaEmergente.CambiarEstado.TerminarProyecto;
 import VentanaEmergente.CambiarEstado.TerminarTodo;
 import VentanaEmergente.Inicio1.Espera;
+import VentanaEmergente.Reportes.ReporteScrap;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import static java.awt.image.ImageObserver.HEIGHT;
 import java.io.ByteArrayInputStream;
 //import java.awt.Font;
 import java.io.File;
@@ -27,9 +29,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -118,45 +122,66 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
         }
     }
 
-    public void limpiarTabla() {
+    public final void limpiarTabla() {
         TablaDeDatos1.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{},
                 new String[]{
-                    "PLANO", "PROYECTO", "UBICACION", "CANTIDAD"
+                    "Plano", "Proyecto", "Ubicacion", "Cantidad", "Intentos"
                 }
         ) {
             boolean[] canEdit = new boolean[]{
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit[columnIndex];
             }
         });
-        TablaDeDatos1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
+        TablaDeDatos1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.BOLD, 14));
         TablaDeDatos1.getTableHeader().setOpaque(false);
         TablaDeDatos1.getTableHeader().setBackground(new Color(0, 78, 171));
         TablaDeDatos1.getTableHeader().setForeground(Color.white);
         TablaDeDatos1.setRowHeight(25);
+        TablaDeDatos1.setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 12));
         TablaDeDatos1.setColumnSelectionAllowed(true);
         DefaultTableModel Modelo = (DefaultTableModel) TablaDeDatos1.getModel();
         TableRowSorter<TableModel> elQueOrdena = new TableRowSorter<TableModel>(Modelo);
         TablaDeDatos1.setRowSorter(elQueOrdena);
     }
 
-    public void limpiarTabla1() {
-
-        DefaultTableModel Modelo = (DefaultTableModel) TablaDeDatos1.getModel();
-        String titulos[] = {"CLIENTE", "DESCRIPCION", "PROYECTO"};
-        Modelo = new DefaultTableModel(null, titulos);
-        Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 14));
+    public final void limpiarTabla1() {
+        Tabla1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+            },
+            new String [] {
+                "Cliente", "Descripcion", "Proyecto"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        Tabla1.setRowHeight(25);
+        Tabla1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Tabla1MouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                Tabla1MouseEntered(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                Tabla1MousePressed(evt);
+            }
+        });
+        Tabla1.getTableHeader().setFont(new java.awt.Font("Roboto", java.awt.Font.BOLD, 14));
         Tabla1.getTableHeader().setOpaque(false);
         Tabla1.getTableHeader().setBackground(new Color(0, 78, 171));
         Tabla1.getTableHeader().setForeground(Color.white);
         Tabla1.setRowHeight(25);
-        Tabla1.setShowGrid(false);
-        Tabla1.setModel(Modelo);
-
+        Tabla1.setFont(new java.awt.Font("Roboto", java.awt.Font.PLAIN, 12));
     }
 
     public void verDatos2() {
@@ -441,95 +466,120 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
                 + "</html>");
     }
 
+    public HashMap<String, Integer> getPlanosSccrap(Connection con, String proyecto) throws SQLException{
+        String sql = "select * from scrap where Plano like '" + proyecto + "'";
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery(sql);
+        ArrayList<String> planos = new ArrayList<>();
+        while (rs.next()) {
+            String plano = rs.getString("Proyecto");
+            planos.add(plano);
+        }
+        HashMap<String, Integer> conteo = new HashMap<>();
+        for (String plano : planos) {
+            conteo.put(plano, conteo.getOrDefault(plano, 0) + 1);
+        }
+        return conteo;
+    }
+    
     public void buscarProyecto(String proyecto) {
-        if (proyecto == null) {
+        if (proyecto != null) {
+            Thread hilo = new Thread() {
+                public void run() {
+                    Informacion.setText("Informacion de planos " + proyecto + "                         ");
+                    espera.activar();
+                    espera.setVisible(true);
+                    limpiarTabla();
 
-            } else {
-                Thread hilo = new Thread() {
-                    public void run() {
-                        Informacion.setText("Informacion de planos " + proyecto + "                         ");
-                        espera.activar();
-                        espera.setVisible(true);
-                        limpiarTabla();
-                        revisarPlanos rev = new revisarPlanos();
+                    btnLiberar.setEnabled(false);
+                    txtProyecto.setText((String) proyecto);
+                    txtPlano.setText("TODOS");
+                    btnExportarD.setEnabled(true);
+                    btnPrioridad.setEnabled(true);
+                    btnVer.setEnabled(false);
+
+                    DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
+                    try {
+                        Connection con;
+                        Conexion con1 = new Conexion();
+                        con = con1.getConnection();
+                        HashMap<String, Integer> planos = getPlanosSccrap(con, proyecto);
                         
-                        btnLiberar.setEnabled(false);
-                        txtProyecto.setText((String) proyecto);
-                        txtPlano.setText("TODOS");
-                        btnExportarD.setEnabled(true);
-                        btnPrioridad.setEnabled(true);
-                        btnVer.setEnabled(false);
-                        
-                        DefaultTableModel miModelo = (DefaultTableModel) TablaDeDatos1.getModel();
-                        try {
-                            Connection con;
-                            Conexion con1 = new Conexion();
-                            con = con1.getConnection();
-                            Statement st = con.createStatement();
-
-                            String sql2 = "select Prioridad, Plano, Proyecto, Estado, Cantidad from Planos where Proyecto like '" + proyecto + "' order by Plano asc";
-                            Statement st2 = con.createStatement();
-                            ResultSet rs2 = st2.executeQuery(sql2);
-                            String dat[] = new String[10];
-                            while (rs2.next()) {
-                                dat[0] = rs2.getString("Plano");
-                                dat[1] = rs2.getString("Proyecto");
-                                dat[2] = rs2.getString("Estado");
-                                try {
-                                    String part[] = dat[0].split(" ");
-                                    int ultimo = Integer.parseInt(part[2]);
-                                    if(ultimo < 100) {
-                                        dat[2] = "SUB ENSAMBLE";
-                                    }
-                                } catch (Exception e) {}
-                                if (dat[2].equals("TERMINADO")) {
-                                    dat[2] = "TERMINADO (CALIDAD)";
+                        String sql2 = "select Prioridad, Plano, Proyecto, Estado, Cantidad from Planos where Proyecto like '" + proyecto + "' order by Plano asc";
+                        Statement st2 = con.createStatement();
+                        ResultSet rs2 = st2.executeQuery(sql2);
+                        String dat[] = new String[10];
+                        while (rs2.next()) {
+                            dat[0] = rs2.getString("Plano");
+                            dat[1] = rs2.getString("Proyecto");
+                            dat[2] = rs2.getString("Estado");
+                            try {
+                                String part[] = dat[0].split(" ");
+                                int ultimo = Integer.parseInt(part[2]);
+                                if(ultimo < 100) {
+                                    dat[2] = "SUB ENSAMBLE";
                                 }
-                                dat[3] = rs2.getString("Cantidad");
-                                miModelo.addRow(dat);
-                                conteo();
+                            } catch (Exception e) {}
+                            if (dat[2].equals("TERMINADO")) {
+                                dat[2] = "TERMINADO (CALIDAD)";
                             }
-
-                            String sql = "select Proyecto, Liberado from Proyectos where Proyecto like '" + proyecto + "'";
-                            ResultSet rs = st.executeQuery(sql);
-                            String datos[] = new String[10];
-                            int cont = 0, v = 0, f = 0;
-                            while (rs.next()) {
-                                cont++;
-                                datos[0] = rs.getString("Liberado");
-                                if (datos[0].equals("SI")) {
-                                    v++;
-                                }
-                                if (datos[0].equals("NO")) {
-                                    f++;
-                                }
-                            }
-                            if ((cont == v)) {
-                                btnLiberar.setEnabled(false);
-                                txtLiberado.setText("SI");
-                            } else if (cont == f) {
-                                btnLiberar.setEnabled(true);
-                                txtLiberado.setText("NO");
-                            } else {
-                                btnLiberar.setEnabled(true);
-                                txtLiberado.setText("INCOMPLETO");
-                            }
-                        } catch (SQLException e) {
-                            espera.band = false;
-                            espera.dispose();
-                            JOptionPane.showMessageDialog(null, "ERROR AL ENVIAR A CORTES: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
+                            dat[3] = rs2.getString("Cantidad");
+                            dat[4] = String.valueOf((Integer.parseInt(planos.getOrDefault(dat[0], 0).toString()) + 1));
+                            miModelo.addRow(dat);
+                            conteo();
                         }
-
+                    } catch (SQLException e) {
                         espera.band = false;
                         espera.dispose();
+                        JOptionPane.showMessageDialog(null, "ERROR AL ENVIAR A CORTES: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-                };
-                hilo.start();
+                    espera.band = false;
+                    espera.dispose();
+                }
+            };
+            hilo.start();
+        }
+    }
+    
+    public void verPdf(String plano) {
+        try {
+            Desktop.getDesktop().open(new File("\\\\192.168.100.40\\03 Project\\04 DISENO\\" + txtProyecto.getText() + "\\" + plano + ".pdf"));
+        } catch (Exception ex) {
+            String dir = getDirectorio(txtProyecto.getText()) + "\\" + plano + ".pdf";
+            try {
+                Connection con;
+                Conexion con1 = new Conexion();
+                con = con1.getConnection();
+                Statement st = con.createStatement();
+                String sql = "select Pdf,Plano from pdfplanos where Plano like '" + plano + "'";
+                ResultSet rs = st.executeQuery(sql);
+                byte[] b = null;
+                while (rs.next()) {
+                    b = rs.getBytes("Pdf");
+                }
+
+                InputStream bos = new ByteArrayInputStream(b);
+                int tamInput = bos.available();
+                byte[] datosPdf = new byte[tamInput];
+                bos.read(datosPdf, 0, tamInput);
+
+                OutputStream out = new FileOutputStream(dir);
+                out.write(datosPdf);
+
+                out.close();
+                bos.close();
+
+                Desktop.getDesktop().open(new File(dir));
+            } catch (SQLException | NumberFormatException | IOException e) {
+                JOptionPane.showMessageDialog(this, "Error al descargar: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
             }
+        }
     }
     
     public CambiarEstado(String numEmpleado) {
         initComponents();
+        limpiarTabla();
+        limpiarTabla1();
         verDatos();
         jScrollPane1.getViewport().setBackground(Color.white);
         jScrollPane2.getViewport().setBackground(Color.white);
@@ -546,6 +596,11 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
         jPopupMenu1 = new javax.swing.JPopupMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         Informacion = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        InformacionPlano = new javax.swing.JMenuItem();
+        InformacionProyecto = new javax.swing.JMenuItem();
+        jSeparator3 = new javax.swing.JPopupMenu.Separator();
+        verPdf = new javax.swing.JMenuItem();
         jPanel2 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
@@ -586,7 +641,17 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
-        jMenuItem4.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        jPopupMenu1.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                jPopupMenu1PopupMenuWillBecomeVisible(evt);
+            }
+        });
+
+        jMenuItem4.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
         jMenuItem4.setText("Menu");
         jMenuItem4.setEnabled(false);
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
@@ -604,6 +669,36 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
             }
         });
         jPopupMenu1.add(Informacion);
+        jPopupMenu1.add(jSeparator2);
+
+        InformacionPlano.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        InformacionPlano.setText("Ver inofrmacion de plano (Intentos)");
+        InformacionPlano.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                InformacionPlanoActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(InformacionPlano);
+
+        InformacionProyecto.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        InformacionProyecto.setText("Ver inofrmacion de proyecto ] (Intentos)");
+        InformacionProyecto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                InformacionProyectoActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(InformacionProyecto);
+        jPopupMenu1.add(jSeparator3);
+
+        verPdf.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        verPdf.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/pdf.png"))); // NOI18N
+        verPdf.setText("Ver PDF");
+        verPdf.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                verPdfActionPerformed(evt);
+            }
+        });
+        jPopupMenu1.add(verPdf);
 
         setBorder(null);
         getContentPane().setLayout(new java.awt.GridLayout(1, 0));
@@ -612,7 +707,7 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
         jPanel2.setLayout(new java.awt.BorderLayout(5, 5));
 
         jPanel5.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel5.setLayout(new java.awt.BorderLayout());
+        jPanel5.setLayout(new java.awt.BorderLayout(10, 10));
 
         jPanel6.setBackground(new java.awt.Color(255, 255, 255));
         jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
@@ -739,11 +834,11 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
 
             },
             new String [] {
-                "PLANO", "PROYECTO", "UBICACION", "CANTIDAD"
+                "Plano", "Proyecto", "Ubicacion", "Cantidad", "Intentos"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, true
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -934,7 +1029,7 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblConteo, javax.swing.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                .addComponent(lblConteo, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -1008,13 +1103,14 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
     }//GEN-LAST:event_Tabla1MousePressed
 
     private void TablaDeDatos1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDeDatos1MouseClicked
-        txtPlano.setText("");
-        txtProyecto.setText("");
-        int fila = TablaDeDatos1.getSelectedRow();
-        txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
-        txtPlano.setText(TablaDeDatos1.getValueAt(fila, 0).toString());
-        btnVer.setEnabled(true);
-
+        if (TablaDeDatos1.getSelectedRow() != -1) {
+            txtPlano.setText("");
+            txtProyecto.setText("");
+            int fila = TablaDeDatos1.getSelectedRow();
+            txtProyecto.setText(TablaDeDatos1.getValueAt(fila, 1).toString());
+            txtPlano.setText(TablaDeDatos1.getValueAt(fila, 0).toString());
+            btnVer.setEnabled(true);
+        }
     }//GEN-LAST:event_TablaDeDatos1MouseClicked
 
     private void btnExportarDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarDActionPerformed
@@ -1342,38 +1438,7 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
     }//GEN-LAST:event_btnLiberarActionPerformed
 
     private void btnVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerActionPerformed
-        try {
-            Desktop.getDesktop().open(new File("\\\\192.168.100.40\\03 Project\\04 DISENO\\" + txtProyecto.getText() + "\\" + txtPlano.getText() + ".pdf"));
-        } catch (Exception ex) {
-            String dir = getDirectorio(txtProyecto.getText()) + "\\" + txtPlano.getText() + ".pdf";
-            try {
-                Connection con;
-                Conexion con1 = new Conexion();
-                con = con1.getConnection();
-                Statement st = con.createStatement();
-                String sql = "select Pdf,Plano from pdfplanos where Plano like '" + txtPlano.getText() + "'";
-                ResultSet rs = st.executeQuery(sql);
-                byte[] b = null;
-                while (rs.next()) {
-                    b = rs.getBytes("Pdf");
-                }
-
-                InputStream bos = new ByteArrayInputStream(b);
-                int tamInput = bos.available();
-                byte[] datosPdf = new byte[tamInput];
-                bos.read(datosPdf, 0, tamInput);
-
-                OutputStream out = new FileOutputStream(dir);
-                out.write(datosPdf);
-
-                out.close();
-                bos.close();
-
-                Desktop.getDesktop().open(new File(dir));
-            } catch (SQLException | NumberFormatException | IOException e) {
-                JOptionPane.showMessageDialog(this, "Error al descargar: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        verPdf(txtPlano.getText());
     }//GEN-LAST:event_btnVerActionPerformed
 
     private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBorrarActionPerformed
@@ -1516,7 +1581,7 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
 
     private void InformacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InformacionActionPerformed
         JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
-        InformacionProyectos info = new InformacionProyectos(f, true, Tabla1.getValueAt(Tabla1.getSelectedRow(), 2).toString());
+        InformacionProyectos info = new InformacionProyectos(f, true, TablaDeDatos1.getValueAt(TablaDeDatos1.getSelectedRow(), 1).toString());
         info.setLocationRelativeTo(f);
         info.setVisible(true);
     }//GEN-LAST:event_InformacionActionPerformed
@@ -1550,9 +1615,51 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
         }
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
+    private void InformacionPlanoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InformacionPlanoActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        ReporteScrap rep = new ReporteScrap(f, true);
+        rep.limpiarTabla();
+        rep.jTextField1.setVisible(false);
+        rep.verDatos("select * from scrap where Proyecto like '" + TablaDeDatos1.getValueAt(TablaDeDatos1.getSelectedRow(), 0) + "' order by id desc");
+        rep.setVisible(true);
+    }//GEN-LAST:event_InformacionPlanoActionPerformed
+
+    private void InformacionProyectoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_InformacionProyectoActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        ReporteScrap rep = new ReporteScrap(f, true);
+        rep.limpiarTabla();
+        rep.jTextField1.setVisible(false);
+        rep.verDatos("select * from scrap where Plano like '" + TablaDeDatos1.getValueAt(TablaDeDatos1.getSelectedRow(), 1) + "' order by id desc");
+        rep.setVisible(true);
+    }//GEN-LAST:event_InformacionProyectoActionPerformed
+
+    private void jPopupMenu1PopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jPopupMenu1PopupMenuWillBecomeVisible
+        if (TablaDeDatos1.getSelectedRow() == -1) {
+            InformacionPlano.setEnabled(false);
+            InformacionProyecto.setEnabled(false);
+            verPdf.setEnabled(false);
+            InformacionPlano.setText("Ver inofrmacion de plano (Intentos)");
+            InformacionProyecto.setText("Ver inofrmacion de proyecto (Intentos)");
+        } else {
+            InformacionPlano.setEnabled(true);
+            InformacionProyecto.setEnabled(true);
+            verPdf.setEnabled(true);
+            InformacionPlano.setText("Ver inofrmacion de plano " + TablaDeDatos1.getValueAt(TablaDeDatos1.getSelectedRow(), 0).toString() + " (Intentos)");
+            InformacionProyecto.setText("Ver inofrmacion de proyecto " + TablaDeDatos1.getValueAt(TablaDeDatos1.getSelectedRow(), 1).toString() + " (Intentos)");
+        }
+    }//GEN-LAST:event_jPopupMenu1PopupMenuWillBecomeVisible
+
+    private void verPdfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_verPdfActionPerformed
+        if (TablaDeDatos1.getSelectedRow() != -1) {
+            verPdf(TablaDeDatos1.getValueAt(TablaDeDatos1.getSelectedRow(), 0).toString());
+        }
+    }//GEN-LAST:event_verPdfActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem Informacion;
+    private javax.swing.JMenuItem InformacionPlano;
+    private javax.swing.JMenuItem InformacionProyecto;
     private javax.swing.JTable Tabla1;
     public javax.swing.JTable TablaDeDatos1;
     public javax.swing.JButton btnBorrar;
@@ -1589,12 +1696,15 @@ public class CambiarEstado extends JInternalFrame implements ActionListener {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JPopupMenu.Separator jSeparator3;
     private javax.swing.JLabel lblConteo;
     private javax.swing.JLabel lblX;
     private javax.swing.JTextField txtBuscar;
     private javax.swing.JLabel txtLiberado;
     private javax.swing.JLabel txtPlano;
     private javax.swing.JLabel txtProyecto;
+    private javax.swing.JMenuItem verPdf;
     // End of variables declaration//GEN-END:variables
 
     @Override

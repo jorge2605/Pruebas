@@ -3562,12 +3562,15 @@ public class OrdenDeCompra extends javax.swing.JInternalFrame implements ActionL
                     System.out.println("Número de semana: " + numeroSemana);
                     System.out.println("Primer día de la semana: " + primerDiaSemana);
                     
-                   String sql = "select * from requisicion where FechaNew > Progreso != 'LLEGO, COMPLETO' and Progreso != 'CANCELADO'  and Progreso != 'CANCELADO/COSTOS' and id > 6850";
+                   String sql = "select distinct NumRequisicion from requisiciones where OC is null and NumRequisicion > 6900";
                    ResultSet rs = st.executeQuery(sql);
+                   Stack<Integer> requisiciones = new Stack<>();
                    while (rs.next()) {
-                        int id = rs.getInt("id");
-                        String fechaNew = rs.getString("FechaNew");
-                        System.out.println(id + " - " + fechaNew);
+                        int id = rs.getInt("NumRequisicion");
+                        requisiciones.add(id);
+                   }
+                   for (int i = 0; i < requisiciones.size(); i++) {
+                       System.out.println(requisiciones.get(i));
                    }
                } catch (SQLException e) {
                    JOptionPane.showMessageDialog(orden, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);

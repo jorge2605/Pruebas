@@ -20,6 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import Controlador.FileTransferHandler;
 import Modelo.javamail;
+import VentanaEmergente.Ventas.AgregarCliente;
 import VentanaEmergente.Ventas.correos;
 import java.util.Stack;
 import javax.swing.DropMode;
@@ -121,11 +122,28 @@ public class Ventas extends javax.swing.JInternalFrame{
         return proy;
     }
     
+    public final void agregarClientes() {
+        try {
+            Connection con = new Conexion().getConnection();
+            Statement st = con.createStatement();
+            String sql = "select * from clientes order by Nombre";
+            ResultSet rs = st.executeQuery(sql);
+            cmbCliente.removeAllItems();
+            cmbCliente.addItem("Seleccionar");
+            while (rs.next()) {
+                cmbCliente.addItem(rs.getString("Nombre"));
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     public Ventas() {
         initComponents();
         txtProyecto.setText(""+aumento());
         verNumero();
         addTransfer();
+        agregarClientes();
         ((javax.swing.plaf.basic.BasicInternalFrameUI) this.getUI()).setNorthPane(null);
         
     }
@@ -162,7 +180,9 @@ public class Ventas extends javax.swing.JInternalFrame{
         jPanel20 = new javax.swing.JPanel();
         jPanel11 = new javax.swing.JPanel();
         jLabel23 = new javax.swing.JLabel();
-        txtCliente = new RSMaterialComponent.RSTextFieldMaterial();
+        cmbCliente = new javax.swing.JComboBox<>();
+        btnAgregar = new javax.swing.JButton();
+        jLabel18 = new javax.swing.JLabel();
         jPanel13 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jLabel17 = new javax.swing.JLabel();
@@ -440,21 +460,33 @@ public class Ventas extends javax.swing.JInternalFrame{
 
         jLabel23.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         jLabel23.setForeground(new java.awt.Color(204, 0, 0));
+        jLabel23.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel23.setText("*");
-        jLabel23.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         jPanel11.add(jLabel23, java.awt.BorderLayout.WEST);
 
-        txtCliente.setForeground(new java.awt.Color(51, 51, 51));
-        txtCliente.setColorMaterial(new java.awt.Color(153, 204, 255));
-        txtCliente.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        txtCliente.setPhColor(new java.awt.Color(51, 153, 255));
-        txtCliente.setPlaceholder("Cliente");
-        txtCliente.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtClienteKeyTyped(evt);
+        cmbCliente.setBackground(new java.awt.Color(255, 255, 255));
+        cmbCliente.setFont(new java.awt.Font("Roboto", 0, 12)); // NOI18N
+        cmbCliente.setForeground(new java.awt.Color(51, 51, 51));
+        cmbCliente.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar" }));
+        cmbCliente.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 2, 0, new java.awt.Color(204, 204, 204)));
+        jPanel11.add(cmbCliente, java.awt.BorderLayout.CENTER);
+
+        btnAgregar.setBackground(new java.awt.Color(204, 51, 0));
+        btnAgregar.setFont(new java.awt.Font("Roboto", 1, 12)); // NOI18N
+        btnAgregar.setForeground(new java.awt.Color(255, 255, 255));
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
             }
         });
-        jPanel11.add(txtCliente, java.awt.BorderLayout.CENTER);
+        jPanel11.add(btnAgregar, java.awt.BorderLayout.LINE_END);
+
+        jLabel18.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
+        jLabel18.setForeground(new java.awt.Color(51, 153, 255));
+        jLabel18.setText("Cliente");
+        jLabel18.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jPanel11.add(jLabel18, java.awt.BorderLayout.NORTH);
 
         jPanel20.add(jPanel11);
 
@@ -773,7 +805,7 @@ public class Ventas extends javax.swing.JInternalFrame{
             JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE ORDEN DE COMPRA","ERROR",JOptionPane.ERROR_MESSAGE);
         } else if (txtDescripcion.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE DESCRIPCION","ERROR",JOptionPane.ERROR_MESSAGE);
-        }  else if (txtCliente.getText().equals("")) {
+        }  else if (cmbCliente.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE CLIENTE","ERROR",JOptionPane.ERROR_MESSAGE);
         } else if (txtValor.getText().equals("")) {
             JOptionPane.showMessageDialog(this, "DEBES LLENAR EL CAMPO DE VALOR","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -925,7 +957,7 @@ public class Ventas extends javax.swing.JInternalFrame{
                 
                 pst.setString(1, txtProyecto.getText());
                 pst.setString(2, sdf3.format(da));
-                pst.setString(3, txtCliente.getText());
+                pst.setString(3, cmbCliente.getSelectedItem().toString());
                 pst.setString(4, "");
                 pst.setString(5, feca);
                 pst.setString(6, "");
@@ -954,7 +986,7 @@ public class Ventas extends javax.swing.JInternalFrame{
                             + "\n"
                             + "<p>Cotizacion: "+txtCotizacion.getText() + "</p>"
                             + "<p>Orden de compra: "+txtOrden.getText() + "</p>"
-                            + "<p>Cliente: "+txtCliente.getText() + "</p>"
+                            + "<p>Cliente: "+ cmbCliente.getSelectedItem().toString() + "</p>"
                             + "<p>Fecha de entrega: "+ fecha1 + "</p>"
                             + "<p>Importe: "+ txtValor.getText() + "</p>"
                             + "<p>Moneda: "+ jcbMoneda.getSelectedItem()+ "</p>"
@@ -987,7 +1019,7 @@ public class Ventas extends javax.swing.JInternalFrame{
                     }
                     JOptionPane.showMessageDialog(this, "Datos guardados correctamente"+mns);
                     verNumero();
-                    txtCliente.setText("");
+                    cmbCliente.setSelectedIndex(0);
                     txtValor.setText("");
                     txtOrden.setText("");
                     txtDescripcion.setText("");
@@ -1032,10 +1064,6 @@ public class Ventas extends javax.swing.JInternalFrame{
         }
     }//GEN-LAST:event_txtOrdenKeyTyped
 
-    private void txtClienteKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtClienteKeyTyped
-        // TODO add your handling code here:
-    }//GEN-LAST:event_txtClienteKeyTyped
-
     private void txtProyectoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtProyectoMouseClicked
         
     }//GEN-LAST:event_txtProyectoMouseClicked
@@ -1065,15 +1093,28 @@ public class Ventas extends javax.swing.JInternalFrame{
         lblSalir.setForeground(Color.black);
     }//GEN-LAST:event_lblSalirMouseExited
 
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        JFrame f = (JFrame) JOptionPane.getFrameForComponent(this);
+        AgregarCliente agregar = new AgregarCliente(f, true);
+        agregar.setLocationRelativeTo(f);
+        boolean guardados = agregar.abrirClientes();
+        if (guardados) {
+            agregarClientes();
+        }
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnCoti;
     private javax.swing.JPanel btnGuardar;
     private javax.swing.JButton btnOC;
     private javax.swing.JButton btnSubir;
+    private javax.swing.JComboBox<String> cmbCliente;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel22;
@@ -1120,7 +1161,6 @@ public class Ventas extends javax.swing.JInternalFrame{
     private javax.swing.JLabel lblSalir;
     private javax.swing.JPanel pan;
     private javax.swing.JPanel panelSalir;
-    private RSMaterialComponent.RSTextFieldMaterial txtCliente;
     private RSMaterialComponent.RSTextFieldMaterial txtCoti;
     private RSMaterialComponent.RSTextFieldMaterial txtCotizacion;
     private javax.swing.JTextArea txtDescripcion;

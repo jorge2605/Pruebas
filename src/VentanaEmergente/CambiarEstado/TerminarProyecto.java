@@ -12,13 +12,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import pruebas.CambiarEstado;
 import pruebas.Inicio1;
 
 public class TerminarProyecto extends javax.swing.JDialog {
@@ -26,165 +23,20 @@ public class TerminarProyecto extends javax.swing.JDialog {
     TextAutoCompleter ac1;
     public String numEmpleado;
 
-    public void terminarProyecto(String proyecto) {
-        try {
-            Connection con;
-            Conexion con1 = new Conexion();
-            con = con1.getConnection();
-            Statement st = con.createStatement();
-            Statement st3 = con.createStatement();
-            Statement st5 = con.createStatement();
-            Statement st7 = con.createStatement();
-            Statement st9 = con.createStatement();
-            Statement st11 = con.createStatement();
-            Statement st13 = con.createStatement();
+    public int terminarProyecto(String proyecto, Connection con) throws SQLException {
+        String sql2 = "update planos set Estado = ? where Proyecto = ?";
+        PreparedStatement pst = con.prepareStatement(sql2);
+        
+        pst.setString(1, "PROYECTO FINALIZADO");
+        pst.setString(2, proyecto);
 
-            String sql = "select Plano, Proyecto, Terminado from datos where Plano like '" + proyecto + "' and Terminado like 'NO'";
-            ResultSet rs = st.executeQuery(sql);
-            String plano;
-            String sql2 = "update datos set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
-            PreparedStatement pst = con.prepareStatement(sql2);
-            Date d = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat();
-            String fecha = sdf.format(d);
-            int n = 0;
-            while (rs.next()) {
-                plano = rs.getString("Proyecto");
-                pst.setString(1, fecha);
-                pst.setString(2, fecha);
-                pst.setString(3, "SI");
-                pst.setString(4, numEmpleado + "," + numEmpleado);
-                pst.setString(5, plano);
-
-                n = pst.executeUpdate();
-            }
-
-            String sql3 = "select Plano, Proyecto, Terminado from acabados where Plano like '" + proyecto + "' and Terminado like 'NO'";
-            ResultSet rs3 = st3.executeQuery(sql3);
-            String sql4 = "update acabados set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
-            PreparedStatement pst4 = con.prepareStatement(sql4);
-            int n1 = 0;
-            while (rs3.next()) {
-                plano = rs3.getString("Proyecto");
-                pst4.setString(1, fecha);
-                pst4.setString(2, fecha);
-                pst4.setString(3, "SI");
-                pst4.setString(4, numEmpleado + "," + numEmpleado);
-                pst4.setString(5, plano);
-
-                n1 = pst4.executeUpdate();
-            }
-
-            String sql5 = "select Plano, Proyecto, Terminado from calidad where Plano like '" + proyecto + "' and Terminado like 'NO'";
-            ResultSet rs5 = st5.executeQuery(sql5);
-            String sql6 = "update calidad set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ?, Tratamiento = ? where Proyecto = ?";
-            PreparedStatement pst6 = con.prepareStatement(sql6);
-            int n2 = 0;
-            while (rs5.next()) {
-                plano = rs5.getString("Proyecto");
-                pst6.setString(1, fecha);
-                pst6.setString(2, fecha);
-                pst6.setString(3, "SI");
-                pst6.setString(4, numEmpleado + "," + numEmpleado);
-                pst6.setString(5, "NO");
-                pst6.setString(6, plano);
-
-                n2 = pst6.executeUpdate();
-            }
-
-            String sql7 = "select Plano, Proyecto, Terminado from cnc where Plano like '" + proyecto + "' and Terminado like 'NO'";
-            ResultSet rs7 = st7.executeQuery(sql7);
-            String sql8 = "update cnc set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
-            PreparedStatement pst8 = con.prepareStatement(sql8);
-            int n3 = 0;
-            while (rs7.next()) {
-                plano = rs7.getString("Proyecto");
-                pst8.setString(1, fecha);
-                pst8.setString(2, fecha);
-                pst8.setString(3, "SI");
-                pst8.setString(4, numEmpleado + "," + numEmpleado);
-                pst8.setString(5, plano);
-
-                n3 = pst8.executeUpdate();
-            }
-
-            String sql9 = "select Plano, Proyecto, Terminado from fresadora where Plano like '" + proyecto + "' and Terminado like 'NO'";
-            ResultSet rs9 = st9.executeQuery(sql9);
-            String sql10 = "update fresadora set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
-            PreparedStatement pst10 = con.prepareStatement(sql10);
-            int n4 = 0;
-            while (rs9.next()) {
-                plano = rs9.getString("Proyecto");
-                pst10.setString(1, fecha);
-                pst10.setString(2, fecha);
-                pst10.setString(3, "SI");
-                pst10.setString(4, numEmpleado + "," + numEmpleado);
-                pst10.setString(5, plano);
-
-                n4 = pst10.executeUpdate();
-            }
-
-            String sql11 = "select Plano, Proyecto, Terminado from torno where Plano like '" + proyecto + "' and Terminado like 'NO'";
-            ResultSet rs11 = st11.executeQuery(sql11);
-            String sql12 = "update torno set FechaInicio = ?, FechaFinal = ?, Terminado = ?, Empleado = ? where Proyecto = ?";
-            PreparedStatement pst12 = con.prepareStatement(sql12);
-            int n5 = 0;
-            while (rs11.next()) {
-                plano = rs11.getString("Proyecto");
-                pst12.setString(1, fecha);
-                pst12.setString(2, fecha);
-                pst12.setString(3, "SI");
-                pst12.setString(4, numEmpleado + "," + numEmpleado);
-                pst12.setString(5, plano);
-
-                n5 = pst12.executeUpdate();
-            }
-
-            String sql13 = "select Plano, Proyecto, Prioridad from planos where Proyecto like '" + proyecto + "'";
-            ResultSet rs13 = st13.executeQuery(sql13);
-            revisarPlanos rev = new revisarPlanos();
-            int n6 = 0;
-            while (rs13.next()) {
-                String pl = rs13.getString("Plano");
-                String pr = rs13.getString("Proyecto");
-                rev.terminarPlano(pl, pr, numEmpleado, null, "integracion", con);
-            }
-
-            if (n > 0 && n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0 && n5 > 0) {
-                JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
-            } else {
-                if (n6 > 0) {
-                    String faltantes = "";
-                    if (n < 1) {
-                        faltantes += "\nCortes";
-                    }
-                    if (n1 < 1) {
-                        faltantes += "\nAcabados";
-                    }
-                    if (n2 < 1) {
-                        faltantes += "\nCalidad";
-                    }
-                    if (n3 < 1) {
-                        faltantes += "\nCnc";
-                    }
-                    if (n4 < 1) {
-                        faltantes += "\nFresadora";
-                    }
-                    if (n5 < 1) {
-                        faltantes += "\nTorno";
-                    }
-
-                    JOptionPane.showMessageDialog(this, "DATOS GUARDADOS, SIN CAMBIOS EN: "
-                            + faltantes);
-                } else {
-                    JOptionPane.showMessageDialog(this, "DATOS GUARDADOS");
-                }
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, "ERROR: " + e, "ERROR", JOptionPane.ERROR_MESSAGE);
-            Logger.getLogger(CambiarEstado.class.getName()).log(Level.SEVERE, null, e);
+        int n = pst.executeUpdate();
+        
+        if (n < 1) {
+            JOptionPane.showMessageDialog(this, "Error al guardar datos","Error", JOptionPane.ERROR_MESSAGE);
+            return 0;
         }
+        return 1;
     }
 
     private static void cargarUbicacionVentana(Frame ventana) {
@@ -361,8 +213,17 @@ public class TerminarProyecto extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        for (int i = 0; i < Tabla1.getRowCount() ;i++) {
-            terminarProyecto(Tabla1.getValueAt(i, 0).toString());
+        try {
+            Connection con = new Conexion().getConnection();
+            int cont = 0;
+            for (int i = 0; i < Tabla1.getRowCount() ;i++) {
+                cont += terminarProyecto(Tabla1.getValueAt(i, 0).toString(), con);
+            }
+            if (cont == Tabla1.getRowCount()) {
+                JOptionPane.showMessageDialog(this, "Proyecto terminado con exito");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

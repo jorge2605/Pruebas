@@ -1,7 +1,6 @@
 package pruebas;
 import Conexiones.Conexion;
 import Conexiones.ConexionChat;
-import Modelo.ModeloExcel;
 import VentanaEmergente.CalidadNew.inicioCalidad;
 import VentanaEmergente.Costos.Costeo;
 import VentanaEmergente.Diseño.InicioDiseño;
@@ -48,12 +47,9 @@ import java.util.prefs.Preferences;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
-import java.awt.Dimension;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import javax.swing.table.DefaultTableModel;
 
 public final class Inicio1 extends javax.swing.JFrame implements Observer,ActionListener{
 

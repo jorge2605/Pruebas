@@ -449,7 +449,6 @@ public class CancelarOrden extends javax.swing.JDialog implements ActionListener
                         Connection con;
                         Conexion con1 = new Conexion();
                         con = con1.getConnection();
-                        Statement st = con.createStatement();
                         int n = 0;
                         for (int i = 0; i < Tabla1.getSelectedRows().length; i++) {
                             String sql = "update requisiciones set OC = ?, Notas = ? where Id = ?";
@@ -457,7 +456,7 @@ public class CancelarOrden extends javax.swing.JDialog implements ActionListener
 
                             pst.setString(1, "CANCELADO");
                             pst.setString(2, "CANCELADO");
-                            pst.setString(3, Tabla1.getValueAt(i, 0).toString());
+                            pst.setString(3, Tabla1.getValueAt(Tabla1.getSelectedRows()[i], 0).toString());
 
                             n += pst.executeUpdate();
                         }

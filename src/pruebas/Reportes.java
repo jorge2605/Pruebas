@@ -57,11 +57,11 @@ public class Reportes extends javax.swing.JInternalFrame {
             new Object [][] {
             },
             new String [] {
-                "Proyecto", "Plano", "Cantidad", "Tipo de material", "Medidas", "Tiempo", "Realizado por", "Fecha"
+                "Proyecto", "Plano", "Cantidad", "Tipo de material", "Tiempo", "Realizado por", "Fecha"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
@@ -132,9 +132,8 @@ public class Reportes extends javax.swing.JInternalFrame {
                         }
                         datos[2] = cantidad;
                         datos[3] = tipo;
-                        datos[4] = "0";
-                        datos[5] = rs3.getString("Cronometro");
-                        datos[6] = rs3.getString("Empleado");
+                        datos[4] = rs3.getString("Cronometro");
+                        datos[5] = rs3.getString("Empleado");
                         miModelo.addRow(datos);
                 }
             }else if(btnTerminados.isSelected()){
@@ -158,11 +157,11 @@ public class Reportes extends javax.swing.JInternalFrame {
 //                        System.out.println("Exception: "+e);
                     }
                     if(turno){
-                       if((fec.equals(s) && (hor >= 7 && hor <= 17))){
+                       if((fec.equals(s) && (hor >= 6 && hor <= 16))){
                         sen1 = true;
                         }
                     }else {
-                        if((fec.equals(s) && (hor >=19)) || (fecSig.equals(s)) && (hor >= 19 || hor <= 6)){
+                        if((fec.equals(s) && (hor >=16)) || (fecSig.equals(s)) && (hor >= 16 || hor <= 5)){
                             sen1 = true;
                         }
                     }
@@ -181,10 +180,9 @@ public class Reportes extends javax.swing.JInternalFrame {
                         }
                         datos[2] = cantidad;
                         datos[3] = tipo;
-                        datos[4] = "0";
-                        datos[5] = rs3.getString("Cronometro");
-                        datos[6] = rs3.getString("Empleado");
-                        datos[7] = rs3.getString("FechaFinal");
+                        datos[4] = rs3.getString("Cronometro");
+                        datos[5] = rs3.getString("Empleado");
+                        datos[6] = rs3.getString("FechaFinal");
                         miModelo.addRow(datos);
                     }
                 }
@@ -506,11 +504,11 @@ public class Reportes extends javax.swing.JInternalFrame {
 
             },
             new String [] {
-                "Proyecto", "Plano", "Cantidad", "Tipo de material", "Medidas", "Tiempo", "Realizado por", "Fecha"
+                "Proyecto", "Plano", "Cantidad", "Tipo de material", "Tiempo", "Realizado por", "Fecha"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -594,13 +592,13 @@ public class Reportes extends javax.swing.JInternalFrame {
         buttonGroup1.add(turno1);
         turno1.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
         turno1.setSelected(true);
-        turno1.setText("Turno No. 1 (07:00 a 17:00)");
+        turno1.setText("Turno No. 1 (06:00 a 16:00)");
         jPanel12.add(turno1);
 
         turno2.setBackground(new java.awt.Color(153, 204, 255));
         buttonGroup1.add(turno2);
         turno2.setFont(new java.awt.Font("Roboto", 1, 14)); // NOI18N
-        turno2.setText("Turno No.2 (18:00 a 06:00)");
+        turno2.setText("Turno No.2 (16:00 a 02:00)");
         jPanel12.add(turno2);
 
         jPanel9.add(jPanel12, java.awt.BorderLayout.PAGE_END);
@@ -679,7 +677,7 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         btnCortes.setBackground(new java.awt.Color(255, 255, 255));
         btnCortes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/segueta.png"))); // NOI18N
-        btnCortes.setToolTipText("ACABADOS");
+        btnCortes.setToolTipText("Cortes");
         btnCortes.setBorder(null);
         btnCortes.setBorderPainted(false);
         btnCortes.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -707,7 +705,7 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         btnFresa.setBackground(new java.awt.Color(255, 255, 255));
         btnFresa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fresadora.png"))); // NOI18N
-        btnFresa.setToolTipText("FRESADORA");
+        btnFresa.setToolTipText("Fresadora");
         btnFresa.setBorder(null);
         btnFresa.setBorderPainted(false);
         btnFresa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -735,7 +733,7 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         btnCnc.setBackground(new java.awt.Color(255, 255, 255));
         btnCnc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/maquina.png"))); // NOI18N
-        btnCnc.setToolTipText("CNC");
+        btnCnc.setToolTipText("Cnc");
         btnCnc.setBorder(null);
         btnCnc.setBorderPainted(false);
         btnCnc.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -763,7 +761,7 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         btnTorno.setBackground(new java.awt.Color(255, 255, 255));
         btnTorno.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/torno.png"))); // NOI18N
-        btnTorno.setToolTipText("TORNO");
+        btnTorno.setToolTipText("Torno");
         btnTorno.setBorder(null);
         btnTorno.setBorderPainted(false);
         btnTorno.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -791,7 +789,7 @@ public class Reportes extends javax.swing.JInternalFrame {
 
         btnAcabados.setBackground(new java.awt.Color(255, 255, 255));
         btnAcabados.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/Acabados.png"))); // NOI18N
-        btnAcabados.setToolTipText("ACABADOS");
+        btnAcabados.setToolTipText("Acbados");
         btnAcabados.setBorder(null);
         btnAcabados.setBorderPainted(false);
         btnAcabados.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -1001,9 +999,9 @@ public class Reportes extends javax.swing.JInternalFrame {
                     }catch(Exception e){
 //                        System.out.println("Exception: "+e);
                     }
-                    if ((fec.equals(f) && (hor >= 7 && hor <= 17))) {
+                    if ((fec.equals(f) && (hor >= 5 && hor <= 16))) {
                         cont1++;
-                    }else if((fec.equals(f) && (hor >=19)) || (fecSig.equals(f)) && (hor >= 19 || hor <= 6)){
+                    }else if((fec.equals(f) && (hor >=16)) || (fecSig.equals(f)) && (hor >= 16 || hor <= 5)){
                         cont6++;
                     }
                 }
@@ -1024,9 +1022,9 @@ public class Reportes extends javax.swing.JInternalFrame {
                     }catch(Exception e){
 //                        System.out.println("Exception: "+e);
                     }
-                    if ((fec.equals(f) && (hor >= 7 && hor <= 17))) {
+                    if ((fec.equals(f) && (hor >= 6 && hor <= 16))) {
                         cont2++;
-                    }else if((fec.equals(f) && (hor >=19)) || (fecSig.equals(f)) && (hor >= 19 || hor <= 6)){
+                    }else if((fec.equals(f) && (hor >= 16)) || (fecSig.equals(f)) && (hor >= 16 || hor <= 5)){
                         cont22++;
                     }
                 }
@@ -1046,9 +1044,9 @@ public class Reportes extends javax.swing.JInternalFrame {
                     }catch(Exception e){
 //                        System.out.println("Exception: "+e);
                     }
-                    if ((fec.equals(f) && (hor >= 7 && hor <= 17))) {
+                    if ((fec.equals(f) && (hor >= 6 && hor <= 16))) {
                         cont3++;
-                    }else if((fec.equals(f) && (hor >=19)) || (fecSig.equals(f)) && (hor >= 19 || hor <= 6)){
+                    }else if((fec.equals(f) && (hor >=16)) || (fecSig.equals(f)) && (hor >= 16 || hor <= 5)){
                         cont33++;
                     }
                 }
@@ -1068,9 +1066,9 @@ public class Reportes extends javax.swing.JInternalFrame {
                     }catch(Exception e){
 //                        System.out.println("Exception: "+e);
                     }
-                    if ((fec.equals(f) && (hor >= 7 && hor <= 17))) {
+                    if ((fec.equals(f) && (hor >= 6 && hor <= 16))) {
                         cont4++;
-                    }else if((fec.equals(f) && (hor >=19)) || (fecSig.equals(f)) && (hor >= 19 || hor <= 6)){
+                    }else if((fec.equals(f) && (hor >=16)) || (fecSig.equals(f)) && (hor >= 16 || hor <= 5)){
                         cont44++;
                     }
                 }
@@ -1090,9 +1088,9 @@ public class Reportes extends javax.swing.JInternalFrame {
                     }catch(Exception e){
 //                        System.out.println("Exception: "+e);
                     }
-                    if ((fec.equals(f) && (hor >= 7 && hor <= 17))) {
+                    if ((fec.equals(f) && (hor >= 6 && hor <= 16))) {
                         cont5++;
-                    }else if((fec.equals(f) && (hor >=19)) || (fecSig.equals(f)) && (hor >= 19 || hor <= 6)){
+                    }else if((fec.equals(f) && (hor >=16)) || (fecSig.equals(f)) && (hor >= 16 || hor <= 5)){
                         cont55++;
                     }
                 }

@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JOptionPane;
 
 public class CostoHoras extends javax.swing.JDialog {
@@ -26,14 +28,18 @@ public class CostoHoras extends javax.swing.JDialog {
                 Connection con;
                 Conexion con1 = new Conexion(); 
                 con = con1.getConnection();
-                String sql = "insert into costohoras(MODDiseño,MODElectromecanico,MODHerramentista,MOI,CI) values(?,?,?,?,?)";
+                String sql = "insert into costohoras(MODDiseño,MODElectromecanico,MODHerramentista,MOI,CI, Fecha) values(?,?,?,?,?,?)";
                 PreparedStatement pst = con.prepareStatement(sql);
 
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date d = new Date();
+                
                 pst.setString(1, txtMOD.getText());
                 pst.setString(2, txtModElec.getText());
                 pst.setString(3, txtMODHerr.getText());
                 pst.setString(4, txtMOI.getText());
                 pst.setString(5, txtCI.getText());
+                pst.setString(6, sdf.format(d));
 
                 int n = pst.executeUpdate();
 
